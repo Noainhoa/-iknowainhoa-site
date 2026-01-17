@@ -3,7 +3,7 @@ export default function Home() {
     <main style={{ padding: 32, fontFamily: "system-ui" }}>
       <h1 style={{ fontSize: 32, fontWeight: 700 }}>iknowainhoa</h1>
       <p style={{ marginTop: 12, fontSize: 18 }}>
-        This page is deployed from my own files.
+        This page is deployed from my own files. Yo soy Ainhoa.
       </p>
     </main>
   );
