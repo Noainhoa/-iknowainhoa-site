@@ -2,8 +2,9 @@
 title: "Blue, The Great Dane"
 date: "2026-01-17"
 description: "My Journey to my own reactivity."
+slug: "blue"
 draft: false
-slug: "blue-the-great-dane-and-what-he-taught-me"
+tags: ["dogs", "training", "grief"]
 
 ---
 
