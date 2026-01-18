@@ -3,7 +3,7 @@ title: "Website Redesign Service"
 description: "Get a modern, fast, custom website built with Next.js and Tailwind CSS."
 date: "2026-01-10"
 slug: "website-redesign"
-draft: false
+draft: true
 tags: ["services", "web design"]
 ---
 

@@ -17,7 +17,6 @@ export default async function LandingPage({
 
   return (
     <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 800 }}>
-      <h1 style={{ fontSize: 40, fontWeight: 700 }}>{landing.title}</h1>
       <div
         style={{ marginTop: 24, lineHeight: 1.7 }}
         dangerouslySetInnerHTML={{ __html: landing.html }}

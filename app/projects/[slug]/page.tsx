@@ -17,7 +17,6 @@ export default async function ProjectPage({
 
   return (
     <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 800 }}>
-      <h1 style={{ fontSize: 40, fontWeight: 700 }}>{project.title}</h1>
       {project.date ? (
         <div style={{ opacity: 0.6, marginTop: 8 }}>{project.date}</div>
       ) : null}

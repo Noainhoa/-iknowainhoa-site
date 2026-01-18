@@ -3,7 +3,7 @@ title: "Getting Started with Next.js 16"
 description: "A guide to building fast, modern web apps with the latest Next.js version."
 date: "2026-01-18"
 slug: "nextjs-16-guide"
-draft: false
+draft: true
 tags: ["nextjs", "web", "tutorial"]
 ---
 

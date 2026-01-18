@@ -17,7 +17,6 @@ export default async function OfferPage({
 
   return (
     <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 800 }}>
-      <h1 style={{ fontSize: 40, fontWeight: 700 }}>{offer.title}</h1>
       {offer.date ? (
         <div style={{ opacity: 0.6, marginTop: 8 }}>{offer.date}</div>
       ) : null}

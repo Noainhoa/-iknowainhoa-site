@@ -3,7 +3,7 @@ title: "My Portfolio Site"
 description: "A custom-built portfolio showcasing my work and ideas."
 date: "2026-01-15"
 slug: "portfolio-site"
-draft: false
+draft: true
 tags: ["projects", "web", "design"]
 ---
 
