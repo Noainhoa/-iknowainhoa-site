@@ -1,18 +1,25 @@
 import Link from "next/link";
-import { getAllBlogPosts } from "../../lib/content";
+import { getAll } from "@/lib/content";
 
-export default function BlogIndex() {
-  const posts = getAllBlogPosts();
+export default async function BlogIndex() {
+  const posts = await getAll("blog");
 
   return (
-    <main style={{ padding: 24 }}>
-      <h1>Blog</h1>
-      <ul style={{ marginTop: 16 }}>
+    <main style={{ padding: 32, fontFamily: "system-ui" }}>
+      <h1 style={{ fontSize: 40, fontWeight: 700 }}>Blog</h1>
+
+      <ul style={{ marginTop: 24 }}>
         {posts.map((p) => (
-          <li key={p.slug} style={{ marginBottom: 12 }}>
-            <Link href={`/blog/${p.slug}`}>{p.title}</Link>
-            {p.date ? <div style={{ opacity: 0.7, fontSize: 14 }}>{p.date}</div> : null}
-            {p.excerpt ? <div style={{ marginTop: 4 }}>{p.excerpt}</div> : null}
+          <li key={p.slug} style={{ marginBottom: 16 }}>
+            <Link href={`/blog/${p.slug}`} style={{ fontSize: 20 }}>
+              {p.title}
+            </Link>
+            {p.description ? (
+              <div style={{ opacity: 0.8, marginTop: 4 }}>{p.description}</div>
+            ) : null}
+            {p.date ? (
+              <div style={{ opacity: 0.6, marginTop: 4 }}>{p.date}</div>
+            ) : null}
           </li>
         ))}
       </ul>
