@@ -5,6 +5,6 @@ export const site = {
   email: "hello@iknowainhoa.com",
   socials: {
     linkedin: "https://linkedin.com/in/ainhoaferrandis",
-    instagram: "https://instagram.com/iknowainhoa",
+    instagram: "https://instagram.com/ainhoaferrandisperea",
   },
 };
