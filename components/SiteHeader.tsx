@@ -36,6 +36,9 @@ export default function SiteHeader() {
         <Link href="/products" className="hover:opacity-60" style={navLinkStyle}>
           Products
         </Link>
+        <Link href="/contact" className="hover:opacity-60" style={navLinkStyle}>
+          Contact
+        </Link>
       </nav>
     </header>
   );
