@@ -13,6 +13,9 @@ import html from "remark-html";
 
 export type Collection = "blog" | "products" | "projects" | "landing";
 
+export type ProductType = "physical" | "digital" | "app" | "service";
+export type ProductStatus = "available" | "beta" | "sold-out" | "idea";
+
 export type ContentItem = {
   title: string;
   description?: string;
@@ -22,6 +25,14 @@ export type ContentItem = {
   tags?: string[];
   coverImage?: string;
   cta?: { text: string; link: string };
+  // Product-specific fields (optional, for products collection)
+  type?: ProductType;
+  status?: ProductStatus;
+  price?: string;
+  ctaText?: string;
+  ctaUrl?: string;
+  waitlistUrl?: string;
+  features?: (string | { name: string; description: string })[]; // backward compatible: stored in metadata
   body: string; // raw markdown
   html: string; // rendered html
   filePath: string; // absolute path (useful for debugging)
@@ -153,6 +164,13 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
       tags: (data.tags as string[]) || [],
       coverImage: data.coverImage as string | undefined,
       cta: (data.cta as { text: string; link: string }) || undefined,
+      type: data.type as ProductType | undefined,
+      status: data.status as ProductStatus | undefined,
+      price: data.price as string | undefined,
+      ctaText: data.ctaText as string | undefined,
+      ctaUrl: data.ctaUrl as string | undefined,
+      waitlistUrl: data.waitlistUrl as string | undefined,
+      features: (data.features as any[]) || undefined,
       filePath: fullPath,
       metadata: data,
     });
@@ -197,6 +215,13 @@ export async function getBySlug(
       tags: (data.tags as string[]) || [],
       coverImage: data.coverImage as string | undefined,
       cta: (data.cta as { text: string; link: string }) || undefined,
+      type: data.type as ProductType | undefined,
+      status: data.status as ProductStatus | undefined,
+      price: data.price as string | undefined,
+      ctaText: data.ctaText as string | undefined,
+      ctaUrl: data.ctaUrl as string | undefined,
+      waitlistUrl: data.waitlistUrl as string | undefined,
+      features: (data.features as any[]) || undefined,
       body: content,
       html: renderedHtml,
       filePath: fullPath,

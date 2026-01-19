@@ -5,6 +5,20 @@ date: "2026-01-10"
 slug: "website-redesign"
 draft: false
 tags: ["services", "web design"]
+type: "service"
+status: "available"
+price: "Custom quote"
+ctaText: "Get a Quote"
+ctaUrl: "https://example.com/contact"
+features:
+  - name: "Custom Design"
+    description: "Built from scratch for your brand"
+  - name: "High Performance"
+    description: "Optimized for speed and SEO"
+  - name: "Mobile-First"
+    description: "Responsive design on all devices"
+  - name: "Future-Proof"
+    description: "Modern tech stack (Next.js, React, TypeScript)"
 cta: {"text": "Get a Quote", "link": "https://example.com/contact"}
 ---
 

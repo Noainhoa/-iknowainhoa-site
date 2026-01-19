@@ -2,6 +2,27 @@ import Link from "next/link";
 import Image from "next/image";
 import { getAllProducts } from "@/lib/content";
 
+const typeColors: Record<string, string> = {
+  physical: "#8b5cf6",
+  digital: "#3b82f6",
+  app: "#10b981",
+  service: "#f59e0b",
+};
+
+const statusColors: Record<string, string> = {
+  available: "#10b981",
+  beta: "#3b82f6",
+  "sold-out": "#ef4444",
+  idea: "#6b7280",
+};
+
+const statusLabels: Record<string, string> = {
+  available: "Available",
+  beta: "Beta",
+  "sold-out": "Sold Out",
+  idea: "Coming Soon",
+};
+
 export default async function ProductsIndex() {
   const products = await getAllProducts();
 
@@ -26,7 +47,7 @@ export default async function ProductsIndex() {
             }}
           >
             {/* Always render a placeholder block */}
-            <div style={{ width: "100%", height: 160, overflow: "hidden", backgroundColor: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: "100%", height: 160, overflow: "hidden", backgroundColor: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
               {o.coverImage ? (
                 <Image
                   src={o.coverImage}
@@ -39,9 +60,42 @@ export default async function ProductsIndex() {
               ) : (
                 <div style={{ fontSize: 12, opacity: 0.4, textAlign: "center" }}>No image</div>
               )}
+              {/* Badges overlay */}
+              <div style={{ position: "absolute", top: 8, left: 8, right: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {o.type && (
+                  <span style={{
+                    backgroundColor: typeColors[o.type] || "#6b7280",
+                    color: "#fff",
+                    padding: "4px 8px",
+                    borderRadius: 4,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    textTransform: "capitalize",
+                  }}>
+                    {o.type}
+                  </span>
+                )}
+                {o.status && (
+                  <span style={{
+                    backgroundColor: statusColors[o.status] || "#6b7280",
+                    color: "#fff",
+                    padding: "4px 8px",
+                    borderRadius: 4,
+                    fontSize: 11,
+                    fontWeight: 500,
+                  }}>
+                    {statusLabels[o.status]}
+                  </span>
+                )}
+              </div>
             </div>
             <div style={{ padding: 16 }}>
               <h2 style={{ fontSize: 18, fontWeight: 600, margin: "0 0 8px 0" }}>{o.title}</h2>
+              {o.price && (
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#000", marginBottom: 8 }}>
+                  {o.price}
+                </div>
+              )}
               {o.description ? (
                 <div style={{ opacity: 0.7, marginBottom: 8, fontSize: 14, lineHeight: 1.5 }}>{o.description}</div>
               ) : null}
