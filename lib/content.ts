@@ -11,7 +11,7 @@ import matter from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
 
-export type Collection = "blog" | "offers" | "projects" | "landing";
+export type Collection = "blog" | "products" | "projects" | "landing";
 
 export type ContentItem = {
   title: string;
@@ -211,16 +211,16 @@ export async function getBySlug(
  * Convenience wrappers (use whichever style your pages import).
  */
 export const getAllBlogSlugs = () => listSlugs("blog");
-export const getAllOfferSlugs = () => listSlugs("offers");
+export const getAllProductSlugs = () => listSlugs("products");
 export const getAllProjectSlugs = () => listSlugs("projects");
 export const getAllLandingSlugs = () => listSlugs("landing");
 
 export const getBlogPost = (slug: string) => getBySlug("blog", slug);
-export const getOffer = (slug: string) => getBySlug("offers", slug);
+export const getProduct = (slug: string) => getBySlug("products", slug);
 export const getProject = (slug: string) => getBySlug("projects", slug);
 export const getLanding = (slug: string) => getBySlug("landing", slug);
 
 export const getAllBlog = () => getAll("blog");
-export const getAllOffers = () => getAll("offers");
+export const getAllProducts = () => getAll("products");
 export const getAllProjects = () => getAll("projects");
 export const getAllLanding = () => getAll("landing");
