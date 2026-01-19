@@ -1,11 +1,14 @@
-# My First Post
+---
+title: "BCheflue, The Great Dane"
+date: "2026-01-17"
+description: "My Journey to my own reactivity."
+slug: "blue"
+draft: true
+tags: ["dogs", "training", "grief"]
 
-This is a test post to check out the blog setup.
+---
 
-## Getting Started
+# Blue, The Great Dane
 
-- [x] Create the post file
-- [ ] Add content
-- [ ] Publish
-
-Feel free to replace this with your actual blog post content!
+Write here...
+bla bla bla

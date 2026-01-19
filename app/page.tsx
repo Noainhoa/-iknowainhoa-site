@@ -23,18 +23,11 @@ export default function Home() {
           <p style={{ marginTop: 8, opacity: 0.6 }}>Explore my recent work and experiments.</p>
         </div>
 
-        <div style={{ marginBottom: 24 }}>
+        <div>
           <Link href="/offers" style={{ fontSize: 24, fontWeight: 600, textDecoration: "none", color: "#0070f3" }}>
             → Offers
           </Link>
           <p style={{ marginTop: 8, opacity: 0.6 }}>Check out what I'm offering.</p>
-        </div>
-
-        <div>
-          <Link href="/l/test" style={{ fontSize: 24, fontWeight: 600, textDecoration: "none", color: "#0070f3" }}>
-            → Test Landing
-          </Link>
-          <p style={{ marginTop: 8, opacity: 0.6 }}>A test landing page.</p>
         </div>
       </nav>
     </main>

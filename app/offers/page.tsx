@@ -9,6 +9,11 @@ export default async function OffersIndex() {
     <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 1000, margin: "0 auto" }}>
       <h1 style={{ fontSize: 40, fontWeight: 700 }}>Offers</h1>
 
+      {offers.length === 0 ? (
+        <div style={{ marginTop: 64, textAlign: "center", opacity: 0.6 }}>
+          <p style={{ fontSize: 18 }}>No offers yet</p>
+        </div>
+      ) : (
       <div style={{ marginTop: 32, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
         {offers.map((o) => (
           <Link
@@ -56,6 +61,7 @@ export default async function OffersIndex() {
           </Link>
         ))}
       </div>
+      )}
     </main>
   );
 }
