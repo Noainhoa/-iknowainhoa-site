@@ -25,17 +25,21 @@ export default async function ProjectsIndex() {
               color: "inherit",
             }}
           >
-            {p.coverImage && (
-              <div style={{ width: "100%", height: 160, overflow: "hidden", backgroundColor: "#f0f0f0" }}>
+            {/* Always render a placeholder block */}
+            <div style={{ width: "100%", height: 160, overflow: "hidden", backgroundColor: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {p.coverImage ? (
                 <Image
                   src={p.coverImage}
                   alt={p.title}
                   width={280}
                   height={160}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  onError={() => null}
                 />
-              </div>
-            )}
+              ) : (
+                <div style={{ fontSize: 12, opacity: 0.4, textAlign: "center" }}>No image</div>
+              )}
+            </div>
             <div style={{ padding: 16 }}>
               <h2 style={{ fontSize: 18, fontWeight: 600, margin: "0 0 8px 0" }}>{p.title}</h2>
               {p.description ? (
