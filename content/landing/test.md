@@ -3,7 +3,6 @@ title: "Test Landing Page"
 description: "This is a test landing page."
 slug: "test"
 draft: false
-coverImage: "/images/landing/hero.jpg"
 ---
 
 # Test Landing Page

@@ -5,7 +5,6 @@ date: "2026-01-18"
 slug: "nextjs-16-guide"
 draft: false
 tags: ["nextjs", "web", "tutorial"]
-coverImage: "/images/blog/nextjs-16.jpg"
 ---
 
 # Getting Started with Next.js 16

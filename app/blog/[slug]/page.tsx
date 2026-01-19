@@ -1,37 +1,96 @@
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 import Image from "next/image";
-import { getBySlug, listSlugs } from "@/lib/content";
+import { getBlogPost, getAllBlogSlugs } from "@/lib/content";
 
 export async function generateStaticParams() {
-  const slugs = await listSlugs("blog");
+  const slugs = await getAllBlogSlugs();
   return slugs.map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string } | Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getBlogPost(slug);
+
+  if (!post) {
+    return { title: "Not Found" };
+  }
+
+  return {
+    title: post.title,
+    description: post.description,
+    openGraph: post.coverImage
+      ? { images: [post.coverImage] }
+      : undefined,
+  };
 }
 
 export default async function BlogPostPage({
   params,
 }: {
-  // Next 16 can provide params as a Promise (Server Components).
   params: { slug: string } | Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;      // ✅ unwrap
-  const post = await getBySlug("blog", slug);
+  const { slug } = await params;
+  const post = await getBlogPost(slug);
   if (!post) return notFound();
 
   return (
-    <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 800, margin: "0 auto" }}>
+    <main style={{ padding: "32px 24px", fontFamily: "system-ui", maxWidth: 800, margin: "0 auto" }}>
+      {/* Cover Image */}
       {post.coverImage && (
-        <div style={{ marginBottom: 24, overflow: "hidden", borderRadius: 8 }}>
+        <div style={{ marginBottom: 32, overflow: "hidden", borderRadius: 8, aspectRatio: "16/9" }}>
           <Image
             src={post.coverImage}
             alt={post.title || ""}
             width={800}
-            height={400}
-            style={{ width: "100%", height: "auto" }}
+            height={450}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
       )}
-      {post.date ? <div style={{ opacity: 0.6, marginBottom: 16, fontSize: 14 }}>{post.date}</div> : null}
-      <div style={{ marginTop: 24, lineHeight: 1.7, prose: true }} dangerouslySetInnerHTML={{ __html: post.html }} />
+
+      {/* Header */}
+      <article>
+        <h1 style={{ fontSize: "2.5rem", fontWeight: 700, margin: "0 0 16px 0", lineHeight: 1.2 }}>
+          {post.title}
+        </h1>
+
+        {/* Meta Info */}
+        <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 24, fontSize: 14, opacity: 0.7 }}>
+          {post.date && <time dateTime={post.date}>{post.date}</time>}
+          {post.tags && post.tags.length > 0 && (
+            <div style={{ display: "flex", gap: 8 }}>
+              {post.tags.map((tag) => (
+                <span key={tag} style={{ backgroundColor: "#f0f0f0", padding: "4px 8px", borderRadius: 4 }}>
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        {post.description && (
+          <p style={{ fontSize: "1.125rem", lineHeight: 1.6, marginBottom: 32, opacity: 0.8 }}>
+            {post.description}
+          </p>
+        )}
+
+        {/* Body */}
+        <div
+          className="prose"
+          style={{
+            marginTop: 32,
+            lineHeight: 1.8,
+            fontSize: "1rem",
+          }}
+          dangerouslySetInnerHTML={{ __html: post.html }}
+        />
+      </article>
     </main>
   );
 }

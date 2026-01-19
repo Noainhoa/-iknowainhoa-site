@@ -19,23 +19,10 @@ export default async function BlogIndex() {
           <Link
             key={p.slug}
             href={`/blog/${p.slug}`}
+            className="block rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
             style={{
               textDecoration: "none",
               color: "inherit",
-              borderRadius: 8,
-              overflow: "hidden",
-              border: "1px solid #e5e5e5",
-              transition: "transform 0.2s, box-shadow 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget;
-              el.style.transform = "translateY(-4px)";
-              el.style.boxShadow = "0 8px 16px rgba(0,0,0,0.1)";
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget;
-              el.style.transform = "translateY(0)";
-              el.style.boxShadow = "none";
             }}
           >
             {p.coverImage && (

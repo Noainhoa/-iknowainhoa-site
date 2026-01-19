@@ -5,7 +5,6 @@ date: "2026-01-15"
 slug: "portfolio-site"
 draft: false
 tags: ["projects", "web", "design"]
-coverImage: "/images/projects/portfolio.jpg"
 ---
 
 # My Portfolio Site

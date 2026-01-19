@@ -1,10 +1,32 @@
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 import Image from "next/image";
 import { getProject, getAllProjectSlugs } from "@/lib/content";
 
 export async function generateStaticParams() {
   const slugs = await getAllProjectSlugs();
   return slugs.map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string } | Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const project = await getProject(slug);
+
+  if (!project) {
+    return { title: "Not Found" };
+  }
+
+  return {
+    title: project.title,
+    description: project.description,
+    openGraph: project.coverImage
+      ? { images: [project.coverImage] }
+      : undefined,
+  };
 }
 
 export default async function ProjectPage({
