@@ -5,6 +5,8 @@ date: "2026-01-10"
 slug: "website-redesign"
 draft: true
 tags: ["services", "web design"]
+coverImage: "/images/offers/redesign.jpg"
+cta: {"text": "Get a Quote", "link": "https://example.com/contact"}
 ---
 
 # Website Redesign Service

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { getProject, getAllProjectSlugs } from "@/lib/content";
 
 export async function generateStaticParams() {
@@ -16,9 +17,20 @@ export default async function ProjectPage({
   if (!project) return notFound();
 
   return (
-    <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 800 }}>
+    <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 800, margin: "0 auto" }}>
+      {project.coverImage && (
+        <div style={{ marginBottom: 24, overflow: "hidden", borderRadius: 8 }}>
+          <Image
+            src={project.coverImage}
+            alt={project.title || ""}
+            width={800}
+            height={400}
+            style={{ width: "100%", height: "auto" }}
+          />
+        </div>
+      )}
       {project.date ? (
-        <div style={{ opacity: 0.6, marginTop: 8 }}>{project.date}</div>
+        <div style={{ opacity: 0.6, marginBottom: 16, fontSize: 14 }}>{project.date}</div>
       ) : null}
       <div
         style={{ marginTop: 24, lineHeight: 1.7 }}

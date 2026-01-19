@@ -4,8 +4,8 @@ description: ""
 slug: ""
 price: ""
 stripe_url: ""
-draft: true
----
+draft: truecoverImage: "/images/offers/cover.jpg"
+cta: {"text": "Learn More", "link": "#"}---
 
 # Offer
 

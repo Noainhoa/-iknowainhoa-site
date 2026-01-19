@@ -20,9 +20,12 @@ export type ContentItem = {
   slug: string;
   draft?: boolean;
   tags?: string[];
+  coverImage?: string;
+  cta?: { text: string; link: string };
   body: string; // raw markdown
   html: string; // rendered html
   filePath: string; // absolute path (useful for debugging)
+  metadata?: Record<string, any>; // all frontmatter data
 };
 
 export type ContentIndexItem = Omit<ContentItem, "body" | "html">;
@@ -148,7 +151,10 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
       slug,
       draft,
       tags: (data.tags as string[]) || [],
+      coverImage: data.coverImage as string | undefined,
+      cta: (data.cta as { text: string; link: string }) || undefined,
       filePath: fullPath,
+      metadata: data,
     });
   }
 
@@ -189,9 +195,12 @@ export async function getBySlug(
       slug,
       draft: false,
       tags: (data.tags as string[]) || [],
+      coverImage: data.coverImage as string | undefined,
+      cta: (data.cta as { text: string; link: string }) || undefined,
       body: content,
       html: renderedHtml,
       filePath: fullPath,
+      metadata: data,
     };
   }
 
