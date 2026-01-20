@@ -3,10 +3,26 @@ import nodemailer from "nodemailer";
 
 export const runtime = "nodejs";
 
-const requiredEnv = ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"] as const;
+/**
+ * IMPORTANT (hosting reality check): many serverless hosts block outbound SMTP (ports 465/587).
+ * To make the contact form work everywhere, this route supports:
+ *   1) SMTP via OVH (or any SMTP server) using nodemailer
+ *   2) Resend HTTP API (recommended for Vercel/Netlify)
+ */
 
-function missingEnvKeys() {
-  return requiredEnv.filter((key) => !process.env[key]);
+function hasSmtpConfig() {
+  return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+}
+
+function hasResendConfig() {
+  return Boolean(process.env.RESEND_API_KEY);
+}
+
+function missingConfigHint() {
+  if (!hasSmtpConfig() && !hasResendConfig()) {
+    return "Set SMTP_HOST/SMTP_USER/SMTP_PASS (SMTP) OR RESEND_API_KEY (Resend).";
+  }
+  return "";
 }
 
 function validatePayload(payload: unknown) {
@@ -48,9 +64,8 @@ function validatePayload(payload: unknown) {
 }
 
 export async function POST(request: Request) {
-  const missingKeys = missingEnvKeys();
-  if (missingKeys.length > 0) {
-    console.error("Contact form missing env keys:", missingKeys);
+  if (!hasSmtpConfig() && !hasResendConfig()) {
+    console.error("Contact form missing configuration.", { hint: missingConfigHint() });
     return NextResponse.json({ ok: false, error: "Server configuration incomplete." }, { status: 500 });
   }
 
@@ -66,27 +81,59 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const parsedPort = Number(process.env.SMTP_PORT);
-  const port = Number.isFinite(parsedPort) && parsedPort > 0 ? parsedPort : 465;
-  const secure = port === 465;
-
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
   try {
+    const to = process.env.CONTACT_TO || process.env.SMTP_USER || "";
+    const text = `Name: ${name}\nEmail: ${email}\n\n${message}`;
+
+    // Preferred path for serverless platforms: Resend HTTP API
+    if (hasResendConfig()) {
+      const from = process.env.CONTACT_FROM || "Contact <onboarding@resend.dev>";
+
+      const resendResponse = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from,
+          to: [to],
+          reply_to: email,
+          subject: `[Contact] ${subject}`,
+          text,
+        }),
+      });
+
+      if (!resendResponse.ok) {
+        const details = await resendResponse.text().catch(() => "");
+        console.error("Resend send failed", { status: resendResponse.status, details });
+        throw new Error("Resend send failed");
+      }
+
+      return NextResponse.json({ ok: true });
+    }
+
+    // Fallback path: SMTP via nodemailer (works on VPS / OVH hosting, but often blocked on serverless)
+    const parsedPort = Number(process.env.SMTP_PORT);
+    const port = Number.isFinite(parsedPort) && parsedPort > 0 ? parsedPort : 465;
+    const secure = port === 465;
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port,
+      secure,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
     await transporter.sendMail({
       from: `"iknowainhoa.com" <${process.env.SMTP_USER}>`,
-      to: process.env.CONTACT_TO || process.env.SMTP_USER,
+      to,
       replyTo: email,
       subject: `[Contact] ${subject}`,
-      text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+      text,
     });
 
     return NextResponse.json({ ok: true });
