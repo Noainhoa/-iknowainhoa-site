@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
     /\/xmlrpc\.php/,    // XML-RPC (common attack)
     /\/shell/,          // Shell upload attempts
     /\/upload/,         // Suspicious upload directories
-    /\/(test|temp|tmp|backup|bak)/,  // Test/backup directories
+    /^\/(test|temp|tmp|backup|bak)(\/|$)/,  // Test/backup directories at root only
   ];
 
   const isSpamPattern = spamPatterns.some((pattern) => pattern.test(pathname));
@@ -29,9 +29,6 @@ export function middleware(request: NextRequest) {
   if (pathname === "/") {
     // Define allowed query parameters for the homepage (none in this case)
     const allowedParams = new Set<string>();
-
-    // Check if there are any query parameters
-    const hasQueryParams = url.search.length > 0;
     
     // Extract current query params
     const currentParams = Array.from(url.searchParams.keys());

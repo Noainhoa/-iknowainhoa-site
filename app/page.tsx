@@ -27,7 +27,7 @@ export default function Home() {
           <Link href="/products" style={{ fontSize: 24, fontWeight: 600, textDecoration: "none", color: "#0070f3" }}>
             → Products
           </Link>
-          <p style={{ marginTop: 8, opacity: 0.6 }}>Check out what I'm offering.</p>
+          <p style={{ marginTop: 8, opacity: 0.6 }}>Check out what I am offering.</p>
         </div>
       </nav>
     </main>

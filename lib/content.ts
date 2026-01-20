@@ -8,6 +8,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import type { GrayMatterFile } from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
 
@@ -16,7 +17,9 @@ export type Collection = "blog" | "products" | "projects" | "landing";
 export type ProductType = "physical" | "digital" | "app" | "service";
 export type ProductStatus = "available" | "beta" | "sold-out" | "idea";
 
-export type ContentItem = {
+export type FeatureItem = string | { name: string; description: string };
+
+type SharedContentFields = {
   title: string;
   description?: string;
   date?: string;
@@ -32,11 +35,16 @@ export type ContentItem = {
   ctaText?: string;
   ctaUrl?: string;
   waitlistUrl?: string;
-  features?: (string | { name: string; description: string })[]; // backward compatible: stored in metadata
+  features?: FeatureItem[]; // backward compatible: stored in metadata
+};
+
+export type Frontmatter = Partial<SharedContentFields> & Record<string, unknown>;
+
+export type ContentItem = SharedContentFields & {
   body: string; // raw markdown
   html: string; // rendered html
   filePath: string; // absolute path (useful for debugging)
-  metadata?: Record<string, any>; // all frontmatter data
+  metadata?: Frontmatter; // all frontmatter data
 };
 
 export type ContentIndexItem = Omit<ContentItem, "body" | "html">;
@@ -52,6 +60,13 @@ function stripMd(p: string) {
 
 function toPosix(p: string) {
   return p.split(path.sep).join("/");
+}
+
+type ParsedFrontmatter = GrayMatterFile<string> & { data: Frontmatter };
+
+function parseFrontmatter(raw: string): ParsedFrontmatter {
+  const parsed = matter(raw);
+  return { ...parsed, data: parsed.data as Frontmatter };
 }
 
 // If no frontmatter slug exists, fallback to file path relative to the collection directory.
@@ -75,9 +90,51 @@ function computeSlug(
 }
 
 // Draft rule: frontmatter draft:true OR filename starts with "draft-"
-function isDraft(fullPath: string, data: any) {
+function isDraft(fullPath: string, data: Frontmatter) {
   const base = path.basename(fullPath).toLowerCase();
-  return Boolean(data?.draft) || base.startsWith("draft-");
+  return data?.draft === true || base.startsWith("draft-");
+}
+
+function readTags(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((tag): tag is string => typeof tag === "string");
+}
+
+function readCta(value: unknown): { text: string; link: string } | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const maybe = value as { text?: unknown; link?: unknown };
+  if (typeof maybe.text === "string" && typeof maybe.link === "string") {
+    return { text: maybe.text, link: maybe.link };
+  }
+  return undefined;
+}
+
+function readFeatures(value: unknown): FeatureItem[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const normalized: FeatureItem[] = [];
+
+  for (const entry of value) {
+    if (typeof entry === "string") {
+      normalized.push(entry);
+      continue;
+    }
+
+    if (
+      entry &&
+      typeof entry === "object" &&
+      "name" in entry &&
+      "description" in entry &&
+      typeof (entry as { name: unknown }).name === "string" &&
+      typeof (entry as { description: unknown }).description === "string"
+    ) {
+      normalized.push({
+        name: (entry as { name: string }).name,
+        description: (entry as { description: string }).description,
+      });
+    }
+  }
+
+  return normalized.length ? normalized : undefined;
 }
 
 async function existsDir(p: string) {
@@ -123,7 +180,7 @@ export async function listSlugs(collection: Collection) {
   const slugs: string[] = [];
   for (const fullPath of files) {
     const raw = await fs.readFile(fullPath, "utf8");
-    const { data } = matter(raw);
+    const { data } = parseFrontmatter(raw);
 
     if (isDraft(fullPath, data)) continue;
 
@@ -148,7 +205,7 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
   const items: ContentIndexItem[] = [];
   for (const fullPath of files) {
     const raw = await fs.readFile(fullPath, "utf8");
-    const { data, content } = matter(raw);
+    const { data } = parseFrontmatter(raw);
 
     const draft = isDraft(fullPath, data);
     if (draft) continue;
@@ -161,16 +218,16 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
       date: data.date as string | undefined,
       slug,
       draft,
-      tags: (data.tags as string[]) || [],
+      tags: readTags(data.tags),
       coverImage: data.coverImage as string | undefined,
-      cta: (data.cta as { text: string; link: string }) || undefined,
+      cta: readCta(data.cta),
       type: data.type as ProductType | undefined,
       status: data.status as ProductStatus | undefined,
       price: data.price as string | undefined,
       ctaText: data.ctaText as string | undefined,
       ctaUrl: data.ctaUrl as string | undefined,
       waitlistUrl: data.waitlistUrl as string | undefined,
-      features: (data.features as any[]) || undefined,
+      features: readFeatures(data.features),
       filePath: fullPath,
       metadata: data,
     });
@@ -196,7 +253,7 @@ export async function getBySlug(
 
   for (const fullPath of files) {
     const raw = await fs.readFile(fullPath, "utf8");
-    const { data, content } = matter(raw);
+    const { data, content } = parseFrontmatter(raw);
 
     const computed = computeSlug(collectionDir, fullPath, data.slug);
     if (computed !== slug) continue;
@@ -212,16 +269,16 @@ export async function getBySlug(
       date: data.date as string | undefined,
       slug,
       draft: false,
-      tags: (data.tags as string[]) || [],
+      tags: readTags(data.tags),
       coverImage: data.coverImage as string | undefined,
-      cta: (data.cta as { text: string; link: string }) || undefined,
+      cta: readCta(data.cta),
       type: data.type as ProductType | undefined,
       status: data.status as ProductStatus | undefined,
       price: data.price as string | undefined,
       ctaText: data.ctaText as string | undefined,
       ctaUrl: data.ctaUrl as string | undefined,
       waitlistUrl: data.waitlistUrl as string | undefined,
-      features: (data.features as any[]) || undefined,
+      features: readFeatures(data.features),
       body: content,
       html: renderedHtml,
       filePath: fullPath,

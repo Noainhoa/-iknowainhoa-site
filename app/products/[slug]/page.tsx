@@ -195,7 +195,7 @@ export default async function ProductPage({
         <section style={{ marginTop: 64 }}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: 24 }}>Features</h2>
           <ul style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, listStyle: "none", padding: 0 }}>
-            {product.features.map((feature: any, idx: number) => (
+            {product.features.map((feature, idx) => (
               <li key={idx} style={{ padding: 16, backgroundColor: "#f9f9f9", borderRadius: 8 }}>
                 {typeof feature === "object" && feature !== null && "name" in feature ? (
                   <>

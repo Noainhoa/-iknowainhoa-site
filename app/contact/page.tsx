@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { ContactForm } from "./ContactForm";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -17,8 +18,8 @@ export default function ContactPage() {
         {/* Intro Text */}
         <section style={{ marginBottom: 48 }}>
           <p style={{ fontSize: "1.125rem", lineHeight: 1.8, opacity: 0.8, margin: 0 }}>
-            I'm always interested in hearing from you—whether it's about a project idea, a collaboration opportunity,
-            feedback on something I've written, or just to connect.
+            I am always interested in hearing from you—whether it is about a project idea, a collaboration opportunity,
+            feedback on something I have written, or just to connect.
           </p>
         </section>
 
@@ -118,126 +119,10 @@ export default function ContactPage() {
             Send a Message
           </h2>
           <p style={{ opacity: 0.7, marginBottom: 24, lineHeight: 1.6 }}>
-            Prefer a contact form? Fill out the details below and I'll get back to you as soon as I can.
+            Prefer a contact form? Fill out the details below and I will get back to you as soon as I can.
           </p>
 
-          <form
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 16,
-              padding: 24,
-              backgroundColor: "#f9f9f9",
-              borderRadius: 8,
-            }}
-            action={`mailto:${site.email}`}
-            method="POST"
-            encType="text/plain"
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <label htmlFor="name" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
-                Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                required
-                style={{
-                  padding: "10px 12px",
-                  border: "1px solid #e5e5e5",
-                  borderRadius: 4,
-                  fontFamily: "inherit",
-                  fontSize: "1rem",
-                }}
-              />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <label htmlFor="email" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                style={{
-                  padding: "10px 12px",
-                  border: "1px solid #e5e5e5",
-                  borderRadius: 4,
-                  fontFamily: "inherit",
-                  fontSize: "1rem",
-                }}
-              />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <label htmlFor="subject" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
-                Subject
-              </label>
-              <input
-                type="text"
-                id="subject"
-                name="subject"
-                style={{
-                  padding: "10px 12px",
-                  border: "1px solid #e5e5e5",
-                  borderRadius: 4,
-                  fontFamily: "inherit",
-                  fontSize: "1rem",
-                }}
-              />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <label htmlFor="message" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
-                Message
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                required
-                rows={6}
-                style={{
-                  padding: "10px 12px",
-                  border: "1px solid #e5e5e5",
-                  borderRadius: 4,
-                  fontFamily: "inherit",
-                  fontSize: "1rem",
-                  resize: "vertical",
-                }}
-              />
-            </div>
-
-            <button
-              type="submit"
-              style={{
-                padding: "12px 24px",
-                backgroundColor: "#000",
-                color: "#fff",
-                border: "none",
-                borderRadius: 4,
-                fontWeight: 600,
-                fontSize: "1rem",
-                cursor: "pointer",
-                transition: "opacity 0.2s",
-                alignSelf: "flex-start",
-              }}
-              className="hover:opacity-80"
-            >
-              Send Message
-            </button>
-          </form>
-
-          <p style={{ fontSize: "0.85rem", opacity: 0.6, marginTop: 16 }}>
-            Note: This form uses the mailto: protocol. Your email client will open with your message, or you can
-            email me directly at{" "}
-            <a href={`mailto:${site.email}`} style={{ color: "inherit", textDecoration: "underline" }}>
-              {site.email}
-            </a>
-            .
-          </p>
+          <ContactForm />
         </section>
 
         {/* Response Time */}
@@ -246,7 +131,7 @@ export default function ContactPage() {
             Response Time
           </h3>
           <p style={{ margin: 0, opacity: 0.8, lineHeight: 1.6 }}>
-            I try to respond to all messages within 48 hours. If it's urgent, feel free to reach out on social media
+            I try to respond to all messages within 48 hours. If it is urgent, feel free to reach out on social media
             or LinkedIn as well.
           </p>
         </section>
