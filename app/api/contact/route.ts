@@ -21,11 +21,28 @@ function validatePayload(payload: unknown) {
     }
   }
 
+  const trimmedEmail = String(email).trim();
+  // Basic email sanity check
+  const emailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail);
+  if (!emailValid) {
+    return { error: "Invalid email address." };
+  }
+
+  const trimmedSubject = String(subject).trim();
+  if (trimmedSubject.length > 200) {
+    return { error: "Subject is too long." };
+  }
+
+  const trimmedMessage = String(message).trim();
+  if (trimmedMessage.length > 5000) {
+    return { error: "Message is too long." };
+  }
+
   return {
     name: String(name).trim(),
-    email: String(email).trim(),
-    subject: String(subject).trim(),
-    message: String(message).trim(),
+    email: trimmedEmail,
+    subject: trimmedSubject,
+    message: trimmedMessage,
     company: typeof company === "string" ? company.trim() : "",
   };
 }
@@ -47,10 +64,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  const port = Number(process.env.SMTP_PORT) || 465;
+  const secure = port === 465;
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: Number(process.env.SMTP_PORT) === 465,
+    port,
+    secure,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -59,8 +79,8 @@ export async function POST(request: Request) {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: process.env.CONTACT_TO,
+      from: `"iknowainhoa.com" <${process.env.SMTP_USER}>`,
+      to: process.env.CONTACT_TO || process.env.SMTP_USER,
       replyTo: email,
       subject: `[Contact] ${subject}`,
       text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
