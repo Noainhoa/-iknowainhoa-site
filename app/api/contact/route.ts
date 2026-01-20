@@ -3,10 +3,10 @@ import nodemailer from "nodemailer";
 
 export const runtime = "nodejs";
 
-const requiredEnv = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "CONTACT_TO"] as const;
+const requiredEnv = ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"] as const;
 
-function hasRequiredEnv() {
-  return requiredEnv.every((key) => process.env[key]);
+function missingEnvKeys() {
+  return requiredEnv.filter((key) => !process.env[key]);
 }
 
 function validatePayload(payload: unknown) {
@@ -48,7 +48,9 @@ function validatePayload(payload: unknown) {
 }
 
 export async function POST(request: Request) {
-  if (!hasRequiredEnv()) {
+  const missingKeys = missingEnvKeys();
+  if (missingKeys.length > 0) {
+    console.error("Contact form missing env keys:", missingKeys);
     return NextResponse.json({ ok: false, error: "Server configuration incomplete." }, { status: 500 });
   }
 
@@ -64,7 +66,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const port = Number(process.env.SMTP_PORT) || 465;
+  const parsedPort = Number(process.env.SMTP_PORT);
+  const port = Number.isFinite(parsedPort) && parsedPort > 0 ? parsedPort : 465;
   const secure = port === 465;
 
   const transporter = nodemailer.createTransport({
