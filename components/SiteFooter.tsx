@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
-import { DonateSlider } from "./DonateSlider";
 
 export default function SiteFooter() {
   const currentYear = new Date().getFullYear();
@@ -21,10 +20,6 @@ export default function SiteFooter() {
           margin: "0 auto",
         }}
       >
-        <div style={{ marginBottom: 32 }}>
-          <DonateSlider />
-        </div>
-
         <div
           style={{
             display: "grid",
@@ -93,6 +88,9 @@ export default function SiteFooter() {
                 >
                   Products
                 </Link>
+              </li>
+              <li>
+                <span style={{ opacity: 0.7 }}>Support</span>
               </li>
             </ul>
           </div>
