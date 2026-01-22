@@ -82,13 +82,13 @@ export default function SiteHeader() {
 
       <style jsx>{`
         .header {
-          border-bottom: 1px solid #e5e5e5;
+          border-bottom: 1px solid var(--border);
           padding: 14px 20px;
           font-family: system-ui, -apple-system, sans-serif;
           position: sticky;
           top: 0;
           z-index: 20;
-          background: #fff;
+          background: var(--background);
         }
         .inner {
           max-width: 1100px;
@@ -121,8 +121,8 @@ export default function SiteHeader() {
           width: 42px;
           height: 42px;
           border-radius: 12px;
-          border: 1px solid #e5e5e5;
-          background: #fff;
+          border: 1px solid var(--border);
+          background: var(--card);
           display: none;
           align-items: center;
           justify-content: center;
@@ -136,12 +136,12 @@ export default function SiteHeader() {
           width: 18px;
           height: 2px;
           border-radius: 4px;
-          background: #111;
+          background: var(--foreground);
         }
         .backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(0, 0, 0, 0.4);
+          background: rgba(0, 0, 0, 0.45);
           z-index: 18;
         }
         .mobile-panel {
@@ -150,7 +150,7 @@ export default function SiteHeader() {
           right: 0;
           height: 100vh;
           width: min(80vw, 320px);
-          background: #fff;
+          background: var(--background);
           z-index: 19;
           display: flex;
           flex-direction: column;

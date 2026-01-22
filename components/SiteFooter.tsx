@@ -7,10 +7,10 @@ export default function SiteFooter() {
   return (
     <footer
       style={{
-        borderTop: "1px solid #e5e5e5",
+        borderTop: "1px solid var(--border)",
         padding: "48px 32px",
         fontFamily: "system-ui, -apple-system, sans-serif",
-        backgroundColor: "#fafafa",
+        backgroundColor: "var(--muted)",
         marginTop: 64,
       }}
     >
@@ -188,10 +188,10 @@ export default function SiteFooter() {
         <div
           style={{
             paddingTop: 24,
-            borderTop: "1px solid #e5e5e5",
+            borderTop: "1px solid var(--border)",
             textAlign: "center",
             fontSize: "0.85rem",
-            opacity: 0.6,
+            opacity: 0.7,
           }}
         >
           <p style={{ margin: 0 }}>
