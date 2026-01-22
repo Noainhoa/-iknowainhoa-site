@@ -1,4 +1,4 @@
-import { DonateSlider } from "@/components/DonateSlider";
+import { SupportCard } from "@/components/SupportCard";
 import { getAllProducts } from "@/lib/content";
 import Link from "next/link";
 
@@ -14,7 +14,7 @@ export default async function SupportPage() {
           If you’ve enjoyed the writing, guides, or resources here, you can send a pay-what-you-want thank you.
         </p>
         <div className="mt-2">
-          <DonateSlider variant="minimal" buttonText="Send a thank you" hideBadges />
+          <SupportCard buttonText="Send a thank you" />
         </div>
       </section>
 
