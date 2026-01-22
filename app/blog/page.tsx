@@ -34,7 +34,6 @@ export default async function BlogIndex() {
                   width={280}
                   height={160}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  onError={() => null}
                 />
               ) : (
                 <div style={{ fontSize: 12, opacity: 0.4, textAlign: "center" }}>No image</div>
