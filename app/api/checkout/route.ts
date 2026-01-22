@@ -3,7 +3,8 @@ import Stripe from "stripe";
 
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
 const successUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/thanks`;
-const SUPPORTED_CURRENCIES = new Set(["eur", "usd", "gbp"]);
+type SupportedCurrency = "eur" | "usd" | "gbp";
+const SUPPORTED_CURRENCIES = new Set<SupportedCurrency>(["eur", "usd", "gbp"]);
 
 const stripe = stripeSecret
   ? new Stripe(stripeSecret, { apiVersion: "2025-12-15.clover" })
@@ -20,9 +21,9 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null);
   const amount = Number(body?.dynamicAmount);
-  const currency =
-    typeof body?.currency === "string" && SUPPORTED_CURRENCIES.has(body.currency)
-      ? (body.currency as Stripe.Checkout.SessionCreateParams.LineItem.PriceData.Currency)
+  const currency: SupportedCurrency =
+    typeof body?.currency === "string" && SUPPORTED_CURRENCIES.has(body.currency as SupportedCurrency)
+      ? (body.currency as SupportedCurrency)
       : "eur";
   const cancelUrl = typeof body?.cancelUrl === "string" && body.cancelUrl.trim()
     ? body.cancelUrl
