@@ -6,7 +6,7 @@ const successUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000
 const SUPPORTED_CURRENCIES = new Set(["eur", "usd", "gbp"]);
 
 const stripe = stripeSecret
-  ? new Stripe(stripeSecret, { apiVersion: "2024-12-18.acacia" })
+  ? new Stripe(stripeSecret, { apiVersion: "2025-12-15.clover" })
   : null;
 
 export async function POST(request: Request) {
