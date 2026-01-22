@@ -90,7 +90,13 @@ export default function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <span style={{ opacity: 0.7 }}>Support</span>
+                <Link
+                  href="/support"
+                  style={{ textDecoration: "none", color: "inherit", opacity: 0.7, display: "inline-flex", alignItems: "center", gap: 6 }}
+                  className="hover:opacity-100"
+                >
+                  Support <span aria-hidden="true" style={{ fontSize: "1.05em" }}>♥</span>
+                </Link>
               </li>
             </ul>
           </div>

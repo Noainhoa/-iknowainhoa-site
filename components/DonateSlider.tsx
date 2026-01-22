@@ -6,9 +6,20 @@ import { CreditCard, BadgeCheck, Link as LinkIcon } from "lucide-react";
 type Props = {
   /** Optional page URL to return to on cancel; defaults to current location. */
   cancelUrl?: string;
+  /** Layout variant; compact/minimal reduce padding and badges. */
+  variant?: "default" | "compact" | "minimal";
+  /** Override button label. */
+  buttonText?: string;
+  /** Hide payment method badges. */
+  hideBadges?: boolean;
 };
 
-export function DonateSlider({ cancelUrl }: Props) {
+export function DonateSlider({
+  cancelUrl,
+  variant = "default",
+  buttonText = "Support my Journey",
+  hideBadges = false,
+}: Props) {
   const [amount, setAmount] = useState<number | "">("");
   const [loading, setLoading] = useState(false);
   const currencies = ["eur", "usd", "gbp"] as const;
@@ -71,9 +82,14 @@ export function DonateSlider({ cancelUrl }: Props) {
   }
 
   return (
-    <div className="w-full max-w-xl rounded-2xl border border-gray-200 bg-white/60 p-6 shadow-sm backdrop-blur">
+    <div
+      className={[
+        "w-full rounded-2xl border border-gray-200 bg-white/60 shadow-sm backdrop-blur",
+        variant === "compact" ? "p-4 max-w-lg" : variant === "minimal" ? "p-4 max-w-md" : "p-6 max-w-xl",
+      ].join(" ")}
+    >
       <div className="mb-4 flex items-center justify-between">
-        <div className="text-sm font-medium text-gray-600">Pay what you want</div>
+        <div className="text-sm font-medium text-gray-700">Pay what you want</div>
         <div className="text-xs text-gray-500 uppercase">{currency}</div>
       </div>
 
@@ -109,23 +125,28 @@ export function DonateSlider({ cancelUrl }: Props) {
         <button
           onClick={handleCheckout}
           disabled={loading}
-          className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-xl bg-black px-5 text-base font-semibold text-white transition hover:translate-y-[-1px] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+          className={[
+            "group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-xl bg-black px-5 text-base font-semibold text-white transition",
+            "hover:translate-y-[-1px] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60",
+            variant !== "default" ? "mt-1" : "",
+          ].join(" ")}
         >
-          {loading ? "Processing..." : "Support my Journey"}
+          {loading ? "Processing..." : buttonText}
         </button>
 
-        <div className="flex items-center gap-3 text-xs font-medium text-gray-600">
-          <span className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1">
-            <CreditCard size={14} /> Apple Pay
-          </span>
-          <span className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1">
-            <BadgeCheck size={14} /> Google Pay
-          </span>
-          <span className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1">
-            <LinkIcon size={14} /> Link
-          </span>
-          <span className="text-gray-400">Zero friction checkout</span>
-        </div>
+        {!hideBadges && (
+          <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-gray-600">
+            <span className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1">
+              <CreditCard size={14} /> Apple Pay
+            </span>
+            <span className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1">
+              <BadgeCheck size={14} /> Google Pay
+            </span>
+            <span className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1">
+              <LinkIcon size={14} /> Link
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
