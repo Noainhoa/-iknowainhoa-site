@@ -3,7 +3,7 @@ title: "Blue, The Great Dane"
 date: "2026-01-17"
 description: "My Journey to my own reactivity."
 slug: "blue"
-draft: true
+draft: false
 tags: ["dogs", "training", "grief"]
 
 ---
