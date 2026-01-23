@@ -229,7 +229,7 @@ If you would like early access when it exists, send me a note via the contact pa
 
 ---
 
-## Download the tracker
+### Download the tracker
 
 <div style="display:flex; flex-wrap:wrap; gap:12px; margin: 20px 0;">
   <a href="https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/edit?usp=sharing" style="display:inline-block; padding:12px 16px; border-radius:10px; background:#111827; color:#ffffff; font-weight:700; text-decoration:none;">
@@ -241,9 +241,17 @@ If you would like early access when it exists, send me a note via the contact pa
 </div>
 
 ### Prefer a direct download?
-- [Download XLSX](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=xlsx)
-- [Download PDF](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=pdf)
+- [Download Excel (.xlsx)](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=xlsx)
+- [Download CSV](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=csv)
+- [Download OpenDocument (.ods)](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=ods)
+
+### Preview the tracker (embed)
+<div style="margin:16px 0; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06);">
+  <iframe
+    src="https://docs.google.com/spreadsheets/d/e/2PACX-1vR2RrFYWZsXKbz68eF2VlWm1QO3QOlvDxw26o35Dls7DXvGVuDgoj2LsdBq7TF2xQ/pubhtml?gid=231693680&single=true&widget=true&headers=false"
+    style="width:100%; min-height:600px; border:0;"
+    loading="lazy"
+  ></iframe>
+</div>
 
 [Back to top](#top)
-
-[//]: # (This may be the most platform independent comment <a href="#top">Back to top</a>)
