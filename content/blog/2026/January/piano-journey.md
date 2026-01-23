@@ -21,7 +21,7 @@ I built this spreadsheet because Simply Piano is excellent at teaching lesson-by
 
 <div style="display:flex; flex-wrap:wrap; gap:12px; margin: 20px 0;">
   <a href="https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/edit?usp=sharing" style="display:inline-block; padding:12px 16px; border-radius:10px; background:#111827; color:#ffffff; font-weight:700; text-decoration:none;">
-    Download the free piano tracker (Google Sheets)
+    Open the free piano tracker (Google Sheets)
   </a>
   <a href="/support" style="display:inline-block; padding:12px 16px; border-radius:10px; background:#f3f4f6; color:#111827; font-weight:700; text-decoration:none; border:1px solid #e5e7eb;">
     If it helped, send a thank you
@@ -118,7 +118,9 @@ A record gives you perspective.
 ### The “pen and paper” tracker that started it
 This is what my practice tracking looked like before the spreadsheet: a calendar where I circled practice days, and a simple progress sheet.
 
-![Handwritten piano progression notes and a 2025 practice calendar pinned to a wooden surface.](/images/blog/paper-tracker.jpg)
+<a href="/images/blog/paper-tracker.jpg">
+  ![Handwritten piano progression notes and a 2025 practice calendar pinned to a wooden surface.](/images/blog/paper-tracker.jpg)
+</a>
 
 On days that felt awful, that page reminded me: I showed up. That matters.
 
@@ -140,7 +142,9 @@ And because I have been there before, I trust that I will look back from the nex
 
 Here is the current version of the tracker dashboard.
 
-![Screenshot of the Timeline & Progression Dashboard showing Simply Piano levels, forecast dates, and a colour-coded monthly progress grid.](/images/blog/tracker-dashboard.jpeg)
+<a href="/images/blog/tracker-dashboard.jpeg">
+  ![Screenshot of the Timeline & Progression Dashboard showing Simply Piano levels, forecast dates, and a colour-coded monthly progress grid.](/images/blog/tracker-dashboard.jpeg)
+</a>
 
 ### What the tracker solves
 - It turns “I’m not progressing” into a **data question**.
@@ -157,8 +161,8 @@ Note: Simply Piano itself offers options like a Trinity College London certifica
 ### How to use it (5 steps)
 1. Open the Google Sheet and click **File → Make a copy**.
 2. Set your **start date**.
-3. Once a week, update the “completed / total” numbers for the current level.
-4. Look at the month-to-month trend (not day-to-day mood).
+3. Once a **month**, update the “completed / total” numbers for the current level.
+4. Look at the **month-to-month** trend (not day-to-day mood).
 5. If you are slowing down, do not punish yourself—adjust your plan.
 
 ### The only rule that matters
@@ -180,8 +184,8 @@ When adult beginners search for help, the underlying question is usually not “
 It is: **how do I not stop?**
 
 You see variations of that everywhere:
-- “How do you keep track of your progress?” citeturn0search0
-- “How do you stay motivated learning piano as an adult?” citeturn0search2
+- “How do you keep track of your progress?” 
+- “How do you stay motivated learning piano as an adult?” 
 
 The tracker helps because it does two things at once:
 - It creates a *north star* (“this is what I am chasing”).
@@ -232,11 +236,23 @@ If you would like early access when it exists, send me a note via the contact pa
 
 <div style="display:flex; flex-wrap:wrap; gap:12px; margin: 20px 0;">
   <a href="https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/edit?usp=sharing" style="display:inline-block; padding:12px 16px; border-radius:10px; background:#111827; color:#ffffff; font-weight:700; text-decoration:none;">
-    Download the free piano tracker (Google Sheets)
+    Open the free piano tracker (Google Sheets)
   </a>
   <a href="/support" style="display:inline-block; padding:12px 16px; border-radius:10px; background:#f3f4f6; color:#111827; font-weight:700; text-decoration:none; border:1px solid #e5e7eb;">
     If it helped, send a thank you
   </a>
 </div>
+
+### Prefer a direct download?
+<div style="display:flex; flex-wrap:wrap; gap:12px; margin: 12px 0;">
+  <a href="https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=xlsx" style="display:inline-block; padding:10px 14px; border-radius:10px; background:#111827; color:#ffffff; font-weight:700; text-decoration:none;">
+    Download XLSX
+  </a>
+  <a href="https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=pdf" style="display:inline-block; padding:10px 14px; border-radius:10px; background:#f3f4f6; color:#111827; font-weight:700; text-decoration:none; border:1px solid #e5e7eb;">
+    Download PDF
+  </a>
+</div>
+
+[Back to top](#top)
 
 <a href="#top">Back to top</a>
