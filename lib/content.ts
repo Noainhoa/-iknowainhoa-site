@@ -10,6 +10,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { GrayMatterFile } from "gray-matter";
 import { remark } from "remark";
+import remarkGfm from "remark-gfm";
 import html from "remark-html";
 
 export type Collection = "blog" | "products" | "projects" | "landing";
@@ -260,7 +261,7 @@ export async function getBySlug(
 
     if (isDraft(fullPath, data)) return null;
 
-    const processed = await remark().use(html).process(content);
+    const processed = await remark().use(remarkGfm).use(html).process(content);
     const renderedHtml = processed.toString();
 
     return {

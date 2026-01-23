@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import { getBlogPost, getAllBlogSlugs } from "@/lib/content";
 import { SupportCard } from "@/components/SupportCard";
+import { site } from "@/lib/site";
 
 export async function generateStaticParams() {
   const slugs = await getAllBlogSlugs();
@@ -21,12 +22,27 @@ export async function generateMetadata({
     return { title: "Not Found" };
   }
 
+  const canonical = `${site.url}/blog/${slug}`;
+
   return {
     title: post.title,
     description: post.description,
-    openGraph: post.coverImage
-      ? { images: [post.coverImage] }
-      : undefined,
+    alternates: {
+      canonical,
+    },
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      url: canonical,
+      type: "article",
+      images: post.coverImage ? [post.coverImage] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: post.coverImage ? [post.coverImage] : undefined,
+    },
   };
 }
 

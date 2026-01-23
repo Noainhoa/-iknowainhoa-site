@@ -6,13 +6,25 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: site.name,
+  metadataBase: new URL(site.url),
+  title: {
+    default: site.name,
+    template: `%s | ${site.name}`,
+  },
   description: site.description,
+  alternates: {
+    canonical: site.url,
+  },
   openGraph: {
     title: site.name,
     description: site.description,
     url: site.url,
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.name,
+    description: site.description,
   },
 };
 
