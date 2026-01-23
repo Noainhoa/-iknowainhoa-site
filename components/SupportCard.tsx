@@ -44,6 +44,12 @@ export function SupportCard({
 
   const symbol = SYMBOLS[currency];
 
+  function cycleCurrency() {
+    const idx = SUPPORTED.indexOf(currency);
+    const next = SUPPORTED[(idx + 1) % SUPPORTED.length];
+    setCurrency(next);
+  }
+
   async function handleCheckout() {
     const numericAmount = Number(displayAmount);
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
@@ -204,28 +210,33 @@ export function SupportCard({
         </button>
       </div>
 
-      {/* Currency pill aligned right */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
-        <select
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value as (typeof SUPPORTED)[number])}
+      {/* Currency hint / switcher */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 10,
+          fontSize: 12,
+          color: "rgba(107,114,128,0.9)",
+          gap: 6,
+          alignItems: "center",
+        }}
+      >
+        <span>Currency: {currency.toUpperCase()}</span>
+        <button
+          type="button"
+          onClick={cycleCurrency}
           style={{
-            borderRadius: 12,
-            border: "1px solid var(--border)",
-            padding: "8px 12px",
+            background: "transparent",
+            border: "none",
+            color: "#111827",
             fontWeight: 600,
-            fontSize: 13,
-            color: "var(--foreground)",
-            background: "var(--card)",
-            minWidth: 74,
+            cursor: "pointer",
+            textDecoration: "underline",
           }}
         >
-          {SUPPORTED.map((c) => (
-            <option key={c} value={c}>
-              {c.toUpperCase()}
-            </option>
-          ))}
-        </select>
+          Not yours?
+        </button>
       </div>
 
       {/* CTA */}
