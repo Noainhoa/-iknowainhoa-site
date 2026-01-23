@@ -73,8 +73,8 @@ export function SupportCard({
     }
   }
 
-  const padding = variant === "compact" ? 16 : 24;
-  const cardWidth = variant === "compact" ? 420 : 440;
+  const padding = variant === "compact" ? 14 : 20;
+  const cardWidth = variant === "compact" ? 400 : 440;
 
   return (
     <div
@@ -120,8 +120,16 @@ export function SupportCard({
         </p>
       </div>
 
-      {/* Presets + custom */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+      {/* Presets + custom + currency inline */}
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          marginBottom: 10,
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
         {presetAmounts.map((amount) => (
           <button
             key={amount}
@@ -194,21 +202,19 @@ export function SupportCard({
             "Other"
           )}
         </button>
-      </div>
 
-      {/* Currency select */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
         <select
           value={currency}
           onChange={(e) => setCurrency(e.target.value as (typeof SUPPORTED)[number])}
           style={{
-            borderRadius: 8,
+            borderRadius: 10,
             border: "1px solid var(--border)",
-            padding: "8px 10px",
+            padding: "10px 12px",
             fontWeight: 600,
             fontSize: 13,
             color: "var(--foreground)",
             background: "var(--card)",
+            minWidth: 72,
           }}
         >
           {SUPPORTED.map((c) => (
