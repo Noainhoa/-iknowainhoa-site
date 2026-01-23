@@ -44,6 +44,7 @@ export function SupportCard({
 
   const symbol = SYMBOLS[currency];
 
+  // Keep currency selection internal; Stripe will handle any card-side conversion.
   function cycleCurrency() {
     const idx = SUPPORTED.indexOf(currency);
     const next = SUPPORTED[(idx + 1) % SUPPORTED.length];
@@ -210,34 +211,7 @@ export function SupportCard({
         </button>
       </div>
 
-      {/* Currency hint / switcher */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: 10,
-          fontSize: 12,
-          color: "rgba(107,114,128,0.9)",
-          gap: 6,
-          alignItems: "center",
-        }}
-      >
-        <span>Currency: {currency.toUpperCase()}</span>
-        <button
-          type="button"
-          onClick={cycleCurrency}
-          style={{
-            background: "transparent",
-            border: "none",
-            color: "#111827",
-            fontWeight: 600,
-            cursor: "pointer",
-            textDecoration: "underline",
-          }}
-        >
-          Not yours?
-        </button>
-      </div>
+      {/* Currency hint intentionally hidden; Stripe handles conversion at checkout. */}
 
       {/* CTA */}
       <button
