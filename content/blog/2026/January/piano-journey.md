@@ -19,14 +19,11 @@ This post is my story, but it is also a practical guide: a free tracker you can 
 
 I built this spreadsheet because Simply Piano is excellent at teaching lesson-by-lesson, but I needed a way to see the *big picture*—especially during weeks when my hands felt clumsy and the app progress bar did not feel like real progress. (Simply Piano does show in-app progress; I just wanted a timeline view I could control.)
 
-<div style="display:flex; flex-wrap:wrap; gap:12px; margin: 20px 0;">
-  <a href="https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/edit?usp=sharing" style="display:inline-block; padding:12px 16px; border-radius:10px; background:#111827; color:#ffffff; font-weight:700; text-decoration:none;">
-    Open the free piano tracker (Google Sheets)
-  </a>
-  <a href="/support" style="display:inline-block; padding:12px 16px; border-radius:10px; background:#f3f4f6; color:#111827; font-weight:700; text-decoration:none; border:1px solid #e5e7eb;">
-    If it helped, send a thank you
-  </a>
-</div>
+**Open in Google Sheets:**  
+[Open the free piano tracker (Google Sheets)](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/edit?usp=sharing)
+
+**Say thanks:**  
+[Support / send a thank you](/support)
 
 **Quick start:** open the Sheet → **File → Make a copy** → set your start date → update once a week.
 
@@ -244,15 +241,9 @@ If you would like early access when it exists, send me a note via the contact pa
 </div>
 
 ### Prefer a direct download?
-<div style="display:flex; flex-wrap:wrap; gap:12px; margin: 12px 0;">
-  <a href="https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=xlsx" style="display:inline-block; padding:10px 14px; border-radius:10px; background:#111827; color:#ffffff; font-weight:700; text-decoration:none;">
-    Download XLSX
-  </a>
-  <a href="https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=pdf" style="display:inline-block; padding:10px 14px; border-radius:10px; background:#f3f4f6; color:#111827; font-weight:700; text-decoration:none; border:1px solid #e5e7eb;">
-    Download PDF
-  </a>
-</div>
+- [Download XLSX](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=xlsx)
+- [Download PDF](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=pdf)
 
 [Back to top](#top)
 
-<a href="#top">Back to top</a>
+[//]: # (This may be the most platform independent comment <a href="#top">Back to top</a>)
