@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
 import { getBlogPost, getAllBlogSlugs } from "@/lib/content";
-import { DonateSlider } from "@/components/DonateSlider";
+import { SupportCard } from "@/components/SupportCard";
 
 export async function generateStaticParams() {
   const slugs = await getAllBlogSlugs();
@@ -94,7 +94,7 @@ export default async function BlogPostPage({
       </article>
 
       <div style={{ marginTop: 64 }}>
-        <DonateSlider />
+        <SupportCard buttonText="Send a thank you" variant="compact" hideBadges />
       </div>
     </main>
   );

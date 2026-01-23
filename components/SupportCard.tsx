@@ -14,9 +14,16 @@ const SYMBOLS: Record<(typeof SUPPORTED)[number], string> = {
 type Props = {
   buttonText?: string;
   cancelUrl?: string;
+  variant?: "default" | "compact";
+  hideBadges?: boolean;
 };
 
-export function SupportCard({ buttonText = "Support with", cancelUrl }: Props) {
+export function SupportCard({
+  buttonText = "Support with",
+  cancelUrl,
+  variant = "default",
+  hideBadges = false,
+}: Props) {
   const [currency, setCurrency] = useState<(typeof SUPPORTED)[number]>("eur");
   const [selectedAmount, setSelectedAmount] = useState<number | null>(10);
   const [customAmount, setCustomAmount] = useState("");
@@ -66,27 +73,30 @@ export function SupportCard({ buttonText = "Support with", cancelUrl }: Props) {
     }
   }
 
+  const padding = variant === "compact" ? 16 : 24;
+  const cardWidth = variant === "compact" ? 420 : 440;
+
   return (
     <div
       style={{
         width: "100%",
-        maxWidth: 440,
+        maxWidth: cardWidth,
         margin: "0 auto",
-        border: "1px solid #e5e7eb",
+        border: "1px solid var(--border)",
         borderRadius: 16,
-        padding: 24,
-        background: "#ffffff",
+        padding,
+        background: "var(--card)",
         boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
       }}
     >
       {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: 20 }}>
+      <div style={{ textAlign: "center", marginBottom: 16 }}>
         <div
           style={{
             width: 40,
             height: 40,
             borderRadius: "50%",
-            background: "#f3f4f6",
+            background: "var(--muted)",
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
@@ -95,16 +105,23 @@ export function SupportCard({ buttonText = "Support with", cancelUrl }: Props) {
         >
           <Heart size={16} color="#111827" fill="#111827" />
         </div>
-        <h3 style={{ fontSize: 18, fontWeight: 600, margin: "0 0 4px 0", color: "#111827" }}>
+        <h3
+          style={{
+            fontSize: variant === "compact" ? 16 : 18,
+            fontWeight: 600,
+            margin: "0 0 4px 0",
+            color: "var(--foreground)",
+          }}
+        >
           Support my work
         </h3>
-        <p style={{ fontSize: 12, color: "#6b7280", margin: 0 }}>
+        <p style={{ fontSize: 12, color: "rgba(107,114,128,0.9)", margin: 0 }}>
           Your support helps me create more content
         </p>
       </div>
 
       {/* Presets + custom */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         {presetAmounts.map((amount) => (
           <button
             key={amount}
@@ -115,7 +132,7 @@ export function SupportCard({ buttonText = "Support with", cancelUrl }: Props) {
             }}
             style={{
               flex: 1,
-              padding: "10px 8px",
+              padding: variant === "compact" ? "9px 8px" : "10px 8px",
               borderRadius: 10,
               fontWeight: 600,
               fontSize: 14,
@@ -143,7 +160,7 @@ export function SupportCard({ buttonText = "Support with", cancelUrl }: Props) {
           }}
           style={{
             flex: 1,
-            padding: "10px 8px",
+            padding: variant === "compact" ? "9px 8px" : "10px 8px",
             borderRadius: 10,
             fontWeight: 600,
             fontSize: 14,
@@ -180,18 +197,18 @@ export function SupportCard({ buttonText = "Support with", cancelUrl }: Props) {
       </div>
 
       {/* Currency select */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
         <select
           value={currency}
           onChange={(e) => setCurrency(e.target.value as (typeof SUPPORTED)[number])}
           style={{
             borderRadius: 8,
-            border: "1px solid #e5e7eb",
+            border: "1px solid var(--border)",
             padding: "8px 10px",
             fontWeight: 600,
             fontSize: 13,
-            color: "#111827",
-            background: "#fff",
+            color: "var(--foreground)",
+            background: "var(--card)",
           }}
         >
           {SUPPORTED.map((c) => (
@@ -208,7 +225,7 @@ export function SupportCard({ buttonText = "Support with", cancelUrl }: Props) {
         disabled={!displayAmount || loading}
         style={{
           width: "100%",
-          padding: "14px 12px",
+          padding: variant === "compact" ? "12px 12px" : "14px 12px",
           borderRadius: 10,
           fontWeight: 700,
           fontSize: 15,
@@ -225,23 +242,25 @@ export function SupportCard({ buttonText = "Support with", cancelUrl }: Props) {
       </button>
 
       {/* Payment methods */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 10,
-          marginTop: 14,
-          color: "#6b7280",
-          fontSize: 11,
-        }}
-      >
-        <span>Apple Pay</span>
-        <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#e5e7eb" }} />
-        <span>Google Pay</span>
-        <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#e5e7eb" }} />
-        <span>Card</span>
-      </div>
+      {!hideBadges && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            marginTop: 14,
+            color: "#6b7280",
+            fontSize: 11,
+          }}
+        >
+          <span>Apple Pay</span>
+          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#e5e7eb" }} />
+          <span>Google Pay</span>
+          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#e5e7eb" }} />
+          <span>Card</span>
+        </div>
+      )}
     </div>
   );
 }
