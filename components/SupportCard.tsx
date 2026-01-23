@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Heart } from "lucide-react";
 
-const presetAmounts = [5, 10, 25, 50];
+const presetAmounts = [5, 10, 25];
 const SUPPORTED: Array<"eur" | "usd" | "gbp"> = ["eur", "usd", "gbp"];
 const SYMBOLS: Record<(typeof SUPPORTED)[number], string> = {
   eur: "€",
@@ -120,11 +120,11 @@ export function SupportCard({
         </p>
       </div>
 
-      {/* Presets + custom + currency inline */}
+      {/* Presets row */}
       <div
         style={{
           display: "flex",
-          gap: 8,
+          gap: 10,
           marginBottom: 10,
           alignItems: "center",
           flexWrap: "wrap",
@@ -202,19 +202,22 @@ export function SupportCard({
             "Other"
           )}
         </button>
+      </div>
 
+      {/* Currency pill aligned right */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
         <select
           value={currency}
           onChange={(e) => setCurrency(e.target.value as (typeof SUPPORTED)[number])}
           style={{
-            borderRadius: 10,
+            borderRadius: 12,
             border: "1px solid var(--border)",
-            padding: "10px 12px",
+            padding: "8px 12px",
             fontWeight: 600,
             fontSize: 13,
             color: "var(--foreground)",
             background: "var(--card)",
-            minWidth: 72,
+            minWidth: 74,
           }}
         >
           {SUPPORTED.map((c) => (
