@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Heart } from "lucide-react";
 
 const presetAmounts = [5, 10, 25];
-const SUPPORTED: Array<"eur" | "usd" | "gbp"> = ["eur", "usd", "gbp"];
-const SYMBOLS: Record<(typeof SUPPORTED)[number], string> = {
+type Currency = "eur" | "usd" | "gbp";
+const SYMBOLS: Record<Currency, string> = {
   eur: "€",
   usd: "$",
   gbp: "£",
@@ -24,7 +24,7 @@ export function SupportCard({
   variant = "default",
   hideBadges = false,
 }: Props) {
-  const [currency, setCurrency] = useState<(typeof SUPPORTED)[number]>("eur");
+  const [currency, setCurrency] = useState<Currency>("eur");
   const [selectedAmount, setSelectedAmount] = useState<number | null>(10);
   const [customAmount, setCustomAmount] = useState("");
   const [isCustom, setIsCustom] = useState(false);
@@ -43,13 +43,6 @@ export function SupportCard({
   }, [isCustom, customAmount, selectedAmount]);
 
   const symbol = SYMBOLS[currency];
-
-  // Keep currency selection internal; Stripe will handle any card-side conversion.
-  function cycleCurrency() {
-    const idx = SUPPORTED.indexOf(currency);
-    const next = SUPPORTED[(idx + 1) % SUPPORTED.length];
-    setCurrency(next);
-  }
 
   async function handleCheckout() {
     const numericAmount = Number(displayAmount);
