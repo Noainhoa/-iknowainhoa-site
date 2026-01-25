@@ -17,7 +17,7 @@ This post is my story, but it is also a practical guide: a free tracker you can 
 ## Take my tracker with you
 <a id="tracker"></a>
 
-I built this spreadsheet because Simply Piano is excellent at teaching lesson-by-lesson, but I needed a way to see the *big picture*—especially during weeks when my hands felt clumsy and the app progress bar did not feel like real progress. (Simply Piano does show in-app progress; I just wanted a timeline view I could control.)
+I built this spreadsheet because [Simply Piano](https://www.hellosimply.com/simply-piano) is excellent at teaching step-by-step, but I needed a way to see the *big picture*—especially during weeks when my hands felt clumsy and the app progress bar did not feel like real progress. (Simply Piano does show in-app progress; I just wanted a timeline view I could control.)
 
 **Open in Google Sheets:**  
 [Open the free piano tracker (Google Sheets)](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/edit?usp=sharing)
@@ -241,9 +241,7 @@ If you would like early access when it exists, send me a note via the contact pa
 </div>
 
 ### Prefer a direct download?
-- [Download Excel (.xlsx)](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=xlsx)
-- [Download CSV](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=csv)
-- [Download OpenDocument (.ods)](https://docs.google.com/spreadsheets/d/18FChKOSg_TwhIB4fl_ySTTcyCnn1WPMkEkGwuHeXEHY/export?format=ods)
+If you need another format, let me know at **admin@iknowainhoa.com** and I will send it to you.
 
 ### Preview the tracker (embed)
 <div style="margin:16px 0; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06);">
