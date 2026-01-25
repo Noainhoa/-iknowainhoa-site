@@ -110,7 +110,7 @@ export function SupportCard({
             marginBottom: 12,
           }}
         >
-          <Heart size={16} color="#111827" fill="#111827" />
+          <Heart size={16} color="var(--primary)" fill="var(--primary)" />
         </div>
         <h3
           style={{
@@ -153,9 +153,9 @@ export function SupportCard({
               fontSize: 14,
               border: "1px solid transparent",
               background:
-                selectedAmount === amount && !isCustom ? "#111827" : "#f3f4f6",
+                selectedAmount === amount && !isCustom ? "var(--primary)" : "var(--muted)",
               color:
-                selectedAmount === amount && !isCustom ? "#ffffff" : "#111827",
+                selectedAmount === amount && !isCustom ? "var(--primary-contrast)" : "var(--foreground)",
               boxShadow:
                 selectedAmount === amount && !isCustom
                   ? "0 10px 25px rgba(17,24,39,0.12)"
@@ -179,9 +179,9 @@ export function SupportCard({
             borderRadius: 10,
             fontWeight: 600,
             fontSize: 14,
-            border: isCustom ? "1px solid #111827" : "1px solid transparent",
-            background: "#f3f4f6",
-            color: isCustom ? "#111827" : "#6b7280",
+            border: isCustom ? "1px solid var(--primary)" : "1px solid transparent",
+            background: "var(--muted)",
+            color: isCustom ? "var(--foreground)" : "#6b7280",
             transition: "all 150ms ease",
           }}
         >
@@ -200,7 +200,7 @@ export function SupportCard({
                   border: "none",
                   width: 48,
                   fontSize: 14,
-                  color: "#111827",
+                  color: "var(--foreground)",
                 }}
                 autoFocus
               />
@@ -223,8 +223,8 @@ export function SupportCard({
           borderRadius: 10,
           fontWeight: 700,
           fontSize: 15,
-          background: "#111827",
-          color: "#ffffff",
+          background: "var(--primary)",
+          color: "var(--primary-contrast)",
           border: "none",
           cursor: !displayAmount || loading ? "not-allowed" : "pointer",
           opacity: !displayAmount || loading ? 0.6 : 1,
@@ -249,9 +249,9 @@ export function SupportCard({
           }}
         >
           <span>Apple Pay</span>
-          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#e5e7eb" }} />
+          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--border)" }} />
           <span>Google Pay</span>
-          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#e5e7eb" }} />
+          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--border)" }} />
           <span>Card</span>
         </div>
       )}

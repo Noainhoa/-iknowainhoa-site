@@ -177,10 +177,10 @@ export default function SiteHeader() {
         }
         .mobile-link {
           text-decoration: none;
-          color: #111;
+          color: var(--foreground);
           font-size: 16px;
           padding: 10px 0;
-          border-bottom: 1px solid #f2f2f2;
+          border-bottom: 1px solid var(--border);
         }
         @media (max-width: 768px) {
           .nav.desktop {

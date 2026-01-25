@@ -73,7 +73,7 @@ export default async function LandingPage({
                 style={{
                   fontSize: "clamp(2rem, 8vw, 3.5rem)",
                   fontWeight: 700,
-                  color: "#fff",
+                  color: "var(--primary-contrast)",
                   margin: "0 0 16px 0",
                   lineHeight: 1.2,
                 }}
@@ -100,8 +100,8 @@ export default async function LandingPage({
                   marginTop: 32,
                   display: "inline-block",
                   padding: "14px 32px",
-                  backgroundColor: "#fff",
-                  color: "#000",
+                  backgroundColor: "var(--primary-contrast)",
+                  color: "#0f1115",
                   textDecoration: "none",
                   borderRadius: 6,
                   fontWeight: 600,
@@ -121,8 +121,8 @@ export default async function LandingPage({
           style={{
             padding: "80px 32px",
             textAlign: "center",
-            backgroundColor: "#f9f9f9",
-            borderBottom: "1px solid #e5e5e5",
+            backgroundColor: "var(--muted)",
+            borderBottom: "1px solid var(--border)",
           }}
         >
           {page.title && (
@@ -142,8 +142,8 @@ export default async function LandingPage({
                 marginTop: 24,
                 display: "inline-block",
                 padding: "14px 32px",
-                backgroundColor: "#000",
-                color: "#fff",
+                backgroundColor: "var(--primary)",
+                color: "var(--primary-contrast)",
                 textDecoration: "none",
                 borderRadius: 6,
                 fontWeight: 600,

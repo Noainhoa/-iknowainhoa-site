@@ -19,14 +19,16 @@ export default async function BlogIndex() {
           <Link
             key={p.slug}
             href={`/blog/${p.slug}`}
-            className="block rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+            className="block rounded-lg overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
             style={{
               textDecoration: "none",
               color: "inherit",
+              border: "1px solid var(--border)",
+              background: "var(--card)",
             }}
           >
             {/* Always render a placeholder block */}
-            <div style={{ width: "100%", height: 160, overflow: "hidden", backgroundColor: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: "100%", height: 160, overflow: "hidden", backgroundColor: "var(--muted)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {p.coverImage ? (
                 <Image
                   src={p.coverImage}

@@ -7,6 +7,8 @@
   --muted: #f6f6f7;
   --border: #e5e5e5;
   --card: #ffffff;
+  --primary: #111827;
+  --primary-contrast: #ffffff;
   --font-geist-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
@@ -25,6 +27,8 @@
     --muted: #161922;
     --border: #222837;
     --card: #111622;
+    --primary: #e5e7eb;
+    --primary-contrast: #0f1115;
   }
 }
 

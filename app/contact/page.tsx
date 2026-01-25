@@ -31,7 +31,7 @@ export default function ContactPage() {
 
           <div style={{ display: "grid", gap: 32, marginBottom: 32 }}>
             {/* Email */}
-            <div style={{ padding: 24, backgroundColor: "#f9f9f9", borderRadius: 8 }}>
+            <div style={{ padding: 24, backgroundColor: "var(--card)", borderRadius: 8, border: "1px solid var(--border)" }}>
               <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 8px 0" }}>
                 Email
               </h3>
@@ -43,8 +43,8 @@ export default function ContactPage() {
                 style={{
                   display: "inline-block",
                   padding: "10px 16px",
-                  backgroundColor: "#000",
-                  color: "#fff",
+                  backgroundColor: "var(--primary)",
+                  color: "var(--primary-contrast)",
                   textDecoration: "none",
                   borderRadius: 4,
                   fontWeight: 500,
@@ -58,7 +58,7 @@ export default function ContactPage() {
             </div>
 
             {/* Socials */}
-            <div style={{ padding: 24, backgroundColor: "#f9f9f9", borderRadius: 8 }}>
+            <div style={{ padding: 24, backgroundColor: "var(--card)", borderRadius: 8, border: "1px solid var(--border)" }}>
               <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 8px 0" }}>
                 Social Media
               </h3>
@@ -75,7 +75,7 @@ export default function ContactPage() {
                       display: "inline-block",
                       padding: "10px 16px",
                       backgroundColor: "#0A66C2",
-                      color: "#fff",
+                      color: "var(--primary-contrast)",
                       textDecoration: "none",
                       borderRadius: 4,
                       fontWeight: 500,
@@ -96,7 +96,7 @@ export default function ContactPage() {
                       display: "inline-block",
                       padding: "10px 16px",
                       background: "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
-                      color: "#fff",
+                      color: "var(--primary-contrast)",
                       textDecoration: "none",
                       borderRadius: 4,
                       fontWeight: 500,
@@ -126,7 +126,7 @@ export default function ContactPage() {
         </section>
 
         {/* Response Time */}
-        <section style={{ padding: 24, backgroundColor: "#f0f0f0", borderRadius: 8 }}>
+        <section style={{ padding: 24, backgroundColor: "var(--muted)", borderRadius: 8, border: "1px solid var(--border)" }}>
           <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 8px 0" }}>
             Response Time
           </h3>
