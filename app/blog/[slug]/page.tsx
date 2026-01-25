@@ -82,7 +82,17 @@ export default async function BlogPostPage({
           {post.tags && post.tags.length > 0 && (
             <div style={{ display: "flex", gap: 8 }}>
               {post.tags.map((tag) => (
-                <span key={tag} style={{ backgroundColor: "#f0f0f0", padding: "4px 8px", borderRadius: 4 }}>
+                <span
+                  key={tag}
+                  style={{
+                    backgroundColor: "var(--muted)",
+                    color: "var(--foreground)",
+                    border: "1px solid var(--border)",
+                    padding: "4px 8px",
+                    borderRadius: 6,
+                    fontWeight: 600,
+                  }}
+                >
                   #{tag}
                 </span>
               ))}
