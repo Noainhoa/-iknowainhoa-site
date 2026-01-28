@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
 import { getProject, getAllProjectSlugs } from "@/lib/content";
+import CopyButton from "./components/copy-button";
 
 export async function generateStaticParams() {
   const slugs = await getAllProjectSlugs();
@@ -65,14 +66,17 @@ export default async function ProjectPage({
                   {project.description}
                 </p>
               ) : null}
-              <a
-                href="https://watnow.netlify.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
-              >
-                Open watnow.netlify.app
-              </a>
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="https://watnow.netlify.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+                >
+                  Open watnow.netlify.app
+                </a>
+                <CopyButton text="watnow.netlify.app" />
+              </div>
             </div>
           </section>
         </>
