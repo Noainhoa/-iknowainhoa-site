@@ -20,6 +20,7 @@ This is a web app. On iPhone, you “install” it by saving it to your **Home S
       <img src="/images/apps/watnow/ios/install/step-02-enter-url-and-go.png" alt="Step 2: Enter watnow.netlify.app and tap Go." style="max-width: 360px; width: 100%; height: auto; display: block; margin: 0.75rem auto;" />
     </a>
     <p><code>watnow.netlify.app</code></p>
+    <p><a href="https://watnow.netlify.app/" target="_blank" rel="noopener">Open watnow.netlify.app</a></p>
   </li>
 
   <li>
