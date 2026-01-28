@@ -73,3 +73,28 @@ a:hover {
 .prose h3 {
   color: var(--foreground);
 }
+
+/* Ensure bold text stays readable in both light/dark themes */
+.prose strong,
+.prose b {
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+/* Keep WhatNow tutorial screenshots tidy */
+.project-content img[src*="watnow-ios-install-v2-annotated"] {
+  max-width: 360px;
+  width: 100%;
+  display: block;
+  margin: 0.9rem auto;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.10);
+}
+
+@media (prefers-color-scheme: dark) {
+  .project-content img[src*="watnow-ios-install-v2-annotated"] {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+  }
+}

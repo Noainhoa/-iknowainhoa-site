@@ -39,7 +39,7 @@ export default async function ProjectPage({
   if (!project) return notFound();
 
   return (
-    <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 800, margin: "0 auto" }}>
+    <main className="mx-auto max-w-[800px] px-8 py-8 font-sans">
       {project.coverImage && (
         <div style={{ marginBottom: 24, overflow: "hidden", borderRadius: 8 }}>
           <Image
@@ -52,10 +52,10 @@ export default async function ProjectPage({
         </div>
       )}
       {project.date ? (
-        <div style={{ opacity: 0.6, marginBottom: 16, fontSize: 14 }}>{project.date}</div>
+        <div className="mb-4 text-sm opacity-60">{project.date}</div>
       ) : null}
       <div
-        style={{ marginTop: 24, lineHeight: 1.7 }}
+        className="project-content prose prose-neutral dark:prose-invert mt-6 leading-relaxed"
         dangerouslySetInnerHTML={{ __html: project.html }}
       />
     </main>
