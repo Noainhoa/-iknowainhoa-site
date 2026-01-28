@@ -1,7 +1,7 @@
 ---
 title: "WhatNow App"
 description: "Guided journaling that helps you turn hard moments into momentum."
-date: "2026-01-28"
+date: "2026-01-26"
 slug: "whatnow-app"
 draft: false
 tags: ["apps", "ios", "pwa", "resilience"]
@@ -16,7 +16,7 @@ A lightweight web app designed to capture the moment something hard happens, the
 
 On iPhone, the best way to use WhatNow is to save it to your Home Screen so it opens full-screen like a native app.
 
-> **Use Safari.** The “Add to Home Screen” option won’t show up the same way in other iPhone browsers.
+> **Use** [**Safari.**](https://apps.apple.com/gb/app/safari/id1146562112) The “Add to Home Screen” option won’t show up the same way in other iPhone browsers.
 
 1. **Open Safari**  
    [![Open Safari from the Home Screen](/images/projects/watnow-ios-install-v2-annotated/step-01-open-safari.png)](/images/projects/watnow-ios-install-v2-annotated/step-01-open-safari.png)
@@ -57,4 +57,6 @@ If you see a generic icon when adding to Home Screen, make sure your site has an
 
 ## Links
 
-- Live app: `https://watnow.netlify.app/`
+- Live app: [WhatNow](https://watnow.netlify.app/)
+
+ 

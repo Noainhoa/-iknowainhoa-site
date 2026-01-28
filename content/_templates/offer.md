@@ -12,3 +12,6 @@ cta: {"text": "Learn More", "link": "#"}
 # Product
 
 What it is, who it’s for, what they get.
+
+- VIPASSANA RINGS
+- 
