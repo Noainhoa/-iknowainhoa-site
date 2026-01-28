@@ -5,7 +5,7 @@ date: "2026-01-28"
 slug: "whatnow-app"
 draft: false
 tags: ["apps", "ios", "pwa", "resilience"]
-coverImage: "/images/apps/watnow/icon/watnow-icon.png?v=1"
+coverImage: "/images/apps/watnow/icon/watnow-icon.png"
 ---
 
 # WhatNow
