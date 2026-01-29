@@ -67,3 +67,17 @@ Yes, 1 year.
 ---
 
 > Tip: Duplicate this file, rename it (e.g., `my-product.mdx`), update frontmatter, images, and links. Ensure your Next.js MDX pipeline is configured to import React components inside content.
+
+---
+
+## Translation plan (decision record)
+
+- **Chosen approach:** Do *not* implement yet. When ready, use server/build-time machine translation with caching. Source-of-truth stays English; translated pages served under locale prefixes (e.g., `/es/...`).
+- **Provider preference:** DeepL API (Free/Pro) for Spanish-first quality. Google Translate intentionally excluded for initial rollout.
+- **Cost reference (DeepL, Jan 2026 pricing):**
+  - Free tier: 500,000 characters/month included; overage not allowed.
+  - Pro tier: €0.00002 per character (≈€20 per 1M chars) after a small included amount; billed monthly. Check latest pricing before enabling.
+- **Content to translate:** titles, descriptions, body HTML/markdown, alt text, Open Graph descriptions.
+- **Cache strategy:** store per-locale/per-slug translations (KV/S3/file cache) to avoid repeat API costs and keep builds fast.
+- **Human overrides:** allow frontmatter `translations.es.title` / `translations.es.description` to override machine output when needed.
+- **Next steps (when implementing):** add `lib/translate.ts` with DeepL API client + cache; enable Next.js i18n routes; translate during static generation; add a locale switcher in the UI.
