@@ -1,0 +1,58 @@
+---
+title: "Product Name"
+description: "One-line pitch for this product."
+date: "2026-01-29"
+slug: "product-slug"
+draft: true
+Tags: ["product", "tag1", "tag2"]
+type: "physical"
+status: "available"
+price: "$99"
+ctaText: "Buy now"
+ctaUrl: "https://checkout.example.com"
+waitlistUrl: "https://example.com/waitlist"
+coverImage: "/images/products/hero.jpg"
+---
+
+import ProductGallery from "@/components/ProductGallery";
+import BuyButton from "@/components/BuyButton";
+
+# Product Name
+
+A short intro that explains what the product is and why it matters.
+
+<ProductGallery
+  images=[
+    { src: "/images/products/sample-1.jpg", alt: "Front view" },
+    { src: "/images/products/sample-2.jpg", alt: "Detail" },
+    { src: "/images/products/sample-3.jpg", alt: "In use" }
+  ]
+/>
+
+<div style={{ margin: "16px 0" }}>
+  <BuyButton href="https://checkout.example.com" label="Buy now" />
+</div>
+
+## What you get
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Specs
+
+- Material: TBD
+- Size: TBD
+- Shipping: Worldwide
+
+## FAQ
+
+**Is there a warranty?**  
+Yes, 1 year.
+
+**How long is shipping?**  
+3–7 business days.
+
+---
+
+> Tip: Duplicate this file, rename it (e.g., `my-product.mdx`), update frontmatter, images, and links. Ensure your Next.js MDX pipeline is configured to import React components inside content.
