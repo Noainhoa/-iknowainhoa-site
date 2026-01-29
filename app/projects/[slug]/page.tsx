@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
 import { getProject, getAllProjectSlugs } from "@/lib/content";
-import CopyButton from "./components/copy-button";
+import CopyButton from "../components/copy-button";
 
 export async function generateStaticParams() {
   const slugs = await getAllProjectSlugs();
