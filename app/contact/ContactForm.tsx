@@ -12,6 +12,7 @@ export function ContactForm() {
     message: "",
     company: "",
   });
+  const [attachments, setAttachments] = useState<File[]>([]);
   const [status, setStatus] = useState<FormState>("idle");
   const [error, setError] = useState("");
 
@@ -19,15 +20,30 @@ export function ContactForm() {
     setFormData((prev) => ({ ...prev, [key]: event.target.value }));
   };
 
+  const handleFiles = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files ? Array.from(event.target.files) : [];
+    setAttachments(files);
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setStatus("loading");
     setError("");
 
+    const body = new FormData();
+    body.append("name", formData.name);
+    body.append("email", formData.email);
+    body.append("subject", formData.subject);
+    body.append("message", formData.message);
+    body.append("company", formData.company);
+
+    attachments.forEach((file) => {
+      body.append("attachments", file, file.name);
+    });
+
     const response = await fetch("/api/contact", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
+      body,
     });
 
     const data = (await response.json().catch(() => ({}))) as { ok?: boolean; error?: string; message?: string };
@@ -35,6 +51,7 @@ export function ContactForm() {
     if (data.ok) {
       setStatus("success");
       setFormData({ name: "", email: "", subject: "", message: "", company: "" });
+      setAttachments([]);
       return;
     }
 
@@ -150,6 +167,20 @@ export function ContactForm() {
             fontSize: "1rem",
             resize: "vertical",
           }}
+        />
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <label htmlFor="attachments" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
+          Attach files (optional)
+        </label>
+        <input
+          type="file"
+          id="attachments"
+          name="attachments"
+          multiple
+          onChange={handleFiles}
+          style={{ fontSize: "0.95rem" }}
         />
       </div>
 

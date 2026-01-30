@@ -12,6 +12,83 @@ function hasSmtpConfig() {
   );
 }
 
+type Attachment = {
+  filename: string;
+  content: Buffer;
+  contentType: string;
+  size: number;
+};
+
+async function readMultipart(request: Request) {
+  const form = await request.formData();
+
+  const payload = {
+    name: form.get("name"),
+    email: form.get("email"),
+    subject: form.get("subject"),
+    message: form.get("message"),
+    company: form.get("company"),
+  };
+
+  const attachments = form
+    .getAll("attachments")
+    .filter((f): f is File => f instanceof File);
+
+  return { payload, attachments };
+}
+
+async function readJson(request: Request) {
+  const payload = await request.json().catch(() => undefined);
+  return { payload, attachments: [] as File[] };
+}
+
+async function parseRequest(request: Request) {
+  const contentType = request.headers.get("content-type") || "";
+  if (contentType.toLowerCase().includes("multipart/form-data")) {
+    return readMultipart(request);
+  }
+  return readJson(request);
+}
+
+function sanitizeFilename(name: string) {
+  return name.replace(/[/\\]/g, "").slice(0, 200) || "attachment";
+}
+
+async function normalizeAttachments(files: File[]): Promise<{ attachments: Attachment[]; error?: string }> {
+  if (files.length > 3) return { attachments: [], error: "Too many attachments (max 3)." };
+
+  const allowedTypes = new Set([
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "text/plain",
+  ]);
+
+  let total = 0;
+  const parsed: Attachment[] = [];
+
+  for (const file of files) {
+    if (!allowedTypes.has(file.type)) {
+      return { attachments: [], error: "Unsupported file type. Allowed: PDF, JPG, PNG, TXT." };
+    }
+
+    total += file.size;
+    if (total > 4 * 1024 * 1024) {
+      return { attachments: [], error: "Attachments exceed 4MB total." };
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    parsed.push({
+      filename: sanitizeFilename(file.name),
+      content: buffer,
+      contentType: file.type,
+      size: file.size,
+    });
+  }
+
+  return { attachments: parsed };
+}
+
 function validatePayload(payload: unknown) {
   if (!payload || typeof payload !== "object") return { error: "Invalid request body." };
 
@@ -59,12 +136,20 @@ export async function POST(request: Request) {
     );
   }
 
-  const validation = validatePayload(await request.json().catch(() => undefined));
+  const { payload, attachments: rawAttachments } = await parseRequest(request);
+
+  const validation = validatePayload(payload);
   if ("error" in validation) {
     return NextResponse.json({ ok: false, error: validation.error }, { status: 400 });
   }
 
   const { name, email, subject, message, company } = validation;
+
+  const attachmentsResult = await normalizeAttachments(rawAttachments);
+  if (attachmentsResult.error) {
+    return NextResponse.json({ ok: false, error: attachmentsResult.error }, { status: 400 });
+  }
+  const attachments = attachmentsResult.attachments;
 
   if (company) {
     // Honeypot triggered—act as if it worked.
@@ -96,6 +181,7 @@ export async function POST(request: Request) {
       replyTo: email,
       subject: `[Contact] ${subject}`,
       text,
+      attachments,
     });
 
     return NextResponse.json({ ok: true });
