@@ -9,7 +9,8 @@ type: "service"
 status: "available"
 price: "Custom quote"
 ctaText: "Get a Quote"
-ctaUrl: "https://example.com/contact"
+ctaText: "Coming soon"
+ctaUrl: ""
 features:
   - name: "Custom Design"
     description: "Built from scratch for your brand"
@@ -19,7 +20,7 @@ features:
     description: "Responsive design on all devices"
   - name: "Future-Proof"
     description: "Modern tech stack (Next.js, React, TypeScript)"
-cta: {"text": "Get a Quote", "link": "https://example.com/contact"}
+cta: {"text": "Coming soon", "link": ""}
 ---
 
 # Website Redesign Service
@@ -55,4 +56,4 @@ Contact me for a custom quote.
 
 ## CTA
 
-[Learn More](https://example.com)
+[Learn More](#)

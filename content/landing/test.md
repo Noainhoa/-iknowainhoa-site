@@ -23,4 +23,4 @@ This is where your main headline goes.
 
 Ready to get started? Click the button below!
 
-[Get Started](https://example.com)
+[Get Started](#)
