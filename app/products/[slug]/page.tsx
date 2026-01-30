@@ -170,6 +170,8 @@ export default async function ProductPage({
           ) : ctaUrl ? (
             <a
               href={ctaUrl}
+              target={ctaUrl.startsWith("http") ? "_blank" : undefined}
+              rel={ctaUrl.startsWith("http") ? "noopener noreferrer" : undefined}
               style={{
                 display: "inline-block",
                 padding: "16px 32px",

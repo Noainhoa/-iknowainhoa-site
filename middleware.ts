@@ -27,20 +27,27 @@ export function middleware(request: NextRequest) {
 
   // Only canonicalize the root path
   if (pathname === "/") {
-    // Define allowed query parameters for the homepage (none in this case)
-    const allowedParams = new Set<string>();
-    
-    // Extract current query params
-    const currentParams = Array.from(url.searchParams.keys());
-    
-    // Check if any current params are not in the allowed set
-    const hasUnknownParams = currentParams.some(
-      (param) => !allowedParams.has(param)
-    );
+    const allowedParams = new Set([
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_term",
+      "utm_content",
+      "gclid",
+      "fbclid",
+      "msclkid",
+    ]);
 
-    // If there are unknown params, redirect to clean root
+    const currentParams = Array.from(url.searchParams.keys());
+    const hasUnknownParams = currentParams.some((param) => !allowedParams.has(param));
+
     if (hasUnknownParams) {
-      return NextResponse.redirect(new URL("/", request.url), {
+      const cleaned = new URL("/", request.url);
+      for (const [key, value] of url.searchParams.entries()) {
+        if (allowedParams.has(key)) cleaned.searchParams.set(key, value);
+      }
+
+      return NextResponse.redirect(cleaned, {
         status: 301, // Permanent redirect for SEO
       });
     }
