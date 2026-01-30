@@ -29,6 +29,12 @@ export function ContactForm() {
 
     const maxFiles = 3;
     const maxTotalBytes = 4 * 1024 * 1024;
+    const allowedTypes = new Set([
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "text/plain",
+    ]);
 
     const totalBytes = combined.reduce((sum, f) => sum + f.size, 0);
 
@@ -40,6 +46,13 @@ export function ContactForm() {
 
     if (totalBytes > maxTotalBytes) {
       setAttachmentsError("Attachments must be 4 MB or smaller in total.");
+      event.target.value = "";
+      return;
+    }
+
+    const hasInvalid = combined.some((file) => !allowedTypes.has(file.type));
+    if (hasInvalid) {
+      setAttachmentsError("Files must be PDF, JPG, PNG, or TXT.");
       event.target.value = "";
       return;
     }
@@ -201,9 +214,12 @@ export function ContactForm() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        <label htmlFor="attachments" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
-          Attach files (optional)
-        </label>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <span style={{ fontWeight: 500, fontSize: "0.95rem" }}>Attachments (optional)</span>
+          <span style={{ fontSize: "0.9rem", color: "#4b5563" }}>
+            Up to 3 files (PDF, JPG, PNG, TXT). Max 4 MB total.
+          </span>
+        </div>
 
         <input
           ref={fileInputRef}
@@ -211,6 +227,7 @@ export function ContactForm() {
           id="attachments"
           name="attachments"
           multiple
+          accept=".pdf,.jpg,.jpeg,.png,.txt"
           onChange={handleFiles}
           style={{ display: "none" }}
         />
@@ -231,7 +248,7 @@ export function ContactForm() {
           }}
           className="hover:opacity-80"
         >
-          <Paperclip size={16} /> Attach files
+          <Paperclip size={16} /> Add files
         </button>
 
         {attachments.length > 0 && (
