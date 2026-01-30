@@ -30,7 +30,7 @@ export function ContactForm() {
       body: JSON.stringify(formData),
     });
 
-    const data = (await response.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+    const data = (await response.json().catch(() => ({}))) as { ok?: boolean; error?: string; message?: string };
 
     if (data.ok) {
       setStatus("success");
@@ -39,7 +39,7 @@ export function ContactForm() {
     }
 
     setStatus("error");
-    setError(data.error || "Something went wrong. Please try again.");
+    setError(data.error || data.message || "Something went wrong. Please try again.");
   };
 
   return (
@@ -178,7 +178,14 @@ export function ContactForm() {
         <p style={{ color: "#0A7A0A", margin: 0 }}>Message sent! I will get back to you soon.</p>
       )}
       {status === "error" && (
-        <p style={{ color: "#B00020", margin: 0 }}>{error || "Something went wrong. Please try again."}</p>
+        <div style={{ color: "#B00020", margin: 0, display: "grid", gap: 6 }}>
+          <p style={{ margin: 0 }}>{error || "Something went wrong. Please try again."}</p>
+          {error === "SERVER_CONFIG_INCOMPLETE" && (
+            <p style={{ margin: 0, color: "#B00020", fontSize: "0.95rem", lineHeight: 1.5 }}>
+              Contact form is not configured yet. The site owner must set SMTP_* and CONTACT_TO in Vercel environment variables.
+            </p>
+          )}
+        </div>
       )}
     </form>
   );
