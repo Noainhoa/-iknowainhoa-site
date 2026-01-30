@@ -8,7 +8,6 @@ tags: ["services", "web design"]
 type: "service"
 status: "available"
 price: "Custom quote"
-ctaText: "Get a Quote"
 ctaText: "Coming soon"
 ctaUrl: ""
 features:
