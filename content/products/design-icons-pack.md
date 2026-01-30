@@ -8,7 +8,6 @@ tags: ["digital", "design assets"]
 type: "digital"
 status: "available"
 price: "$29"
-ctaText: "Buy Now"
 ctaText: "Coming soon"
 ctaUrl: ""
 features:

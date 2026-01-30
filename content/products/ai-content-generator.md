@@ -8,7 +8,6 @@ tags: ["app", "AI", "SaaS"]
 type: "app"
 status: "beta"
 price: "Free during beta"
-ctaText: "Early Access"
 ctaText: "Coming soon"
 ctaUrl: ""
 waitlistUrl: ""

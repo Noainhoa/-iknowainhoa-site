@@ -8,7 +8,6 @@ tags: ["physical", "apparel", "limited edition"]
 type: "physical"
 status: "sold-out"
 price: "Was $45"
-ctaText: "Notify Me"
 ctaText: "Coming soon"
 ctaUrl: ""
 features:
