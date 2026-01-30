@@ -16,6 +16,7 @@ export function ContactForm() {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [attachmentsError, setAttachmentsError] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [clientError, setClientError] = useState("");
   const [status, setStatus] = useState<FormState>("idle");
   const [error, setError] = useState("");
 
@@ -71,6 +72,32 @@ export function ContactForm() {
     event.preventDefault();
     setStatus("loading");
     setError("");
+    setClientError("");
+
+    // Client-side validation mirrors server limits
+    if (!formData.name.trim() || formData.name.length > 100) {
+      setStatus("error");
+      setClientError("Name is required and must be under 100 characters.");
+      return;
+    }
+
+    if (!formData.email.trim() || formData.email.length > 200) {
+      setStatus("error");
+      setClientError("Email is required and must be under 200 characters.");
+      return;
+    }
+
+    if (!formData.subject.trim() || formData.subject.length > 200) {
+      setStatus("error");
+      setClientError("Subject is required and must be under 200 characters.");
+      return;
+    }
+
+    if (!formData.message.trim() || formData.message.length > 5000) {
+      setStatus("error");
+      setClientError("Message is required and must be under 5000 characters.");
+      return;
+    }
 
     const body = new FormData();
     body.append("name", formData.name);
@@ -323,10 +350,15 @@ export function ContactForm() {
       )}
       {status === "error" && (
         <div style={{ color: "#B00020", margin: 0, display: "grid", gap: 6 }}>
-          <p style={{ margin: 0 }}>{error || "Something went wrong. Please try again."}</p>
+          <p style={{ margin: 0 }}>{clientError || error || "Something went wrong. Please try again."}</p>
           {error === "SERVER_CONFIG_INCOMPLETE" && (
             <p style={{ margin: 0, color: "#B00020", fontSize: "0.95rem", lineHeight: 1.5 }}>
               Contact form is not configured yet. The site owner must set SMTP_* and CONTACT_TO in Vercel environment variables.
+            </p>
+          )}
+          {error === "RATE_LIMITED" && (
+            <p style={{ margin: 0, color: "#B00020", fontSize: "0.95rem", lineHeight: 1.5 }}>
+              You’re sending messages too quickly. Please wait a moment and try again.
             </p>
           )}
         </div>

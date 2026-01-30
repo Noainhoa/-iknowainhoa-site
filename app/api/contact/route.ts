@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import crypto from "node:crypto";
 
 export const runtime = "nodejs";
 
@@ -52,6 +53,30 @@ async function parseRequest(request: Request) {
 
 function sanitizeFilename(name: string) {
   return name.replace(/[/\\]/g, "").slice(0, 200) || "attachment";
+}
+
+function requestId() {
+  return crypto.randomBytes(8).toString("hex");
+}
+
+const COOLDOWN_SECONDS = 20;
+
+function extractCooldownToken(req: Request) {
+  return req.headers.get("x-contact-token") || "";
+}
+
+function issueCooldownToken(now: number) {
+  return Buffer.from(JSON.stringify({ ts: now })).toString("base64url");
+}
+
+function isCooldownValid(token: string, now: number) {
+  try {
+    const decoded = JSON.parse(Buffer.from(token, "base64url").toString("utf8")) as { ts?: number };
+    if (typeof decoded.ts !== "number") return false;
+    return now - decoded.ts < COOLDOWN_SECONDS * 1000;
+  } catch {
+    return false;
+  }
 }
 
 async function normalizeAttachments(files: File[]): Promise<{ attachments: Attachment[]; error?: string }> {
