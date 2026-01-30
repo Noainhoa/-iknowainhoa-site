@@ -1,6 +1,7 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { Paperclip, X } from "lucide-react";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
@@ -13,6 +14,8 @@ export function ContactForm() {
     company: "",
   });
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [attachmentsError, setAttachmentsError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [status, setStatus] = useState<FormState>("idle");
   const [error, setError] = useState("");
 
@@ -22,7 +25,33 @@ export function ContactForm() {
 
   const handleFiles = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ? Array.from(event.target.files) : [];
-    setAttachments(files);
+    const combined = [...attachments, ...files];
+
+    const maxFiles = 3;
+    const maxTotalBytes = 4 * 1024 * 1024;
+
+    const totalBytes = combined.reduce((sum, f) => sum + f.size, 0);
+
+    if (combined.length > maxFiles) {
+      setAttachmentsError("You can attach up to 3 files.");
+      event.target.value = "";
+      return;
+    }
+
+    if (totalBytes > maxTotalBytes) {
+      setAttachmentsError("Attachments must be 4 MB or smaller in total.");
+      event.target.value = "";
+      return;
+    }
+
+    setAttachmentsError("");
+    setAttachments(combined);
+  };
+
+  const removeAttachment = (name: string) => {
+    setAttachments((prev) => prev.filter((file) => file.name !== name));
+    setAttachmentsError("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -52,6 +81,7 @@ export function ContactForm() {
       setStatus("success");
       setFormData({ name: "", email: "", subject: "", message: "", company: "" });
       setAttachments([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
@@ -170,18 +200,84 @@ export function ContactForm() {
         />
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <label htmlFor="attachments" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
           Attach files (optional)
         </label>
+
         <input
+          ref={fileInputRef}
           type="file"
           id="attachments"
           name="attachments"
           multiple
           onChange={handleFiles}
-          style={{ fontSize: "0.95rem" }}
+          style={{ display: "none" }}
         />
+
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 14px",
+            borderRadius: 6,
+            border: "1px solid #d1d5db",
+            backgroundColor: "#fff",
+            cursor: "pointer",
+            fontWeight: 600,
+          }}
+          className="hover:opacity-80"
+        >
+          <Paperclip size={16} /> Attach files
+        </button>
+
+        {attachments.length > 0 && (
+          <div style={{ display: "grid", gap: 6 }}>
+            {attachments.map((file) => (
+              <div
+                key={file.name}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 10,
+                  padding: "8px 10px",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 6,
+                  backgroundColor: "#f9fafb",
+                  fontSize: "0.95rem",
+                }}
+              >
+                <span style={{ wordBreak: "break-all" }}>
+                  {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeAttachment(file.name)}
+                  aria-label={`Remove ${file.name}`}
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    padding: 4,
+                    cursor: "pointer",
+                    color: "#6b7280",
+                    display: "inline-flex",
+                  }}
+                  className="hover:opacity-70"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {attachmentsError && (
+          <p style={{ margin: 0, color: "#B00020", fontSize: "0.95rem" }}>{attachmentsError}</p>
+        )}
       </div>
 
       <button
