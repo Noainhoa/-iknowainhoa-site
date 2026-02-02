@@ -8,6 +8,23 @@ export default async function BlogIndex() {
   return (
     <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 1000, margin: "0 auto" }}>
       <h1 style={{ fontSize: 40, fontWeight: 700 }}>Blog</h1>
+      <section
+        style={{
+          marginTop: 12,
+          marginBottom: 24,
+          padding: 20,
+          borderRadius: 16,
+          border: "1px solid var(--border)",
+          background: "var(--card)",
+        }}
+      >
+        <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 8px 0" }}>About</h2>
+        <p style={{ margin: 0, lineHeight: 1.6, opacity: 0.85 }}>
+          I build and ship in public because it keeps me honest and curious. I like working on
+          scrappy tools, helpful guides, and products that feel human. If something on this site
+          helps you, that’s the whole point.
+        </p>
+      </section>
 
       {posts.length === 0 ? (
         <div style={{ marginTop: 64, textAlign: "center", opacity: 0.6 }}>
