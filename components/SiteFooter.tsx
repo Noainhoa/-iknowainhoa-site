@@ -3,8 +3,9 @@ import { site } from "@/lib/site";
 import { headers } from "next/headers";
 import LikeCounter from "@/components/LikeCounter";
 
-export default function SiteFooter() {
-  const countryHeader = headers().get("x-vercel-ip-country");
+export default async function SiteFooter() {
+  const hdrs = await headers();
+  const countryHeader = hdrs.get("x-vercel-ip-country");
   const countryCode = countryHeader && countryHeader.length === 2 ? countryHeader.toUpperCase() : "US";
   const flag = codeToFlag(countryCode);
   const currentYear = new Date().getFullYear();
