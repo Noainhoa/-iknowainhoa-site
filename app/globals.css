@@ -98,3 +98,12 @@ a:hover {
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
   }
 }
+
+.home-link {
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.home-link:hover {
+  background: var(--muted);
+  transform: translateY(-1px);
+}

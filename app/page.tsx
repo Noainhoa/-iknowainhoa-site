@@ -81,19 +81,12 @@ function HomeLink({
           gap: 4,
           padding: "10px 12px",
           borderRadius: 12,
-          transition: "background 150ms ease, transform 150ms ease",
         }}
         className="home-link"
       >
         <span style={{ fontWeight: 700 }}>{label}</span>
         <span style={{ opacity: 0.65 }}>{description}</span>
       </div>
-      <style jsx>{`
-        .home-link:hover {
-          background: var(--muted);
-          transform: translateY(-1px);
-        }
-      `}</style>
     </Link>
   );
 }
