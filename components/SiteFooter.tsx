@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
+import { headers } from "next/headers";
+import LikeCounter from "@/components/LikeCounter";
 
 export default function SiteFooter() {
+  const countryHeader = headers().get("x-vercel-ip-country");
+  const countryCode = countryHeader && countryHeader.length === 2 ? countryHeader.toUpperCase() : "US";
+  const flag = codeToFlag(countryCode);
   const currentYear = new Date().getFullYear();
 
   return (
@@ -182,6 +187,17 @@ export default function SiteFooter() {
               )}
             </ul>
           </div>
+
+          {/* Fun Counter */}
+          <div>
+            <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 12px 0" }}>
+              Tiny Counter {flag ? `(${flag})` : ""}
+            </h3>
+            <p style={{ fontSize: "0.9rem", opacity: 0.7, lineHeight: 1.6, margin: "0 0 12px 0" }}>
+              I like it because it is free. Your view looks like it&apos;s from {countryCode || "somewhere on Earth"}.
+            </p>
+            <LikeCounter />
+          </div>
         </div>
 
         {/* Copyright */}
@@ -200,5 +216,14 @@ export default function SiteFooter() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function codeToFlag(code: string | null) {
+  if (!code || code.length !== 2) return "🌐";
+  const A = 0x1f1e6;
+  return String.fromCodePoint(
+    A + code.charCodeAt(0) - 65,
+    A + code.charCodeAt(1) - 65
   );
 }
