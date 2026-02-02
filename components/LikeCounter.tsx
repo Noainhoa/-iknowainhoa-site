@@ -6,7 +6,13 @@ import { useEffect, useState } from "react";
  * Simple local like counter with a playful message.
  * Value is kept in localStorage so it survives refreshes.
  */
-export default function LikeCounter() {
+export default function LikeCounter({
+  flag,
+  countryCode,
+}: {
+  flag?: string;
+  countryCode?: string;
+}) {
   const [count, setCount] = useState<number | null>(null);
 
   // Hydrate from localStorage on mount.
@@ -37,11 +43,34 @@ export default function LikeCounter() {
       }}
     >
       <div>
-        <p style={{ margin: 0, fontSize: 14, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.6 }}>
-          Tiny counter
-        </p>
-        <h3 style={{ margin: "6px 0 4px 0", fontSize: 22, fontWeight: 700 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <p style={{ margin: 0, fontSize: 14, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.6 }}>
+            Tiny counter
+          </p>
+          {flag ? (
+            <span
+              aria-label={`flag ${countryCode || ""}`}
+              style={{ fontSize: 16, display: "inline-flex", alignItems: "center" }}
+            >
+              {flag}
+            </span>
+          ) : null}
+        </div>
+        <h3 style={{ margin: "6px 0 4px 0", fontSize: 22, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
           I like it because it is free
+          {flag ? (
+            <span
+              style={{
+                fontSize: 12,
+                padding: "4px 8px",
+                borderRadius: 999,
+                background: "var(--muted)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              {countryCode || "??"}
+            </span>
+          ) : null}
         </h3>
         <p style={{ margin: 0, opacity: 0.75, lineHeight: 1.5, fontSize: 15 }}>
           Tap the button and watch the number climb. It&apos;s just for fun, and it lives in your browser.

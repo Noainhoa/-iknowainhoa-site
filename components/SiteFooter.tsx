@@ -191,13 +191,27 @@ export default async function SiteFooter() {
 
           {/* Fun Counter */}
           <div>
-            <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 12px 0" }}>
-              Tiny Counter {flag ? `(${flag})` : ""}
+            <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: 8 }}>
+              Tiny Counter
+              <span aria-label={`flag ${countryCode}`} style={{ fontSize: 16, display: "inline-flex", alignItems: "center" }}>
+                {flag}
+              </span>
+              <span
+                style={{
+                  fontSize: 12,
+                  padding: "3px 8px",
+                  borderRadius: 999,
+                  background: "var(--muted)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                {countryCode}
+              </span>
             </h3>
             <p style={{ fontSize: "0.9rem", opacity: 0.7, lineHeight: 1.6, margin: "0 0 12px 0" }}>
               I like it because it is free. Your view looks like it&apos;s from {countryCode || "somewhere on Earth"}.
             </p>
-            <LikeCounter />
+            <LikeCounter flag={flag} countryCode={countryCode} />
           </div>
         </div>
 
