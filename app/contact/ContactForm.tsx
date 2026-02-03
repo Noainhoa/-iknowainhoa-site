@@ -137,7 +137,7 @@ export function ContactForm() {
         flexDirection: "column",
         gap: 16,
         padding: 24,
-        backgroundColor: "#f9f9f9",
+        backgroundColor: "var(--card)",
         borderRadius: 8,
       }}
       noValidate
@@ -166,12 +166,15 @@ export function ContactForm() {
           required
           value={formData.name}
           onChange={updateField("name")}
+          className="contact-input"
           style={{
             padding: "10px 12px",
-            border: "1px solid #e5e5e5",
-            borderRadius: 4,
+            border: "1px solid var(--border)",
+            borderRadius: 6,
             fontFamily: "inherit",
             fontSize: "1rem",
+            backgroundColor: "var(--card)",
+            color: "var(--foreground)",
           }}
         />
       </div>
@@ -187,12 +190,15 @@ export function ContactForm() {
           required
           value={formData.email}
           onChange={updateField("email")}
+          className="contact-input"
           style={{
             padding: "10px 12px",
-            border: "1px solid #e5e5e5",
-            borderRadius: 4,
+            border: "1px solid var(--border)",
+            borderRadius: 6,
             fontFamily: "inherit",
             fontSize: "1rem",
+            backgroundColor: "var(--card)",
+            color: "var(--foreground)",
           }}
         />
       </div>
@@ -208,12 +214,15 @@ export function ContactForm() {
           required
           value={formData.subject}
           onChange={updateField("subject")}
+          className="contact-input"
           style={{
             padding: "10px 12px",
-            border: "1px solid #e5e5e5",
-            borderRadius: 4,
+            border: "1px solid var(--border)",
+            borderRadius: 6,
             fontFamily: "inherit",
             fontSize: "1rem",
+            backgroundColor: "var(--card)",
+            color: "var(--foreground)",
           }}
         />
       </div>
@@ -229,13 +238,16 @@ export function ContactForm() {
           rows={6}
           value={formData.message}
           onChange={updateField("message")}
+          className="contact-textarea"
           style={{
             padding: "10px 12px",
-            border: "1px solid #e5e5e5",
-            borderRadius: 4,
+            border: "1px solid var(--border)",
+            borderRadius: 6,
             fontFamily: "inherit",
             fontSize: "1rem",
             resize: "vertical",
+            backgroundColor: "var(--card)",
+            color: "var(--foreground)",
           }}
         />
       </div>
@@ -268,10 +280,11 @@ export function ContactForm() {
             gap: 8,
             padding: "10px 14px",
             borderRadius: 6,
-            border: "1px solid #d1d5db",
-            backgroundColor: "#fff",
+            border: "1px solid var(--border)",
+            backgroundColor: "var(--card)",
             cursor: "pointer",
             fontWeight: 600,
+            color: "var(--foreground)",
           }}
           className="hover:opacity-80"
         >
@@ -289,9 +302,9 @@ export function ContactForm() {
                   justifyContent: "space-between",
                   gap: 10,
                   padding: "8px 10px",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid var(--border)",
                   borderRadius: 6,
-                  backgroundColor: "#f9fafb",
+                  backgroundColor: "var(--muted)",
                   fontSize: "0.95rem",
                 }}
               >
@@ -329,8 +342,8 @@ export function ContactForm() {
         disabled={status === "loading"}
         style={{
           padding: "12px 24px",
-          backgroundColor: "#000",
-          color: "#fff",
+          backgroundColor: "var(--primary)",
+          color: "var(--primary-contrast)",
           border: "none",
           borderRadius: 4,
           fontWeight: 600,
@@ -346,18 +359,18 @@ export function ContactForm() {
       </button>
 
       {status === "success" && (
-        <p style={{ color: "#0A7A0A", margin: 0 }}>Message sent! I will get back to you soon.</p>
+        <p style={{ color: "var(--success, #16a34a)", margin: 0 }}>Message sent! I will get back to you soon.</p>
       )}
       {status === "error" && (
-        <div style={{ color: "#B00020", margin: 0, display: "grid", gap: 6 }}>
+        <div style={{ color: "var(--error, #ef4444)", margin: 0, display: "grid", gap: 6 }}>
           <p style={{ margin: 0 }}>{clientError || error || "Something went wrong. Please try again."}</p>
           {error === "SERVER_CONFIG_INCOMPLETE" && (
-            <p style={{ margin: 0, color: "#B00020", fontSize: "0.95rem", lineHeight: 1.5 }}>
+            <p style={{ margin: 0, color: "var(--error, #ef4444)", fontSize: "0.95rem", lineHeight: 1.5 }}>
               Contact form is not configured yet. The site owner must set SMTP_* and CONTACT_TO in Vercel environment variables.
             </p>
           )}
           {error === "RATE_LIMITED" && (
-            <p style={{ margin: 0, color: "#B00020", fontSize: "0.95rem", lineHeight: 1.5 }}>
+            <p style={{ margin: 0, color: "var(--error, #ef4444)", fontSize: "0.95rem", lineHeight: 1.5 }}>
               You’re sending messages too quickly. Please wait a moment and try again.
             </p>
           )}

@@ -107,3 +107,24 @@ a:hover {
   background: var(--muted);
   transform: translateY(-1px);
 }
+
+/* Contact form theme-aware inputs */
+.contact-input,
+.contact-textarea {
+  background: var(--card);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.contact-input::placeholder,
+.contact-textarea::placeholder {
+  color: #4b5563; /* darker for contrast on light inputs */
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .contact-input::placeholder,
+  .contact-textarea::placeholder {
+    color: #9ca3af; /* slightly lighter for dark backgrounds */
+  }
+}
