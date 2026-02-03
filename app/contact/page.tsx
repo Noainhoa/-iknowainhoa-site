@@ -28,7 +28,18 @@ export default function ContactPage() {
             Ways to Reach Me
           </h2>
 
-          <div style={{ padding: 24, backgroundColor: "var(--card)", borderRadius: 10, border: "1px solid var(--border)", display: "grid", gap: 16 }}>
+          <div
+            style={{
+              padding: 24,
+              backgroundColor: "var(--card)",
+              borderRadius: 10,
+              border: "1px solid var(--border)",
+              display: "grid",
+              gap: 24,
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              alignItems: "start",
+            }}
+          >
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Email</h3>
               <p style={{ margin: 0, opacity: 0.7 }}>
@@ -52,8 +63,6 @@ export default function ContactPage() {
                 {site.email}
               </a>
             </div>
-
-            <div style={{ height: 1, background: "var(--border)" }} />
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Social Media</h3>
