@@ -145,20 +145,44 @@ export default async function SiteFooter() {
                     aria-label={label}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
+                    style={{
+                      opacity: 0.9,
+                      display: "inline-flex",
+                      transition: "opacity 0.2s, transform 0.2s",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 44,
+                      height: 44,
+                      borderRadius: "50%",
+                      background: "var(--muted)",
+                      color: "inherit",
+                      border: "1px solid var(--border)",
+                    }}
                     className="hover:opacity-100"
                   >
-                    <Icon size={22} />
+                    <Icon size={20} />
                   </a>
                 ) : (
                   <Link
                     key={key}
                     href={href}
                     aria-label={label}
-                    style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
+                    style={{
+                      opacity: 0.9,
+                      display: "inline-flex",
+                      transition: "opacity 0.2s, transform 0.2s",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 44,
+                      height: 44,
+                      borderRadius: "50%",
+                      background: "var(--muted)",
+                      color: "inherit",
+                      border: "1px solid var(--border)",
+                    }}
                     className="hover:opacity-100"
                   >
-                    <Icon size={22} />
+                    <Icon size={20} />
                   </Link>
                 )
               )}
