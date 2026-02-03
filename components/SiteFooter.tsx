@@ -2,6 +2,7 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import { headers } from "next/headers";
 import LikeCounter from "@/components/LikeCounter";
+import { Mail, Linkedin, Instagram, NotebookPen } from "lucide-react";
 
 export default async function SiteFooter() {
   const hdrs = await headers();
@@ -119,7 +120,7 @@ export default async function SiteFooter() {
                 style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
                 className="hover:opacity-100"
               >
-                ✉️
+                <Mail size={22} />
               </a>
               <Link
                 href="/contact"
@@ -127,7 +128,7 @@ export default async function SiteFooter() {
                 style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
                 className="hover:opacity-100"
               >
-                📝
+                <NotebookPen size={22} />
               </Link>
               {site.socials?.linkedin && (
                 <a
@@ -138,7 +139,7 @@ export default async function SiteFooter() {
                   style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
                   className="hover:opacity-100"
                 >
-                  💼
+                  <Linkedin size={22} />
                 </a>
               )}
               {site.socials?.instagram && (
@@ -150,7 +151,7 @@ export default async function SiteFooter() {
                   style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
                   className="hover:opacity-100"
                 >
-                  📷
+                  <Instagram size={22} />
                 </a>
               )}
             </div>
