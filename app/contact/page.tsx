@@ -18,8 +18,7 @@ export default function ContactPage() {
         {/* Intro Text */}
         <section style={{ marginBottom: 48 }}>
           <p style={{ fontSize: "1.125rem", lineHeight: 1.8, opacity: 0.8, margin: 0 }}>
-            I am always interested in hearing from you—whether it is about a project idea, a collaboration opportunity,
-            feedback on something I have written, or just to connect.
+            Get in touch with Ainhoa. Questions, collaborations, or just to say hello.
           </p>
         </section>
 
@@ -29,13 +28,10 @@ export default function ContactPage() {
             Ways to Reach Me
           </h2>
 
-          <div style={{ display: "grid", gap: 32, marginBottom: 32 }}>
-            {/* Email */}
-            <div style={{ padding: 24, backgroundColor: "var(--card)", borderRadius: 8, border: "1px solid var(--border)" }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 8px 0" }}>
-                Email
-              </h3>
-              <p style={{ margin: "0 0 12px 0", opacity: 0.7 }}>
+          <div style={{ padding: 24, backgroundColor: "var(--card)", borderRadius: 10, border: "1px solid var(--border)", display: "grid", gap: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Email</h3>
+              <p style={{ margin: 0, opacity: 0.7 }}>
                 The most direct way to reach me:
               </p>
               <a
@@ -46,8 +42,8 @@ export default function ContactPage() {
                   backgroundColor: "var(--primary)",
                   color: "var(--primary-contrast)",
                   textDecoration: "none",
-                  borderRadius: 4,
-                  fontWeight: 500,
+                  borderRadius: 6,
+                  fontWeight: 600,
                   fontSize: "0.95rem",
                   transition: "opacity 0.2s",
                 }}
@@ -57,12 +53,11 @@ export default function ContactPage() {
               </a>
             </div>
 
-            {/* Socials */}
-            <div style={{ padding: 24, backgroundColor: "var(--card)", borderRadius: 8, border: "1px solid var(--border)" }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 8px 0" }}>
-                Social Media
-              </h3>
-              <p style={{ margin: "0 0 12px 0", opacity: 0.7 }}>
+            <div style={{ height: 1, background: "var(--border)" }} />
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Social Media</h3>
+              <p style={{ margin: 0, opacity: 0.7 }}>
                 Connect or follow along:
               </p>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -77,8 +72,8 @@ export default function ContactPage() {
                       backgroundColor: "#0A66C2",
                       color: "var(--primary-contrast)",
                       textDecoration: "none",
-                      borderRadius: 4,
-                      fontWeight: 500,
+                      borderRadius: 6,
+                      fontWeight: 600,
                       fontSize: "0.95rem",
                       transition: "opacity 0.2s",
                     }}
@@ -98,8 +93,8 @@ export default function ContactPage() {
                       background: "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
                       color: "var(--primary-contrast)",
                       textDecoration: "none",
-                      borderRadius: 4,
-                      fontWeight: 500,
+                      borderRadius: 6,
+                      fontWeight: 600,
                       fontSize: "0.95rem",
                       transition: "opacity 0.2s",
                     }}
