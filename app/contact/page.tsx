@@ -24,11 +24,7 @@ export default function ContactPage() {
 
         {/* Contact Methods */}
         <section style={{ marginBottom: 48 }}>
-          <h2 style={{ fontSize: "1.5rem", fontWeight: 600, margin: "0 0 24px 0" }}>
-            Ways to Reach Me
-          </h2>
-
-          <div
+          {/* <div
             style={{
               padding: 24,
               backgroundColor: "var(--card)",
@@ -39,7 +35,8 @@ export default function ContactPage() {
               gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
               alignItems: "start",
             }}
-          >
+          > */}
+          <div style={{ display: "grid", gap: 24, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", alignItems: "start", marginBottom: 48 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Email</h3>
               <p style={{ margin: 0, opacity: 0.7 }}>
@@ -118,14 +115,10 @@ export default function ContactPage() {
         </section>
 
         {/* Contact Form */}
-        <section style={{ marginBottom: 48 }}>
+        <section id="contact-form" style={{ marginBottom: 48, scrollMarginTop: 120 }}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: 600, margin: "0 0 24px 0" }}>
             Send a Message
           </h2>
-          <p style={{ opacity: 0.7, marginBottom: 24, lineHeight: 1.6 }}>
-            Prefer a contact form? Fill out the details below and I will get back to you as soon as I can.
-          </p>
-
           <ContactForm />
         </section>
 

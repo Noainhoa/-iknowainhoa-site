@@ -2,7 +2,7 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import { headers } from "next/headers";
 import LikeCounter from "@/components/LikeCounter";
-import { Send, Linkedin, Instagram, NotebookPen, type LucideIcon } from "lucide-react";
+import { Mail, Linkedin, Instagram, NotebookPen, type LucideIcon } from "lucide-react";
 
 export default async function SiteFooter() {
   const hdrs = await headers();
@@ -18,8 +18,8 @@ export default async function SiteFooter() {
     Icon: LucideIcon;
     external?: boolean;
   }[] = [
-    { key: "email", href: `mailto:${site.email}`, label: "Email", Icon: Send },
-    { key: "contact", href: "/contact", label: "Contact page", Icon: NotebookPen },
+    { key: "email", href: `mailto:${site.email}`, label: "Email", Icon: Mail },
+    { key: "contact", href: "/contact#contact-form", label: "Contact page", Icon: NotebookPen },
     site.socials?.linkedin
       ? { key: "linkedin", href: site.socials.linkedin, label: "LinkedIn", Icon: Linkedin, external: true }
       : null,
