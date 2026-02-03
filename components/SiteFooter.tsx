@@ -109,84 +109,51 @@ export default async function SiteFooter() {
 
           {/* Contact Column */}
           <div>
-            <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 16px 0" }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 12px 0" }}>
               Get in Touch
             </h3>
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-              }}
-            >
-              <li>
-                <a
-                  href={`mailto:${site.email}`}
-                  style={{
-                    textDecoration: "none",
-                    color: "inherit",
-                    opacity: 0.7,
-                    transition: "opacity 0.2s",
-                  }}
-                  className="hover:opacity-100"
-                >
-                  Email
-                </a>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  style={{
-                    textDecoration: "none",
-                    color: "inherit",
-                    opacity: 0.7,
-                    transition: "opacity 0.2s",
-                  }}
-                  className="hover:opacity-100"
-                >
-                  Contact Page
-                </Link>
-              </li>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <a
+                href={`mailto:${site.email}`}
+                aria-label="Email"
+                style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
+                className="hover:opacity-100"
+              >
+                ✉️
+              </a>
+              <Link
+                href="/contact"
+                aria-label="Contact page"
+                style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
+                className="hover:opacity-100"
+              >
+                📝
+              </Link>
               {site.socials?.linkedin && (
-                <li>
-                  <a
-                    href={site.socials.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      textDecoration: "none",
-                      color: "inherit",
-                      opacity: 0.7,
-                      transition: "opacity 0.2s",
-                    }}
-                    className="hover:opacity-100"
-                  >
-                    LinkedIn
-                  </a>
-                </li>
+                <a
+                  href={site.socials.linkedin}
+                  aria-label="LinkedIn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
+                  className="hover:opacity-100"
+                >
+                  💼
+                </a>
               )}
               {site.socials?.instagram && (
-                <li>
-                  <a
-                    href={site.socials.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      textDecoration: "none",
-                      color: "inherit",
-                      opacity: 0.7,
-                      transition: "opacity 0.2s",
-                    }}
-                    className="hover:opacity-100"
-                  >
-                    Instagram
-                  </a>
-                </li>
+                <a
+                  href={site.socials.instagram}
+                  aria-label="Instagram"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
+                  className="hover:opacity-100"
+                >
+                  📷
+                </a>
               )}
-            </ul>
+            </div>
           </div>
 
           {/* Fun Counter */}
