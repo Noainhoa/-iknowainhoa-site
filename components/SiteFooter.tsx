@@ -2,7 +2,7 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import { headers } from "next/headers";
 import LikeCounter from "@/components/LikeCounter";
-import { Mail, Linkedin, Instagram, NotebookPen } from "lucide-react";
+import { Mail, Linkedin, Instagram, NotebookPen, type LucideIcon } from "lucide-react";
 
 export default async function SiteFooter() {
   const hdrs = await headers();
@@ -10,6 +10,29 @@ export default async function SiteFooter() {
   const countryCode = countryHeader && countryHeader.length === 2 ? countryHeader.toUpperCase() : "US";
   const flag = codeToFlag(countryCode);
   const currentYear = new Date().getFullYear();
+
+  const contactLinks: {
+    key: string;
+    href: string;
+    label: string;
+    Icon: LucideIcon;
+    external?: boolean;
+  }[] = [
+    { key: "email", href: `mailto:${site.email}`, label: "Email", Icon: Mail },
+    { key: "contact", href: "/contact", label: "Contact page", Icon: NotebookPen },
+    site.socials?.linkedin
+      ? { key: "linkedin", href: site.socials.linkedin, label: "LinkedIn", Icon: Linkedin, external: true }
+      : null,
+    site.socials?.instagram
+      ? { key: "instagram", href: site.socials.instagram, label: "Instagram", Icon: Instagram, external: true }
+      : null,
+  ].filter(Boolean) as {
+    key: string;
+    href: string;
+    label: string;
+    Icon: LucideIcon;
+    external?: boolean;
+  }[];
 
   return (
     <footer
@@ -114,45 +137,30 @@ export default async function SiteFooter() {
               Get in Touch
             </h3>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <a
-                href={`mailto:${site.email}`}
-                aria-label="Email"
-                style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
-                className="hover:opacity-100"
-              >
-                <Mail size={22} />
-              </a>
-              <Link
-                href="/contact"
-                aria-label="Contact page"
-                style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
-                className="hover:opacity-100"
-              >
-                <NotebookPen size={22} />
-              </Link>
-              {site.socials?.linkedin && (
-                <a
-                  href={site.socials.linkedin}
-                  aria-label="LinkedIn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
-                  className="hover:opacity-100"
-                >
-                  <Linkedin size={22} />
-                </a>
-              )}
-              {site.socials?.instagram && (
-                <a
-                  href={site.socials.instagram}
-                  aria-label="Instagram"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
-                  className="hover:opacity-100"
-                >
-                  <Instagram size={22} />
-                </a>
+              {contactLinks.map(({ key, href, label, Icon, external }) =>
+                external ? (
+                  <a
+                    key={key}
+                    href={href}
+                    aria-label={label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
+                    className="hover:opacity-100"
+                  >
+                    <Icon size={22} />
+                  </a>
+                ) : (
+                  <Link
+                    key={key}
+                    href={href}
+                    aria-label={label}
+                    style={{ opacity: 0.7, display: "inline-flex", transition: "opacity 0.2s" }}
+                    className="hover:opacity-100"
+                  >
+                    <Icon size={22} />
+                  </Link>
+                )
               )}
             </div>
           </div>
