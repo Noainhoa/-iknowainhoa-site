@@ -38,7 +38,7 @@ Random photos from that time: Paul bakery boxes, the best palmeras in England, F
 
 Because of the new work-from-home job, I had to get an office chair. I discovered (with a lot of hesitation) that the first one was the best: a Kneeling Balancing Chair. Since then, I’ve had four of the same — one in each house, workplace, or country I’ve lived in.
 
-![Kneeling chair experiment](/images/blog/2021/3AB4EDE4-D167-4B40-937E-53CE1122BE35.JPEG)
+![Kneeling chair experiment](/images/blog/2021/3AB4EDE4-D167-4B40-937E-53CE1122BE35.jpg)
 <p style="font-size:0.85rem; opacity:0.65;">Taken Feb 6, 2021 at 07:42</p>
 
 ![Sunlight through a rare blue window](/images/blog/2021/IMG_3247.jpg)
@@ -59,10 +59,10 @@ Because of the new work-from-home job, I had to get an office chair. I discovere
 ![A quick video from that evening](/images/blog/2021/recorded-16618282521186.MP4)
 <p style="font-size:0.85rem; opacity:0.65;">Recorded Feb 20, 2021 at 17:29</p>
 
-![Late-February light](/images/blog/2021/63586617242__6D2D94D2-A23B-41C4-BDA9-89819BDA3A3E.fullsizerender.JPEG)
+![Late-February light](/images/blog/2021/63586617242__6D2D94D2-A23B-41C4-BDA9-89819BDA3A3E.fullsizerender.jpg)
 <p style="font-size:0.85rem; opacity:0.65;">Taken Feb 24, 2021 at 13:29</p>
 
-![Night snack run](/images/blog/2021/b614cb79-7752-4e5f-bd7c-e53748bdcc0a.JPEG)
+![Night snack run](/images/blog/2021/b614cb79-7752-4e5f-bd7c-e53748bdcc0a.jpg)
 <p style="font-size:0.85rem; opacity:0.65;">Taken Feb 25, 2021 at 21:28</p>
 
 I barely remember most of these moments. I’m grateful I snapped photos — as random as they look — so I can come back to them. I also relied on the app 1 Second Everyday until they shifted to a subscription model.  
