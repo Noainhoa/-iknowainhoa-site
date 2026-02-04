@@ -17,6 +17,8 @@ tags:
 Where was I 5 years ago? Let’s see: 2021 — that was easy. I’m going to need to check my IG. I dug up “Image 03-02-2026 at 15.31.JPG,” a photo-of-photos from February 2021, and had to find my old computer to even open it. (I’ll add the scan once it’s copied into `/public`.)  
 Here are a few snapshots from that month.
 
+If you like iPhone automation stories, I just published a small **[iPhone Shortcuts Library](/shortcuts)** with the exact tools I use. I’ll keep adding write-ups like “How I Automated x with iOS Shortcuts” and “A shortcut I built to input only one image to ChatGPT instead of 10.”
+
 ![Mailbox walls and cold mornings](/images/blog/2021/63388333691__47D0E4A0-D620-4E6B-AB47-B85A9302F287.jpg)
 <p style="font-size:0.85rem; opacity:0.65;">Taken Feb 1, 2021 at 14:42</p>
 
