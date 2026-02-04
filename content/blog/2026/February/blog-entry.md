@@ -1,3 +1,13 @@
+---
+title: "Five-Year Reflection — February 2026"
+description: "Looking back to early 2021: long shifts, frozen mornings, and tiny joys."
+date: "2026-02-03"
+slug: "five-year-reflection-2026"
+tags:
+  - reflection
+  - life
+---
+
 # Five-Year Reflection — February 3, 2026
 
 > “If someone knew you **five** years ago, chances are they hardly know you at all today.” — Vex King
