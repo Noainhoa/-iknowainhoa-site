@@ -13,6 +13,31 @@ export default async function ProjectsIndex() {
     <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 1000, margin: "0 auto" }}>
       <h1 style={{ fontSize: 40, fontWeight: 700 }}>Projects</h1>
 
+      <div
+        style={{
+          marginTop: 16,
+          marginBottom: 28,
+          padding: 16,
+          borderRadius: 12,
+          border: "1px solid var(--border)",
+          background: "var(--card)",
+        }}
+      >
+        <Link
+          href="/shortcuts"
+          style={{ textDecoration: "none", color: "inherit", display: "inline-flex", gap: 8, alignItems: "center" }}
+          className="hover:opacity-80"
+        >
+          <span style={{ fontWeight: 700 }}>New: iPhone Shortcuts Library</span>
+          <span style={{ fontSize: 13, padding: "3px 8px", borderRadius: 8, background: "var(--muted)", border: "1px solid var(--border)" }}>
+            iOS automation
+          </span>
+        </Link>
+        <p style={{ margin: "6px 0 0 0", opacity: 0.75 }}>
+          A set of iPhone automation tools (Merge Vertically, Merge Horizontal, Screen AutoLock, and more).
+        </p>
+      </div>
+
       {projects.length === 0 ? (
         <div style={{ marginTop: 64, textAlign: "center", opacity: 0.6 }}>
           <p style={{ fontSize: 18 }}>No projects yet</p>
