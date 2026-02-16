@@ -65,6 +65,64 @@ function toPosix(p: string) {
 
 type ParsedFrontmatter = GrayMatterFile<string> & { data: Frontmatter };
 
+type StripePaymentLinks = Record<string, string>;
+
+let stripePaymentLinksPromise: Promise<StripePaymentLinks> | null = null;
+
+async function loadStripePaymentLinks(): Promise<StripePaymentLinks> {
+  if (!stripePaymentLinksPromise) {
+    stripePaymentLinksPromise = (async () => {
+      const filePath = path.join(CONTENT_DIR, "stripe-payment-links.json");
+      try {
+        const raw = await fs.readFile(filePath, "utf8");
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+
+        const cleaned: StripePaymentLinks = {};
+        for (const [slug, value] of Object.entries(parsed)) {
+          if (typeof value === "string") {
+            cleaned[slug] = value.trim();
+          }
+        }
+        return cleaned;
+      } catch (error) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("stripe-payment-links.json missing or invalid; skipping", error);
+        }
+        return {};
+      }
+    })();
+  }
+  return stripePaymentLinksPromise;
+}
+
+function isStripePaymentLink(url: string) {
+  return url.startsWith("https://buy.stripe.com/");
+}
+
+function sanitizeProductCtaUrl(
+  slug: string,
+  frontmatterUrl: string | undefined,
+  stripeUrl: string | undefined
+): string | undefined {
+  const PLACEHOLDER_DOMAIN = ["example", "com"].join(".");
+  // Drop placeholder/example links from content
+  const cleanFrontmatter = frontmatterUrl && frontmatterUrl.includes(PLACEHOLDER_DOMAIN)
+    ? undefined
+    : frontmatterUrl?.trim();
+
+  // Prefer Stripe payment link if present and valid
+  if (stripeUrl) {
+    if (isStripePaymentLink(stripeUrl)) {
+      return stripeUrl;
+    }
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(`Invalid Stripe payment link for product "${slug}": ${stripeUrl}`);
+    }
+  }
+
+  return cleanFrontmatter || undefined;
+}
+
 function parseFrontmatter(raw: string): ParsedFrontmatter {
   const parsed = matter(raw);
   return { ...parsed, data: parsed.data as Frontmatter };
@@ -201,6 +259,8 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
   const collectionDir = path.join(CONTENT_DIR, collection);
   if (!(await existsDir(collectionDir))) return [];
 
+  const stripeLinks = collection === "products" ? await loadStripePaymentLinks() : undefined;
+
   const files = await walkMarkdownFiles(collectionDir);
 
   const items: ContentIndexItem[] = [];
@@ -212,6 +272,12 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
     if (draft) continue;
 
     const slug = computeSlug(collectionDir, fullPath, data.slug);
+
+    const ctaUrl = sanitizeProductCtaUrl(
+      slug,
+      data.ctaUrl as string | undefined,
+      stripeLinks?.[slug]
+    );
 
     items.push({
       title: (data.title as string) || slug,
@@ -226,7 +292,7 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
       status: data.status as ProductStatus | undefined,
       price: data.price as string | undefined,
       ctaText: data.ctaText as string | undefined,
-      ctaUrl: data.ctaUrl as string | undefined,
+      ctaUrl,
       waitlistUrl: data.waitlistUrl as string | undefined,
       features: readFeatures(data.features),
       filePath: fullPath,
@@ -250,6 +316,8 @@ export async function getBySlug(
   const collectionDir = path.join(CONTENT_DIR, collection);
   if (!(await existsDir(collectionDir))) return null;
 
+  const stripeLinks = collection === "products" ? await loadStripePaymentLinks() : undefined;
+
   const files = await walkMarkdownFiles(collectionDir);
 
   for (const fullPath of files) {
@@ -260,6 +328,12 @@ export async function getBySlug(
     if (computed !== slug) continue;
 
     if (isDraft(fullPath, data)) return null;
+
+    const ctaUrl = sanitizeProductCtaUrl(
+      computed,
+      data.ctaUrl as string | undefined,
+      stripeLinks?.[computed]
+    );
 
     const processed = await remark().use(remarkGfm).use(html).process(content);
     const renderedHtml = processed.toString();
@@ -277,7 +351,7 @@ export async function getBySlug(
       status: data.status as ProductStatus | undefined,
       price: data.price as string | undefined,
       ctaText: data.ctaText as string | undefined,
-      ctaUrl: data.ctaUrl as string | undefined,
+      ctaUrl,
       waitlistUrl: data.waitlistUrl as string | undefined,
       features: readFeatures(data.features),
       body: content,
