@@ -1,4 +1,5 @@
 ---
+coverImage: "/images/blog/2026/i-start-here-cover.jpg"
 title: "Eight-Step Process for Maximising Efficacy"
 description: "Tim Ferriss’s eight-step morning process to stay out of reactive mode and focus on high-leverage work."
 date: "2026-02-18"
