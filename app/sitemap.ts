@@ -72,6 +72,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly" as const,
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/photoarc`,
+      lastModified: new Date(),
+      changeFrequency: "yearly" as const,
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/photoarc/privacy`,
+      lastModified: new Date(),
+      changeFrequency: "yearly" as const,
+      priority: 0.6,
+    },
   ];
 
   return [...staticUrls, ...blogUrls, ...projectUrls, ...productUrls, ...landingUrls];
