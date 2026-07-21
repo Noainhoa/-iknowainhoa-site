@@ -1,12 +1,12 @@
 ---
 title: "PhotoArc Privacy Policy"
 description: "How PhotoArc handles photos and data on your device."
-date: "2026-07-20"
+date: "2026-07-21"
 ---
 
 # PhotoArc Privacy Policy
 
-**Last updated:** 20 July 2026
+**Last updated:** 21 July 2026
 
 This policy describes how the PhotoArc iOS app (“PhotoArc”) handles information. It reflects the behaviour of the shipping app.
 
@@ -49,6 +49,12 @@ These stay on your device. They are not sent to the developer.
 - No developer-operated collection of personal content from the app
 
 System features you choose to use (for example Share Sheet destinations, opening Settings, opening App Store or mailto links) are handled by Apple or the destination you select. Those services have their own privacy practices.
+
+## Purchases and support
+
+- PhotoArc Pro purchases are processed by Apple through StoreKit. The developer does not receive or store payment-card details.
+- If the user voluntarily contacts support by email, the email address, message, and any information the user chooses to include are handled through the user’s mail provider and received only for the purpose of responding to that support request.
+- PhotoArc does not automatically transmit photos, videos, diagnostics, or device information to the developer.
 
 ## Contact
 
