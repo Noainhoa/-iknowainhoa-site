@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { site } from "@/lib/site";
 import { getAllBlog, getAllProjects, getAllProducts, getAllLanding } from "@/lib/content";
+import { getAllProductApps, productAppPaths } from "@/lib/productApps";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = site.url;
@@ -41,6 +42,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  const productAppUrls = getAllProductApps().flatMap((app) => {
+    const paths = productAppPaths(app.slug);
+    return [
+      {
+        url: `${baseUrl}${paths.product}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+      },
+      {
+        url: `${baseUrl}${paths.support}`,
+        lastModified: new Date(),
+        changeFrequency: "yearly" as const,
+        priority: 0.5,
+      },
+      {
+        url: `${baseUrl}${paths.privacy}`,
+        lastModified: new Date(),
+        changeFrequency: "yearly" as const,
+        priority: 0.5,
+      },
+    ];
+  });
+
   const staticUrls = [
     {
       url: baseUrl,
@@ -72,19 +97,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly" as const,
       priority: 0.7,
     },
-    {
-      url: `${baseUrl}/photoarc`,
-      lastModified: new Date(),
-      changeFrequency: "yearly" as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/photoarc/privacy`,
-      lastModified: new Date(),
-      changeFrequency: "yearly" as const,
-      priority: 0.6,
-    },
   ];
 
-  return [...staticUrls, ...blogUrls, ...projectUrls, ...productUrls, ...landingUrls];
+  return [
+    ...staticUrls,
+    ...productAppUrls,
+    ...blogUrls,
+    ...projectUrls,
+    ...productUrls,
+    ...landingUrls,
+  ];
 }

@@ -1,6 +1,6 @@
 ---
-title: "PhotoArc Privacy Policy"
-description: "How PhotoArc handles photos and data on your device."
+title: "PhotoArc Privacy Policy (archived source)"
+description: "Archived copy. Canonical privacy policy now lives at content/product-apps/photoarc/privacy.md"
 date: "2026-07-20"
 ---
 
@@ -57,3 +57,5 @@ Questions about this policy: [hola@iknowainhoa.com](mailto:hola@iknowainhoa.com)
 ## Changes
 
 If this policy changes in a future version of PhotoArc, the updated text will be published on this page with a new “Last updated” date.
+
+> Archived note: this file is no longer loaded by the site. Live source: `content/product-apps/photoarc/privacy.md`.

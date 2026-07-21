@@ -1,6 +1,6 @@
 ---
-title: "PhotoArc Support"
-description: "Help and contact for the PhotoArc iOS app."
+title: "PhotoArc Support (archived source)"
+description: "Archived copy. Canonical support content now lives at content/product-apps/photoarc/support.md"
 date: "2026-07-20"
 ---
 
@@ -37,3 +37,5 @@ Email [hola@iknowainhoa.com](mailto:hola@iknowainhoa.com) with what you expected
 ## Privacy
 
 Read the [PhotoArc Privacy Policy](/photoarc/privacy).
+
+> Archived note: this file is no longer loaded by the site. Live source: `content/product-apps/photoarc/support.md`.
