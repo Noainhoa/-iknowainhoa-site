@@ -500,7 +500,9 @@ export default function ParkingAdminApp() {
           Luego completa fechas, teléfono e importe.
         </p>
         <label>
-          Foto del DNI *
+          <span className="adm-lab">
+            Foto del DNI <span className="req">*</span>
+          </span>
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp,image/heic"
@@ -527,7 +529,9 @@ export default function ParkingAdminApp() {
         ) : null}
         <div className="row">
           <label>
-            Nombre *
+            <span className="adm-lab">
+              Nombre <span className="req">*</span>
+            </span>
             <input
               value={form.customer_name}
               onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
@@ -535,7 +539,9 @@ export default function ParkingAdminApp() {
             />
           </label>
           <label>
-            Apellidos *
+            <span className="adm-lab">
+              Apellidos <span className="req">*</span>
+            </span>
             <input
               value={form.customer_surnames}
               onChange={(e) =>
@@ -547,14 +553,18 @@ export default function ParkingAdminApp() {
         </div>
         <div className="row">
           <label>
-            DNI / NIE *
+            <span className="adm-lab">
+              DNI / NIE <span className="req">*</span>
+            </span>
             <input
               value={form.customer_dni}
               onChange={(e) => setForm({ ...form, customer_dni: e.target.value })}
             />
           </label>
           <label>
-            Teléfono *
+            <span className="adm-lab">
+              Teléfono <span className="req">*</span>
+            </span>
             <input
               type="tel"
               value={form.customer_phone}
@@ -568,7 +578,9 @@ export default function ParkingAdminApp() {
         </div>
         <div className="row">
           <label>
-            Inicio *
+            <span className="adm-lab">
+              Inicio <span className="req">*</span>
+            </span>
             <input
               type="date"
               required
@@ -577,7 +589,9 @@ export default function ParkingAdminApp() {
             />
           </label>
           <label>
-            Fin *
+            <span className="adm-lab">
+              Fin <span className="req">*</span>
+            </span>
             <input
               type="date"
               required
@@ -586,50 +600,56 @@ export default function ParkingAdminApp() {
             />
           </label>
         </div>
+        <div className="row">
+          <label>
+            <span className="adm-lab">Estado</span>
+            <select
+              value={form.status}
+              onChange={(e) =>
+                setForm({ ...form, status: e.target.value as ParkingBookingStatus })
+              }
+            >
+              <option value="reserved">Reservado (confirmado)</option>
+              <option value="blocked">No disponible (bloqueado)</option>
+              <option value="completed">Finalizado</option>
+              <option value="cancelled">Cancelado</option>
+            </select>
+          </label>
+          <label>
+            <span className="adm-lab">
+              Importe pagado (€) <span className="req">*</span>
+            </span>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.price_eur}
+              onChange={(e) => setForm({ ...form, price_eur: e.target.value })}
+            />
+          </label>
+        </div>
+        <div className="row">
+          <label>
+            <span className="adm-lab">Matrícula</span>
+            <input
+              value={form.vehicle_registration}
+              onChange={(e) =>
+                setForm({ ...form, vehicle_registration: e.target.value })
+              }
+            />
+          </label>
+          <label>
+            <span className="adm-lab">Vehículo</span>
+            <input
+              value={form.vehicle_description}
+              onChange={(e) =>
+                setForm({ ...form, vehicle_description: e.target.value })
+              }
+            />
+          </label>
+        </div>
         <label>
-          Estado
-          <select
-            value={form.status}
-            onChange={(e) =>
-              setForm({ ...form, status: e.target.value as ParkingBookingStatus })
-            }
-          >
-            <option value="reserved">Reservado (confirmado)</option>
-            <option value="blocked">No disponible (bloqueado)</option>
-            <option value="completed">Finalizado</option>
-            <option value="cancelled">Cancelado</option>
-          </select>
-        </label>
-        <label>
-          Importe pagado (€) *
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            value={form.price_eur}
-            onChange={(e) => setForm({ ...form, price_eur: e.target.value })}
-          />
-        </label>
-        <label>
-          Matrícula
-          <input
-            value={form.vehicle_registration}
-            onChange={(e) =>
-              setForm({ ...form, vehicle_registration: e.target.value })
-            }
-          />
-        </label>
-        <label>
-          Vehículo
-          <input
-            value={form.vehicle_description}
-            onChange={(e) =>
-              setForm({ ...form, vehicle_description: e.target.value })
-            }
-          />
-        </label>
-        <label>
-          Notas privadas
+          <span className="adm-lab">Notas privadas</span>
           <textarea
             rows={3}
             value={form.private_notes}
@@ -827,11 +847,13 @@ const styles = `
   .card { background: #fff; border: 1px solid #e6e6e6; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
   .dash-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   .dash-card li { display: grid; gap: 2px; font-size: 0.85rem; }
-  .form { display: grid; gap: 10px; }
-  label { display: grid; gap: 6px; font-size: 0.88rem; font-weight: 650; }
+  .form { display: grid; gap: 8px; }
+  label { display: grid; gap: 5px; font-size: 0.88rem; font-weight: 650; }
+  .adm-lab { display: inline; line-height: 1.2; }
+  .req { color: #b42318; font-weight: 700; }
   input, select, textarea { min-height: 44px; border: 1px solid #ccc; border-radius: 8px; padding: 8px 10px; font: inherit; font-weight: 400; }
   textarea { min-height: 80px; }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   @media (max-width: 560px) { .row { grid-template-columns: 1fr; } .top { flex-direction: column; } }
   button { min-height: 44px; border: 0; border-radius: 10px; background: #111; color: #fff; font-weight: 650; cursor: pointer; padding: 0 14px; }
   .ghost { background: #fff; color: #111; border: 1px solid #ccc; }
