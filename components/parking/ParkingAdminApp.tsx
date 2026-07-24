@@ -35,6 +35,20 @@ const EMPTY_FORM = {
 
 const LOGO_SRC = "/images/parking/guardamar-parking-logo.png";
 
+const SCHEMA_MIGRATE_HINT =
+  "Falta una columna en Supabase. Abre SQL Editor del proyecto y ejecuta supabase/parking-booking-fields.sql (incluye customer_dni / customer_surnames y NOTIFY pgrst).";
+
+function formatParkingError(message: string): string {
+  if (
+    /customer_dni|customer_surnames|customer_dni_image_path|schema cache/i.test(
+      message
+    )
+  ) {
+    return `${message}\n\n${SCHEMA_MIGRATE_HINT}`;
+  }
+  return message;
+}
+
 export default function ParkingAdminApp() {
   const configured = parkingSupabaseConfigured();
   const supabase = getParkingSupabase();
@@ -355,29 +369,48 @@ export default function ParkingAdminApp() {
         : await supabase.from("parking_bookings").insert(payload).select().single();
 
       if (result.error) {
-        setMessage(result.error.message);
+        setMessage(formatParkingError(result.error.message));
         return;
       }
 
       const saved = result.data as ParkingBooking;
+      const wasUpdate = Boolean(form.id);
       setLastSaved(saved);
-      setMessage(
-        form.id
-          ? "Registro actualizado."
-          : "Reserva guardada. Se ha descargado la imagen de confirmación."
-      );
+      // Keep the saved booking loaded so missing fields can be fixed and saved again.
+      setForm({
+        id: saved.id,
+        start_date: saved.start_date,
+        end_date: saved.end_date,
+        status: saved.status,
+        customer_name: saved.customer_name || "",
+        customer_surnames: saved.customer_surnames || "",
+        customer_dni: saved.customer_dni || "",
+        customer_dni_image_path: saved.customer_dni_image_path || "",
+        customer_phone: saved.customer_phone || "",
+        vehicle_registration: saved.vehicle_registration || "",
+        vehicle_description: saved.vehicle_description || "",
+        price_eur: saved.price_eur != null ? String(saved.price_eur) : "",
+        private_notes: saved.private_notes || "",
+      });
+      setDniFile(null);
+      if (dniLocalPreview) URL.revokeObjectURL(dniLocalPreview);
+      setDniLocalPreview(null);
+
+      let nextMessage = wasUpdate
+        ? "Registro actualizado."
+        : "Reserva guardada. Puedes editar los datos abajo si falta algo.";
 
       if (isBooking) {
         try {
           await makeConfirmation(saved);
         } catch {
-          setMessage(
-            "Reserva guardada, pero no se pudo generar la imagen de confirmación."
-          );
+          nextMessage = wasUpdate
+            ? "Registro actualizado, pero no se pudo generar la imagen de confirmación."
+            : "Reserva guardada, pero no se pudo generar la imagen de confirmación. Puedes editar los datos abajo si falta algo.";
         }
       }
 
-      resetForm();
+      setMessage(nextMessage);
       await loadRows();
     } catch (err) {
       const raw =
@@ -433,7 +466,7 @@ export default function ParkingAdminApp() {
       <div className="adm">
         <div className="brand">
           <img className="logo" src={LOGO_SRC} alt="Guardamar Parking" width={48} height={48} decoding="async" />
-          <h1>Administración — Parking Guardamar Centro</h1>
+          <h1>Administración. Parking Guardamar Centro</h1>
         </div>
         <p className="warn">
           Configura <code>NEXT_PUBLIC_SUPABASE_URL</code> y la publishable/anon
@@ -450,7 +483,7 @@ export default function ParkingAdminApp() {
       <div className="adm">
         <div className="brand">
           <img className="logo" src={LOGO_SRC} alt="Guardamar Parking" width={48} height={48} decoding="async" />
-          <h1>Administración — Parking Guardamar Centro</h1>
+          <h1>Administración. Parking Guardamar Centro</h1>
         </div>
         <p className="muted">Acceso restringido. Inicia sesión.</p>
         <form className="card form" onSubmit={onLogin}>
@@ -488,7 +521,7 @@ export default function ParkingAdminApp() {
         <div className="brand">
           <img className="logo" src={LOGO_SRC} alt="Guardamar Parking" width={48} height={48} decoding="async" />
           <div>
-            <h1>Administración — Parking Guardamar Centro</h1>
+            <h1>Administración. Parking Guardamar Centro</h1>
             <p className="muted">{sessionEmail}</p>
           </div>
         </div>
@@ -682,9 +715,12 @@ export default function ParkingAdminApp() {
             <button
               type="button"
               className="ghost"
-              onClick={() => resetForm()}
+              onClick={() => {
+                resetForm();
+                setMessage(null);
+              }}
             >
-              Cancelar edición
+              Nueva reserva
             </button>
           ) : null}
         </div>
