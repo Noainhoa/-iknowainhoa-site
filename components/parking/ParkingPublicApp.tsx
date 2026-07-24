@@ -88,7 +88,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     document.documentElement.lang = locale;
   }, [locale]);
 
-  const cells = useMemo(() => buildMonthCells(view), [view]);
+  const months = useMemo(
+    () => [
+      new Date(view.getFullYear(), view.getMonth(), 1),
+      new Date(view.getFullYear(), view.getMonth() + 1, 1),
+      new Date(view.getFullYear(), view.getMonth() + 2, 1),
+    ],
+    [view]
+  );
   const previewEnd = departure || (arrival && hover ? hover : null);
 
   function dayState(iso: string): "past" | "unavailable" | "available" | "selected" | "inrange" {
@@ -241,7 +248,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           >
             ‹
           </button>
-          <h2>{formatMonthLabel(view, locale)}</h2>
+          <h2>
+            {formatMonthLabel(months[0], locale)} –{" "}
+            {formatMonthLabel(months[2], locale)}
+          </h2>
           <button
             type="button"
             className="pk-nav-btn"
@@ -254,43 +264,62 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </button>
         </div>
 
-        <div className="pk-weekdays">
-          {t.weekdays.map((d) => (
-            <div key={d}>{d}</div>
-          ))}
-        </div>
-
-        <div className="pk-grid">
-          {cells.map((cell, i) => {
-            if (!cell) return <div key={`e-${i}`} className="pk-cell empty" />;
-            const iso = toISODate(cell);
-            const state = dayState(iso);
-            const disabled = state === "past" || state === "unavailable";
-            const label =
-              state === "past"
-                ? t.past
-                : state === "unavailable"
-                  ? t.unavailable
-                  : state === "selected" || state === "inrange"
-                    ? t.selected
-                    : t.available;
+        <div className="pk-months">
+          {months.map((monthDate) => {
+            const cells = buildMonthCells(monthDate);
             return (
-              <button
-                key={iso}
-                type="button"
-                className={`pk-cell day ${state}`}
-                disabled={disabled}
-                aria-label={`${cell.getDate()} ${formatMonthLabel(view, locale)} — ${label}`}
-                aria-pressed={state === "selected" || state === "inrange"}
-                onMouseEnter={() => {
-                  if (arrival && !departure && !disabled) setHover(iso);
-                }}
-                onMouseLeave={() => setHover(null)}
-                onClick={() => onSelectDay(iso)}
+              <div
+                key={`${monthDate.getFullYear()}-${monthDate.getMonth()}`}
+                className="pk-month"
               >
-                <span className="num">{cell.getDate()}</span>
-                <span className="sr-only">{label}</span>
-              </button>
+                <h3>{formatMonthLabel(monthDate, locale)}</h3>
+                <div className="pk-weekdays">
+                  {t.weekdays.map((d) => (
+                    <div key={d}>{d}</div>
+                  ))}
+                </div>
+                <div className="pk-grid">
+                  {cells.map((cell, i) => {
+                    if (!cell) {
+                      return (
+                        <div
+                          key={`e-${monthDate.getMonth()}-${i}`}
+                          className="pk-cell empty"
+                        />
+                      );
+                    }
+                    const iso = toISODate(cell);
+                    const state = dayState(iso);
+                    const disabled = state === "past" || state === "unavailable";
+                    const label =
+                      state === "past"
+                        ? t.past
+                        : state === "unavailable"
+                          ? t.unavailable
+                          : state === "selected" || state === "inrange"
+                            ? t.selected
+                            : t.available;
+                    return (
+                      <button
+                        key={iso}
+                        type="button"
+                        className={`pk-cell day ${state}`}
+                        disabled={disabled}
+                        aria-label={`${cell.getDate()} ${formatMonthLabel(monthDate, locale)} — ${label}`}
+                        aria-pressed={state === "selected" || state === "inrange"}
+                        onMouseEnter={() => {
+                          if (arrival && !departure && !disabled) setHover(iso);
+                        }}
+                        onMouseLeave={() => setHover(null)}
+                        onClick={() => onSelectDay(iso)}
+                      >
+                        <span className="num">{cell.getDate()}</span>
+                        <span className="sr-only">{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </div>
@@ -424,7 +453,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           --selected: #b7e4c7;
           --wa: #128c7e;
           --wa-hover: #0e6e63;
-          max-width: 520px;
+          max-width: 560px;
           margin: 0 auto;
           padding: 20px 16px 48px;
           color: var(--ink);
@@ -539,7 +568,19 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
         .pk-cal-nav h2 {
           margin: 0;
-          font-size: 1.05rem;
+          font-size: 0.95rem;
+          text-transform: capitalize;
+          font-weight: 700;
+          text-align: center;
+          line-height: 1.3;
+        }
+        .pk-months {
+          display: grid;
+          gap: 18px;
+        }
+        .pk-month h3 {
+          margin: 0 0 10px;
+          font-size: 1rem;
           text-transform: capitalize;
           font-weight: 700;
         }
