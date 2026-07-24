@@ -1,92 +1,146 @@
+import { publicPages } from "@/lib/site";
+import BlankPage from "@/components/BlankPage";
 import Link from "next/link";
-import LikeCounter from "@/components/LikeCounter";
+import { getAllWork } from "@/lib/content";
+import { getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/shared";
 
-export default function Home() {
+export default async function Home() {
+  if (!publicPages.homeContent) {
+    return <BlankPage />;
+  }
+
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+  const work = await getAllWork();
+  const featured = work.slice(0, 3);
+
   return (
     <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 960, margin: "0 auto" }}>
       <section style={{ marginBottom: 40 }}>
         <p style={{ fontSize: 14, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.6, marginBottom: 8 }}>
           iknowainhoa
         </p>
-        <h1 style={{ fontSize: 48, fontWeight: 750, margin: 0, lineHeight: 1.05 }}>
-          A playground for the things I build, learn, and ship.
+        <h1 style={{ fontSize: 42, fontWeight: 750, margin: 0, lineHeight: 1.1 }}>
+          {t.home.heroTitle}
         </h1>
-        <p style={{ fontSize: 18, opacity: 0.8, marginTop: 14, maxWidth: 720, lineHeight: 1.6 }}>
-          I share projects, essays, and tools as I go. It stays simple, intentional, and (usually) fast.
+        <p style={{ fontSize: 18, opacity: 0.8, marginTop: 16, maxWidth: 720, lineHeight: 1.6 }}>
+          {t.home.heroSubtitle}
         </p>
       </section>
 
+      {featured.length > 0 && (
+        <section
+          style={{
+            border: "1px solid var(--border)",
+            borderRadius: 16,
+            padding: 20,
+            background: "var(--card)",
+            marginBottom: 32,
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t.home.featuredTitle}</h2>
+            <Link
+              href="/work"
+              style={{ fontSize: 14, opacity: 0.7, textDecoration: "none", borderBottom: "1px solid rgba(0,0,0,0.1)", paddingBottom: 1 }}
+              className="hover:opacity-100"
+            >
+              {t.home.viewAllWork}
+            </Link>
+          </div>
+          <div
+            style={{
+              marginTop: 16,
+              display: "grid",
+              gap: 16,
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            }}
+          >
+            {featured.map((item) => (
+              <Link
+                key={`${item.kind}-${item.href}`}
+                href={item.href}
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  borderRadius: 12,
+                  border: "1px solid var(--border)",
+                  padding: 14,
+                  background: "var(--background)",
+                  display: "grid",
+                  gap: 6,
+                }}
+                className="hover:opacity-100"
+              >
+                <span
+                  style={{
+                    fontSize: 11,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.12,
+                    opacity: 0.6,
+                  }}
+                >
+                  {item.kind}
+                </span>
+                <span style={{ fontWeight: 600 }}>{item.title}</span>
+                {item.description && (
+                  <span style={{ fontSize: 14, opacity: 0.7, lineHeight: 1.5 }}>
+                    {item.description}
+                  </span>
+                )}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section
         style={{
-          display: "grid",
-          gap: 28,
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          alignItems: "stretch",
+          borderRadius: 16,
+          border: "1px solid var(--border)",
+          padding: 20,
+          background: "var(--card)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
         }}
       >
-        <div
-          style={{
-            border: "1px solid var(--border)",
-            borderRadius: 16,
-            padding: 20,
-            background: "var(--card)",
-          }}
-        >
-          <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 10px 0" }}>Navigation</h2>
-          <nav style={{ display: "grid", gap: 12 }}>
-            <HomeLink href="/blog" label="Blog" description="Read new notes and longer essays." />
-            <HomeLink href="/projects" label="Projects" description="See the things I built recently." />
-            <HomeLink href="/products" label="Products" description="Tiny, useful things I’m offering." />
-            <HomeLink href="/support" label="Support ♥" description="Tip jar and ways to help." />
-            <HomeLink href="/contact" label="Contact" description="Reach me directly." />
-          </nav>
+        <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{t.home.aboutCtaTitle}</h2>
+        <p style={{ margin: 0, fontSize: 15, opacity: 0.8, lineHeight: 1.6 }}>
+          {t.home.aboutCtaBody}
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 4 }}>
+          <Link
+            href="/about"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              padding: "8px 14px",
+              borderRadius: 999,
+              border: "1px solid var(--border)",
+              fontSize: 14,
+            }}
+            className="hover:opacity-100"
+          >
+            {t.home.aboutButton}
+          </Link>
+          <Link
+            href="/contact"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              padding: "8px 14px",
+              borderRadius: 999,
+              border: "1px solid var(--border)",
+              fontSize: 14,
+            }}
+            className="hover:opacity-100"
+          >
+            {t.home.contactButton}
+          </Link>
         </div>
-
-        <div
-          style={{
-            border: "1px solid var(--border)",
-            borderRadius: 16,
-            padding: 20,
-            background: "var(--card)",
-          }}
-        >
-          <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 10px 0" }}>About</h2>
-          <p style={{ margin: 0, lineHeight: 1.6, opacity: 0.85 }}>
-            I build and ship in public because it keeps me honest and curious. I like working on
-            scrappy tools, helpful guides, and products that feel human. If something on this site
-            helps you, that’s the whole point.
-          </p>
-        </div>
-
-        <LikeCounter />
       </section>
     </main>
-  );
-}
-
-function HomeLink({
-  href,
-  label,
-  description,
-}: {
-  href: string;
-  label: string;
-  description: string;
-}) {
-  return (
-    <Link href={href} style={{ textDecoration: "none", color: "inherit" }}>
-      <div
-        style={{
-          display: "grid",
-          gap: 4,
-          padding: "10px 12px",
-          borderRadius: 12,
-        }}
-        className="home-link"
-      >
-        <span style={{ fontWeight: 700 }}>{label}</span>
-        <span style={{ opacity: 0.65 }}>{description}</span>
-      </div>
-    </Link>
   );
 }

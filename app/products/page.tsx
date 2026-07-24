@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
+import BlankPage from "@/components/BlankPage";
 import { getAllProducts } from "@/lib/content";
+import { publicPages } from "@/lib/site";
 
 const typeColors: Record<string, string> = {
   physical: "#8b5cf6",
@@ -24,6 +26,8 @@ const statusLabels: Record<string, string> = {
 };
 
 export default async function ProductsIndex() {
+  if (!publicPages.products) return <BlankPage />;
+
   const products = await getAllProducts();
 
   return (
@@ -55,7 +59,6 @@ export default async function ProductsIndex() {
                   width={280}
                   height={160}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  onError={() => null}
                 />
               ) : (
                 <div style={{ fontSize: 12, opacity: 0.4, textAlign: "center" }}>No image</div>

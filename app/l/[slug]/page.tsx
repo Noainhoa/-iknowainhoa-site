@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
+import BlankPage from "@/components/BlankPage";
 import { getLanding, getAllLandingSlugs } from "@/lib/content";
+import { publicPages } from "@/lib/site";
 
 export async function generateStaticParams() {
   const slugs = await getAllLandingSlugs();
@@ -39,6 +41,8 @@ export default async function LandingPage({
   // Next 16 can provide params as a Promise (Server Components).
   params: { slug: string } | Promise<{ slug: string }>;
 }) {
+  if (!publicPages.landings) return <BlankPage />;
+
   const { slug } = await params;      // ✅ unwrap
   const page = await getLanding(slug);
   if (!page) return notFound();

@@ -1,8 +1,12 @@
 import { SupportCard } from "@/components/SupportCard";
+import BlankPage from "@/components/BlankPage";
 import { getAllProducts } from "@/lib/content";
 import Link from "next/link";
+import { publicPages } from "@/lib/site";
 
 export default async function SupportPage() {
+  if (!publicPages.support) return <BlankPage />;
+
   const products = await getAllProducts();
 
   return (

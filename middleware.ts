@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isLocale } from "@/lib/i18n/shared";
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const pathname = url.pathname.toLowerCase();
+
+  // Persist language selection from query parameter.
+  const langParam = url.searchParams.get("lang");
+  if (langParam && isLocale(langParam)) {
+    const cleaned = new URL(request.url);
+    cleaned.searchParams.delete("lang");
+    const response = NextResponse.redirect(cleaned, { status: 302 });
+    response.cookies.set("preferred_locale", langParam, {
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+    return response;
+  }
 
   // Block spam/hacked URL patterns and return 404
   // These patterns are common attack vectors and should not be accessible
@@ -36,6 +51,7 @@ export function middleware(request: NextRequest) {
       "gclid",
       "fbclid",
       "msclkid",
+      "lang",
     ]);
 
     const currentParams = Array.from(url.searchParams.keys());

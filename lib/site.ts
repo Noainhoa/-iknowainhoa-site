@@ -8,3 +8,26 @@ export const site = {
     instagram: "https://instagram.com/ainhoaferrandisperea",
   },
 };
+
+/**
+ * Flip these to re-enable routes without restoring deleted code.
+ * Blog + contact stay on; everything else renders blank for now.
+ */
+export const publicPages = {
+  homeContent: false,
+  blog: true,
+  contact: true,
+  work: false,
+  about: false,
+  apps: false,
+  offers: false,
+  shop: false,
+  products: false,
+  projects: false,
+  support: false,
+  thanks: false,
+  shortcuts: false,
+  photoarc: false,
+  listeneasy: false,
+  landings: false,
+} as const;

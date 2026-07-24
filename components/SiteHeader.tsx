@@ -2,18 +2,17 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import type { Locale } from "@/lib/i18n/shared";
+import { getDictionary } from "@/lib/i18n/shared";
+import LanguageToggle from "@/components/LanguageToggle";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/blog", label: "Blog" },
-  { href: "/projects", label: "Projects" },
-  { href: "/products", label: "Products" },
-  { href: "/support", label: "Support ♥" },
-  { href: "/contact", label: "Contact" },
-];
-
-export default function SiteHeader() {
+export default function SiteHeader({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
+  const t = getDictionary(locale);
+  const navLinks = [
+    { href: "/blog", label: t.header.blog },
+    { href: "/contact", label: t.header.contact },
+  ];
 
   // Prevent background scroll when menu is open.
   useEffect(() => {
@@ -42,6 +41,10 @@ export default function SiteHeader() {
           ))}
         </nav>
 
+        <div className="lang desktop-lang">
+          <LanguageToggle locale={locale} />
+        </div>
+
         <button
           className="hamburger"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -59,12 +62,17 @@ export default function SiteHeader() {
           <div className="backdrop" onClick={() => setOpen(false)} />
           <nav className="mobile-panel">
             <div className="mobile-header">
-              <span className="brand">iknowainhoa</span>
+              <Link href="/" className="brand" onClick={() => setOpen(false)}>
+                iknowainhoa
+              </Link>
               <button className="close" aria-label="Close menu" onClick={() => setOpen(false)}>
                 ×
               </button>
             </div>
             <div className="mobile-links">
+              <div style={{ marginBottom: 8 }}>
+                <LanguageToggle locale={locale} />
+              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -91,7 +99,7 @@ export default function SiteHeader() {
           background: var(--background);
         }
         .inner {
-          max-width: 1100px;
+          max-width: 800px;
           margin: 0 auto;
           display: flex;
           align-items: center;
@@ -184,6 +192,9 @@ export default function SiteHeader() {
         }
         @media (max-width: 768px) {
           .nav.desktop {
+            display: none;
+          }
+          .desktop-lang {
             display: none;
           }
           .hamburger {

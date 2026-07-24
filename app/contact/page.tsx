@@ -1,24 +1,29 @@
 import { Metadata } from "next";
 import { ContactForm } from "./ContactForm";
 import { site } from "@/lib/site";
+import { getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/shared";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with Ainhoa. Questions, collaborations, or just to say hello.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+
   return (
     <main style={{ padding: "32px 24px", fontFamily: "system-ui", maxWidth: 800, margin: "0 auto" }}>
       <article>
         <h1 style={{ fontSize: "2.5rem", fontWeight: 700, margin: "0 0 32px 0", lineHeight: 1.2 }}>
-          Get in Touch
+          {t.contact.title}
         </h1>
 
         {/* Intro Text */}
         <section style={{ marginBottom: 48 }}>
           <p style={{ fontSize: "1.125rem", lineHeight: 1.8, opacity: 0.8, margin: 0 }}>
-            Get in touch with Ainhoa. Questions, collaborations, or just to say hello.
+            {t.contact.intro}
           </p>
         </section>
 
@@ -38,9 +43,9 @@ export default function ContactPage() {
           > */}
           <div style={{ display: "grid", gap: 24, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", alignItems: "start", marginBottom: 48 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Email</h3>
+              <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>{t.contact.emailTitle}</h3>
               <p style={{ margin: 0, opacity: 0.7 }}>
-                The most direct way to reach me:
+                {t.contact.emailSubtitle}
               </p>
               <a
                 href={`mailto:${site.email}`}
@@ -62,9 +67,9 @@ export default function ContactPage() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Social Media</h3>
+              <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>{t.contact.socialTitle}</h3>
               <p style={{ margin: 0, opacity: 0.7 }}>
-                Connect or follow along:
+                {t.contact.socialSubtitle}
               </p>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 {site.socials?.linkedin && (
@@ -117,7 +122,7 @@ export default function ContactPage() {
         {/* Contact Form */}
         <section id="contact-form" style={{ marginBottom: 48, scrollMarginTop: 120 }}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: 600, margin: "0 0 24px 0" }}>
-            Send a Message
+            {t.contact.formTitle}
           </h2>
           <ContactForm />
         </section>
@@ -125,11 +130,10 @@ export default function ContactPage() {
         {/* Response Time */}
         <section style={{ padding: 24, backgroundColor: "var(--muted)", borderRadius: 8, border: "1px solid var(--border)" }}>
           <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 8px 0" }}>
-            Response Time
+            {t.contact.responseTitle}
           </h3>
           <p style={{ margin: 0, opacity: 0.8, lineHeight: 1.6 }}>
-            I try to respond to all messages within 48 hours. If it is urgent, feel free to reach out on social media
-            or LinkedIn as well.
+            {t.contact.responseBody}
           </p>
         </section>
       </article>

@@ -1,8 +1,11 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
+import BlankPage from "@/components/BlankPage";
 import { getProject, getAllProjectSlugs } from "@/lib/content";
 import CopyButton from "../components/copy-button";
+import { publicPages } from "@/lib/site";
 
 export async function generateStaticParams() {
   const slugs = await getAllProjectSlugs();
@@ -35,9 +38,14 @@ export default async function ProjectPage({
 }: {
   params: { slug: string } | Promise<{ slug: string }>;
 }) {
+  if (!publicPages.projects) return <BlankPage />;
+
   const { slug } = await params;
   const project = await getProject(slug);
   if (!project) return notFound();
+
+  const isWebsite = (project.tags || []).some((t) => t.toLowerCase() === "website");
+  const websiteHref = isWebsite && project.cta?.link ? project.cta.link : null;
 
   return (
     <main className="mx-auto max-w-[800px] px-8 py-8 font-sans">
@@ -84,13 +92,31 @@ export default async function ProjectPage({
         <>
           {project.coverImage && (
             <div style={{ marginBottom: 24, overflow: "hidden", borderRadius: 8 }}>
-              <Image
-                src={project.coverImage}
-                alt={project.title || ""}
-                width={800}
-                height={400}
-                style={{ width: "100%", height: "auto" }}
-              />
+              {websiteHref ? (
+                <a
+                  href={websiteHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Visit ${project.title}`}
+                  style={{ display: "block" }}
+                >
+                  <Image
+                    src={project.coverImage}
+                    alt={project.title || ""}
+                    width={800}
+                    height={400}
+                    style={{ width: "100%", height: "auto" }}
+                  />
+                </a>
+              ) : (
+                <Image
+                  src={project.coverImage}
+                  alt={project.title || ""}
+                  width={800}
+                  height={400}
+                  style={{ width: "100%", height: "auto" }}
+                />
+              )}
             </div>
           )}
           {project.date ? (
@@ -107,6 +133,17 @@ export default async function ProjectPage({
         className="project-content prose prose-neutral dark:prose-invert mt-6 leading-relaxed"
         dangerouslySetInnerHTML={{ __html: project.html }}
       />
+
+      {isWebsite && (
+        <section className="mt-10 pt-6 border-t border-slate-200 dark:border-slate-800">
+          <p className="text-base opacity-85">
+            Need a website like this?{" "}
+            <Link href="/contact" className="underline underline-offset-4">
+              Contact me
+            </Link>
+          </p>
+        </section>
+      )}
     </main>
   );
 }

@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import Image from "next/image";
 import { getBlogPost, getAllBlogSlugs } from "@/lib/content";
 import { SupportCard } from "@/components/SupportCard";
 import { site } from "@/lib/site";
@@ -57,19 +56,6 @@ export default async function BlogPostPage({
 
   return (
     <main style={{ padding: "32px 24px", fontFamily: "system-ui", maxWidth: 800, margin: "0 auto" }}>
-      {/* Cover Image */}
-      {post.coverImage && (
-        <div style={{ marginBottom: 32, overflow: "hidden", borderRadius: 8, aspectRatio: "16/9" }}>
-          <Image
-            src={post.coverImage}
-            alt={post.title || ""}
-            width={800}
-            height={450}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-        </div>
-      )}
-
       {/* Header */}
       <article>
         <h1 style={{ fontSize: "2.5rem", fontWeight: 700, margin: "0 0 16px 0", lineHeight: 1.2 }}>

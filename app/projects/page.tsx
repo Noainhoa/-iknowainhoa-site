@@ -1,9 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getAllProjects, type ContentIndexItem } from "@/lib/content";
+import BlankPage from "@/components/BlankPage";
+import { getAllProjects, getLanding, type ContentIndexItem } from "@/lib/content";
+import { publicPages } from "@/lib/site";
 
 export default async function ProjectsIndex() {
+  if (!publicPages.projects) return <BlankPage />;
+
   const projects = await getAllProjects();
+  const comingSoonSection = await getLanding("projects-coming-soon");
   const apps = projects.filter(
     (p) => (p.tags || []).some((t) => t.toLowerCase() === "apps" || t.toLowerCase() === "app")
   );
@@ -37,6 +42,31 @@ export default async function ProjectsIndex() {
           A set of iPhone automation tools (Merge Vertically, Merge Horizontal, Screen AutoLock, and more).
         </p>
       </div>
+
+      <section
+        style={{
+          marginTop: 12,
+          marginBottom: 24,
+          padding: 20,
+          borderRadius: 16,
+          border: "1px solid var(--border)",
+          background: "var(--card)",
+        }}
+      >
+        <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 8px 0" }}>
+          {comingSoonSection?.title || "Coming soon"}
+        </h2>
+        {comingSoonSection?.html ? (
+          <div
+            style={{ margin: 0, lineHeight: 1.6, opacity: 0.85 }}
+            dangerouslySetInnerHTML={{ __html: comingSoonSection.html }}
+          />
+        ) : (
+          <p style={{ margin: 0, lineHeight: 1.6, opacity: 0.85 }}>
+            New projects are on the way.
+          </p>
+        )}
+      </section>
 
       {projects.length === 0 ? (
         <div style={{ marginTop: 64, textAlign: "center", opacity: 0.6 }}>

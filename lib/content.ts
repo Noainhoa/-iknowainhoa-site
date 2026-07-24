@@ -13,7 +13,7 @@ import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import html from "remark-html";
 
-export type Collection = "blog" | "products" | "projects" | "landing";
+export type Collection = "blog" | "products" | "projects" | "landing" | "apps" | "offers";
 
 export type ProductType = "physical" | "digital" | "app" | "service";
 export type ProductStatus = "available" | "beta" | "sold-out" | "idea";
@@ -29,6 +29,8 @@ type SharedContentFields = {
   tags?: string[];
   coverImage?: string;
   cta?: { text: string; link: string };
+  heroHeading?: string;
+  heroSubheading?: string;
   // Product-specific fields (optional, for products collection)
   type?: ProductType;
   status?: ProductStatus;
@@ -335,7 +337,10 @@ export async function getBySlug(
       stripeLinks?.[computed]
     );
 
-    const processed = await remark().use(remarkGfm).use(html).process(content);
+    const processed = await remark()
+      .use(remarkGfm)
+      .use(html, { sanitize: false })
+      .process(content);
     const renderedHtml = processed.toString();
 
     return {
@@ -371,13 +376,81 @@ export const getAllBlogSlugs = () => listSlugs("blog");
 export const getAllProductSlugs = () => listSlugs("products");
 export const getAllProjectSlugs = () => listSlugs("projects");
 export const getAllLandingSlugs = () => listSlugs("landing");
+export const getAllAppsSlugs = () => listSlugs("apps");
+export const getAllOffersSlugs = () => listSlugs("offers");
 
 export const getBlogPost = (slug: string) => getBySlug("blog", slug);
 export const getProduct = (slug: string) => getBySlug("products", slug);
 export const getProject = (slug: string) => getBySlug("projects", slug);
 export const getLanding = (slug: string) => getBySlug("landing", slug);
+export const getApp = (slug: string) => getBySlug("apps", slug);
+export const getOffer = (slug: string) => getBySlug("offers", slug);
 
 export const getAllBlog = () => getAll("blog");
 export const getAllProducts = () => getAll("products");
 export const getAllProjects = () => getAll("projects");
 export const getAllLanding = () => getAll("landing");
+export const getAllApps = () => getAll("apps");
+export const getAllOffers = () => getAll("offers");
+
+export type WorkItem = {
+  title: string;
+  description?: string;
+  date?: string;
+  coverImage?: string;
+  kind: "App" | "Product" | "Project" | "Website";
+  href: string;
+  externalHref?: string;
+};
+
+export async function getAllWork(): Promise<WorkItem[]> {
+  const [apps, products, projects] = await Promise.all([
+    getAllApps(),
+    getAllProducts(),
+    getAllProjects(),
+  ]);
+
+  const mapped: (WorkItem & { _dateKey: string })[] = [];
+
+  for (const app of apps) {
+    mapped.push({
+      title: app.title,
+      description: app.description,
+      date: app.date,
+      coverImage: app.coverImage,
+      kind: "App",
+      href: `/apps/${app.slug}`,
+      _dateKey: app.date || "",
+    });
+  }
+
+  for (const product of products) {
+    mapped.push({
+      title: product.title,
+      description: product.description,
+      date: product.date,
+      coverImage: product.coverImage,
+      kind: "Product",
+      href: `/products/${product.slug}`,
+      _dateKey: product.date || "",
+    });
+  }
+
+  for (const project of projects) {
+    const isWebsiteTag = (project.tags || []).some((t) => t.toLowerCase() === "website");
+    mapped.push({
+      title: project.title,
+      description: project.description,
+      date: project.date,
+      coverImage: project.coverImage,
+      kind: isWebsiteTag ? "Website" : "Project",
+      href: `/projects/${project.slug}`,
+      externalHref: typeof project.cta?.link === "string" ? project.cta.link : undefined,
+      _dateKey: project.date || "",
+    });
+  }
+
+  mapped.sort((a, b) => b._dateKey.localeCompare(a._dateKey));
+
+  return mapped.map(({ _dateKey, ...rest }) => rest);
+}

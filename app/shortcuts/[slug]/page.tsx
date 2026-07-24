@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import BlankPage from "@/components/BlankPage";
 import { getShortcut, shortcuts } from "@/lib/shortcuts";
+import { publicPages } from "@/lib/site";
 
 export async function generateStaticParams() {
   return shortcuts.map((s) => ({ slug: s.slug }));
@@ -26,6 +28,8 @@ export default async function ShortcutPage({
 }: {
   params: { slug: string } | Promise<{ slug: string }>;
 }) {
+  if (!publicPages.shortcuts) return <BlankPage />;
+
   const { slug } = await params;
   const sc = getShortcut(slug);
   if (!sc) return notFound();

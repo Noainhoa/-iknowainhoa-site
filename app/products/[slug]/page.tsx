@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
+import BlankPage from "@/components/BlankPage";
 import { getProduct, getAllProductSlugs } from "@/lib/content";
+import { publicPages } from "@/lib/site";
 
 const statusLabels: Record<string, string> = {
   available: "Available",
@@ -41,6 +43,8 @@ export default async function ProductPage({
 }: {
   params: { slug: string } | Promise<{ slug: string }>;
 }) {
+  if (!publicPages.products) return <BlankPage />;
+
   const { slug } = await params;
   const product = await getProduct(slug);
   if (!product) return notFound();

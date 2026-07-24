@@ -108,6 +108,14 @@ a:hover {
   transform: translateY(-1px);
 }
 
+.latest-updates-details[open] > summary {
+  display: none;
+}
+
+.latest-updates-details > summary::-webkit-details-marker {
+  display: none;
+}
+
 /* Contact form theme-aware inputs */
 .contact-input,
 .contact-textarea {

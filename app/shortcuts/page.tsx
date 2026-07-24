@@ -1,5 +1,7 @@
 import Link from "next/link";
+import BlankPage from "@/components/BlankPage";
 import { shortcuts } from "@/lib/shortcuts";
+import { publicPages } from "@/lib/site";
 
 export const metadata = {
   title: "iPhone Shortcuts Library",
@@ -7,6 +9,8 @@ export const metadata = {
 };
 
 export default function ShortcutsPage() {
+  if (!publicPages.shortcuts) return <BlankPage />;
+
   return (
     <main style={{ padding: "32px 24px", fontFamily: "system-ui", maxWidth: 900, margin: "0 auto" }}>
       <header style={{ marginBottom: 32 }}>

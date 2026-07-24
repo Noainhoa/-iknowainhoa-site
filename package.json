@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "post:new": "node scripts/new-blog-post.mjs"
   },
   "dependencies": {
     "@stripe/stripe-js": "^8.6.3",

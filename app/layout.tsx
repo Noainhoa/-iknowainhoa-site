@@ -4,6 +4,7 @@ import "./globals.css";
 import { site } from "@/lib/site";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import { getLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -28,15 +29,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body className="antialiased">
-        <SiteHeader />
+        <SiteHeader locale={locale} />
         {children}
         <SiteFooter />
       </body>
