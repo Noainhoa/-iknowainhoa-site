@@ -325,10 +325,9 @@ export default function ParkingAdminApp() {
       <div className="adm">
         <h1>Administración — Parking Guardamar Centro</h1>
         <p className="warn">
-          Configura <code>NEXT_PUBLIC_SUPABASE_URL</code> y{" "}
-          <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code>, ejecuta{" "}
-          <code>supabase/parking.sql</code> y crea un usuario administrador en
-          Supabase Auth.
+          Configura <code>NEXT_PUBLIC_SUPABASE_URL</code> y la publishable/anon
+          key, ejecuta <code>supabase/parking.sql</code> y crea un usuario
+          administrador en Supabase Auth.
         </p>
         <style jsx>{styles}</style>
       </div>

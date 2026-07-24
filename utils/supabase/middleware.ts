@@ -1,8 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+import { getSupabaseEnv } from "@/utils/supabase/env";
 
 /**
  * Refreshes the Supabase auth session cookies on each matched request.
@@ -12,7 +10,9 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  const supabase = createServerClient(supabaseUrl!, supabaseKey!, {
+  const { url, key } = getSupabaseEnv();
+
+  const supabase = createServerClient(url!, key!, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -31,7 +31,6 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // Do not run code between createServerClient and getUser().
   await supabase.auth.getUser();
 
   return supabaseResponse;
