@@ -15,6 +15,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: site.url,
   },
+  // Served from public/favicon.ico so nested routes can fully replace icons
+  // via metadata (App Router always prepends app/favicon.ico otherwise).
+  icons: {
+    icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
+  },
   openGraph: {
     title: site.name,
     description: site.description,

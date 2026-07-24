@@ -4,8 +4,18 @@ import ParkingAdminApp from "@/components/parking/ParkingAdminApp";
 export const metadata: Metadata = {
   title: "Admin — Parking Guardamar Centro",
   icons: {
-    icon: [{ url: "/images/parking/guardamar-parking-logo.png", type: "image/png" }],
-    apple: [{ url: "/images/parking/guardamar-parking-logo.png", type: "image/png" }],
+    icon: [
+      { url: "/images/parking/guardamar-parking-logo.png", type: "image/png", sizes: "512x512" },
+      { url: "/images/parking/guardamar-parking-logo.png", type: "image/png" },
+    ],
+    apple: [
+      {
+        url: "/images/parking/guardamar-parking-logo.png",
+        type: "image/png",
+        sizes: "180x180",
+      },
+    ],
+    shortcut: "/images/parking/guardamar-parking-logo.png",
   },
   robots: {
     index: false,
