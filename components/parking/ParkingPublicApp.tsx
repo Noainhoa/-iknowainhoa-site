@@ -62,16 +62,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     if (!supabase) return;
     const { data, error } = await supabase.rpc("parking_unavailable_ranges");
     if (error) {
-      const fallback = await supabase
-        .from("parking_public_availability")
-        .select("id, start_date, end_date, availability");
-      if (fallback.error) {
-        setLoadError(t.loadError);
-        setRanges([]);
-        return;
-      }
-      setLoadError(null);
-      setRanges((fallback.data || []) as ParkingUnavailableRange[]);
+      setLoadError(t.loadError);
+      setRanges([]);
       return;
     }
     setLoadError(null);
