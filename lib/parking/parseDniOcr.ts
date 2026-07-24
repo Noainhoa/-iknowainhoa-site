@@ -100,9 +100,19 @@ function isSectionLabel(line: string): boolean {
 }
 
 function isBilingualOnlyLine(line: string): boolean {
-  return /^(SURNAME|GIVEN NAMES?|SEX|SEXE|NATIONALITY|NACIONALITAT|COGNOMS|NOM)$/i.test(
+  return /^(SURNAME|GIVEN NAMES?|SEX|SEXE|NATIONALITY|NACIONALITAT|COGNOMS|NOM|APELLIDOS|NOMBRE)$/i.test(
     line
   );
+}
+
+/** True when the line is only a field label (no real person-name content). */
+function isPureLabelLine(line: string): boolean {
+  if (isBilingualOnlyLine(line)) return true;
+  const scrubbed = scrubPersonName(line);
+  if (scrubbed.split(/\s+/).filter((w) => w.length > 2).length >= 1) {
+    return false;
+  }
+  return isSectionLabel(line);
 }
 
 /** Collect value lines after a label until the next section. */
@@ -124,14 +134,10 @@ function valuesAfterLabel(
   for (let i = start + 1; i < lines.length; i++) {
     const line = normalizeLine(lines[i]);
     if (!line) continue;
-    if (isSectionLabel(line)) break;
+    if (isPureLabelLine(line)) break;
     if (looksLikeDate(line) || looksLikeDniId(line)) break;
-    if (isBilingualOnlyLine(line)) continue;
     if (!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{2,}/.test(line)) continue;
-    // Strip leading bilingual label crumbs: "Nom Maria…" / "Cognoms Limiñana…"
-    const cleaned = scrubPersonName(
-      line.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s\-']/g, " ")
-    );
+    const cleaned = scrubPersonName(line);
     if (!cleaned || isJunk(cleaned)) continue;
     out.push(cleaned);
     if (out.length >= maxLines) break;
