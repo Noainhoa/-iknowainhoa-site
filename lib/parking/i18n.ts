@@ -1,0 +1,167 @@
+import type { Locale } from "@/lib/i18n/shared";
+
+export type MiddayTiming = "before_midday" | "after_midday";
+
+export type ParkingCopy = {
+  brand: string;
+  title: string;
+  intro: string;
+  pricesTitle: string;
+  priceHigh: string;
+  priceSeptember: string;
+  priceLow: string;
+  legend: string;
+  available: string;
+  unavailable: string;
+  past: string;
+  selected: string;
+  prevMonth: string;
+  nextMonth: string;
+  clearDates: string;
+  summaryRange: (from: string, to: string) => string;
+  duration: (n: number) => string;
+  pickDeparture: string;
+  pickArrival: string;
+  name: string;
+  registration: string;
+  vehicle: string;
+  optional: string;
+  namePlaceholder: string;
+  arrivalTiming: string;
+  departureTiming: string;
+  timingPlaceholder: string;
+  beforeMidday: string;
+  afterMidday: string;
+  comments: string;
+  whatsappCta: string;
+  whatsappNote: string;
+  supabaseHint: string;
+  loadError: string;
+  errNeedDates: string;
+  errNeedName: string;
+  errUnavailable: string;
+  errRangeUnavailable: string;
+  errNeedTiming: string;
+  weekdays: string[];
+};
+
+const es: ParkingCopy = {
+  brand: "Parking Guardamar Centro",
+  title: "Disponibilidad de la plaza",
+  intro:
+    "Consulta las fechas disponibles y envíame una solicitud por WhatsApp. La selección de fechas no constituye una reserva hasta que sea confirmada.",
+  pricesTitle: "Precios",
+  priceHigh: "Temporada alta (junio-agosto): 70 €/semana",
+  priceSeptember: "Septiembre: 50 €/semana",
+  priceLow: "Octubre-mayo: 75 €/mes",
+  legend: "Leyenda",
+  available: "Disponible",
+  unavailable: "No disponible",
+  past: "Pasado",
+  selected: "Seleccionado",
+  prevMonth: "Mes anterior",
+  nextMonth: "Mes siguiente",
+  clearDates: "Borrar fechas",
+  summaryRange: (from, to) => `Fechas seleccionadas: del ${from} al ${to}.`,
+  duration: (n) => `Duración: ${n} ${n === 1 ? "día" : "días"}.`,
+  pickDeparture: "Elige la fecha de salida.",
+  pickArrival: "Elige la fecha de llegada.",
+  name: "Nombre",
+  registration: "Matrícula del vehículo",
+  vehicle: "Modelo o tipo de vehículo",
+  optional: "Opcional",
+  namePlaceholder: "Tu nombre",
+  arrivalTiming: "Llegada",
+  departureTiming: "Salida",
+  timingPlaceholder: "Selecciona…",
+  beforeMidday: "Antes del mediodía",
+  afterMidday: "Después del mediodía",
+  comments: "Comentarios",
+  whatsappCta: "Consultar por WhatsApp",
+  whatsappNote:
+    "Se abrirá WhatsApp con tu consulta. No confirma la reserva hasta que yo te responda.",
+  supabaseHint:
+    "Calendario en modo local: falta configurar Supabase. Todas las fechas futuras aparecen como disponibles hasta que se conecte la base de datos.",
+  loadError:
+    "No se ha podido cargar la disponibilidad. Inténtalo de nuevo más tarde.",
+  errNeedDates: "Selecciona las fechas de llegada y salida.",
+  errNeedName: "El nombre es obligatorio.",
+  errUnavailable: "El intervalo incluye fechas no disponibles.",
+  errRangeUnavailable:
+    "El intervalo incluye fechas no disponibles. Elige otras fechas.",
+  errNeedTiming: "Indica si la llegada y la salida son antes o después del mediodía.",
+  weekdays: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+};
+
+const en: ParkingCopy = {
+  brand: "Parking Guardamar Centro",
+  title: "Space availability",
+  intro:
+    "Check available dates and send me a request on WhatsApp. Selecting dates does not confirm a booking until I reply.",
+  pricesTitle: "Prices",
+  priceHigh: "High season (June–August): €70/week",
+  priceSeptember: "September: €50/week",
+  priceLow: "October–May: €75/month",
+  legend: "Legend",
+  available: "Available",
+  unavailable: "Unavailable",
+  past: "Past",
+  selected: "Selected",
+  prevMonth: "Previous month",
+  nextMonth: "Next month",
+  clearDates: "Clear dates",
+  summaryRange: (from, to) => `Selected dates: from ${from} to ${to}.`,
+  duration: (n) => `Duration: ${n} ${n === 1 ? "day" : "days"}.`,
+  pickDeparture: "Choose your departure date.",
+  pickArrival: "Choose your arrival date.",
+  name: "Name",
+  registration: "Vehicle registration",
+  vehicle: "Vehicle model or type",
+  optional: "Optional",
+  namePlaceholder: "Your name",
+  arrivalTiming: "Arrival",
+  departureTiming: "Departure",
+  timingPlaceholder: "Select…",
+  beforeMidday: "Before midday",
+  afterMidday: "After midday",
+  comments: "Comments",
+  whatsappCta: "Enquire on WhatsApp",
+  whatsappNote:
+    "WhatsApp will open with your enquiry. This does not confirm the booking until I reply.",
+  supabaseHint:
+    "Calendar in local mode: Supabase is not configured. All future dates show as available until the database is connected.",
+  loadError: "Could not load availability. Please try again later.",
+  errNeedDates: "Select arrival and departure dates.",
+  errNeedName: "Name is required.",
+  errUnavailable: "The range includes unavailable dates.",
+  errRangeUnavailable:
+    "The range includes unavailable dates. Please choose other dates.",
+  errNeedTiming: "Choose whether arrival and departure are before or after midday.",
+  weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+};
+
+export function getParkingCopy(locale: Locale): ParkingCopy {
+  return locale === "es" ? es : en;
+}
+
+export function formatParkingDate(iso: string, locale: Locale): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export function formatMonthLabel(date: Date, locale: Locale): string {
+  return date.toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export function timingLabel(timing: MiddayTiming, locale: Locale): string {
+  const t = getParkingCopy(locale);
+  return timing === "before_midday" ? t.beforeMidday : t.afterMidday;
+}

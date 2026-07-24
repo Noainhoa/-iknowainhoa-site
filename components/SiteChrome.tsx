@@ -15,9 +15,12 @@ export default function SiteChrome({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  // Parking is a standalone mini-app; blog keeps global chrome until its shell ships.
+  // Parking is a standalone mini-app (no site header/footer).
   const hideChrome =
-    pathname === "/parking" || pathname.startsWith("/parking/");
+    pathname === "/parking-guardamar-centro" ||
+    pathname.startsWith("/parking-guardamar-centro/") ||
+    pathname === "/parking" ||
+    pathname.startsWith("/parking/");
 
   return (
     <>

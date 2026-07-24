@@ -89,33 +89,75 @@ export function formatSpanishDate(iso: string): string {
   });
 }
 
+export function formatLocaleDate(iso: string, locale: "en" | "es"): string {
+  return parseISODate(iso).toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export function countInclusiveDays(startIso: string, endIso: string): number {
   return eachDateInclusive(startIso, endIso).length;
 }
 
 export function buildWhatsAppMessage(input: {
+  locale: "en" | "es";
   arrival: string;
   departure: string;
   name: string;
   registration?: string;
   vehicle?: string;
-  arrivalTime?: string;
-  departureTime?: string;
+  arrivalTiming: "before_midday" | "after_midday";
+  departureTiming: "before_midday" | "after_midday";
   comments?: string;
 }): string {
   const days = countInclusiveDays(input.arrival, input.departure);
-  return `Hola Ainhoa, quisiera consultar la disponibilidad de Parking Guardamar Centro.
+  const es = input.locale === "es";
+  const arrivalLabel =
+    input.arrivalTiming === "before_midday"
+      ? es
+        ? "Antes del mediodía"
+        : "Before midday"
+      : es
+        ? "Después del mediodía"
+        : "After midday";
+  const departureLabel =
+    input.departureTiming === "before_midday"
+      ? es
+        ? "Antes del mediodía"
+        : "Before midday"
+      : es
+        ? "Después del mediodía"
+        : "After midday";
 
-Fechas: del ${formatSpanishDate(input.arrival)} al ${formatSpanishDate(input.departure)}
+  if (es) {
+    return `Hola Ainhoa, quisiera consultar la disponibilidad de Parking Guardamar Centro.
+
+Fechas: del ${formatLocaleDate(input.arrival, "es")} al ${formatLocaleDate(input.departure, "es")}
 Duración: ${days} días
 Nombre: ${input.name}
 Matrícula: ${input.registration?.trim() || "No indicada"}
 Vehículo: ${input.vehicle?.trim() || "No indicado"}
-Llegada aproximada: ${input.arrivalTime?.trim() || "No indicada"}
-Salida aproximada: ${input.departureTime?.trim() || "No indicada"}
+Llegada: ${arrivalLabel}
+Salida: ${departureLabel}
 Comentarios: ${input.comments?.trim() || "Sin comentarios"}
 
 Entiendo que esta consulta no confirma la reserva hasta recibir tu confirmación.`;
+  }
+
+  return `Hi Ainhoa, I'd like to check availability for Parking Guardamar Centro.
+
+Dates: from ${formatLocaleDate(input.arrival, "en")} to ${formatLocaleDate(input.departure, "en")}
+Duration: ${days} days
+Name: ${input.name}
+Registration: ${input.registration?.trim() || "Not provided"}
+Vehicle: ${input.vehicle?.trim() || "Not provided"}
+Arrival: ${arrivalLabel}
+Departure: ${departureLabel}
+Comments: ${input.comments?.trim() || "None"}
+
+I understand this enquiry does not confirm the booking until you confirm.`;
 }
 
 export function whatsAppHref(message: string): string {

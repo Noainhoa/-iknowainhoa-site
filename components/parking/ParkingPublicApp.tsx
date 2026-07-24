@@ -1,11 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import LanguageToggle from "@/components/LanguageToggle";
+import type { Locale } from "@/lib/i18n/shared";
+import {
+  formatMonthLabel,
+  formatParkingDate,
+  getParkingCopy,
+  type MiddayTiming,
+} from "@/lib/parking/i18n";
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
-  addDays,
   buildWhatsAppMessage,
-  formatSpanishDate,
   isDateUnavailable,
   parseISODate,
   rangeContainsUnavailable,
@@ -15,17 +21,10 @@ import {
   type ParkingUnavailableRange,
 } from "@/lib/parking/types";
 
-const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-
-function monthLabel(date: Date): string {
-  return date.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
-}
-
 function buildMonthCells(view: Date): (Date | null)[] {
   const year = view.getFullYear();
   const month = view.getMonth();
   const first = new Date(year, month, 1);
-  // Monday = 0 … Sunday = 6
   const mondayIndex = (first.getDay() + 6) % 7;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const cells: (Date | null)[] = [];
@@ -35,7 +34,8 @@ function buildMonthCells(view: Date): (Date | null)[] {
   return cells;
 }
 
-export default function ParkingPublicApp() {
+export default function ParkingPublicApp({ locale }: { locale: Locale }) {
+  const t = getParkingCopy(locale);
   const today = useMemo(() => startOfToday(), []);
   const [view, setView] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [ranges, setRanges] = useState<ParkingUnavailableRange[]>([]);
@@ -49,8 +49,8 @@ export default function ParkingPublicApp() {
   const [name, setName] = useState("");
   const [registration, setRegistration] = useState("");
   const [vehicle, setVehicle] = useState("");
-  const [arrivalTime, setArrivalTime] = useState("");
-  const [departureTime, setDepartureTime] = useState("");
+  const [arrivalTiming, setArrivalTiming] = useState<MiddayTiming | "">("");
+  const [departureTiming, setDepartureTiming] = useState<MiddayTiming | "">("");
   const [comments, setComments] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -64,14 +64,11 @@ export default function ParkingPublicApp() {
     if (!supabase) return;
     const { data, error } = await supabase.rpc("parking_unavailable_ranges");
     if (error) {
-      // Fallback to view if RPC is not yet deployed
       const fallback = await supabase
         .from("parking_public_availability")
         .select("id, start_date, end_date, availability");
       if (fallback.error) {
-        setLoadError(
-          "No se ha podido cargar la disponibilidad. Inténtalo de nuevo más tarde."
-        );
+        setLoadError(t.loadError);
         setRanges([]);
         return;
       }
@@ -81,14 +78,17 @@ export default function ParkingPublicApp() {
     }
     setLoadError(null);
     setRanges((data || []) as ParkingUnavailableRange[]);
-  }, [configured]);
+  }, [configured, t.loadError]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  const cells = useMemo(() => buildMonthCells(view), [view]);
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
+  const cells = useMemo(() => buildMonthCells(view), [view]);
   const previewEnd = departure || (arrival && hover ? hover : null);
 
   function dayState(iso: string): "past" | "unavailable" | "available" | "selected" | "inrange" {
@@ -121,7 +121,6 @@ export default function ParkingPublicApp() {
       return;
     }
 
-    // second click
     let start = arrival;
     let end = iso;
     if (end < start) {
@@ -130,7 +129,7 @@ export default function ParkingPublicApp() {
       end = tmp;
     }
     if (rangeContainsUnavailable(start, end, ranges)) {
-      setFormError("El intervalo incluye fechas no disponibles. Elige otras fechas.");
+      setFormError(t.errRangeUnavailable);
       setArrival(iso);
       setDeparture(null);
       return;
@@ -149,25 +148,30 @@ export default function ParkingPublicApp() {
   function openWhatsApp() {
     setFormError(null);
     if (!arrival || !departure) {
-      setFormError("Selecciona las fechas de llegada y salida.");
+      setFormError(t.errNeedDates);
       return;
     }
     if (!name.trim()) {
-      setFormError("El nombre es obligatorio.");
+      setFormError(t.errNeedName);
+      return;
+    }
+    if (!arrivalTiming || !departureTiming) {
+      setFormError(t.errNeedTiming);
       return;
     }
     if (rangeContainsUnavailable(arrival, departure, ranges)) {
-      setFormError("El intervalo incluye fechas no disponibles.");
+      setFormError(t.errUnavailable);
       return;
     }
     const message = buildWhatsAppMessage({
+      locale,
       arrival,
       departure,
       name: name.trim(),
       registration,
       vehicle,
-      arrivalTime,
-      departureTime,
+      arrivalTiming,
+      departureTiming,
       comments,
     });
     window.open(whatsAppHref(message), "_blank", "noopener,noreferrer");
@@ -177,20 +181,31 @@ export default function ParkingPublicApp() {
     arrival && departure ? countInclusiveDays(arrival, departure) : 0;
 
   return (
-    <div className="pk">
+    <div className="pk" lang={locale}>
+      <div className="pk-top">
+        <Suspense fallback={null}>
+          <LanguageToggle locale={locale} />
+        </Suspense>
+      </div>
+
       <header className="pk-header">
-        <p className="pk-brand">Parking Guardamar Centro</p>
-        <h1>Disponibilidad de la plaza</h1>
-        <p>
-          Consulta las fechas disponibles y envíame una solicitud por WhatsApp. La
-          selección de fechas no constituye una reserva hasta que sea confirmada.
-        </p>
+        <p className="pk-brand">{t.brand}</p>
+        <h1>{t.title}</h1>
+        <p>{t.intro}</p>
       </header>
+
+      <section className="pk-prices" aria-label={t.pricesTitle}>
+        <h2>{t.pricesTitle}</h2>
+        <ul>
+          <li>{t.priceHigh}</li>
+          <li>{t.priceSeptember}</li>
+          <li>{t.priceLow}</li>
+        </ul>
+      </section>
 
       {!configured ? (
         <p className="pk-banner" role="status">
-          Calendario en modo local: falta configurar Supabase. Todas las fechas
-          futuras aparecen como disponibles hasta que se conecte la base de datos.
+          {t.supabaseHint}
         </p>
       ) : null}
       {loadError ? (
@@ -199,38 +214,38 @@ export default function ParkingPublicApp() {
         </p>
       ) : null}
 
-      <section className="pk-legend" aria-label="Leyenda">
+      <section className="pk-legend" aria-label={t.legend}>
         <span>
-          <i className="swatch available" /> Disponible
+          <i className="swatch available" /> {t.available}
         </span>
         <span>
-          <i className="swatch unavailable" /> No disponible
+          <i className="swatch unavailable" /> {t.unavailable}
         </span>
         <span>
-          <i className="swatch past" /> Pasado
+          <i className="swatch past" /> {t.past}
         </span>
         <span>
-          <i className="swatch selected" /> Seleccionado
+          <i className="swatch selected" /> {t.selected}
         </span>
       </section>
 
-      <section className="pk-cal" aria-label="Calendario">
+      <section className="pk-cal" aria-label={locale === "es" ? "Calendario" : "Calendar"}>
         <div className="pk-cal-nav">
           <button
             type="button"
             className="pk-nav-btn"
-            aria-label="Mes anterior"
+            aria-label={t.prevMonth}
             onClick={() =>
               setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))
             }
           >
             ‹
           </button>
-          <h2>{monthLabel(view)}</h2>
+          <h2>{formatMonthLabel(view, locale)}</h2>
           <button
             type="button"
             className="pk-nav-btn"
-            aria-label="Mes siguiente"
+            aria-label={t.nextMonth}
             onClick={() =>
               setView(new Date(view.getFullYear(), view.getMonth() + 1, 1))
             }
@@ -240,7 +255,7 @@ export default function ParkingPublicApp() {
         </div>
 
         <div className="pk-weekdays">
-          {WEEKDAYS.map((d) => (
+          {t.weekdays.map((d) => (
             <div key={d}>{d}</div>
           ))}
         </div>
@@ -253,19 +268,19 @@ export default function ParkingPublicApp() {
             const disabled = state === "past" || state === "unavailable";
             const label =
               state === "past"
-                ? "Pasado"
+                ? t.past
                 : state === "unavailable"
-                  ? "No disponible"
+                  ? t.unavailable
                   : state === "selected" || state === "inrange"
-                    ? "Seleccionado"
-                    : "Disponible";
+                    ? t.selected
+                    : t.available;
             return (
               <button
                 key={iso}
                 type="button"
                 className={`pk-cell day ${state}`}
                 disabled={disabled}
-                aria-label={`${cell.getDate()} de ${monthLabel(view)} — ${label}`}
+                aria-label={`${cell.getDate()} ${formatMonthLabel(view, locale)} — ${label}`}
                 aria-pressed={state === "selected" || state === "inrange"}
                 onMouseEnter={() => {
                   if (arrival && !departure && !disabled) setHover(iso);
@@ -282,22 +297,24 @@ export default function ParkingPublicApp() {
 
         {(arrival || departure) && (
           <button type="button" className="pk-clear" onClick={clearDates}>
-            Borrar fechas
+            {t.clearDates}
           </button>
         )}
       </section>
 
       {arrival && departure ? (
         <p className="pk-summary" role="status">
-          Fechas seleccionadas: del {formatSpanishDate(arrival)} al{" "}
-          {formatSpanishDate(departure)}.
+          {t.summaryRange(
+            formatParkingDate(arrival, locale),
+            formatParkingDate(departure, locale)
+          )}
           <br />
-          Duración: {daysCount} {daysCount === 1 ? "día" : "días"}.
+          {t.duration(daysCount)}
         </p>
       ) : arrival ? (
-        <p className="pk-summary">Elige la fecha de salida.</p>
+        <p className="pk-summary">{t.pickDeparture}</p>
       ) : (
-        <p className="pk-summary">Elige la fecha de llegada.</p>
+        <p className="pk-summary">{t.pickArrival}</p>
       )}
 
       <form
@@ -308,62 +325,74 @@ export default function ParkingPublicApp() {
         }}
       >
         <label>
-          Nombre <span className="req">*</span>
+          {t.name} <span className="req">*</span>
           <input
             required
             name="name"
             autoComplete="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Tu nombre"
+            placeholder={t.namePlaceholder}
           />
         </label>
         <label>
-          Matrícula del vehículo
+          {t.registration}
           <input
             name="registration"
             value={registration}
             onChange={(e) => setRegistration(e.target.value)}
-            placeholder="Opcional"
+            placeholder={t.optional}
           />
         </label>
         <label>
-          Modelo o tipo de vehículo
+          {t.vehicle}
           <input
             name="vehicle"
             value={vehicle}
             onChange={(e) => setVehicle(e.target.value)}
-            placeholder="Opcional"
+            placeholder={t.optional}
           />
         </label>
         <div className="pk-row">
           <label>
-            Hora aproximada de llegada
-            <input
-              type="time"
-              name="arrivalTime"
-              value={arrivalTime}
-              onChange={(e) => setArrivalTime(e.target.value)}
-            />
+            {t.arrivalTiming} <span className="req">*</span>
+            <select
+              required
+              name="arrivalTiming"
+              value={arrivalTiming}
+              onChange={(e) =>
+                setArrivalTiming(e.target.value as MiddayTiming | "")
+              }
+            >
+              <option value="">{t.timingPlaceholder}</option>
+              <option value="before_midday">{t.beforeMidday}</option>
+              <option value="after_midday">{t.afterMidday}</option>
+            </select>
           </label>
           <label>
-            Hora aproximada de salida
-            <input
-              type="time"
-              name="departureTime"
-              value={departureTime}
-              onChange={(e) => setDepartureTime(e.target.value)}
-            />
+            {t.departureTiming} <span className="req">*</span>
+            <select
+              required
+              name="departureTiming"
+              value={departureTiming}
+              onChange={(e) =>
+                setDepartureTiming(e.target.value as MiddayTiming | "")
+              }
+            >
+              <option value="">{t.timingPlaceholder}</option>
+              <option value="before_midday">{t.beforeMidday}</option>
+              <option value="after_midday">{t.afterMidday}</option>
+            </select>
           </label>
         </div>
         <label>
-          Comentarios
+          {t.comments}
           <textarea
             name="comments"
             rows={3}
             value={comments}
             onChange={(e) => setComments(e.target.value)}
-            placeholder="Opcional"
+            placeholder={t.optional}
           />
         </label>
 
@@ -374,12 +403,9 @@ export default function ParkingPublicApp() {
         ) : null}
 
         <button type="submit" className="pk-wa">
-          Consultar por WhatsApp
+          {t.whatsappCta}
         </button>
-        <p className="pk-note">
-          Se abrirá WhatsApp con tu consulta. No confirma la reserva hasta que yo
-          te responda.
-        </p>
+        <p className="pk-note">{t.whatsappNote}</p>
       </form>
 
       <style jsx>{`
@@ -404,6 +430,11 @@ export default function ParkingPublicApp() {
           color: var(--ink);
           font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
+        .pk-top {
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: 12px;
+        }
         .pk-brand {
           margin: 0 0 6px;
           font-size: 0.82rem;
@@ -423,6 +454,28 @@ export default function ParkingPublicApp() {
           color: var(--muted);
           line-height: 1.55;
           font-size: 0.98rem;
+        }
+        .pk-prices {
+          margin: 18px 0 0;
+          padding: 14px 16px;
+          background: var(--card);
+          border: 1px solid var(--line);
+          border-radius: 12px;
+        }
+        .pk-prices h2 {
+          margin: 0 0 8px;
+          font-size: 1rem;
+          font-weight: 750;
+        }
+        .pk-prices ul {
+          margin: 0;
+          padding-left: 1.1rem;
+          color: var(--muted);
+          line-height: 1.55;
+          font-size: 0.95rem;
+        }
+        .pk-prices li + li {
+          margin-top: 4px;
         }
         .pk-banner {
           margin: 16px 0 0;
@@ -584,7 +637,8 @@ export default function ParkingPublicApp() {
           font-weight: 600;
         }
         .pk-form input,
-        .pk-form textarea {
+        .pk-form textarea,
+        .pk-form select {
           width: 100%;
           box-sizing: border-box;
           min-height: 44px;
