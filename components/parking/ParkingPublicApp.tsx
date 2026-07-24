@@ -5,7 +5,6 @@ import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
 import {
   formatMonthLabel,
-  formatParkingDate,
   getParkingCopy,
   type MiddayTiming,
 } from "@/lib/parking/i18n";
@@ -17,7 +16,6 @@ import {
   rangeContainsUnavailable,
   toISODate,
   whatsAppHref,
-  countInclusiveDays,
   type ParkingUnavailableRange,
 } from "@/lib/parking/types";
 
@@ -184,9 +182,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     window.open(whatsAppHref(message), "_blank", "noopener,noreferrer");
   }
 
-  const daysCount =
-    arrival && departure ? countInclusiveDays(arrival, departure) : 0;
-
   return (
     <div className="pk" lang={locale}>
       <div className="pk-top">
@@ -330,21 +325,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </button>
         )}
       </section>
-
-      {arrival && departure ? (
-        <p className="pk-summary" role="status">
-          {t.summaryRange(
-            formatParkingDate(arrival, locale),
-            formatParkingDate(departure, locale)
-          )}
-          <br />
-          {t.duration(daysCount)}
-        </p>
-      ) : arrival ? (
-        <p className="pk-summary">{t.pickDeparture}</p>
-      ) : (
-        <p className="pk-summary">{t.pickArrival}</p>
-      )}
 
       <form
         className="pk-form"
@@ -652,15 +632,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           border: 1px solid var(--line);
           background: var(--bg);
           cursor: pointer;
-          font-size: 0.95rem;
-        }
-        .pk-summary {
-          margin: 16px 0;
-          padding: 12px 14px;
-          background: var(--card);
-          border: 1px solid var(--line);
-          border-radius: 12px;
-          line-height: 1.5;
           font-size: 0.95rem;
         }
         .pk-form {
