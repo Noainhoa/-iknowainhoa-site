@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS parking_bookings (
   customer_name TEXT,
   customer_surnames TEXT,
   customer_dni TEXT,
+  customer_dni_image_path TEXT,
   customer_phone TEXT,
   vehicle_registration TEXT,
   vehicle_description TEXT,
@@ -34,9 +35,9 @@ CREATE TABLE IF NOT EXISTS parking_bookings (
   CONSTRAINT parking_bookings_dates_ok CHECK (end_date >= start_date)
 );
 
--- Safe upgrades if the table already existed without these columns
 ALTER TABLE parking_bookings ADD COLUMN IF NOT EXISTS customer_surnames TEXT;
 ALTER TABLE parking_bookings ADD COLUMN IF NOT EXISTS customer_dni TEXT;
+ALTER TABLE parking_bookings ADD COLUMN IF NOT EXISTS customer_dni_image_path TEXT;
 
 ALTER TABLE parking_bookings DROP CONSTRAINT IF EXISTS parking_bookings_no_overlap;
 ALTER TABLE parking_bookings
@@ -69,8 +70,6 @@ CREATE POLICY parking_bookings_admin_all
   USING (true)
   WITH CHECK (true);
 
--- No anon policies on the base table (private fields stay protected).
-
 CREATE OR REPLACE FUNCTION public.parking_unavailable_ranges()
 RETURNS TABLE (
   id UUID,
@@ -94,7 +93,41 @@ $$;
 REVOKE ALL ON FUNCTION public.parking_unavailable_ranges() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.parking_unavailable_ranges() TO anon, authenticated;
 
-CREATE OR REPLACE VIEW parking_public_availability AS
-SELECT * FROM public.parking_unavailable_ranges();
+-- Prefer RPC over a SECURITY DEFINER view (avoids advisor lint).
+DROP VIEW IF EXISTS public.parking_public_availability;
 
-GRANT SELECT ON parking_public_availability TO anon, authenticated;
+-- Private bucket for DNI images (admin only)
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'parking-dni',
+  'parking-dni',
+  false,
+  5242880,
+  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'application/pdf']
+)
+ON CONFLICT (id) DO UPDATE SET
+  public = EXCLUDED.public,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP POLICY IF EXISTS "parking_dni_select_authenticated" ON storage.objects;
+DROP POLICY IF EXISTS "parking_dni_insert_authenticated" ON storage.objects;
+DROP POLICY IF EXISTS "parking_dni_update_authenticated" ON storage.objects;
+DROP POLICY IF EXISTS "parking_dni_delete_authenticated" ON storage.objects;
+
+CREATE POLICY "parking_dni_select_authenticated"
+  ON storage.objects FOR SELECT TO authenticated
+  USING (bucket_id = 'parking-dni');
+
+CREATE POLICY "parking_dni_insert_authenticated"
+  ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'parking-dni');
+
+CREATE POLICY "parking_dni_update_authenticated"
+  ON storage.objects FOR UPDATE TO authenticated
+  USING (bucket_id = 'parking-dni')
+  WITH CHECK (bucket_id = 'parking-dni');
+
+CREATE POLICY "parking_dni_delete_authenticated"
+  ON storage.objects FOR DELETE TO authenticated
+  USING (bucket_id = 'parking-dni');

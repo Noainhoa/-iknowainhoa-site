@@ -1,5 +1,16 @@
 export const PARKING_WHATSAPP_NUMBER = "34636670103";
 export const PARKING_WHATSAPP_URL = `https://wa.me/${PARKING_WHATSAPP_NUMBER}`;
+export const PARKING_DNI_BUCKET = "parking-dni";
+
+export function dniStoragePath(bookingId: string, file: File): string {
+  const raw = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const ext = ["jpg", "jpeg", "png", "webp", "heic", "pdf"].includes(raw)
+    ? raw === "jpeg"
+      ? "jpg"
+      : raw
+    : "jpg";
+  return `${bookingId}/dni.${ext}`;
+}
 
 export type ParkingBookingStatus =
   | "reserved"
@@ -15,6 +26,7 @@ export type ParkingBooking = {
   customer_name: string | null;
   customer_surnames: string | null;
   customer_dni: string | null;
+  customer_dni_image_path: string | null;
   customer_phone: string | null;
   vehicle_registration: string | null;
   vehicle_description: string | null;

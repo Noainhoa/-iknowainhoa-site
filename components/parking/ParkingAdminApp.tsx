@@ -9,6 +9,8 @@ import {
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
   STATUS_LABELS_ES,
+  PARKING_DNI_BUCKET,
+  dniStoragePath,
   formatSpanishDate,
   rangesOverlap,
   type ParkingBooking,
@@ -23,6 +25,7 @@ const EMPTY_FORM = {
   customer_name: "",
   customer_surnames: "",
   customer_dni: "",
+  customer_dni_image_path: "" as string,
   customer_phone: "",
   vehicle_registration: "",
   vehicle_description: "",
@@ -45,6 +48,8 @@ export default function ParkingAdminApp() {
   const [message, setMessage] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<ParkingBooking | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [dniFile, setDniFile] = useState<File | null>(null);
+  const [dniLocalPreview, setDniLocalPreview] = useState<string | null>(null);
 
   const refreshSession = useCallback(async () => {
     if (!supabase) return;
@@ -78,8 +83,22 @@ export default function ParkingAdminApp() {
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (dniLocalPreview) URL.revokeObjectURL(dniLocalPreview);
     };
-  }, [previewUrl]);
+  }, [previewUrl, dniLocalPreview]);
+
+  function resetForm() {
+    setForm(EMPTY_FORM);
+    setDniFile(null);
+    if (dniLocalPreview) URL.revokeObjectURL(dniLocalPreview);
+    setDniLocalPreview(null);
+  }
+
+  function onPickDni(file: File | null) {
+    if (dniLocalPreview) URL.revokeObjectURL(dniLocalPreview);
+    setDniFile(file);
+    setDniLocalPreview(file && file.type.startsWith("image/") ? URL.createObjectURL(file) : null);
+  }
 
   const today = useMemo(() => {
     const n = new Date();
@@ -119,6 +138,7 @@ export default function ParkingAdminApp() {
     setRows([]);
     setForm(EMPTY_FORM);
     setLastSaved(null);
+    resetForm();
   }
 
   function editRow(row: ParkingBooking) {
@@ -130,14 +150,40 @@ export default function ParkingAdminApp() {
       customer_name: row.customer_name || "",
       customer_surnames: row.customer_surnames || "",
       customer_dni: row.customer_dni || "",
+      customer_dni_image_path: row.customer_dni_image_path || "",
       customer_phone: row.customer_phone || "",
       vehicle_registration: row.vehicle_registration || "",
       vehicle_description: row.vehicle_description || "",
       price_eur: row.price_eur != null ? String(row.price_eur) : "",
       private_notes: row.private_notes || "",
     });
+    setDniFile(null);
+    if (dniLocalPreview) URL.revokeObjectURL(dniLocalPreview);
+    setDniLocalPreview(null);
     setMessage(null);
     setLastSaved(row);
+  }
+
+  async function openDniImage(path: string) {
+    if (!supabase) return;
+    const { data, error } = await supabase.storage
+      .from(PARKING_DNI_BUCKET)
+      .createSignedUrl(path, 60 * 10);
+    if (error || !data?.signedUrl) {
+      setMessage(error?.message || "No se pudo abrir la imagen del DNI.");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  }
+
+  async function uploadDniForBooking(bookingId: string, file: File) {
+    if (!supabase) throw new Error("Supabase no configurado");
+    const path = dniStoragePath(bookingId, file);
+    const { error } = await supabase.storage
+      .from(PARKING_DNI_BUCKET)
+      .upload(path, file, { upsert: true, contentType: file.type || undefined });
+    if (error) throw error;
+    return path;
   }
 
   function validateOverlap(
@@ -229,6 +275,10 @@ export default function ParkingAdminApp() {
         setMessage("El importe pagado es obligatorio para una reserva.");
         return;
       }
+      if (!dniFile && !form.customer_dni_image_path) {
+        setMessage("Sube una foto o PDF del DNI para confirmar la reserva.");
+        return;
+      }
     }
 
     const overlap = validateOverlap(
@@ -242,67 +292,87 @@ export default function ParkingAdminApp() {
       return;
     }
 
-    const payload = {
-      start_date: form.start_date,
-      end_date: form.end_date,
-      status: form.status,
-      customer_name: form.customer_name.trim() || null,
-      customer_surnames: form.customer_surnames.trim() || null,
-      customer_dni: form.customer_dni.trim().toUpperCase() || null,
-      customer_phone: form.customer_phone.trim() || null,
-      vehicle_registration: form.vehicle_registration.trim() || null,
-      vehicle_description: form.vehicle_description.trim() || null,
-      price_eur: form.price_eur === "" ? null : Number(form.price_eur),
-      private_notes: form.private_notes.trim() || null,
-    };
+    const bookingId = form.id || crypto.randomUUID();
+    let dniPath = form.customer_dni_image_path || null;
 
     setSaving(true);
-    const result = form.id
-      ? await supabase
-          .from("parking_bookings")
-          .update(payload)
-          .eq("id", form.id)
-          .select()
-          .single()
-      : await supabase.from("parking_bookings").insert(payload).select().single();
-    setSaving(false);
-
-    if (result.error) {
-      setMessage(result.error.message);
-      return;
-    }
-
-    const saved = result.data as ParkingBooking;
-    setLastSaved(saved);
-    setMessage(
-      form.id
-        ? "Registro actualizado."
-        : "Reserva guardada. Se ha descargado la imagen de confirmación."
-    );
-
-    if (isBooking) {
-      try {
-        await makeConfirmation(saved);
-      } catch {
-        setMessage(
-          "Reserva guardada, pero no se pudo generar la imagen de confirmación."
-        );
+    try {
+      if (dniFile) {
+        dniPath = await uploadDniForBooking(bookingId, dniFile);
       }
-    }
 
-    setForm(EMPTY_FORM);
-    await loadRows();
+      const payload = {
+        id: bookingId,
+        start_date: form.start_date,
+        end_date: form.end_date,
+        status: form.status,
+        customer_name: form.customer_name.trim() || null,
+        customer_surnames: form.customer_surnames.trim() || null,
+        customer_dni: form.customer_dni.trim().toUpperCase() || null,
+        customer_dni_image_path: dniPath,
+        customer_phone: form.customer_phone.trim() || null,
+        vehicle_registration: form.vehicle_registration.trim() || null,
+        vehicle_description: form.vehicle_description.trim() || null,
+        price_eur: form.price_eur === "" ? null : Number(form.price_eur),
+        private_notes: form.private_notes.trim() || null,
+      };
+
+      const result = form.id
+        ? await supabase
+            .from("parking_bookings")
+            .update(payload)
+            .eq("id", form.id)
+            .select()
+            .single()
+        : await supabase.from("parking_bookings").insert(payload).select().single();
+
+      if (result.error) {
+        setMessage(result.error.message);
+        return;
+      }
+
+      const saved = result.data as ParkingBooking;
+      setLastSaved(saved);
+      setMessage(
+        form.id
+          ? "Registro actualizado."
+          : "Reserva guardada. Se ha descargado la imagen de confirmación."
+      );
+
+      if (isBooking) {
+        try {
+          await makeConfirmation(saved);
+        } catch {
+          setMessage(
+            "Reserva guardada, pero no se pudo generar la imagen de confirmación."
+          );
+        }
+      }
+
+      resetForm();
+      await loadRows();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Error al guardar.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function onDelete(id: string) {
     if (!supabase) return;
     if (!window.confirm("¿Eliminar este registro?")) return;
+    const row = rows.find((r) => r.id === id);
+    if (row?.customer_dni_image_path) {
+      await supabase.storage
+        .from(PARKING_DNI_BUCKET)
+        .remove([row.customer_dni_image_path]);
+    }
     const { error } = await supabase.from("parking_bookings").delete().eq("id", id);
     if (error) {
       setMessage(error.message);
       return;
     }
-    if (form.id === id) setForm(EMPTY_FORM);
+    if (form.id === id) resetForm();
     if (lastSaved?.id === id) setLastSaved(null);
     await loadRows();
   }
@@ -470,6 +540,30 @@ export default function ParkingAdminApp() {
           </label>
         </div>
         <label>
+          Foto / PDF del DNI *
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
+            onChange={(e) => onPickDni(e.target.files?.[0] || null)}
+          />
+        </label>
+        {dniLocalPreview ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={dniLocalPreview} alt="Vista previa DNI" className="dni-preview" />
+        ) : null}
+        {form.customer_dni_image_path && !dniFile ? (
+          <p className="hint">
+            DNI guardado.{" "}
+            <button
+              type="button"
+              className="linkish"
+              onClick={() => void openDniImage(form.customer_dni_image_path)}
+            >
+              Ver archivo
+            </button>
+          </p>
+        ) : null}
+        <label>
           Importe pagado (€) *
           <input
             type="number"
@@ -518,7 +612,7 @@ export default function ParkingAdminApp() {
             <button
               type="button"
               className="ghost"
-              onClick={() => setForm(EMPTY_FORM)}
+              onClick={() => resetForm()}
             >
               Cancelar edición
             </button>
@@ -573,6 +667,7 @@ export default function ParkingAdminApp() {
                 <th>Estado</th>
                 <th>Cliente</th>
                 <th>DNI</th>
+                <th>Foto</th>
                 <th>Tel.</th>
                 <th>€</th>
                 <th />
@@ -592,6 +687,19 @@ export default function ParkingAdminApp() {
                       .join(" ") || "—"}
                   </td>
                   <td>{r.customer_dni || "—"}</td>
+                  <td>
+                    {r.customer_dni_image_path ? (
+                      <button
+                        type="button"
+                        className="ghost"
+                        onClick={() => void openDniImage(r.customer_dni_image_path!)}
+                      >
+                        Ver
+                      </button>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
                   <td>{r.customer_phone || "—"}</td>
                   <td>{r.price_eur != null ? r.price_eur : "—"}</td>
                   <td className="ops">
@@ -692,6 +800,8 @@ const styles = `
   .wa { background: #128c7e; }
   .actions { display: flex; flex-wrap: wrap; gap: 8px; }
   .preview { width: 100%; max-width: 360px; border-radius: 10px; border: 1px solid #e6e6e6; margin: 8px 0 12px; }
+  .dni-preview { width: 100%; max-width: 280px; border-radius: 10px; border: 1px solid #e6e6e6; }
+  .linkish { background: none; border: 0; color: #0b6e4f; text-decoration: underline; cursor: pointer; padding: 0; min-height: auto; font: inherit; font-weight: 650; }
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
   th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #eee; vertical-align: top; }

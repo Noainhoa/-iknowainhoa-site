@@ -34,7 +34,9 @@ When you save a **reserved** booking, fill in:
 
 The admin generates a **confirmation PNG** (name, DNI, dates, payment, Jorge Juan 13) and downloads it. Use **Abrir WhatsApp del cliente** and attach the image manually (WhatsApp links cannot auto-attach files).
 
-If the table already exists, also run `supabase/parking-booking-fields.sql` for the new columns.
+For reservas, also upload a **DNI photo/PDF** (stored privately in Supabase Storage bucket `parking-dni`).
+
+If the table already exists, run `supabase/parking-dni-storage.sql` (adds column + private bucket + storage policies). Also run `supabase/parking-booking-fields.sql` for name fields if needed.
 
 ## Local
 
