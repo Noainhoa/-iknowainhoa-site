@@ -196,7 +196,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       </div>
 
       <header className="pk-header">
-        <p className="pk-brand">{t.brand}</p>
         <h1>{t.title}</h1>
         <p>{t.intro}</p>
       </header>
@@ -464,16 +463,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           justify-content: flex-end;
           margin-bottom: 12px;
         }
-        .pk-brand {
-          margin: 0 0 6px;
-          font-size: 0.82rem;
-          font-weight: 700;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          color: var(--ink);
-        }
         .pk-header h1 {
-          margin: 0 0 10px;
+          margin: 0 0 8px;
           font-size: 1.55rem;
           line-height: 1.2;
           font-weight: 750;
@@ -481,7 +472,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-header p {
           margin: 0;
           color: var(--muted);
-          line-height: 1.55;
+          line-height: 1.45;
           font-size: 0.98rem;
         }
         .pk-prices {

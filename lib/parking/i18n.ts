@@ -47,9 +47,8 @@ export type ParkingCopy = {
 
 const es: ParkingCopy = {
   brand: "Parking Guardamar Centro",
-  title: "Disponibilidad de la plaza",
-  intro:
-    "Consulta las fechas disponibles y envíame una solicitud por WhatsApp. La selección de fechas no constituye una reserva hasta que sea confirmada.",
+  title: "Parking Guardamar Centro",
+  intro: "Elige fechas y consulta por WhatsApp.",
   pricesTitle: "Precios",
   priceHigh: "Temporada alta (junio-agosto): 70 €/semana",
   priceSeptember: "Septiembre: 50 €/semana",
@@ -62,8 +61,8 @@ const es: ParkingCopy = {
   prevMonth: "Mes anterior",
   nextMonth: "Mes siguiente",
   clearDates: "Borrar fechas",
-  summaryRange: (from, to) => `Fechas seleccionadas: del ${from} al ${to}.`,
-  duration: (n) => `Duración: ${n} ${n === 1 ? "día" : "días"}.`,
+  summaryRange: (from, to) => `Fechas: del ${from} al ${to}.`,
+  duration: (n) => `${n} ${n === 1 ? "día" : "días"}.`,
   pickDeparture: "Elige la fecha de salida.",
   pickArrival: "Elige la fecha de llegada.",
   name: "Nombre",
@@ -78,8 +77,7 @@ const es: ParkingCopy = {
   afterMidday: "Después del mediodía",
   comments: "Comentarios",
   whatsappCta: "Consultar por WhatsApp",
-  whatsappNote:
-    "Se abrirá WhatsApp con tu consulta. No confirma la reserva hasta que yo te responda.",
+  whatsappNote: "No confirma la reserva hasta que te responda.",
   supabaseHint:
     "Calendario en modo local: falta configurar Supabase. Todas las fechas futuras aparecen como disponibles hasta que se conecte la base de datos.",
   loadError:
@@ -95,9 +93,8 @@ const es: ParkingCopy = {
 
 const en: ParkingCopy = {
   brand: "Parking Guardamar Centro",
-  title: "Space availability",
-  intro:
-    "Check available dates and send me a request on WhatsApp. Selecting dates does not confirm a booking until I reply.",
+  title: "Parking Guardamar Centro",
+  intro: "Pick dates and enquire on WhatsApp.",
   pricesTitle: "Prices",
   priceHigh: "High season (June–August): €70/week",
   priceSeptember: "September: €50/week",
@@ -110,8 +107,8 @@ const en: ParkingCopy = {
   prevMonth: "Previous month",
   nextMonth: "Next month",
   clearDates: "Clear dates",
-  summaryRange: (from, to) => `Selected dates: from ${from} to ${to}.`,
-  duration: (n) => `Duration: ${n} ${n === 1 ? "day" : "days"}.`,
+  summaryRange: (from, to) => `Dates: from ${from} to ${to}.`,
+  duration: (n) => `${n} ${n === 1 ? "day" : "days"}.`,
   pickDeparture: "Choose your departure date.",
   pickArrival: "Choose your arrival date.",
   name: "Name",
@@ -126,8 +123,7 @@ const en: ParkingCopy = {
   afterMidday: "After midday",
   comments: "Comments",
   whatsappCta: "Enquire on WhatsApp",
-  whatsappNote:
-    "WhatsApp will open with your enquiry. This does not confirm the booking until I reply.",
+  whatsappNote: "Does not confirm the booking until I reply.",
   supabaseHint:
     "Calendar in local mode: Supabase is not configured. All future dates show as available until the database is connected.",
   loadError: "Could not load availability. Please try again later.",
