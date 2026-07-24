@@ -5,7 +5,10 @@ export type ParsedDniFields = {
 };
 
 const JUNK =
-  /^(s|sur|name|names|surname|surnames|given|givennames|apellido|apellidos|nombre|nombres|dni|nie|esp|españa|espana|sex|sexo|nationality|nacionalidad|id|identity|document|documento|card|tarjeta)$/i;
+  /^(s|sur|name|names|surname|surnames|given|givennames|apellido|apellidos|cognom|cognoms|nombre|nombres|nom|dni|nie|esp|españa|espana|sex|sexo|sexe|nationality|nacionalidad|nacionalitat|id|identity|document|documento|card|tarjeta|soport|suport)$/i;
+
+const BILINGUAL_LEFTOVER =
+  /\b(surname|surnames|given|names?|cognoms?|nom|sexe|nacionalitat|nationality|naixement)\b/gi;
 
 function titleCaseName(value: string): string {
   return value
@@ -43,22 +46,36 @@ function isSectionLabel(line: string): boolean {
   const u = line.toUpperCase();
   return (
     /APELLIDOS/.test(u) ||
+    /COGNOMS/.test(u) ||
     /\bNOMBRE\b/.test(u) ||
+    /\/\s*NOM\b/.test(u) ||
+    /^\s*NOM\b/.test(u) ||
     /SURNAME/.test(u) ||
     /GIVEN\s*NAMES?/.test(u) ||
     /NACIONALIDAD/.test(u) ||
+    /NACIONALITAT/.test(u) ||
     /NATIONALITY/.test(u) ||
     /\bSEXO\b/.test(u) ||
+    /\bSEXE\b/.test(u) ||
     /\bSEX\b/.test(u) ||
     /FECHA/.test(u) ||
+    /NAIXEMENT/.test(u) ||
     /BIRTH/.test(u) ||
     /DOMICILIO/.test(u) ||
     /ADDRESS/.test(u) ||
     /VALIDEZ/.test(u) ||
+    /VALIDESA/.test(u) ||
     /VALIDITY/.test(u) ||
-    /SOPORTE/.test(u) ||
+    /SOPORT/.test(u) ||
+    /SUPORT/.test(u) ||
     /SUPPORT/.test(u) ||
     /IDENTIDAD/.test(u)
+  );
+}
+
+function isBilingualOnlyLine(line: string): boolean {
+  return /^(SURNAME|GIVEN NAMES?|SEX|SEXE|NATIONALITY|NACIONALITAT|COGNOMS|NOM)$/i.test(
+    line
   );
 }
 
@@ -81,10 +98,9 @@ function valuesAfterLabel(
   for (let i = start + 1; i < lines.length; i++) {
     const line = normalizeLine(lines[i]);
     if (!line) continue;
-    if (isSectionLabel(line) && !inlineExtract?.(line)) break;
     if (isSectionLabel(line)) break;
     if (looksLikeDate(line) || looksLikeDniId(line)) break;
-    if (/^(SURNAME|GIVEN NAMES?|SEX|NATIONALITY)$/i.test(line)) continue;
+    if (isBilingualOnlyLine(line)) continue;
     if (!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{2,}/.test(line)) continue;
     out.push(
       line.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s\-']/g, " ").replace(/\s+/g, " ").trim()
@@ -99,7 +115,7 @@ function inlineAfter(line: string, patterns: RegExp[]): string | null {
     const m = line.match(re);
     if (m?.[1]) {
       const v = m[1]
-        .replace(/\b(SURNAME|GIVEN NAMES?|SEX|NATIONALITY)\b/gi, " ")
+        .replace(BILINGUAL_LEFTOVER, " ")
         .replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s\-']/g, " ")
         .replace(/\s+/g, " ")
         .trim();
@@ -122,7 +138,11 @@ function parseMrz(upper: string): { name: string; surnames: string } | null {
 
   const [surnamesPart, namesPart = ""] = nameLine.split("<<");
   const surnames = titleCaseName(
-    surnamesPart.replace(/</g, " ").replace(/[^A-ZÁÉÍÓÚÜÑ\s]/gi, " ").replace(/\s+/g, " ").trim()
+    surnamesPart
+      .replace(/</g, " ")
+      .replace(/[^A-ZÁÉÍÓÚÜÑ\s]/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim()
   );
   const name = titleCaseName(
     namesPart
@@ -138,7 +158,24 @@ function parseMrz(upper: string): { name: string; surnames: string } | null {
   };
 }
 
-/** Parse Spanish DNI / NIE OCR text (visual labels + optional MRZ). */
+function isSurnameLabel(line: string): boolean {
+  return (
+    /APELLIDOS/i.test(line) ||
+    /COGNOMS/i.test(line) ||
+    (/SURNAME/i.test(line) && !/GIVEN/i.test(line))
+  );
+}
+
+function isNameLabel(line: string): boolean {
+  return (
+    /\bNOMBRE\b/i.test(line) ||
+    /GIVEN\s*NAMES?/i.test(line) ||
+    /NOMBRE\s*\/\s*NOM\b/i.test(line) ||
+    /\/\s*NOM\b/i.test(line)
+  );
+}
+
+/** Parse Spanish DNI / NIE OCR text (ES / CA / EN labels + optional MRZ). */
 export function parseSpanishDniText(raw: string): ParsedDniFields {
   const text = raw.replace(/\r/g, "\n");
   const upper = text.toUpperCase();
@@ -157,23 +194,27 @@ export function parseSpanishDniText(raw: string): ParsedDniFields {
 
   const surnameLines = valuesAfterLabel(
     lines,
-    (l) => /APELLIDOS/i.test(l) || (/SURNAME/i.test(l) && !/GIVEN/i.test(l)),
+    isSurnameLabel,
     3,
     (l) =>
       inlineAfter(l, [
+        /APELLIDOS\s*\/\s*COGNOMS?\s+(.+)/i,
         /APELLIDOS\s*\/\s*SURNAME\s+(.+)/i,
         /APELLIDOS\s*[:\-]?\s+(.+)/i,
+        /COGNOMS?\s*[:\-]?\s+(.+)/i,
         /SURNAME\s*[:\-]?\s+(.+)/i,
       ])
   );
   const nameLines = valuesAfterLabel(
     lines,
-    (l) => /\bNOMBRE\b/i.test(l) || /GIVEN\s*NAMES?/i.test(l),
+    isNameLabel,
     2,
     (l) =>
       inlineAfter(l, [
+        /NOMBRE\s*\/\s*NOM\s+(.+)/i,
         /NOMBRE\s*\/\s*GIVEN\s*NAMES?\s+(.+)/i,
         /NOMBRE\s*[:\-]?\s+(.+)/i,
+        /\bNOM\s*[:\-]?\s+(.+)/i,
         /GIVEN\s*NAMES?\s*[:\-]?\s+(.+)/i,
       ])
   );
@@ -181,17 +222,13 @@ export function parseSpanishDniText(raw: string): ParsedDniFields {
   let surnames = surnameLines.join(" ").trim();
   let name = nameLines.join(" ").trim();
 
-  // Prefer visual card fields; fall back to MRZ
   if (isJunk(surnames) && mrz?.surnames) surnames = mrz.surnames;
   if (isJunk(name) && mrz?.name) name = mrz.name;
 
-  // If surname capture accidentally ate English label leftovers
-  surnames = surnames
-    .replace(/\b(surname|surnames|given|names?)\b/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  surnames = surnames.replace(BILINGUAL_LEFTOVER, " ").replace(/\s+/g, " ").trim();
   name = name
-    .replace(/\b(surname|surnames|given|names?|nombre|apellidos?|dni|nie)\b/gi, " ")
+    .replace(BILINGUAL_LEFTOVER, " ")
+    .replace(/\b(nombre|apellidos?|dni|nie)\b/gi, " ")
     .replace(/\b\d{8}[A-Z]\b/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -211,7 +248,6 @@ export async function extractDniFromImage(file: File): Promise<ParsedDniFields> 
   const worker = await createWorker("spa+eng");
   try {
     await worker.setParameters({
-      // Assume a uniform block of text (ID card photo / screenshot)
       tessedit_pageseg_mode: "6",
       user_defined_dpi: "300",
     });
