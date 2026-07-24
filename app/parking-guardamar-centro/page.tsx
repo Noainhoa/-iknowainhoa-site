@@ -15,6 +15,10 @@ export async function generateMetadata(): Promise<Metadata> {
       ? "Parking Guardamar Centro: consulta las fechas disponibles de la plaza y envía una solicitud por WhatsApp."
       : "Parking Guardamar Centro: check available dates and send a WhatsApp enquiry.",
     alternates: { canonical: PATH },
+    icons: {
+      icon: [{ url: "/images/parking/guardamar-parking-logo.png", type: "image/png" }],
+      apple: [{ url: "/images/parking/guardamar-parking-logo.png", type: "image/png" }],
+    },
     openGraph: {
       title: es
         ? "Parking Guardamar Centro — Disponibilidad"
@@ -25,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: PATH,
       locale: es ? "es_ES" : "en_GB",
       type: "website",
+      images: [{ url: "/images/parking/guardamar-parking-logo.png", width: 512, height: 512 }],
     },
   };
 }

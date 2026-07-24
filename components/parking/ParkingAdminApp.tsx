@@ -33,6 +33,8 @@ const EMPTY_FORM = {
   private_notes: "",
 };
 
+const LOGO_SRC = "/images/parking/guardamar-parking-logo.png";
+
 export default function ParkingAdminApp() {
   const configured = parkingSupabaseConfigured();
   const supabase = getParkingSupabase();
@@ -429,7 +431,10 @@ export default function ParkingAdminApp() {
   if (!configured || !supabase) {
     return (
       <div className="adm">
-        <h1>Administración — Parking Guardamar Centro</h1>
+        <div className="brand">
+          <img className="logo" src={LOGO_SRC} alt="Guardamar Parking" width={48} height={48} decoding="async" />
+          <h1>Administración — Parking Guardamar Centro</h1>
+        </div>
         <p className="warn">
           Configura <code>NEXT_PUBLIC_SUPABASE_URL</code> y la publishable/anon
           key, ejecuta <code>supabase/parking.sql</code> y crea un usuario
@@ -443,7 +448,10 @@ export default function ParkingAdminApp() {
   if (!sessionEmail) {
     return (
       <div className="adm">
-        <h1>Administración — Parking Guardamar Centro</h1>
+        <div className="brand">
+          <img className="logo" src={LOGO_SRC} alt="Guardamar Parking" width={48} height={48} decoding="async" />
+          <h1>Administración — Parking Guardamar Centro</h1>
+        </div>
         <p className="muted">Acceso restringido. Inicia sesión.</p>
         <form className="card form" onSubmit={onLogin}>
           <label>
@@ -477,9 +485,12 @@ export default function ParkingAdminApp() {
   return (
     <div className="adm">
       <header className="top">
-        <div>
-          <h1>Administración — Parking Guardamar Centro</h1>
-          <p className="muted">{sessionEmail}</p>
+        <div className="brand">
+          <img className="logo" src={LOGO_SRC} alt="Guardamar Parking" width={48} height={48} decoding="async" />
+          <div>
+            <h1>Administración — Parking Guardamar Centro</h1>
+            <p className="muted">{sessionEmail}</p>
+          </div>
         </div>
         <button type="button" className="ghost" onClick={() => void onLogout()}>
           Cerrar sesión
@@ -837,6 +848,11 @@ const styles = `
   h1 { margin: 0 0 8px; font-size: 1.45rem; }
   h2 { margin: 0 0 12px; font-size: 1.1rem; }
   h3 { margin: 0 0 8px; font-size: 0.95rem; }
+  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .brand h1 { margin: 0; }
+  .brand .muted { margin: 4px 0 0; }
+  .top .brand { margin-bottom: 0; }
+  .logo { width: 48px; height: 48px; flex-shrink: 0; border-radius: 50%; display: block; }
   .muted { color: #666; font-size: 0.9rem; }
   .hint { margin: 0 0 8px; color: #555; font-size: 0.88rem; line-height: 1.45; font-weight: 400; }
   .warn { background: #fff6d6; border: 1px solid #f0e0a0; padding: 12px; border-radius: 10px; line-height: 1.5; }

@@ -183,7 +183,17 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       </div>
 
       <header className="pk-header">
-        <h1>{t.title}</h1>
+        <div className="pk-brand">
+          <img
+            className="pk-logo"
+            src="/images/parking/guardamar-parking-logo.png"
+            alt="Guardamar Parking"
+            width={48}
+            height={48}
+            decoding="async"
+          />
+          <h1>{t.title}</h1>
+        </div>
         <p>{t.intro}</p>
         <p className="pk-access">{t.accessNote}</p>
       </header>
@@ -444,8 +454,21 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           justify-content: flex-end;
           margin-bottom: 12px;
         }
+        .pk-brand {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 8px;
+        }
+        .pk-logo {
+          width: 48px;
+          height: 48px;
+          flex-shrink: 0;
+          border-radius: 50%;
+          display: block;
+        }
         .pk-header h1 {
-          margin: 0 0 8px;
+          margin: 0;
           font-size: 1.55rem;
           line-height: 1.2;
           font-weight: 750;
