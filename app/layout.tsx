@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import { site } from "@/lib/site";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import SiteChrome from "@/components/SiteChrome";
 import { getLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -39,9 +38,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body className="antialiased">
-        <SiteHeader locale={locale} />
-        {children}
-        <SiteFooter />
+        <SiteChrome locale={locale}>{children}</SiteChrome>
       </body>
     </html>
   );

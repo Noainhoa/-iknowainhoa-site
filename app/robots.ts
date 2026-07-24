@@ -9,6 +9,8 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
         "/_next",
         "/api",
+        "/parking/admin",
+        "/parking/admin/",
         "*.json$",
       ],
     },
