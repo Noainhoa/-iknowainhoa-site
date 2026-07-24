@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS parking_bookings (
   end_date DATE NOT NULL,
   status parking_booking_status NOT NULL,
   customer_name TEXT,
+  customer_surnames TEXT,
+  customer_dni TEXT,
   customer_phone TEXT,
   vehicle_registration TEXT,
   vehicle_description TEXT,
@@ -31,6 +33,10 @@ CREATE TABLE IF NOT EXISTS parking_bookings (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT parking_bookings_dates_ok CHECK (end_date >= start_date)
 );
+
+-- Safe upgrades if the table already existed without these columns
+ALTER TABLE parking_bookings ADD COLUMN IF NOT EXISTS customer_surnames TEXT;
+ALTER TABLE parking_bookings ADD COLUMN IF NOT EXISTS customer_dni TEXT;
 
 ALTER TABLE parking_bookings DROP CONSTRAINT IF EXISTS parking_bookings_no_overlap;
 ALTER TABLE parking_bookings
@@ -88,7 +94,6 @@ $$;
 REVOKE ALL ON FUNCTION public.parking_unavailable_ranges() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.parking_unavailable_ranges() TO anon, authenticated;
 
--- Optional convenience view (same SECURITY DEFINER function under the hood if preferred).
 CREATE OR REPLACE VIEW parking_public_availability AS
 SELECT * FROM public.parking_unavailable_ranges();
 

@@ -1,6 +1,11 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  buildConfirmationImage,
+  customerWhatsAppHref,
+  downloadBlob,
+} from "@/lib/parking/confirmationImage";
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
   STATUS_LABELS_ES,
@@ -16,11 +21,11 @@ const EMPTY_FORM = {
   end_date: "",
   status: "reserved" as ParkingBookingStatus,
   customer_name: "",
+  customer_surnames: "",
+  customer_dni: "",
   customer_phone: "",
   vehicle_registration: "",
   vehicle_description: "",
-  arrival_time: "",
-  departure_time: "",
   price_eur: "",
   private_notes: "",
 };
@@ -38,6 +43,8 @@ export default function ParkingAdminApp() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [message, setMessage] = useState<string | null>(null);
+  const [lastSaved, setLastSaved] = useState<ParkingBooking | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const refreshSession = useCallback(async () => {
     if (!supabase) return;
@@ -67,6 +74,12 @@ export default function ParkingAdminApp() {
   useEffect(() => {
     if (sessionEmail) void loadRows();
   }, [sessionEmail, loadRows]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const today = useMemo(() => {
     const n = new Date();
@@ -105,6 +118,7 @@ export default function ParkingAdminApp() {
     setSessionEmail(null);
     setRows([]);
     setForm(EMPTY_FORM);
+    setLastSaved(null);
   }
 
   function editRow(row: ParkingBooking) {
@@ -114,18 +128,24 @@ export default function ParkingAdminApp() {
       end_date: row.end_date,
       status: row.status,
       customer_name: row.customer_name || "",
+      customer_surnames: row.customer_surnames || "",
+      customer_dni: row.customer_dni || "",
       customer_phone: row.customer_phone || "",
       vehicle_registration: row.vehicle_registration || "",
       vehicle_description: row.vehicle_description || "",
-      arrival_time: row.arrival_time?.slice(0, 5) || "",
-      departure_time: row.departure_time?.slice(0, 5) || "",
       price_eur: row.price_eur != null ? String(row.price_eur) : "",
       private_notes: row.private_notes || "",
     });
     setMessage(null);
+    setLastSaved(row);
   }
 
-  function validateOverlap(start: string, end: string, status: ParkingBookingStatus, id?: string) {
+  function validateOverlap(
+    start: string,
+    end: string,
+    status: ParkingBookingStatus,
+    id?: string
+  ) {
     if (status !== "reserved" && status !== "blocked") return null;
     const clash = rows.find(
       (r) =>
@@ -137,6 +157,41 @@ export default function ParkingAdminApp() {
       return `Las fechas se solapan con un registro existente (${STATUS_LABELS_ES[clash.status]}: ${clash.start_date} – ${clash.end_date}).`;
     }
     return null;
+  }
+
+  async function makeConfirmation(booking: {
+    customer_name: string | null;
+    customer_surnames: string | null;
+    customer_dni: string | null;
+    customer_phone: string | null;
+    start_date: string;
+    end_date: string;
+    price_eur: number | null;
+  }) {
+    if (
+      !booking.customer_name ||
+      !booking.customer_surnames ||
+      !booking.customer_dni ||
+      !booking.customer_phone ||
+      booking.price_eur == null
+    ) {
+      return;
+    }
+    const blob = await buildConfirmationImage({
+      name: booking.customer_name,
+      surnames: booking.customer_surnames,
+      dni: booking.customer_dni,
+      phone: booking.customer_phone,
+      startDate: booking.start_date,
+      endDate: booking.end_date,
+      priceEur: Number(booking.price_eur),
+    });
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(URL.createObjectURL(blob));
+    downloadBlob(
+      blob,
+      `confirmacion-parking-${booking.start_date}-${booking.customer_dni}.png`
+    );
   }
 
   async function onSave(e: FormEvent) {
@@ -151,7 +206,37 @@ export default function ParkingAdminApp() {
       setMessage("La fecha de fin debe ser igual o posterior a la de inicio.");
       return;
     }
-    const overlap = validateOverlap(form.start_date, form.end_date, form.status, form.id || undefined);
+
+    const isBooking = form.status === "reserved" || form.status === "completed";
+    if (isBooking) {
+      if (!form.customer_name.trim()) {
+        setMessage("El nombre es obligatorio para una reserva.");
+        return;
+      }
+      if (!form.customer_surnames.trim()) {
+        setMessage("Los apellidos son obligatorios para una reserva.");
+        return;
+      }
+      if (!form.customer_dni.trim()) {
+        setMessage("El DNI/NIE es obligatorio para una reserva.");
+        return;
+      }
+      if (!form.customer_phone.trim()) {
+        setMessage("El teléfono es obligatorio para una reserva.");
+        return;
+      }
+      if (form.price_eur === "" || Number.isNaN(Number(form.price_eur))) {
+        setMessage("El importe pagado es obligatorio para una reserva.");
+        return;
+      }
+    }
+
+    const overlap = validateOverlap(
+      form.start_date,
+      form.end_date,
+      form.status,
+      form.id || undefined
+    );
     if (overlap) {
       setMessage(overlap);
       return;
@@ -162,18 +247,23 @@ export default function ParkingAdminApp() {
       end_date: form.end_date,
       status: form.status,
       customer_name: form.customer_name.trim() || null,
+      customer_surnames: form.customer_surnames.trim() || null,
+      customer_dni: form.customer_dni.trim().toUpperCase() || null,
       customer_phone: form.customer_phone.trim() || null,
       vehicle_registration: form.vehicle_registration.trim() || null,
       vehicle_description: form.vehicle_description.trim() || null,
-      arrival_time: form.arrival_time || null,
-      departure_time: form.departure_time || null,
       price_eur: form.price_eur === "" ? null : Number(form.price_eur),
       private_notes: form.private_notes.trim() || null,
     };
 
     setSaving(true);
     const result = form.id
-      ? await supabase.from("parking_bookings").update(payload).eq("id", form.id).select().single()
+      ? await supabase
+          .from("parking_bookings")
+          .update(payload)
+          .eq("id", form.id)
+          .select()
+          .single()
       : await supabase.from("parking_bookings").insert(payload).select().single();
     setSaving(false);
 
@@ -181,7 +271,25 @@ export default function ParkingAdminApp() {
       setMessage(result.error.message);
       return;
     }
-    setMessage(form.id ? "Registro actualizado." : "Registro creado.");
+
+    const saved = result.data as ParkingBooking;
+    setLastSaved(saved);
+    setMessage(
+      form.id
+        ? "Registro actualizado."
+        : "Reserva guardada. Se ha descargado la imagen de confirmación."
+    );
+
+    if (isBooking) {
+      try {
+        await makeConfirmation(saved);
+      } catch {
+        setMessage(
+          "Reserva guardada, pero no se pudo generar la imagen de confirmación."
+        );
+      }
+    }
+
     setForm(EMPTY_FORM);
     await loadRows();
   }
@@ -195,7 +303,21 @@ export default function ParkingAdminApp() {
       return;
     }
     if (form.id === id) setForm(EMPTY_FORM);
+    if (lastSaved?.id === id) setLastSaved(null);
     await loadRows();
+  }
+
+  function openCustomerWhatsApp(booking: ParkingBooking) {
+    if (!booking.customer_phone) return;
+    const fullName = [booking.customer_name, booking.customer_surnames]
+      .filter(Boolean)
+      .join(" ");
+    const msg = `Hola${fullName ? ` ${fullName}` : ""}, te confirmo la reserva de Parking Guardamar Centro (Jorge Juan 13) del ${formatSpanishDate(booking.start_date)} al ${formatSpanishDate(booking.end_date)}${booking.price_eur != null ? ` por ${booking.price_eur} €` : ""}. Te envío el comprobante con tu DNI en la siguiente imagen.`;
+    window.open(
+      customerWhatsAppHref(booking.customer_phone, msg),
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
 
   if (!configured || !supabase) {
@@ -267,7 +389,12 @@ export default function ParkingAdminApp() {
       </div>
 
       <form className="card form" onSubmit={(e) => void onSave(e)}>
-        <h2>{form.id ? "Editar registro" : "Nuevo registro"}</h2>
+        <h2>{form.id ? "Editar registro" : "Confirmar reserva"}</h2>
+        <p className="hint">
+          Para una reserva confirmada: nombre, apellidos, DNI, teléfono, fechas e
+          importe. Al guardar se genera una imagen de confirmación para enviar por
+          WhatsApp.
+        </p>
         <div className="row">
           <label>
             Inicio *
@@ -296,24 +423,61 @@ export default function ParkingAdminApp() {
               setForm({ ...form, status: e.target.value as ParkingBookingStatus })
             }
           >
-            <option value="reserved">Reservado</option>
+            <option value="reserved">Reservado (confirmado)</option>
             <option value="blocked">No disponible (bloqueado)</option>
             <option value="completed">Finalizado</option>
             <option value="cancelled">Cancelado</option>
           </select>
         </label>
+        <div className="row">
+          <label>
+            Nombre *
+            <input
+              value={form.customer_name}
+              onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
+              autoComplete="given-name"
+            />
+          </label>
+          <label>
+            Apellidos *
+            <input
+              value={form.customer_surnames}
+              onChange={(e) =>
+                setForm({ ...form, customer_surnames: e.target.value })
+              }
+              autoComplete="family-name"
+            />
+          </label>
+        </div>
+        <div className="row">
+          <label>
+            DNI / NIE *
+            <input
+              value={form.customer_dni}
+              onChange={(e) => setForm({ ...form, customer_dni: e.target.value })}
+            />
+          </label>
+          <label>
+            Teléfono *
+            <input
+              type="tel"
+              value={form.customer_phone}
+              onChange={(e) =>
+                setForm({ ...form, customer_phone: e.target.value })
+              }
+              placeholder="636…"
+              autoComplete="tel"
+            />
+          </label>
+        </div>
         <label>
-          Nombre del cliente
+          Importe pagado (€) *
           <input
-            value={form.customer_name}
-            onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
-          />
-        </label>
-        <label>
-          Teléfono
-          <input
-            value={form.customer_phone}
-            onChange={(e) => setForm({ ...form, customer_phone: e.target.value })}
+            type="number"
+            step="0.01"
+            min="0"
+            value={form.price_eur}
+            onChange={(e) => setForm({ ...form, price_eur: e.target.value })}
           />
         </label>
         <label>
@@ -334,34 +498,6 @@ export default function ParkingAdminApp() {
             }
           />
         </label>
-        <div className="row">
-          <label>
-            Hora llegada
-            <input
-              type="time"
-              value={form.arrival_time}
-              onChange={(e) => setForm({ ...form, arrival_time: e.target.value })}
-            />
-          </label>
-          <label>
-            Hora salida
-            <input
-              type="time"
-              value={form.departure_time}
-              onChange={(e) => setForm({ ...form, departure_time: e.target.value })}
-            />
-          </label>
-        </div>
-        <label>
-          Precio (€)
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            value={form.price_eur}
-            onChange={(e) => setForm({ ...form, price_eur: e.target.value })}
-          />
-        </label>
         <label>
           Notas privadas
           <textarea
@@ -373,7 +509,11 @@ export default function ParkingAdminApp() {
         {message ? <p className="msg">{message}</p> : null}
         <div className="actions">
           <button type="submit" disabled={saving}>
-            {saving ? "Guardando…" : form.id ? "Guardar cambios" : "Añadir"}
+            {saving
+              ? "Guardando…"
+              : form.id
+                ? "Guardar cambios"
+                : "Guardar y generar comprobante"}
           </button>
           {form.id ? (
             <button
@@ -387,6 +527,41 @@ export default function ParkingAdminApp() {
         </div>
       </form>
 
+      {lastSaved &&
+      lastSaved.customer_phone &&
+      (lastSaved.status === "reserved" || lastSaved.status === "completed") ? (
+        <section className="card confirm-box">
+          <h2>Enviar confirmación</h2>
+          <p className="hint">
+            WhatsApp no puede adjuntar la imagen automáticamente. Descárgala (o
+            usa la vista previa) y adjúntala en el chat.
+          </p>
+          {previewUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={previewUrl}
+              alt="Vista previa del comprobante"
+              className="preview"
+            />
+          ) : null}
+          <div className="actions">
+            <button
+              type="button"
+              onClick={() => void makeConfirmation(lastSaved)}
+            >
+              Descargar imagen otra vez
+            </button>
+            <button
+              type="button"
+              className="wa"
+              onClick={() => openCustomerWhatsApp(lastSaved)}
+            >
+              Abrir WhatsApp del cliente
+            </button>
+          </div>
+        </section>
+      ) : null}
+
       {loadError ? <p className="err">{loadError}</p> : null}
 
       <section className="card">
@@ -398,8 +573,8 @@ export default function ParkingAdminApp() {
                 <th>Fechas</th>
                 <th>Estado</th>
                 <th>Cliente</th>
+                <th>DNI</th>
                 <th>Tel.</th>
-                <th>Matrícula</th>
                 <th>€</th>
                 <th />
               </tr>
@@ -408,18 +583,42 @@ export default function ParkingAdminApp() {
               {rows.map((r) => (
                 <tr key={r.id}>
                   <td>
-                    {formatSpanishDate(r.start_date)} → {formatSpanishDate(r.end_date)}
+                    {formatSpanishDate(r.start_date)} →{" "}
+                    {formatSpanishDate(r.end_date)}
                   </td>
                   <td>{STATUS_LABELS_ES[r.status]}</td>
-                  <td>{r.customer_name || "—"}</td>
+                  <td>
+                    {[r.customer_name, r.customer_surnames]
+                      .filter(Boolean)
+                      .join(" ") || "—"}
+                  </td>
+                  <td>{r.customer_dni || "—"}</td>
                   <td>{r.customer_phone || "—"}</td>
-                  <td>{r.vehicle_registration || "—"}</td>
                   <td>{r.price_eur != null ? r.price_eur : "—"}</td>
                   <td className="ops">
                     <button type="button" onClick={() => editRow(r)}>
                       Editar
                     </button>
-                    <button type="button" className="danger" onClick={() => void onDelete(r.id)}>
+                    {r.customer_phone &&
+                    (r.status === "reserved" || r.status === "completed") ? (
+                      <button
+                        type="button"
+                        className="wa"
+                        onClick={() => {
+                          setLastSaved(r);
+                          void makeConfirmation(r).then(() =>
+                            openCustomerWhatsApp(r)
+                          );
+                        }}
+                      >
+                        WhatsApp
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={() => void onDelete(r.id)}
+                    >
                       Eliminar
                     </button>
                   </td>
@@ -446,7 +645,10 @@ function DashCard({ title, rows }: { title: string; rows: ParkingBooking[] }) {
         <ul>
           {rows.slice(0, 5).map((r) => (
             <li key={r.id}>
-              <strong>{r.customer_name || "Sin nombre"}</strong>
+              <strong>
+                {[r.customer_name, r.customer_surnames].filter(Boolean).join(" ") ||
+                  "Sin nombre"}
+              </strong>
               <span>
                 {r.start_date} → {r.end_date}
               </span>
@@ -470,6 +672,7 @@ const styles = `
   h2 { margin: 0 0 12px; font-size: 1.1rem; }
   h3 { margin: 0 0 8px; font-size: 0.95rem; }
   .muted { color: #666; font-size: 0.9rem; }
+  .hint { margin: 0 0 8px; color: #555; font-size: 0.88rem; line-height: 1.45; font-weight: 400; }
   .warn { background: #fff6d6; border: 1px solid #f0e0a0; padding: 12px; border-radius: 10px; line-height: 1.5; }
   .err { color: #8b1e1e; }
   .msg { color: #1b5e34; }
@@ -487,10 +690,12 @@ const styles = `
   button { min-height: 44px; border: 0; border-radius: 10px; background: #111; color: #fff; font-weight: 650; cursor: pointer; padding: 0 14px; }
   .ghost { background: #fff; color: #111; border: 1px solid #ccc; }
   .danger { background: #8b1e1e; }
+  .wa { background: #128c7e; }
   .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .preview { width: 100%; max-width: 360px; border-radius: 10px; border: 1px solid #e6e6e6; margin: 8px 0 12px; }
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
   th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
-  .ops { display: flex; gap: 6px; }
+  .ops { display: flex; flex-wrap: wrap; gap: 6px; }
   .ops button { min-height: 36px; font-size: 0.8rem; }
 `;

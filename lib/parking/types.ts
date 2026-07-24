@@ -13,6 +13,8 @@ export type ParkingBooking = {
   end_date: string;
   status: ParkingBookingStatus;
   customer_name: string | null;
+  customer_surnames: string | null;
+  customer_dni: string | null;
   customer_phone: string | null;
   vehicle_registration: string | null;
   vehicle_description: string | null;

@@ -23,11 +23,17 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ## Behaviour
 
 - Public calendar shows only Available / Unavailable (no private fields).
-- ES / EN via the same `?lang=` + `preferred_locale` cookie as the main site; first visit uses `Accept-Language`.
-- Prices shown on the public page (high season / September / Oct–May).
-- Arrival and departure use before/after midday selects (no clock times).
-- Range selection builds a WhatsApp message to `+34 636 670 103`.
-- Selecting dates does **not** create a booking.
+- Selecting dates does **not** create a booking; WhatsApp enquire only.
+
+## Admin confirmation
+
+When you save a **reserved** booking, fill in:
+
+- Name, surnames, DNI/NIE, phone, dates, payment amount
+
+The admin generates a **confirmation PNG** (name, DNI, dates, payment, Jorge Juan 13) and downloads it. Use **Abrir WhatsApp del cliente** and attach the image manually (WhatsApp links cannot auto-attach files).
+
+If the table already exists, also run `supabase/parking-booking-fields.sql` for the new columns.
 
 ## Local
 
