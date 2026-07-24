@@ -199,12 +199,26 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       </header>
 
       <section className="pk-prices" aria-label={t.pricesTitle}>
-        <h2>{t.pricesTitle}</h2>
-        <ul>
-          <li>{t.priceHigh}</li>
-          <li>{t.priceSeptember}</li>
-          <li>{t.priceLow}</li>
-        </ul>
+        <div className="pk-prices-head">
+          <span className="pk-prices-mark" aria-hidden="true" />
+          <h2>{t.pricesTitle}</h2>
+        </div>
+        <table className="pk-prices-table">
+          <tbody>
+            <tr>
+              <th scope="row">{t.pricePeriodHigh}</th>
+              <td>{t.priceRateHigh}</td>
+            </tr>
+            <tr>
+              <th scope="row">{t.pricePeriodSeptember}</th>
+              <td>{t.priceRateSeptember}</td>
+            </tr>
+            <tr>
+              <th scope="row">{t.pricePeriodLow}</th>
+              <td>{t.priceRateLow}</td>
+            </tr>
+          </tbody>
+        </table>
       </section>
 
       {!configured ? (
@@ -434,6 +448,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           --line: #e6e6e6;
           --bg: #fafaf8;
           --card: #ffffff;
+          --pk-navy: #005288;
+          --pk-red: #e31c23;
           --available: #d8f0df;
           --available-ink: #1b5e34;
           --unavailable: #f0d9d9;
@@ -484,26 +500,63 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           font-size: 0.9rem !important;
         }
         .pk-prices {
-          margin: 18px 0 0;
-          padding: 14px 16px;
-          background: var(--card);
-          border: 1px solid var(--line);
-          border-radius: 12px;
+          margin: 20px 0 0;
+          padding: 0;
+          background: transparent;
+          border: 0;
+          border-top: 1px solid color-mix(in srgb, var(--pk-navy) 22%, transparent);
+          border-bottom: 1px solid color-mix(in srgb, var(--pk-navy) 22%, transparent);
+        }
+        .pk-prices-head {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 14px 0 10px;
+        }
+        .pk-prices-mark {
+          width: 14px;
+          height: 1px;
+          background: var(--pk-red);
+          flex-shrink: 0;
         }
         .pk-prices h2 {
-          margin: 0 0 8px;
-          font-size: 1rem;
-          font-weight: 750;
-        }
-        .pk-prices ul {
           margin: 0;
-          padding-left: 1.1rem;
-          color: var(--muted);
-          line-height: 1.55;
-          font-size: 0.95rem;
+          font-size: 0.72rem;
+          font-weight: 650;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--pk-navy);
         }
-        .pk-prices li + li {
-          margin-top: 4px;
+        .pk-prices-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 0 0 14px;
+          font-size: 0.9rem;
+          line-height: 1.35;
+        }
+        .pk-prices-table tr + tr th,
+        .pk-prices-table tr + tr td {
+          border-top: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
+        }
+        .pk-prices-table th,
+        .pk-prices-table td {
+          padding: 9px 0;
+          vertical-align: baseline;
+          font-weight: 450;
+        }
+        .pk-prices-table th {
+          text-align: left;
+          color: var(--muted);
+          padding-right: 16px;
+          font-weight: 450;
+        }
+        .pk-prices-table td {
+          text-align: right;
+          white-space: nowrap;
+          color: var(--pk-navy);
+          font-weight: 600;
+          font-variant-numeric: tabular-nums;
+          letter-spacing: 0.01em;
         }
         .pk-banner {
           margin: 16px 0 0;

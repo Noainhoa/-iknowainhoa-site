@@ -8,9 +8,12 @@ export type ParkingCopy = {
   intro: string;
   accessNote: string;
   pricesTitle: string;
-  priceHigh: string;
-  priceSeptember: string;
-  priceLow: string;
+  pricePeriodHigh: string;
+  priceRateHigh: string;
+  pricePeriodSeptember: string;
+  priceRateSeptember: string;
+  pricePeriodLow: string;
+  priceRateLow: string;
   legend: string;
   available: string;
   unavailable: string;
@@ -52,9 +55,12 @@ const es: ParkingCopy = {
   intro: "Elige fechas y consulta por WhatsApp.",
   accessNote: "Por restricciones de acceso, coches de máximo 1,79 m de altura.",
   pricesTitle: "Precios",
-  priceHigh: "Temporada alta (junio-agosto): 70 €/semana",
-  priceSeptember: "Septiembre: 50 €/semana",
-  priceLow: "Octubre-mayo: 75 €/mes",
+  pricePeriodHigh: "Temporada alta (junio–agosto)",
+  priceRateHigh: "70 €/semana",
+  pricePeriodSeptember: "Septiembre",
+  priceRateSeptember: "50 €/semana",
+  pricePeriodLow: "Octubre–mayo",
+  priceRateLow: "75 €/mes",
   legend: "Leyenda",
   available: "Disponible",
   unavailable: "No disponible",
@@ -99,9 +105,12 @@ const en: ParkingCopy = {
   intro: "Pick dates and enquire on WhatsApp.",
   accessNote: "Access restriction: cars max. 1.79 m height.",
   pricesTitle: "Prices",
-  priceHigh: "High season (June–August): €70/week",
-  priceSeptember: "September: €50/week",
-  priceLow: "October–May: €75/month",
+  pricePeriodHigh: "High season (June–August)",
+  priceRateHigh: "€70/week",
+  pricePeriodSeptember: "September",
+  priceRateSeptember: "€50/week",
+  pricePeriodLow: "October–May",
+  priceRateLow: "€75/month",
   legend: "Legend",
   available: "Available",
   unavailable: "Unavailable",
