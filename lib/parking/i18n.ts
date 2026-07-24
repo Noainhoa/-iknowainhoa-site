@@ -6,6 +6,7 @@ export type ParkingCopy = {
   brand: string;
   title: string;
   intro: string;
+  accessNote: string;
   pricesTitle: string;
   priceHigh: string;
   priceSeptember: string;
@@ -49,6 +50,7 @@ const es: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking Guardamar Centro",
   intro: "Elige fechas y consulta por WhatsApp.",
+  accessNote: "Por restricciones de acceso, coches de máximo 1,79 m de altura.",
   pricesTitle: "Precios",
   priceHigh: "Temporada alta (junio-agosto): 70 €/semana",
   priceSeptember: "Septiembre: 50 €/semana",
@@ -95,6 +97,7 @@ const en: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking Guardamar Centro",
   intro: "Pick dates and enquire on WhatsApp.",
+  accessNote: "Access restriction: cars max. 1.79 m height.",
   pricesTitle: "Prices",
   priceHigh: "High season (June–August): €70/week",
   priceSeptember: "September: €50/week",

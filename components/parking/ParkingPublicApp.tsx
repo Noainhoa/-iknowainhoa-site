@@ -198,6 +198,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       <header className="pk-header">
         <h1>{t.title}</h1>
         <p>{t.intro}</p>
+        <p className="pk-access">{t.accessNote}</p>
       </header>
 
       <section className="pk-prices" aria-label={t.pricesTitle}>
@@ -474,6 +475,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           color: var(--muted);
           line-height: 1.45;
           font-size: 0.98rem;
+        }
+        .pk-access {
+          margin-top: 8px !important;
+          font-size: 0.9rem !important;
         }
         .pk-prices {
           margin: 18px 0 0;
