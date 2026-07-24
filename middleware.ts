@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isLocale } from "@/lib/i18n/shared";
+import { updateSession } from "@/utils/supabase/middleware";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const pathname = url.pathname.toLowerCase();
 
@@ -20,19 +21,18 @@ export function middleware(request: NextRequest) {
   }
 
   // Block spam/hacked URL patterns and return 404
-  // These patterns are common attack vectors and should not be accessible
   const spamPatterns = [
-    /\.php$/,           // PHP files (.php, .php5, etc.)
-    /\.asp$/,           // ASP files
-    /\.jsp$/,           // JSP files
-    /\.cfm$/,           // ColdFusion files
-    /\/saiga/,          // Known spam/hack pattern
-    /\/admin[.-_]/,     // Suspicious admin paths
-    /\/wp-/,            // WordPress paths (if not using WP)
-    /\/xmlrpc\.php/,    // XML-RPC (common attack)
-    /\/shell/,          // Shell upload attempts
-    /\/upload/,         // Suspicious upload directories
-    /^\/(test|temp|tmp|backup|bak)(\/|$)/,  // Test/backup directories at root only
+    /\.php$/,
+    /\.asp$/,
+    /\.jsp$/,
+    /\.cfm$/,
+    /\/saiga/,
+    /\/admin[.-_]/,
+    /\/wp-/,
+    /\/xmlrpc\.php/,
+    /\/shell/,
+    /\/upload/,
+    /^\/(test|temp|tmp|backup|bak)(\/|$)/,
   ];
 
   const isSpamPattern = spamPatterns.some((pattern) => pattern.test(pathname));
@@ -55,7 +55,9 @@ export function middleware(request: NextRequest) {
     ]);
 
     const currentParams = Array.from(url.searchParams.keys());
-    const hasUnknownParams = currentParams.some((param) => !allowedParams.has(param));
+    const hasUnknownParams = currentParams.some(
+      (param) => !allowedParams.has(param)
+    );
 
     if (hasUnknownParams) {
       const cleaned = new URL("/", request.url);
@@ -64,9 +66,17 @@ export function middleware(request: NextRequest) {
       }
 
       return NextResponse.redirect(cleaned, {
-        status: 301, // Permanent redirect for SEO
+        status: 301,
       });
     }
+  }
+
+  // Keep Supabase auth sessions fresh (needed for /parking-guardamar-centro/admin).
+  if (
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  ) {
+    return updateSession(request);
   }
 
   return NextResponse.next();
@@ -74,13 +84,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!_next/static|_next/image|favicon.ico|public).*)",
+    "/((?!_next/static|_next/image|favicon.ico|public|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

@@ -1,24 +1,29 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient as createBrowserClient } from "@/utils/supabase/client";
 
-let browserClient: SupabaseClient | null = null;
+let browserClient: ReturnType<typeof createBrowserClient> | null = null;
 
-export function getParkingSupabase(): SupabaseClient | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) return null;
+function supabaseEnvReady() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  );
+}
+
+export function getParkingSupabase() {
+  if (!supabaseEnvReady()) return null;
 
   if (typeof window === "undefined") {
-    return createClient(url, anon);
+    // Client components call this in the browser; server pages should use
+    // utils/supabase/server.createClient instead.
+    return createBrowserClient();
   }
 
   if (!browserClient) {
-    browserClient = createClient(url, anon);
+    browserClient = createBrowserClient();
   }
   return browserClient;
 }
 
 export function parkingSupabaseConfigured(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  return supabaseEnvReady();
 }

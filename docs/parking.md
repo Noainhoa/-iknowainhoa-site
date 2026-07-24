@@ -15,9 +15,10 @@ Brand name: **Parking Guardamar Centro**
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 ```
 
+Also set the same two variables in **Vercel → Project → Settings → Environment Variables** (Production), then redeploy.
 5. Deploy. Public URL: `https://iknowainhoa.com/parking-guardamar-centro/`
 
 ## Behaviour
