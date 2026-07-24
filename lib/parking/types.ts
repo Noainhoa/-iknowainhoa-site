@@ -1,6 +1,30 @@
 export const PARKING_WHATSAPP_NUMBER = "34636670103";
-export const PARKING_WHATSAPP_URL = `https://wa.me/${PARKING_WHATSAPP_NUMBER}`;
+/** Official click-to-chat (works with WhatsApp Business accounts). */
+export const PARKING_WHATSAPP_URL = `https://api.whatsapp.com/send/?phone=${PARKING_WHATSAPP_NUMBER}&type=phone_number&app_absent=0`;
 export const PARKING_DNI_BUCKET = "parking-dni";
+
+/**
+ * Build a chat URL that prefers WhatsApp Business on Android
+ * (package com.whatsapp.w4b) when both apps are installed.
+ */
+export function buildBusinessWhatsAppUrl(
+  phoneDigits: string | null,
+  message: string
+): string {
+  const text = encodeURIComponent(message);
+  const web = phoneDigits
+    ? `https://api.whatsapp.com/send/?phone=${phoneDigits}&text=${text}&type=phone_number&app_absent=0`
+    : `https://api.whatsapp.com/send/?text=${text}`;
+
+  if (typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent)) {
+    const path = phoneDigits
+      ? `send?phone=${phoneDigits}&text=${text}`
+      : `send?text=${text}`;
+    return `intent://${path}#Intent;scheme=whatsapp;package=com.whatsapp.w4b;S.browser_fallback_url=${encodeURIComponent(web)};end`;
+  }
+
+  return web;
+}
 
 export function dniStoragePath(bookingId: string, file: File): string {
   const raw = file.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -92,7 +116,11 @@ export function rangesOverlap(
   bStart: string,
   bEnd: string
 ): boolean {
-  return aStart <= bEnd && bStart <= aEnd;
+  // Occupancy is half-open [start, end): end_date is checkout / exit day
+  // and may be reused as another booking's start. Same-day blocks occupy that day.
+  const aExclusiveEnd = aStart === aEnd ? toISODate(addDays(parseISODate(aEnd), 1)) : aEnd;
+  const bExclusiveEnd = bStart === bEnd ? toISODate(addDays(parseISODate(bEnd), 1)) : bEnd;
+  return aStart < bExclusiveEnd && bStart < aExclusiveEnd;
 }
 
 export function formatSpanishDate(iso: string): string {
@@ -113,6 +141,29 @@ export function formatLocaleDate(iso: string, locale: "en" | "es"): string {
 
 export function countInclusiveDays(startIso: string, endIso: string): number {
   return eachDateInclusive(startIso, endIso).length;
+}
+
+/** Days the vehicle occupies the spot: [start, end) — exit day is free. */
+export function eachOccupiedDate(startIso: string, endIso: string): string[] {
+  if (startIso === endIso) return [startIso];
+  const out: string[] = [];
+  let cur = parseISODate(startIso);
+  const end = parseISODate(endIso);
+  while (cur < end) {
+    out.push(toISODate(cur));
+    cur = addDays(cur, 1);
+  }
+  return out;
+}
+
+/** True if this booking occupies `iso` (exit/end day does not count). */
+export function bookingOccupiesDate(
+  iso: string,
+  startIso: string,
+  endIso: string
+): boolean {
+  if (startIso === endIso) return iso === startIso;
+  return iso >= startIso && iso < endIso;
 }
 
 export function buildWhatsAppMessage(input: {
@@ -175,15 +226,17 @@ I understand this enquiry does not confirm the booking until you confirm.`;
 }
 
 export function whatsAppHref(message: string): string {
-  return `${PARKING_WHATSAPP_URL}?text=${encodeURIComponent(message)}`;
+  return buildBusinessWhatsAppUrl(PARKING_WHATSAPP_NUMBER, message);
 }
 
-/** True if date falls inside any unavailable range (inclusive). */
+/** True if date is occupied by any booking (exit/end day stays available). */
 export function isDateUnavailable(
   iso: string,
   ranges: ParkingUnavailableRange[]
 ): boolean {
-  return ranges.some((r) => iso >= r.start_date && iso <= r.end_date);
+  return ranges.some((r) =>
+    bookingOccupiesDate(iso, r.start_date, r.end_date)
+  );
 }
 
 export function rangeContainsUnavailable(
@@ -191,7 +244,7 @@ export function rangeContainsUnavailable(
   endIso: string,
   ranges: ParkingUnavailableRange[]
 ): boolean {
-  return eachDateInclusive(startIso, endIso).some((d) =>
+  return eachOccupiedDate(startIso, endIso).some((d) =>
     isDateUnavailable(d, ranges)
   );
 }

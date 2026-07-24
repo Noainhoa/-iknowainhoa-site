@@ -25,6 +25,7 @@ Also set the same two variables in **Vercel → Project → Settings → Environ
 
 - Public calendar shows only Available / Unavailable (no private fields).
 - Selecting dates does **not** create a booking; WhatsApp enquire only.
+- **Checkout day is free:** a booking from day 1 to day 10 occupies days 1–9; day 10 (exit) stays available for the next arrival. Run `supabase/parking-checkout-day.sql` if the project was created with the old inclusive overlap rule.
 
 ## Admin confirmation
 

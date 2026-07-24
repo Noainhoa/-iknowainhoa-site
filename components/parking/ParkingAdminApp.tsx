@@ -10,6 +10,7 @@ import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/sup
 import {
   STATUS_LABELS_ES,
   PARKING_DNI_BUCKET,
+  bookingOccupiesDate,
   dniStoragePath,
   formatSpanishDate,
   rangesOverlap,
@@ -154,7 +155,9 @@ export default function ParkingAdminApp() {
     (r) => r.status === "reserved" && r.end_date >= today
   );
   const current = rows.filter(
-    (r) => r.status === "reserved" && r.start_date <= today && r.end_date >= today
+    (r) =>
+      r.status === "reserved" &&
+      bookingOccupiesDate(today, r.start_date, r.end_date)
   );
   const completed = rows.filter((r) => r.status === "completed");
 
@@ -732,8 +735,8 @@ export default function ParkingAdminApp() {
         <section className="card confirm-box">
           <h2>Enviar confirmación</h2>
           <p className="hint">
-            WhatsApp no puede adjuntar la imagen automáticamente. Descárgala (o
-            usa la vista previa) y adjúntala en el chat.
+            WhatsApp Business no puede adjuntar la imagen automáticamente.
+            Descárgala (o usa la vista previa) y adjúntala en el chat.
           </p>
           {previewUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -755,7 +758,7 @@ export default function ParkingAdminApp() {
               className="wa"
               onClick={() => openCustomerWhatsApp(lastSaved)}
             >
-              Abrir WhatsApp del cliente
+              Abrir WhatsApp Business del cliente
             </button>
           </div>
         </section>
@@ -824,7 +827,7 @@ export default function ParkingAdminApp() {
                           );
                         }}
                       >
-                        WhatsApp
+                        WhatsApp Business
                       </button>
                     ) : null}
                     <button

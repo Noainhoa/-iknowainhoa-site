@@ -52,7 +52,7 @@ export type ParkingCopy = {
 const es: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking Guardamar Centro",
-  intro: "Elige fechas y consulta por WhatsApp.",
+  intro: "Elige fechas y consulta por WhatsApp Business.",
   accessNote: "Por restricciones de acceso, coches de máximo 1,79 m de altura.",
   pricesTitle: "Precios",
   pricePeriodHigh: "Temporada alta (junio–agosto)",
@@ -84,7 +84,7 @@ const es: ParkingCopy = {
   beforeMidday: "Antes del mediodía",
   afterMidday: "Después del mediodía",
   comments: "Comentarios",
-  whatsappCta: "Consultar por WhatsApp",
+  whatsappCta: "Consultar por WhatsApp Business",
   whatsappNote: "No confirma la reserva hasta que te responda.",
   supabaseHint:
     "Calendario en modo local: falta configurar Supabase. Todas las fechas futuras aparecen como disponibles hasta que se conecte la base de datos.",
@@ -102,7 +102,7 @@ const es: ParkingCopy = {
 const en: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking Guardamar Centro",
-  intro: "Pick dates and enquire on WhatsApp.",
+  intro: "Pick dates and enquire on WhatsApp Business.",
   accessNote: "Access restriction: cars max. 1.79 m height.",
   pricesTitle: "Prices",
   pricePeriodHigh: "High season (June–August)",
@@ -134,7 +134,7 @@ const en: ParkingCopy = {
   beforeMidday: "Before midday",
   afterMidday: "After midday",
   comments: "Comments",
-  whatsappCta: "Enquire on WhatsApp",
+  whatsappCta: "Enquire on WhatsApp Business",
   whatsappNote: "Does not confirm the booking until I reply.",
   supabaseHint:
     "Calendar in local mode: Supabase is not configured. All future dates show as available until the database is connected.",

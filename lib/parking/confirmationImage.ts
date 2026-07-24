@@ -1,4 +1,7 @@
-import { formatSpanishDate } from "@/lib/parking/types";
+import {
+  buildBusinessWhatsAppUrl,
+  formatSpanishDate,
+} from "@/lib/parking/types";
 
 export type ConfirmationImageInput = {
   name: string;
@@ -124,7 +127,7 @@ export function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-/** Normalize a Spanish phone for wa.me (digits only, default +34). */
+/** Normalize a Spanish phone for WhatsApp (digits only, default +34). */
 export function phoneToWhatsAppDigits(phone: string): string | null {
   const digits = phone.replace(/\D/g, "");
   if (!digits) return null;
@@ -133,8 +136,7 @@ export function phoneToWhatsAppDigits(phone: string): string | null {
   return digits;
 }
 
+/** Open chat in WhatsApp Business when possible (admin → customer). */
 export function customerWhatsAppHref(phone: string, message: string): string {
-  const digits = phoneToWhatsAppDigits(phone);
-  if (!digits) return `https://wa.me/?text=${encodeURIComponent(message)}`;
-  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+  return buildBusinessWhatsAppUrl(phoneToWhatsAppDigits(phone), message);
 }
