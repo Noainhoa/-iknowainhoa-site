@@ -17,17 +17,21 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: PATH },
     icons: {
       icon: [
-        { url: "/images/parking/guardamar-parking-logo.png", type: "image/png", sizes: "512x512" },
-        { url: "/images/parking/guardamar-parking-logo.png", type: "image/png" },
+        {
+          url: "/parking-guardamar-centro/icon.png",
+          type: "image/png",
+          sizes: "512x512",
+        },
+        { url: "/parking-guardamar-centro/icon.png", type: "image/png" },
       ],
       apple: [
         {
-          url: "/images/parking/guardamar-parking-logo.png",
+          url: "/parking-guardamar-centro/apple-icon.png",
           type: "image/png",
           sizes: "180x180",
         },
       ],
-      shortcut: "/images/parking/guardamar-parking-logo.png",
+      shortcut: "/parking-guardamar-centro/icon.png",
     },
     openGraph: {
       title: es
