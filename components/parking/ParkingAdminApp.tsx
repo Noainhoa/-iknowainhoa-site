@@ -378,7 +378,17 @@ export default function ParkingAdminApp() {
       resetForm();
       await loadRows();
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Error al guardar.");
+      const raw =
+        err && typeof err === "object" && "message" in err
+          ? String((err as { message: string }).message)
+          : err instanceof Error
+            ? err.message
+            : "Error al guardar.";
+      setMessage(
+        /bucket not found/i.test(raw)
+          ? "Falta crear el bucket en Supabase. En SQL Editor ejecuta supabase/parking-dni-storage.sql y vuelve a guardar."
+          : raw
+      );
     } finally {
       setSaving(false);
     }
