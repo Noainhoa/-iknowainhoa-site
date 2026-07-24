@@ -5,10 +5,14 @@ export type ParsedDniFields = {
 };
 
 const JUNK =
-  /^(s|sur|name|names|surname|surnames|given|givennames|apellido|apellidos|cognom|cognoms|nombre|nombres|nom|dni|nie|esp|españa|espana|sex|sexo|sexe|nationality|nacionalidad|nacionalitat|id|identity|document|documento|card|tarjeta|soport|suport)$/i;
+  /^(s|sur|au|ap|name|names|surname|surnames|given|givennames|apellido|apellidos|cognom|cognoms|nombre|nombres|nom|dni|nie|esp|españa|espana|sex|sexo|sexe|nationality|nacionalidad|nacionalitat|id|identity|document|documento|card|tarjeta|soport|suport)$/i;
 
-const BILINGUAL_LEFTOVER =
-  /\b(surname|surnames|given|names?|cognoms?|nom|sexe|nacionalitat|nationality|naixement)\b/gi;
+const LABEL_TOKEN =
+  /\b(apellidos?|cognoms?|nombre|nombres|nom|surname|surnames|given|names?)\b/gi;
+
+/** Keep Catalan/Spanish name particles; drop other 1–2 letter OCR crumbs (e.g. Au, Ap). */
+const NAME_PARTICLE =
+  /^(de|del|la|las|los|y|i|da|do|das|dos|e|san|santa)$/i;
 
 function titleCaseName(value: string): string {
   return value
@@ -17,6 +21,28 @@ function titleCaseName(value: string): string {
     .filter(Boolean)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+function scrubPersonName(value: string): string {
+  let v = value
+    .replace(LABEL_TOKEN, " ")
+    .replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s\-']/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  v = v
+    .split(/\s+/)
+    .filter((w) => {
+      if (!w) return false;
+      if (NAME_PARTICLE.test(w)) return true;
+      if (w.length <= 2) return false;
+      if (JUNK.test(w)) return false;
+      return true;
+    })
+    .join(" ")
+    .trim();
+
+  return v;
 }
 
 function normalizeLine(line: string): string {
@@ -102,9 +128,12 @@ function valuesAfterLabel(
     if (looksLikeDate(line) || looksLikeDniId(line)) break;
     if (isBilingualOnlyLine(line)) continue;
     if (!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{2,}/.test(line)) continue;
-    out.push(
-      line.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s\-']/g, " ").replace(/\s+/g, " ").trim()
+    // Strip leading bilingual label crumbs: "Nom Maria…" / "Cognoms Limiñana…"
+    const cleaned = scrubPersonName(
+      line.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s\-']/g, " ")
     );
+    if (!cleaned || isJunk(cleaned)) continue;
+    out.push(cleaned);
     if (out.length >= maxLines) break;
   }
   return out.filter((v) => !isJunk(v));
@@ -114,11 +143,7 @@ function inlineAfter(line: string, patterns: RegExp[]): string | null {
   for (const re of patterns) {
     const m = line.match(re);
     if (m?.[1]) {
-      const v = m[1]
-        .replace(BILINGUAL_LEFTOVER, " ")
-        .replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s\-']/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+      const v = scrubPersonName(m[1]);
       if (!isJunk(v)) return v;
     }
   }
@@ -219,19 +244,11 @@ export function parseSpanishDniText(raw: string): ParsedDniFields {
       ])
   );
 
-  let surnames = surnameLines.join(" ").trim();
-  let name = nameLines.join(" ").trim();
+  let surnames = scrubPersonName(surnameLines.join(" "));
+  let name = scrubPersonName(nameLines.join(" "));
 
-  if (isJunk(surnames) && mrz?.surnames) surnames = mrz.surnames;
-  if (isJunk(name) && mrz?.name) name = mrz.name;
-
-  surnames = surnames.replace(BILINGUAL_LEFTOVER, " ").replace(/\s+/g, " ").trim();
-  name = name
-    .replace(BILINGUAL_LEFTOVER, " ")
-    .replace(/\b(nombre|apellidos?|dni|nie)\b/gi, " ")
-    .replace(/\b\d{8}[A-Z]\b/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  if (isJunk(surnames) && mrz?.surnames) surnames = scrubPersonName(mrz.surnames);
+  if (isJunk(name) && mrz?.name) name = scrubPersonName(mrz.name);
 
   if (isJunk(surnames)) surnames = "";
   if (isJunk(name)) name = "";
