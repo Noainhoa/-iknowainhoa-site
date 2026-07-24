@@ -132,7 +132,7 @@ export function buildWhatsAppMessage(input: {
         : "After midday";
 
   if (es) {
-    return `Hola Ainhoa, quisiera consultar la disponibilidad de Parking Guardamar Centro.
+    return `Hola Ainhoa, quisiera consultar la disponibilidad de Parking Guardamar Centro (Jorge Juan 13).
 
 Fechas: del ${formatLocaleDate(input.arrival, "es")} al ${formatLocaleDate(input.departure, "es")}
 Duración: ${days} días
@@ -146,7 +146,7 @@ Comentarios: ${input.comments?.trim() || "Sin comentarios"}
 Entiendo que esta consulta no confirma la reserva hasta recibir tu confirmación.`;
   }
 
-  return `Hi Ainhoa, I'd like to check availability for Parking Guardamar Centro.
+  return `Hi Ainhoa, I'd like to check availability for Parking Guardamar Centro (Jorge Juan 13).
 
 Dates: from ${formatLocaleDate(input.arrival, "en")} to ${formatLocaleDate(input.departure, "en")}
 Duration: ${days} days
