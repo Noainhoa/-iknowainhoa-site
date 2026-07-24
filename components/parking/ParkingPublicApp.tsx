@@ -326,7 +326,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }}
       >
         <label>
-          {t.name} <span className="req">*</span>
+          <span className="pk-lab">
+            {t.name} <span className="req">*</span>
+          </span>
           <input
             required
             name="name"
@@ -336,27 +338,31 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             placeholder={t.namePlaceholder}
           />
         </label>
-        <label>
-          {t.registration}
-          <input
-            name="registration"
-            value={registration}
-            onChange={(e) => setRegistration(e.target.value)}
-            placeholder={t.optional}
-          />
-        </label>
-        <label>
-          {t.vehicle}
-          <input
-            name="vehicle"
-            value={vehicle}
-            onChange={(e) => setVehicle(e.target.value)}
-            placeholder={t.optional}
-          />
-        </label>
         <div className="pk-row">
           <label>
-            {t.arrivalTiming} <span className="req">*</span>
+            <span className="pk-lab">{t.registration}</span>
+            <input
+              name="registration"
+              value={registration}
+              onChange={(e) => setRegistration(e.target.value)}
+              placeholder={t.optional}
+            />
+          </label>
+          <label>
+            <span className="pk-lab">{t.vehicle}</span>
+            <input
+              name="vehicle"
+              value={vehicle}
+              onChange={(e) => setVehicle(e.target.value)}
+              placeholder={t.optional}
+            />
+          </label>
+        </div>
+        <div className="pk-row">
+          <label>
+            <span className="pk-lab">
+              {t.arrivalTiming} <span className="req">*</span>
+            </span>
             <select
               required
               name="arrivalTiming"
@@ -371,7 +377,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             </select>
           </label>
           <label>
-            {t.departureTiming} <span className="req">*</span>
+            <span className="pk-lab">
+              {t.departureTiming} <span className="req">*</span>
+            </span>
             <select
               required
               name="departureTiming"
@@ -387,10 +395,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </label>
         </div>
         <label>
-          {t.comments}
+          <span className="pk-lab">{t.comments}</span>
           <textarea
             name="comments"
-            rows={3}
+            rows={2}
             value={comments}
             onChange={(e) => setComments(e.target.value)}
             placeholder={t.optional}
@@ -628,21 +636,26 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
         .pk-form {
           display: grid;
-          gap: 12px;
+          gap: 10px;
+          margin-top: 14px;
         }
         .pk-form label {
           display: grid;
-          gap: 6px;
+          gap: 5px;
           font-size: 0.9rem;
           font-weight: 600;
+        }
+        .pk-lab {
+          display: inline;
+          line-height: 1.2;
         }
         .pk-form input,
         .pk-form textarea,
         .pk-form select {
           width: 100%;
           box-sizing: border-box;
-          min-height: 44px;
-          padding: 10px 12px;
+          min-height: 42px;
+          padding: 9px 11px;
           border-radius: 10px;
           border: 1px solid #ccc;
           font: inherit;
@@ -650,7 +663,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           background: #fff;
         }
         .pk-form textarea {
-          min-height: 88px;
+          min-height: 64px;
           resize: vertical;
         }
         .pk-row {
@@ -665,6 +678,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
         .req {
           color: #b42318;
+          font-weight: 700;
         }
         .pk-form-error {
           margin: 0;
