@@ -267,11 +267,11 @@ export function parseSpanishDniText(raw: string): ParsedDniFields {
 }
 
 export async function extractDniFromImage(file: File): Promise<ParsedDniFields> {
-  const { createWorker } = await import("tesseract.js");
+  const { createWorker, PSM } = await import("tesseract.js");
   const worker = await createWorker("spa+eng");
   try {
     await worker.setParameters({
-      tessedit_pageseg_mode: "6",
+      tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
       user_defined_dpi: "300",
     });
     const {
