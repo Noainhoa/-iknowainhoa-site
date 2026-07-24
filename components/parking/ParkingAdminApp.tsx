@@ -50,6 +50,7 @@ export default function ParkingAdminApp() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [dniFile, setDniFile] = useState<File | null>(null);
   const [dniLocalPreview, setDniLocalPreview] = useState<string | null>(null);
+  const [ocrBusy, setOcrBusy] = useState(false);
 
   const refreshSession = useCallback(async () => {
     if (!supabase) return;
@@ -94,10 +95,35 @@ export default function ParkingAdminApp() {
     setDniLocalPreview(null);
   }
 
-  function onPickDni(file: File | null) {
+  async function onPickDni(file: File | null) {
     if (dniLocalPreview) URL.revokeObjectURL(dniLocalPreview);
     setDniFile(file);
     setDniLocalPreview(file && file.type.startsWith("image/") ? URL.createObjectURL(file) : null);
+    if (!file || !file.type.startsWith("image/")) return;
+
+    setOcrBusy(true);
+    setMessage("Leyendo el DNI…");
+    try {
+      const { extractDniFromImage } = await import("@/lib/parking/parseDniOcr");
+      const parsed = await extractDniFromImage(file);
+      setForm((prev) => ({
+        ...prev,
+        customer_name: parsed.name || prev.customer_name,
+        customer_surnames: parsed.surnames || prev.customer_surnames,
+        customer_dni: parsed.dni || prev.customer_dni,
+        status: prev.status === "blocked" ? "reserved" : prev.status,
+      }));
+      const filled = [parsed.name, parsed.surnames, parsed.dni].filter(Boolean).length;
+      setMessage(
+        filled
+          ? `DNI leído (${filled}/3 campos). Revisa y completa fechas, teléfono e importe.`
+          : "No se pudo leer el DNI con claridad. Rellena los datos a mano."
+      );
+    } catch {
+      setMessage("No se pudo leer el DNI. Rellena los datos a mano.");
+    } finally {
+      setOcrBusy(false);
+    }
   }
 
   const today = useMemo(() => {
@@ -460,44 +486,35 @@ export default function ParkingAdminApp() {
       <form className="card form" onSubmit={(e) => void onSave(e)}>
         <h2>{form.id ? "Editar registro" : "Confirmar reserva"}</h2>
         <p className="hint">
-          Para una reserva confirmada: nombre, apellidos, DNI, teléfono, fechas e
-          importe. Al guardar se genera una imagen de confirmación para enviar por
-          WhatsApp.
+          Sube la foto del DNI primero: se rellenan nombre, apellidos y número.
+          Luego completa fechas, teléfono e importe.
         </p>
-        <div className="row">
-          <label>
-            Inicio *
-            <input
-              type="date"
-              required
-              value={form.start_date}
-              onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-            />
-          </label>
-          <label>
-            Fin *
-            <input
-              type="date"
-              required
-              value={form.end_date}
-              onChange={(e) => setForm({ ...form, end_date: e.target.value })}
-            />
-          </label>
-        </div>
         <label>
-          Estado
-          <select
-            value={form.status}
-            onChange={(e) =>
-              setForm({ ...form, status: e.target.value as ParkingBookingStatus })
-            }
-          >
-            <option value="reserved">Reservado (confirmado)</option>
-            <option value="blocked">No disponible (bloqueado)</option>
-            <option value="completed">Finalizado</option>
-            <option value="cancelled">Cancelado</option>
-          </select>
+          Foto del DNI *
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/heic"
+            disabled={ocrBusy}
+            onChange={(e) => void onPickDni(e.target.files?.[0] || null)}
+          />
         </label>
+        {ocrBusy ? <p className="hint">Leyendo el DNI…</p> : null}
+        {dniLocalPreview ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={dniLocalPreview} alt="Vista previa DNI" className="dni-preview" />
+        ) : null}
+        {form.customer_dni_image_path && !dniFile ? (
+          <p className="hint">
+            DNI guardado.{" "}
+            <button
+              type="button"
+              className="linkish"
+              onClick={() => void openDniImage(form.customer_dni_image_path)}
+            >
+              Ver archivo
+            </button>
+          </p>
+        ) : null}
         <div className="row">
           <label>
             Nombre *
@@ -539,30 +556,40 @@ export default function ParkingAdminApp() {
             />
           </label>
         </div>
+        <div className="row">
+          <label>
+            Inicio *
+            <input
+              type="date"
+              required
+              value={form.start_date}
+              onChange={(e) => setForm({ ...form, start_date: e.target.value })}
+            />
+          </label>
+          <label>
+            Fin *
+            <input
+              type="date"
+              required
+              value={form.end_date}
+              onChange={(e) => setForm({ ...form, end_date: e.target.value })}
+            />
+          </label>
+        </div>
         <label>
-          Foto / PDF del DNI *
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
-            onChange={(e) => onPickDni(e.target.files?.[0] || null)}
-          />
+          Estado
+          <select
+            value={form.status}
+            onChange={(e) =>
+              setForm({ ...form, status: e.target.value as ParkingBookingStatus })
+            }
+          >
+            <option value="reserved">Reservado (confirmado)</option>
+            <option value="blocked">No disponible (bloqueado)</option>
+            <option value="completed">Finalizado</option>
+            <option value="cancelled">Cancelado</option>
+          </select>
         </label>
-        {dniLocalPreview ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={dniLocalPreview} alt="Vista previa DNI" className="dni-preview" />
-        ) : null}
-        {form.customer_dni_image_path && !dniFile ? (
-          <p className="hint">
-            DNI guardado.{" "}
-            <button
-              type="button"
-              className="linkish"
-              onClick={() => void openDniImage(form.customer_dni_image_path)}
-            >
-              Ver archivo
-            </button>
-          </p>
-        ) : null}
         <label>
           Importe pagado (€) *
           <input
@@ -601,12 +628,14 @@ export default function ParkingAdminApp() {
         </label>
         {message ? <p className="msg">{message}</p> : null}
         <div className="actions">
-          <button type="submit" disabled={saving}>
+          <button type="submit" disabled={saving || ocrBusy}>
             {saving
               ? "Guardando…"
-              : form.id
-                ? "Guardar cambios"
-                : "Guardar y generar comprobante"}
+              : ocrBusy
+                ? "Leyendo DNI…"
+                : form.id
+                  ? "Guardar cambios"
+                  : "Guardar y generar comprobante"}
           </button>
           {form.id ? (
             <button
