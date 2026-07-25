@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { getParkingLocale } from "@/lib/parking/locale";
 
-// Next.js 16 serves app/.../icon.png as this path (not /icon without extension).
 const PARKING_ICON = "/parking-guardamar-centro/icon.png";
 const PARKING_APPLE_ICON = "/parking-guardamar-centro/apple-icon.png";
 
 export const metadata: Metadata = {
-  // Replaces root /favicon.ico (Vercel triangle) for this segment and /admin.
   icons: {
     icon: [
       { url: PARKING_ICON, type: "image/png", sizes: "512x512" },
@@ -17,9 +16,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ParkingLayout({ children }: { children: ReactNode }) {
+export default async function ParkingLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const locale = await getParkingLocale();
   return (
-    <div lang="es" className="parking-root">
+    <div lang={locale} className="parking-root">
       {children}
     </div>
   );

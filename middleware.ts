@@ -6,33 +6,32 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const pathname = url.pathname.toLowerCase();
 
-  // Persist language selection from query parameter.
+  // Persist language from ?lang= without stripping it, so URL and UI stay aligned.
   const langParam = url.searchParams.get("lang");
-  if (langParam && isLocale(langParam)) {
-    const cleaned = new URL(request.url);
-    cleaned.searchParams.delete("lang");
-    const response = NextResponse.redirect(cleaned, { status: 302 });
-    response.cookies.set("preferred_locale", langParam, {
-      path: "/",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 365,
-    });
+  const applyLocaleCookie = (response: NextResponse) => {
+    if (langParam && isLocale(langParam)) {
+      response.cookies.set("preferred_locale", langParam, {
+        path: "/",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
     return response;
-  }
+  };
 
   // Block spam/hacked URL patterns and return 404
   const spamPatterns = [
-    /\.php$/,
-    /\.asp$/,
-    /\.jsp$/,
-    /\.cfm$/,
-    /\/saiga/,
-    /\/admin[.-_]/,
-    /\/wp-/,
-    /\/xmlrpc\.php/,
-    /\/shell/,
-    /\/upload/,
-    /^\/(test|temp|tmp|backup|bak)(\/|$)/,
+    /\.php$/i,
+    /\.asp$/i,
+    /\.jsp$/i,
+    /\.cfm$/i,
+    /\/saiga/i,
+    /\/admin[.\-_]/i,
+    /\/wp-/i,
+    /\/xmlrpc\.php/i,
+    /\/shell/i,
+    /\/upload/i,
+    /^\/(test|temp|tmp|backup|bak)(\/|$)/i,
   ];
 
   const isSpamPattern = spamPatterns.some((pattern) => pattern.test(pathname));
@@ -65,9 +64,11 @@ export async function middleware(request: NextRequest) {
         if (allowedParams.has(key)) cleaned.searchParams.set(key, value);
       }
 
-      return NextResponse.redirect(cleaned, {
-        status: 301,
-      });
+      return applyLocaleCookie(
+        NextResponse.redirect(cleaned, {
+          status: 301,
+        })
+      );
     }
   }
 
@@ -77,10 +78,10 @@ export async function middleware(request: NextRequest) {
     (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   if (hasSupabase) {
-    return updateSession(request);
+    return applyLocaleCookie(await updateSession(request));
   }
 
-  return NextResponse.next();
+  return applyLocaleCookie(NextResponse.next());
 }
 
 export const config = {

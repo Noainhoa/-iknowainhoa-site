@@ -173,56 +173,55 @@ export function buildWhatsAppMessage(input: {
   name: string;
   registration?: string;
   vehicle?: string;
-  arrivalTiming: "before_midday" | "after_midday";
-  departureTiming: "before_midday" | "after_midday";
   comments?: string;
 }): string {
   const days = countInclusiveDays(input.arrival, input.departure);
   const es = input.locale === "es";
-  const arrivalLabel =
-    input.arrivalTiming === "before_midday"
-      ? es
-        ? "Antes del mediodía"
-        : "Before midday"
-      : es
-        ? "Después del mediodía"
-        : "After midday";
-  const departureLabel =
-    input.departureTiming === "before_midday"
-      ? es
-        ? "Antes del mediodía"
-        : "Before midday"
-      : es
-        ? "Después del mediodía"
-        : "After midday";
+  const registration = input.registration?.trim()
+    ? input.registration.trim().toUpperCase()
+    : es
+      ? "No indicada"
+      : "Not provided";
+  const vehicle = input.vehicle?.trim()
+    ? input.vehicle.trim()
+    : es
+      ? "No indicado"
+      : "Not provided";
+  const comments = input.comments?.trim()
+    ? input.comments.trim()
+    : es
+      ? "Sin comentarios"
+      : "No additional comments";
+  const duration =
+    es
+      ? `${days} ${days === 1 ? "día" : "días"}`
+      : `${days} ${days === 1 ? "day" : "days"}`;
 
   if (es) {
-    return `Hola Ainhoa, quisiera consultar la disponibilidad de Parking Guardamar Centro (Jorge Juan 13).
+    return `Hola, Ainhoa. Quisiera consultar la disponibilidad de la plaza de garaje de Guardamar.
 
-Fechas: del ${formatLocaleDate(input.arrival, "es")} al ${formatLocaleDate(input.departure, "es")}
-Duración: ${days} días
-Nombre: ${input.name}
-Matrícula: ${input.registration?.trim() || "No indicada"}
-Vehículo: ${input.vehicle?.trim() || "No indicado"}
-Llegada: ${arrivalLabel}
-Salida: ${departureLabel}
-Comentarios: ${input.comments?.trim() || "Sin comentarios"}
+Entrada: ${formatLocaleDate(input.arrival, "es")}
+Salida: ${formatLocaleDate(input.departure, "es")}
+Duración: ${duration}
+Nombre: ${input.name.trim()}
+Matrícula: ${registration}
+Vehículo: ${vehicle}
+Comentarios: ${comments}
 
-Entiendo que esta consulta no confirma la reserva hasta recibir tu confirmación.`;
+Entiendo que la reserva no queda confirmada hasta recibir tu respuesta.`;
   }
 
-  return `Hi Ainhoa, I'd like to check availability for Parking Guardamar Centro (Jorge Juan 13).
+  return `Hello Ainhoa, I would like to enquire about the parking space in Guardamar.
 
-Dates: from ${formatLocaleDate(input.arrival, "en")} to ${formatLocaleDate(input.departure, "en")}
-Duration: ${days} days
-Name: ${input.name}
-Registration: ${input.registration?.trim() || "Not provided"}
-Vehicle: ${input.vehicle?.trim() || "Not provided"}
-Arrival: ${arrivalLabel}
-Departure: ${departureLabel}
-Comments: ${input.comments?.trim() || "None"}
+Arrival: ${formatLocaleDate(input.arrival, "en")}
+Departure: ${formatLocaleDate(input.departure, "en")}
+Duration: ${duration}
+Name: ${input.name.trim()}
+Vehicle registration: ${registration}
+Vehicle: ${vehicle}
+Comments: ${comments}
 
-I understand this enquiry does not confirm the booking until you confirm.`;
+I understand that the booking is not confirmed until you reply.`;
 }
 
 export function whatsAppHref(message: string): string {

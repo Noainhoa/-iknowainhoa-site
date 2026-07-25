@@ -1,20 +1,33 @@
 import type { Metadata } from "next";
 import ParkingPublicApp from "@/components/parking/ParkingPublicApp";
-import { getLocale } from "@/lib/i18n";
+import { getParkingCopy } from "@/lib/parking/i18n";
+import { getParkingLocale } from "@/lib/parking/locale";
 
 const PATH = "https://iknowainhoa.com/parking-guardamar-centro";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
+type PageProps = {
+  searchParams: Promise<{ lang?: string | string[] }>;
+};
+
+export async function generateMetadata({
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const locale = await getParkingLocale(params.lang);
+  const t = getParkingCopy(locale);
   const es = locale === "es";
+
   return {
-    title: es
-      ? "Parking Guardamar Centro — Disponibilidad"
-      : "Parking Guardamar Centro — Availability",
-    description: es
-      ? "Parking Guardamar Centro: consulta las fechas disponibles de la plaza y envía una solicitud por WhatsApp Business."
-      : "Parking Guardamar Centro: check available dates and send a WhatsApp Business enquiry.",
-    alternates: { canonical: PATH },
+    title: t.metaTitle,
+    description: t.metaDescription,
+    alternates: {
+      canonical: `${PATH}${es ? "?lang=es" : "?lang=en"}`,
+      languages: {
+        es: `${PATH}?lang=es`,
+        en: `${PATH}?lang=en`,
+        "x-default": `${PATH}?lang=es`,
+      },
+    },
     icons: {
       icon: [
         {
@@ -34,22 +47,27 @@ export async function generateMetadata(): Promise<Metadata> {
       shortcut: "/parking-guardamar-centro/icon.png",
     },
     openGraph: {
-      title: es
-        ? "Parking Guardamar Centro — Disponibilidad"
-        : "Parking Guardamar Centro — Availability",
-      description: es
-        ? "Consulta las fechas disponibles y envía una solicitud por WhatsApp Business. La selección no confirma la reserva."
-        : "Check available dates and enquire on WhatsApp Business. Selecting dates does not confirm a booking.",
-      url: PATH,
+      title: t.metaTitle,
+      description: t.metaDescription,
+      url: `${PATH}?lang=${locale}`,
       locale: es ? "es_ES" : "en_GB",
+      alternateLocale: es ? ["en_GB"] : ["es_ES"],
       type: "website",
-      images: [{ url: "/images/parking/guardamar-parking-logo.png", width: 512, height: 512 }],
+      images: [
+        {
+          url: "/images/parking/guardamar-parking-logo.png",
+          width: 512,
+          height: 512,
+          alt: t.heroAlt,
+        },
+      ],
     },
   };
 }
 
-export default async function ParkingPage() {
-  const locale = await getLocale();
+export default async function ParkingPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const locale = await getParkingLocale(params.lang);
   return (
     <main style={{ margin: 0, minHeight: "100vh", background: "#fafaf8" }}>
       <ParkingPublicApp locale={locale} />

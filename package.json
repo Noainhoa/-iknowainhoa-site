@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:parking": "tsx --tsconfig tsconfig.json --test lib/parking/parking.test.ts",
     "post:new": "node scripts/new-blog-post.mjs"
   },
   "dependencies": {
