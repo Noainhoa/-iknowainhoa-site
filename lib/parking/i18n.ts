@@ -61,8 +61,8 @@ const DASH = "—";
 const es: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking Guardamar Centro",
-  intro: "Elige fechas y consulta por WhatsApp.",
-  accessNote: "Por restricciones de acceso, coches de máximo 1,79 m de altura.",
+  intro: "Comprueba disponibilidad en parking privado Carrer Jorge Juan 13.",
+  accessNote: "",
   pricesTitle: "Precios",
   priceColDay: "Día",
   priceColWeek: "Semana",
@@ -132,8 +132,8 @@ const es: ParkingCopy = {
 const en: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking Guardamar Centro",
-  intro: "Pick dates and enquire on WhatsApp.",
-  accessNote: "Access restriction: cars max. 1.79 m height.",
+  intro: "Check availability at the private parking on Carrer Jorge Juan 13.",
+  accessNote: "",
   pricesTitle: "Prices",
   priceColDay: "Day",
   priceColWeek: "Week",

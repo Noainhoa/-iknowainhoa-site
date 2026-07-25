@@ -195,7 +195,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           <h1>{t.title}</h1>
         </div>
         <p>{t.intro}</p>
-        <p className="pk-access">{t.accessNote}</p>
+        {t.accessNote ? <p className="pk-access">{t.accessNote}</p> : null}
       </header>
 
       <section className="pk-prices" aria-label={t.pricesTitle}>
