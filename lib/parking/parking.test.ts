@@ -20,7 +20,10 @@ describe("parking i18n", () => {
   it("returns concise Spanish copy", () => {
     const t = getParkingCopy("es");
     assert.equal(t.title, "Parking privado en el centro de Guardamar");
-    assert.equal(t.intro, "Consulta la disponibilidad y solicita tus fechas.");
+    assert.match(t.intro, /agosto/i);
+    assert.equal(t.spaceWidth, "Ancho: 240 cm");
+    assert.equal(t.spaceLength, "Largo: 490 cm");
+    assert.match(t.metaTitle, /agosto/i);
     assert.equal(t.pricesTitle, "Tarifas");
     assert.equal(t.pricesSupport, "Elige tus fechas para consultar la tarifa.");
     assert.equal(t.pricesDisclaimer, "Precio final sujeto a confirmación.");
@@ -37,7 +40,9 @@ describe("parking i18n", () => {
   it("returns concise English copy", () => {
     const t = getParkingCopy("en");
     assert.equal(t.title, "Private parking in central Guardamar");
-    assert.equal(t.intro, "Check availability and request your dates.");
+    assert.match(t.intro, /August/i);
+    assert.equal(t.spaceWidth, "Width: 240 cm");
+    assert.match(t.metaTitle, /August/i);
     assert.equal(t.pricesTitle, "Prices");
     assert.equal(t.pricesSupport, "Select your dates to check the rate.");
     assert.equal(t.pricesDisclaimer, "Final price subject to confirmation.");

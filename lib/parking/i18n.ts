@@ -15,6 +15,15 @@ export type ParkingCopy = {
   locationLine1: string;
   locationLine2: string;
   heroAlt: string;
+  spaceTitle: string;
+  spaceIntro: string;
+  spaceWidth: string;
+  spaceLength: string;
+  spaceHeight: string;
+  spaceCovered: string;
+  spaceAugust: string;
+  galleryLabel: string;
+  photoAlts: [string, string, string];
   pricesTitle: string;
   pricesSupport: string;
   pricesDisclaimer: string;
@@ -88,10 +97,26 @@ const DASH = "—";
 const es: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking privado en el centro de Guardamar",
-  intro: "Consulta la disponibilidad y solicita tus fechas.",
+  intro:
+    "Plaza de garaje cubierta en Carrer de Jorge Juan. Ideal para agosto y el resto del año.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
-  heroAlt: "Plaza de garaje privada en el centro de Guardamar",
+  heroAlt:
+    "Plaza de garaje privada cubierta en el centro de Guardamar del Segura",
+  spaceTitle: "La plaza",
+  spaceIntro:
+    "Una plaza privada en garaje cerrado del centro de Guardamar del Segura. Seca, iluminada y lista para verano, agosto y vacaciones.",
+  spaceWidth: "Ancho: 240 cm",
+  spaceLength: "Largo: 490 cm",
+  spaceHeight: "Altura máxima: 1,79 m",
+  spaceCovered: "Garaje cubierto y cerrado",
+  spaceAugust: "Disponible para agosto y temporada alta (consulta fechas)",
+  galleryLabel: "Fotos de la plaza de garaje",
+  photoAlts: [
+    "Plaza de garaje privada cubierta en Guardamar del Segura, 240 cm de ancho y 490 cm de largo",
+    "Vista frontal de la plaza de parking en garaje cerrado, centro de Guardamar",
+    "Plaza de aparcamiento privada con armarios y altura limitada a 1,79 m en Guardamar",
+  ],
   pricesTitle: "Tarifas",
   pricesSupport: "Elige tus fechas para consultar la tarifa.",
   pricesDisclaimer: "Precio final sujeto a confirmación.",
@@ -188,18 +213,34 @@ const es: ParkingCopy = {
     "El periodo incluye fechas no disponibles. Selección reiniciada.",
   languageLabel: "Seleccionar idioma",
   weekdays: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
-  metaTitle: "Parking privado en el centro de Guardamar | Disponibilidad",
+  metaTitle:
+    "Parking Guardamar agosto | Plaza garaje centro Guardamar del Segura",
   metaDescription:
-    "Consulta la disponibilidad de una plaza de garaje privada en el centro de Guardamar del Segura y envía tu solicitud por WhatsApp.",
+    "Alquila plaza de garaje privada y cubierta en el centro de Guardamar del Segura (Jorge Juan 13). 240×490 cm, altura 1,79 m. Ideal agosto y verano. Consulta disponibilidad.",
 };
 
 const en: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Private parking in central Guardamar",
-  intro: "Check availability and request your dates.",
+  intro:
+    "Covered private garage space on Carrer de Jorge Juan. Ideal for August and the rest of the year.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
-  heroAlt: "Private parking space in central Guardamar",
+  heroAlt: "Covered private parking space in central Guardamar del Segura",
+  spaceTitle: "The space",
+  spaceIntro:
+    "A private bay in a closed garage in central Guardamar del Segura. Dry, well lit, and ready for summer, August and holidays.",
+  spaceWidth: "Width: 240 cm",
+  spaceLength: "Length: 490 cm",
+  spaceHeight: "Maximum height: 1.79 m",
+  spaceCovered: "Covered, enclosed garage",
+  spaceAugust: "Available for August and high season (check dates)",
+  galleryLabel: "Photos of the parking space",
+  photoAlts: [
+    "Covered private parking bay in Guardamar del Segura, 240 cm wide by 490 cm long",
+    "Front view of the enclosed garage parking space in central Guardamar",
+    "Private parking space with cabinets and 1.79 m height limit in Guardamar",
+  ],
   pricesTitle: "Prices",
   pricesSupport: "Select your dates to check the rate.",
   pricesDisclaimer: "Final price subject to confirmation.",
@@ -294,9 +335,10 @@ const en: ParkingCopy = {
     "The period includes unavailable dates. Selection restarted.",
   languageLabel: "Select language",
   weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-  metaTitle: "Private parking in central Guardamar | Availability",
+  metaTitle:
+    "August parking Guardamar | Private garage space Guardamar del Segura",
   metaDescription:
-    "Check the availability of a private parking space in central Guardamar del Segura and send your enquiry through WhatsApp.",
+    "Rent a private covered garage space in central Guardamar del Segura (Jorge Juan 13). 240×490 cm, 1.79 m height. Ideal for August and summer. Check availability.",
 };
 
 export function getParkingCopy(locale: Locale): ParkingCopy {

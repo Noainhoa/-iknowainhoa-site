@@ -534,6 +534,40 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         </div>
       </header>
 
+      <section className="pk-space" aria-labelledby="pk-space-heading">
+        <h2 id="pk-space-heading">{t.spaceTitle}</h2>
+        <p className="pk-space-intro">{t.spaceIntro}</p>
+
+        <div className="pk-gallery" role="group" aria-label={t.galleryLabel}>
+          {(
+            [
+              "/images/parking/plaza-1.jpg",
+              "/images/parking/plaza-2.jpg",
+              "/images/parking/plaza-3.jpg",
+            ] as const
+          ).map((src, i) => (
+            <figure key={src} className="pk-gallery-item">
+              <img
+                src={src}
+                alt={t.photoAlts[i]}
+                width={i === 1 ? 1025 : 1400}
+                height={i === 1 ? 1400 : i === 0 ? 793 : 1047}
+                loading={i === 0 ? "eager" : "lazy"}
+                decoding="async"
+              />
+            </figure>
+          ))}
+        </div>
+
+        <ul className="pk-space-facts">
+          <li>{t.spaceWidth}</li>
+          <li>{t.spaceLength}</li>
+          <li>{t.spaceHeight}</li>
+          <li>{t.spaceCovered}</li>
+          <li>{t.spaceAugust}</li>
+        </ul>
+      </section>
+
       <section className="pk-prices" aria-labelledby="pk-prices-heading">
         <h2 id="pk-prices-heading">{t.pricesTitle}</h2>
         <p className="pk-prices-support">{t.pricesSupport}</p>
@@ -1099,10 +1133,94 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           box-shadow: var(--shadow);
         }
 
+        .pk-space {
+          margin: 0 0 var(--space-section);
+        }
+
+        .pk-space h2 {
+          margin: 0 0 6px;
+          font-size: 1.15rem;
+          font-weight: 750;
+          color: var(--pk-navy);
+          letter-spacing: -0.01em;
+        }
+
+        .pk-space-intro {
+          margin: 0 0 12px;
+          color: var(--muted);
+          font-size: 0.92rem;
+          line-height: 1.45;
+          max-width: 42rem;
+        }
+
+        .pk-gallery {
+          display: grid;
+          grid-template-columns: 1.35fr 0.9fr;
+          grid-template-rows: minmax(140px, 28vw) minmax(140px, 28vw);
+          gap: 6px;
+          margin: 0 0 12px;
+          border-radius: var(--radius);
+          overflow: hidden;
+        }
+
+        .pk-gallery-item {
+          margin: 0;
+          min-width: 0;
+          min-height: 0;
+          background: #d8dee4;
+        }
+
+        .pk-gallery-item:first-child {
+          grid-row: 1 / span 2;
+        }
+
+        .pk-gallery-item img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .pk-space-facts {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          gap: 6px;
+          color: var(--ink);
+          font-size: 0.9rem;
+          line-height: 1.35;
+        }
+
+        .pk-space-facts li {
+          margin: 0;
+          padding-left: 1rem;
+          position: relative;
+        }
+
+        .pk-space-facts li::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0.45em;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--pk-navy);
+        }
+
         @media (min-width: 560px) {
           .pk-intro,
           .pk-location {
             text-align: left;
+          }
+          .pk-gallery {
+            grid-template-rows: 200px 200px;
+            gap: 8px;
+          }
+          .pk-space-facts {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px 16px;
           }
         }
 
