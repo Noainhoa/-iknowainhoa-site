@@ -195,7 +195,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           <h1>{t.title}</h1>
         </div>
         <p>{t.intro}</p>
-        {t.accessNote ? <p className="pk-access">{t.accessNote}</p> : null}
       </header>
 
       <section className="pk-prices" aria-label={t.pricesTitle}>
@@ -451,10 +450,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </p>
         ) : null}
 
+        <div className="pk-before-book">
+          <p>{t.accessNote}</p>
+          <p>{t.whatsappNote}</p>
+        </div>
+
         <button type="submit" className="pk-wa">
           {t.whatsappCta}
         </button>
-        <p className="pk-note">{t.whatsappNote}</p>
       </form>
 
       <style jsx>{`
@@ -510,10 +513,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           color: var(--muted);
           line-height: 1.45;
           font-size: 0.98rem;
-        }
-        .pk-access {
-          margin-top: 8px !important;
-          font-size: 0.9rem !important;
         }
         .pk-prices {
           margin: 20px 0 0;
@@ -810,7 +809,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-wa:hover {
           background: var(--wa-hover);
         }
-        .pk-note {
+        .pk-before-book {
+          display: grid;
+          gap: 6px;
+          margin: 2px 0 0;
+        }
+        .pk-before-book p {
           margin: 0;
           font-size: 0.82rem;
           color: var(--muted);
