@@ -158,11 +158,6 @@ function parkingJsonLd(locale: "es" | "en") {
       },
       {
         "@type": "PropertyValue",
-        name: es ? "Altura máxima" : "Maximum height",
-        value: "1.79 m",
-      },
-      {
-        "@type": "PropertyValue",
         name: es ? "Tipo" : "Type",
         value: es ? "Plaza privada en garaje cubierto" : "Private covered garage bay",
       },

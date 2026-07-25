@@ -562,7 +562,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         <ul className="pk-space-facts">
           <li>{t.spaceWidth}</li>
           <li>{t.spaceLength}</li>
-          <li>{t.spaceHeight}</li>
           <li>{t.spaceCovered}</li>
           <li>{t.spaceAugust}</li>
         </ul>

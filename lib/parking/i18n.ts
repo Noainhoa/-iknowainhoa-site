@@ -19,7 +19,6 @@ export type ParkingCopy = {
   spaceIntro: string;
   spaceWidth: string;
   spaceLength: string;
-  spaceHeight: string;
   spaceCovered: string;
   spaceAugust: string;
   galleryLabel: string;
@@ -108,14 +107,13 @@ const es: ParkingCopy = {
     "Una plaza privada en garaje cerrado del centro de Guardamar del Segura. Seca, iluminada y lista para verano, agosto y vacaciones.",
   spaceWidth: "Ancho: 240 cm",
   spaceLength: "Largo: 490 cm",
-  spaceHeight: "Altura máxima: 1,79 m",
   spaceCovered: "Garaje cubierto y cerrado",
   spaceAugust: "Disponible para agosto y temporada alta (consulta fechas)",
   galleryLabel: "Fotos de la plaza de garaje",
   photoAlts: [
     "Plaza de garaje privada cubierta en Guardamar del Segura, 240 cm de ancho y 490 cm de largo",
     "Vista frontal de la plaza de parking en garaje cerrado, centro de Guardamar",
-    "Plaza de aparcamiento privada con armarios y altura limitada a 1,79 m en Guardamar",
+    "Plaza de aparcamiento privada con armarios en garaje cubierto en Guardamar",
   ],
   pricesTitle: "Tarifas",
   pricesSupport: "Elige tus fechas para consultar la tarifa.",
@@ -177,7 +175,7 @@ const es: ParkingCopy = {
   vehiclePlaceholder: "Opcional",
   commentsPlaceholder: "Horario de llegada, dudas…",
   accessImportant:
-    "Importante: la altura máxima permitida para el vehículo es de 1,79 m.",
+    "Importante: la altura máxima de acceso al garaje es de 1,79 m.",
   bookingDisclaimer:
     "Enviar la solicitud no confirma la reserva. Te responderé por WhatsApp para confirmar la disponibilidad, el precio y el pago.",
   privacyNote:
@@ -216,7 +214,7 @@ const es: ParkingCopy = {
   metaTitle:
     "Parking Guardamar agosto | Plaza garaje centro Guardamar del Segura",
   metaDescription:
-    "Alquila plaza de garaje privada y cubierta en el centro de Guardamar del Segura (Jorge Juan 13). 240×490 cm, altura 1,79 m. Ideal agosto y verano. Consulta disponibilidad.",
+    "Alquila plaza de garaje privada y cubierta en el centro de Guardamar del Segura (Jorge Juan 13). 240×490 cm. Ideal agosto y verano. Consulta disponibilidad.",
 };
 
 const en: ParkingCopy = {
@@ -232,14 +230,13 @@ const en: ParkingCopy = {
     "A private bay in a closed garage in central Guardamar del Segura. Dry, well lit, and ready for summer, August and holidays.",
   spaceWidth: "Width: 240 cm",
   spaceLength: "Length: 490 cm",
-  spaceHeight: "Maximum height: 1.79 m",
   spaceCovered: "Covered, enclosed garage",
   spaceAugust: "Available for August and high season (check dates)",
   galleryLabel: "Photos of the parking space",
   photoAlts: [
     "Covered private parking bay in Guardamar del Segura, 240 cm wide by 490 cm long",
     "Front view of the enclosed garage parking space in central Guardamar",
-    "Private parking space with cabinets and 1.79 m height limit in Guardamar",
+    "Private parking space with cabinets in a covered garage in Guardamar",
   ],
   pricesTitle: "Prices",
   pricesSupport: "Select your dates to check the rate.",
@@ -301,7 +298,7 @@ const en: ParkingCopy = {
   vehiclePlaceholder: "Optional",
   commentsPlaceholder: "Arrival time, questions…",
   accessImportant:
-    "Important: the maximum permitted vehicle height is 1.79 m.",
+    "Important: the maximum garage access height is 1.79 m.",
   bookingDisclaimer:
     "Sending this enquiry does not confirm the booking. I will reply through WhatsApp to confirm availability, the price and payment.",
   privacyNote:
@@ -338,7 +335,7 @@ const en: ParkingCopy = {
   metaTitle:
     "August parking Guardamar | Private garage space Guardamar del Segura",
   metaDescription:
-    "Rent a private covered garage space in central Guardamar del Segura (Jorge Juan 13). 240×490 cm, 1.79 m height. Ideal for August and summer. Check availability.",
+    "Rent a private covered garage space in central Guardamar del Segura (Jorge Juan 13). 240×490 cm. Ideal for August and summer. Check availability.",
 };
 
 export function getParkingCopy(locale: Locale): ParkingCopy {

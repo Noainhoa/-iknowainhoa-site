@@ -99,7 +99,7 @@ export async function buildConfirmationImage(
   ctx.font = "400 16px system-ui, -apple-system, sans-serif";
   wrapText(
     ctx,
-    "Reserva confirmada. Conserva este comprobante. Altura máxima del vehículo: 1,79 m.",
+    "Reserva confirmada. Conserva este comprobante. Altura máxima de acceso al garaje: 1,79 m.",
     48,
     height - 90,
     width - 96,
