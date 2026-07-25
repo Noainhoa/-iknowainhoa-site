@@ -310,7 +310,7 @@ export function formatMonthLabel(date: Date, locale: Locale): string {
 export function formatMonthWithYear(date: Date, locale: Locale): string {
   const month = formatMonthLabel(date, locale);
   const year = date.getFullYear();
-  return locale === "es" ? `${month} de ${year}` : `${month} ${year}`;
+  return `${month} ${year}`;
 }
 
 /** Nav title for one or more visible months, always including year. */
@@ -329,16 +329,12 @@ export function formatMonthRangeLabel(
   }
 
   if (startY === endY) {
-    if (locale === "es") {
-      return `${startM}–${endM.toLowerCase()} de ${startY}`;
-    }
-    return `${startM}–${endM} ${startY}`;
+    const endLabel = locale === "es" ? endM.toLowerCase() : endM;
+    return `${startM}–${endLabel} ${startY}`;
   }
 
-  if (locale === "es") {
-    return `${startM} de ${startY}–${endM.toLowerCase()} de ${endY}`;
-  }
-  return `${startM} ${startY}–${endM} ${endY}`;
+  const endLabel = locale === "es" ? endM.toLowerCase() : endM;
+  return `${startM} ${startY}–${endLabel} ${endY}`;
 }
 
 export const PRICE_DASH = DASH;
