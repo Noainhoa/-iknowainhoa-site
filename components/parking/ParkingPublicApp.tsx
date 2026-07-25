@@ -495,24 +495,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </tbody>
         </table>
 
-        <div className="pk-prices-cards">
-          {t.priceRows.map((row) => (
-            <article key={row.period} className="pk-price-card">
-              <h3>{row.period}</h3>
-              <dl>
-                {priceCols.map((col) => (
-                  <div key={col.key} className="pk-price-row">
-                    <dt>{col.label}</dt>
-                    <dd>
-                      <PriceCell value={row[col.key]} unavailableLabel={t.priceUnavailableLabel} />
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </article>
-          ))}
-        </div>
-
         <p className="pk-prices-disclaimer">{t.pricesDisclaimer}</p>
       </section>
 
@@ -998,7 +980,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-prices {
           margin: 0 0 var(--space-section);
-          padding: 14px 16px 16px;
+          padding: 12px 14px 12px;
           background: var(--card);
           border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
           border-radius: var(--radius);
@@ -1007,7 +989,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-prices h2,
         .pk-availability h2,
         .pk-form-section h2 {
-          margin: 0 0 6px;
+          margin: 0 0 4px;
           font-size: 1.15rem;
           font-weight: 750;
           color: var(--pk-navy);
@@ -1015,27 +997,28 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-prices-support {
-          margin: 0 0 12px;
+          margin: 0 0 8px;
           color: var(--muted);
-          font-size: 0.9rem;
-          line-height: 1.4;
-        }
-
-        .pk-prices-table {
-          display: none;
-          width: 100%;
-          border-collapse: collapse;
-          margin: 0 0 10px;
-          font-size: 0.9rem;
+          font-size: 0.86rem;
           line-height: 1.35;
         }
 
+        .pk-prices-table {
+          display: table;
+          width: 100%;
+          border-collapse: collapse;
+          margin: 0 0 8px;
+          font-size: 0.84rem;
+          line-height: 1.2;
+          table-layout: fixed;
+        }
+
         .pk-prices-table thead th {
-          padding: 0 6px 8px;
+          padding: 0 4px 6px;
           text-align: right;
-          font-size: 0.68rem;
+          font-size: 0.64rem;
           font-weight: 650;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.03em;
           text-transform: uppercase;
           color: var(--muted);
           white-space: nowrap;
@@ -1044,11 +1027,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-prices-table thead th:first-child {
           text-align: left;
           padding-left: 0;
+          width: 34%;
         }
 
         .pk-prices-table tbody th,
         .pk-prices-table tbody td {
-          padding: 10px 6px;
+          padding: 6px 4px;
           border-top: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
           vertical-align: baseline;
         }
@@ -1058,57 +1042,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           padding-left: 0;
           font-weight: 550;
           color: var(--muted);
+          font-size: 0.8rem;
         }
 
         .pk-prices-table tbody td {
           text-align: right;
           white-space: nowrap;
-          color: var(--pk-navy);
-          font-weight: 750;
-          font-variant-numeric: tabular-nums;
-        }
-
-        .pk-prices-cards {
-          display: grid;
-          gap: 12px;
-          margin: 0 0 14px;
-        }
-
-        .pk-price-card {
-          padding: 12px 14px;
-          border: 1px solid var(--line);
-          border-radius: 12px;
-          background: var(--bg);
-        }
-
-        .pk-price-card h3 {
-          margin: 0 0 10px;
-          font-size: 0.95rem;
-          font-weight: 700;
-          color: var(--pk-navy);
-        }
-
-        .pk-price-card dl {
-          margin: 0;
-          display: grid;
-          gap: 6px;
-        }
-
-        .pk-price-row {
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          align-items: baseline;
-        }
-
-        .pk-price-row dt {
-          margin: 0;
-          color: var(--muted);
-          font-size: 0.85rem;
-        }
-
-        .pk-price-row dd {
-          margin: 0;
           color: var(--pk-navy);
           font-weight: 750;
           font-variant-numeric: tabular-nums;
@@ -1121,17 +1060,25 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-prices-disclaimer {
           margin: 0;
-          font-size: 0.82rem;
+          font-size: 0.78rem;
           color: var(--muted);
-          line-height: 1.45;
+          line-height: 1.35;
         }
 
-        @media (min-width: 640px) {
+        @media (min-width: 560px) {
           .pk-prices-table {
-            display: table;
+            font-size: 0.9rem;
           }
-          .pk-prices-cards {
-            display: none;
+          .pk-prices-table thead th {
+            font-size: 0.68rem;
+            padding: 0 6px 8px;
+          }
+          .pk-prices-table tbody th,
+          .pk-prices-table tbody td {
+            padding: 8px 6px;
+          }
+          .pk-prices-table tbody th {
+            font-size: 0.9rem;
           }
         }
 
