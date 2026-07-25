@@ -188,8 +188,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             className="pk-logo"
             src="/images/parking/guardamar-parking-logo.png"
             alt="Guardamar Parking"
-            width={48}
-            height={48}
+            width={72}
+            height={72}
             decoding="async"
           />
           <h1>{t.title}</h1>
@@ -491,28 +491,55 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
         .pk-brand {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 12px;
-          margin-bottom: 8px;
+          text-align: center;
+          gap: 10px;
+          margin-bottom: 10px;
+          width: 100%;
         }
         .pk-logo {
-          width: 48px;
-          height: 48px;
+          width: 64px;
+          height: 64px;
           flex-shrink: 0;
           border-radius: 50%;
           display: block;
         }
         .pk-header h1 {
           margin: 0;
-          font-size: 1.55rem;
-          line-height: 1.2;
+          font-size: clamp(1.45rem, 6.2vw, 1.75rem);
+          line-height: 1.15;
           font-weight: 750;
+          letter-spacing: -0.01em;
+          max-width: 14ch;
         }
         .pk-header p {
           margin: 0;
           color: var(--muted);
           line-height: 1.45;
           font-size: 0.98rem;
+          text-align: center;
+        }
+        @media (min-width: 520px) {
+          .pk-brand {
+            flex-direction: row;
+            align-items: center;
+            text-align: left;
+            gap: 16px;
+          }
+          .pk-logo {
+            width: 80px;
+            height: 80px;
+          }
+          .pk-header h1 {
+            font-size: clamp(1.85rem, 4.2vw, 2.15rem);
+            line-height: 1.12;
+            max-width: none;
+            flex: 1;
+          }
+          .pk-header p {
+            text-align: left;
+          }
         }
         .pk-prices {
           margin: 20px 0 0;
