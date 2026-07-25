@@ -204,19 +204,41 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           <h2>{t.pricesTitle}</h2>
         </div>
         <table className="pk-prices-table">
+          <thead>
+            <tr>
+              <th scope="col" className="pk-prices-period">
+                <span className="pk-visually-hidden">
+                  {locale === "es" ? "Periodo" : "Period"}
+                </span>
+              </th>
+              <th scope="col">{t.priceColDay}</th>
+              <th scope="col">{t.priceColWeek}</th>
+              <th scope="col">{t.priceColQuincena}</th>
+              <th scope="col">{t.priceColMonth}</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr>
-              <th scope="row">{t.pricePeriodHigh}</th>
-              <td>{t.priceRateHigh}</td>
-            </tr>
-            <tr>
-              <th scope="row">{t.pricePeriodSeptember}</th>
-              <td>{t.priceRateSeptember}</td>
-            </tr>
-            <tr>
-              <th scope="row">{t.pricePeriodLow}</th>
-              <td>{t.priceRateLow}</td>
-            </tr>
+            {t.priceRows.map((row) => (
+              <tr key={row.period}>
+                <th scope="row" className="pk-prices-period">
+                  {row.period}
+                </th>
+                <td className={row.day === "—" ? "pk-price-empty" : undefined}>
+                  {row.day}
+                </td>
+                <td className={row.week === "—" ? "pk-price-empty" : undefined}>
+                  {row.week}
+                </td>
+                <td
+                  className={row.quincena === "—" ? "pk-price-empty" : undefined}
+                >
+                  {row.quincena}
+                </td>
+                <td className={row.month === "—" ? "pk-price-empty" : undefined}>
+                  {row.month}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </section>
@@ -528,33 +550,65 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           width: 100%;
           border-collapse: collapse;
           margin: 0 0 14px;
-          font-size: 0.9rem;
+          font-size: 0.86rem;
           line-height: 1.35;
+          table-layout: fixed;
         }
-        .pk-prices-table tr + tr th,
-        .pk-prices-table tr + tr td {
+        .pk-prices-table thead th {
+          padding: 0 4px 8px;
+          text-align: right;
+          font-size: 0.68rem;
+          font-weight: 650;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: var(--muted);
+          white-space: nowrap;
+        }
+        .pk-prices-table thead th.pk-prices-period {
+          text-align: left;
+          padding-left: 0;
+          padding-right: 8px;
+        }
+        .pk-prices-table tbody tr + tr th,
+        .pk-prices-table tbody tr + tr td {
           border-top: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
         }
-        .pk-prices-table th,
-        .pk-prices-table td {
-          padding: 9px 0;
+        .pk-prices-table tbody th,
+        .pk-prices-table tbody td {
+          padding: 9px 4px;
           vertical-align: baseline;
-          font-weight: 450;
         }
-        .pk-prices-table th {
+        .pk-prices-table tbody th.pk-prices-period {
           text-align: left;
           color: var(--muted);
-          padding-right: 16px;
+          padding-left: 0;
+          padding-right: 8px;
           font-weight: 450;
+          width: 34%;
         }
-        .pk-prices-table td {
+        .pk-prices-table tbody td {
           text-align: right;
           white-space: nowrap;
           color: var(--pk-navy);
           font-weight: 750;
           font-variant-numeric: tabular-nums;
           letter-spacing: 0.02em;
-          font-size: 0.98rem;
+          font-size: 0.95rem;
+        }
+        .pk-prices-table tbody td.pk-price-empty {
+          color: color-mix(in srgb, var(--muted) 70%, transparent);
+          font-weight: 450;
+        }
+        .pk-visually-hidden {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
         }
         .pk-banner {
           margin: 16px 0 0;

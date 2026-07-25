@@ -2,18 +2,25 @@ import type { Locale } from "@/lib/i18n/shared";
 
 export type MiddayTiming = "before_midday" | "after_midday";
 
+export type ParkingPriceRow = {
+  period: string;
+  day: string;
+  week: string;
+  quincena: string;
+  month: string;
+};
+
 export type ParkingCopy = {
   brand: string;
   title: string;
   intro: string;
   accessNote: string;
   pricesTitle: string;
-  pricePeriodHigh: string;
-  priceRateHigh: string;
-  pricePeriodSeptember: string;
-  priceRateSeptember: string;
-  pricePeriodLow: string;
-  priceRateLow: string;
+  priceColDay: string;
+  priceColWeek: string;
+  priceColQuincena: string;
+  priceColMonth: string;
+  priceRows: ParkingPriceRow[];
   legend: string;
   available: string;
   unavailable: string;
@@ -49,18 +56,41 @@ export type ParkingCopy = {
   weekdays: string[];
 };
 
+const DASH = "—";
+
 const es: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking Guardamar Centro",
   intro: "Elige fechas y consulta por WhatsApp.",
   accessNote: "Por restricciones de acceso, coches de máximo 1,79 m de altura.",
   pricesTitle: "Precios",
-  pricePeriodHigh: "Junio–agosto",
-  priceRateHigh: "10 €/día · 70 €/semana",
-  pricePeriodSeptember: "Septiembre",
-  priceRateSeptember: "50 €/semana",
-  pricePeriodLow: "Octubre–mayo",
-  priceRateLow: "40 €/semana · 75 €/mes",
+  priceColDay: "Día",
+  priceColWeek: "Semana",
+  priceColQuincena: "Quincena",
+  priceColMonth: "Mes",
+  priceRows: [
+    {
+      period: "Junio–agosto",
+      day: "10 €",
+      week: "70 €",
+      quincena: DASH,
+      month: DASH,
+    },
+    {
+      period: "Septiembre",
+      day: DASH,
+      week: "50 €",
+      quincena: DASH,
+      month: DASH,
+    },
+    {
+      period: "Octubre–mayo",
+      day: DASH,
+      week: DASH,
+      quincena: "40 €",
+      month: "75 €",
+    },
+  ],
   legend: "Leyenda",
   available: "Disponible",
   unavailable: "No disponible",
@@ -105,12 +135,33 @@ const en: ParkingCopy = {
   intro: "Pick dates and enquire on WhatsApp.",
   accessNote: "Access restriction: cars max. 1.79 m height.",
   pricesTitle: "Prices",
-  pricePeriodHigh: "June–August",
-  priceRateHigh: "€10/day · €70/week",
-  pricePeriodSeptember: "September",
-  priceRateSeptember: "€50/week",
-  pricePeriodLow: "October–May",
-  priceRateLow: "€40/week · €75/month",
+  priceColDay: "Day",
+  priceColWeek: "Week",
+  priceColQuincena: "Fortnight",
+  priceColMonth: "Month",
+  priceRows: [
+    {
+      period: "June–August",
+      day: "€10",
+      week: "€70",
+      quincena: DASH,
+      month: DASH,
+    },
+    {
+      period: "September",
+      day: DASH,
+      week: "€50",
+      quincena: DASH,
+      month: DASH,
+    },
+    {
+      period: "October–May",
+      day: DASH,
+      week: DASH,
+      quincena: "€40",
+      month: "€75",
+    },
+  ],
   legend: "Legend",
   available: "Available",
   unavailable: "Unavailable",
