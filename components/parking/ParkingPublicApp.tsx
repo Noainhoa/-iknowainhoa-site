@@ -240,9 +240,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           <i className="swatch unavailable" /> {t.unavailable}
         </span>
         <span>
-          <i className="swatch past" /> {t.past}
-        </span>
-        <span>
           <i className="swatch selected" /> {t.selected}
         </span>
       </section>
@@ -554,9 +551,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           text-align: right;
           white-space: nowrap;
           color: var(--pk-navy);
-          font-weight: 600;
+          font-weight: 750;
           font-variant-numeric: tabular-nums;
-          letter-spacing: 0.01em;
+          letter-spacing: 0.02em;
+          font-size: 0.98rem;
         }
         .pk-banner {
           margin: 16px 0 0;

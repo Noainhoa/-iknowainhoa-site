@@ -52,15 +52,15 @@ export type ParkingCopy = {
 const es: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking Guardamar Centro",
-  intro: "Elige fechas y consulta por WhatsApp Business.",
+  intro: "Elige fechas y consulta por WhatsApp.",
   accessNote: "Por restricciones de acceso, coches de máximo 1,79 m de altura.",
   pricesTitle: "Precios",
-  pricePeriodHigh: "Temporada alta (junio–agosto)",
-  priceRateHigh: "70 €/semana",
+  pricePeriodHigh: "Junio–agosto",
+  priceRateHigh: "10 €/día · 70 €/semana",
   pricePeriodSeptember: "Septiembre",
   priceRateSeptember: "50 €/semana",
   pricePeriodLow: "Octubre–mayo",
-  priceRateLow: "75 €/mes",
+  priceRateLow: "40 €/semana · 75 €/mes",
   legend: "Leyenda",
   available: "Disponible",
   unavailable: "No disponible",
@@ -102,15 +102,15 @@ const es: ParkingCopy = {
 const en: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking Guardamar Centro",
-  intro: "Pick dates and enquire on WhatsApp Business.",
+  intro: "Pick dates and enquire on WhatsApp.",
   accessNote: "Access restriction: cars max. 1.79 m height.",
   pricesTitle: "Prices",
-  pricePeriodHigh: "High season (June–August)",
-  priceRateHigh: "€70/week",
+  pricePeriodHigh: "June–August",
+  priceRateHigh: "€10/day · €70/week",
   pricePeriodSeptember: "September",
   priceRateSeptember: "€50/week",
   pricePeriodLow: "October–May",
-  priceRateLow: "€75/month",
+  priceRateLow: "€40/week · €75/month",
   legend: "Legend",
   available: "Available",
   unavailable: "Unavailable",
@@ -163,10 +163,10 @@ export function formatParkingDate(iso: string, locale: Locale): string {
 }
 
 export function formatMonthLabel(date: Date, locale: Locale): string {
-  return date.toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
+  const month = date.toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
     month: "long",
-    year: "numeric",
   });
+  return month.charAt(0).toUpperCase() + month.slice(1);
 }
 
 export function timingLabel(timing: MiddayTiming, locale: Locale): string {
