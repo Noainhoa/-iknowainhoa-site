@@ -460,8 +460,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             <h1>{t.title}</h1>
             <p className="pk-intro">{t.intro}</p>
             <p className="pk-location">
-              <span>{t.locationLine1}</span>
-              <span>{t.locationLine2}</span>
+              {t.locationLine1}, {t.locationLine2}
             </p>
           </div>
         </div>
@@ -960,8 +959,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-location {
           margin: 0;
-          display: grid;
-          gap: 2px;
           color: var(--muted);
           font-size: 0.9rem;
           line-height: 1.35;
