@@ -1,8 +1,13 @@
 # Blog Workflow
 
-This site already supports blog posts as markdown files in `content/blog/YYYY/Month/`.
+This site already supports blog posts as markdown files in `content/blog/YYYY/MM-month/`
+(for example `content/blog/2026/07-july/`).
 
 You do not need a separate HTML page each time.
+
+The public URL uses only the post `slug` from frontmatter — never the month folder:
+
+`https://iknowainhoa.com/blog/your-slug`
 
 ## The simple model
 
@@ -10,8 +15,8 @@ You do not need a separate HTML page each time.
 2. Write in markdown.
 3. Paste HTML only for special blocks like embeds or image galleries.
 4. Preview locally.
-5. Commit and push.
-6. Your Git-based deployment picks it up automatically.
+5. Run `npm run post:publish -- path/to/post.md` (sets draft false, commits, pushes).
+6. Vercel auto-deploys production from `main`.
 
 ## Create a new post
 
@@ -19,7 +24,8 @@ You do not need a separate HTML page each time.
 npm run post:new -- "Life in the UK: Hotspot Writing Setup"
 ```
 
-That creates a draft file in the current year and month folder.
+That creates a draft file in the current year and numbered month folder
+(e.g. `content/blog/2026/07-july/life-in-the-uk-hotspot-writing-setup.md`).
 
 ## Write the post
 
@@ -32,6 +38,7 @@ Open the generated file and fill in:
 - body content
 
 Keep `draft: true` while writing. Change it to `draft: false` when ready to publish.
+Keep `slug` short and stable — that is what appears in the URL.
 
 ## Add richer content
 
@@ -49,20 +56,31 @@ npm run dev
 
 Open `http://localhost:3000/blog`.
 
-## Publish
+## Publish (auto-deploys)
 
-If your deployment is connected to Git, the minimal publish flow is:
+This site is connected to Vercel. Any push to `main` triggers a production deploy automatically — including blog posts.
+
+One-command publish (sets `draft: false`, commits the post + related images, pushes):
 
 ```bash
-git add content/blog public/images/blog docs/blog-workflow.md scripts/new-blog-post.mjs package.json
-git commit -m "Publish new blog post"
-git push
+npm run post:publish -- content/blog/2026/07-july/your-post.md
 ```
 
-If you only changed the post and images, you can keep it even smaller:
+You can also pass just the filename or slug:
 
 ```bash
-git add content/blog/YYYY/Month/your-post.md public/images/blog/YYYY/Month
+npm run post:publish -- your-post.md
+npm run post:publish -- your-post
+```
+
+After the push, Vercel builds and the post goes live at:
+
+`https://iknowainhoa.com/blog/your-slug`
+
+### Manual publish (same result)
+
+```bash
+git add content/blog/YYYY/MM-month/your-post.md public/images/blog/YYYY/MM-month
 git commit -m "Publish your-post"
 git push
 ```
