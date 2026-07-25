@@ -24,6 +24,7 @@ import {
 } from "@/lib/parking/types";
 
 const STORAGE_KEY = "parking-enquiry";
+const WA_STATUS_KEY = "parking-wa-status";
 
 type PersistedEnquiry = {
   arrival: string | null;
@@ -33,6 +34,34 @@ type PersistedEnquiry = {
   vehicle: string;
   comments: string;
 };
+
+type WaStatus = "idle" | "opened" | "sent";
+
+function readWaStatus(): { status: WaStatus; href: string | null } {
+  try {
+    const raw = sessionStorage.getItem(WA_STATUS_KEY);
+    if (!raw) return { status: "idle", href: null };
+    const parsed = JSON.parse(raw) as { status?: string; href?: string | null };
+    if (parsed.status === "opened" || parsed.status === "sent") {
+      return { status: parsed.status, href: parsed.href ?? null };
+    }
+  } catch {
+    /* ignore */
+  }
+  return { status: "idle", href: null };
+}
+
+function writeWaStatus(status: WaStatus, href: string | null) {
+  try {
+    if (status === "idle") {
+      sessionStorage.removeItem(WA_STATUS_KEY);
+      return;
+    }
+    sessionStorage.setItem(WA_STATUS_KEY, JSON.stringify({ status, href }));
+  } catch {
+    /* ignore */
+  }
+}
 
 function startOfToday() {
   const n = new Date();
@@ -150,10 +179,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   }>({});
   const [liveMessage, setLiveMessage] = useState("");
   const [preparing, setPreparing] = useState(false);
-  const [waStatus, setWaStatus] = useState<"idle" | "opened" | "sent" | "blocked">(
-    "idle"
+  const [waStatus, setWaStatus] = useState<WaStatus>(() =>
+    typeof window === "undefined" ? "idle" : readWaStatus().status
   );
-  const [waHref, setWaHref] = useState<string | null>(null);
+  const [waHref, setWaHref] = useState<string | null>(() =>
+    typeof window === "undefined" ? null : readWaStatus().href
+  );
 
   const nameRef = useRef<HTMLInputElement>(null);
   const acceptHeightRef = useRef<HTMLInputElement>(null);
@@ -165,6 +196,19 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     setLiveMessage("");
     requestAnimationFrame(() => setLiveMessage(message));
   }, []);
+
+  function updateWaStatus(status: WaStatus, nextHref?: string | null) {
+    if (status === "idle") {
+      setWaStatus("idle");
+      setWaHref(null);
+      writeWaStatus("idle", null);
+      return;
+    }
+    const href = nextHref ?? waHref;
+    setWaStatus(status);
+    if (href) setWaHref(href);
+    writeWaStatus(status, href);
+  }
 
   useEffect(() => {
     const payload: PersistedEnquiry = {
@@ -185,6 +229,28 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
+
+  useEffect(() => {
+    if (waStatus === "idle") return;
+
+    function focusStatus() {
+      requestAnimationFrame(() => {
+        waStatusRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        waStatusRef.current?.focus();
+      });
+    }
+
+    focusStatus();
+
+    function onPageShow(event: PageTransitionEvent) {
+      if (event.persisted || document.visibilityState === "visible") {
+        focusStatus();
+      }
+    }
+
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, [waStatus]);
 
   const load = useCallback(async () => {
     if (!configured) {
@@ -414,32 +480,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       comments,
     });
     const href = whatsAppHref(message);
-    setWaHref(href);
+
     setPreparing(true);
-
-    const popup = window.open(href, "_blank", "noopener,noreferrer");
-    setPreparing(false);
-
-    if (!popup) {
-      setWaStatus("blocked");
-    } else {
-      setWaStatus("opened");
-    }
-
-    requestAnimationFrame(() => {
-      waStatusRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      waStatusRef.current?.focus();
-    });
+    // Same-tab navigation avoids a blank Safari/in-app browser sheet on iOS
+    // after WhatsApp opens. Status is restored when the user comes back.
+    updateWaStatus("opened", href);
+    window.location.assign(href);
   }
 
   function reopenWhatsApp() {
     if (!waHref) return;
-    const popup = window.open(waHref, "_blank", "noopener,noreferrer");
-    if (!popup) {
-      window.location.href = waHref;
-      return;
-    }
-    setWaStatus("opened");
+    updateWaStatus("opened", waHref);
+    window.location.assign(waHref);
   }
 
   const priceCols = [
@@ -872,25 +924,21 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                 <button
                   type="button"
                   className="pk-wa-status-secondary"
-                  onClick={() => setWaStatus("idle")}
+                  onClick={() => updateWaStatus("idle")}
                 >
                   {t.whatsappEditEnquiry}
                 </button>
               </>
             ) : (
               <>
-                <p className="pk-wa-status-title">
-                  {waStatus === "blocked" ? t.whatsappBlocked : t.whatsappOpenedTitle}
-                </p>
-                {waStatus === "opened" ? (
-                  <p className="pk-wa-status-body">{t.whatsappOpenedBody}</p>
-                ) : null}
+                <p className="pk-wa-status-title">{t.whatsappOpenedTitle}</p>
+                <p className="pk-wa-status-body">{t.whatsappOpenedBody}</p>
                 <div className="pk-wa-status-actions">
                   <button
                     type="button"
                     className="pk-wa-status-primary"
                     onClick={() => {
-                      setWaStatus("sent");
+                      updateWaStatus("sent", waHref);
                       announce(t.whatsappSentTitle);
                     }}
                   >
@@ -906,7 +954,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                   <button
                     type="button"
                     className="pk-wa-status-secondary"
-                    onClick={() => setWaStatus("idle")}
+                    onClick={() => updateWaStatus("idle")}
                   >
                     {t.whatsappEditEnquiry}
                   </button>

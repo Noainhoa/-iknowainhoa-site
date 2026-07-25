@@ -63,7 +63,6 @@ export type ParkingCopy = {
   whatsappEditEnquiry: string;
   whatsappSentTitle: string;
   whatsappSentBody: string;
-  whatsappBlocked: string;
   supabaseHint: string;
   loadError: string;
   errNeedArrival: string;
@@ -169,8 +168,6 @@ const es: ParkingCopy = {
   whatsappSentTitle: "Mensaje enviado",
   whatsappSentBody:
     "Gracias. Te responderé por WhatsApp para confirmar la disponibilidad, el precio y el pago.",
-  whatsappBlocked:
-    "No se ha podido abrir WhatsApp automáticamente. Usa el botón de abajo para abrirlo.",
   supabaseHint:
     "Calendario en modo local: falta configurar Supabase. Todas las fechas futuras aparecen como disponibles hasta que se conecte la base de datos.",
   loadError:
@@ -279,8 +276,6 @@ const en: ParkingCopy = {
   whatsappSentTitle: "Message sent",
   whatsappSentBody:
     "Thank you. I will reply through WhatsApp to confirm availability, the price and payment.",
-  whatsappBlocked:
-    "WhatsApp could not open automatically. Use the button below to open it.",
   supabaseHint:
     "Calendar in local mode: Supabase is not configured. All future dates show as available until the database is connected.",
   loadError: "Could not load availability. Please try again later.",
