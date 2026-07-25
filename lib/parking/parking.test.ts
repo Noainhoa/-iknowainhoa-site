@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   formatMonthRangeLabel,
   formatParkingDate,
+  formatShortParkingDate,
   getParkingCopy,
   PRICE_DASH,
 } from "./i18n";
@@ -16,25 +17,57 @@ import {
 } from "./types";
 
 describe("parking i18n", () => {
-  it("returns Spanish copy by default dictionary", () => {
+  it("returns concise Spanish copy", () => {
     const t = getParkingCopy("es");
     assert.equal(t.title, "Parking privado en el centro de Guardamar");
+    assert.equal(t.intro, "Consulta la disponibilidad y solicita tus fechas.");
+    assert.equal(t.pricesTitle, "Tarifas");
+    assert.equal(t.pricesSupport, "Elige tus fechas para consultar la tarifa.");
+    assert.equal(t.pricesDisclaimer, "Precio final sujeto a confirmación.");
+    assert.equal(t.factPrivate, "Plaza privada");
+    assert.equal(t.factHeight, "Altura máxima: 1,79 m");
+    assert.equal(t.factConfirmation, "Reserva con confirmación");
+    assert.equal(t.vehicle, "Modelo");
+    assert.equal(t.vehiclePlaceholder, "Opcional");
+    assert.equal(t.commentsPlaceholder, "Horario de llegada, dudas…");
+    assert.equal(t.announceCleared, "Selección de fechas eliminada.");
+    assert.equal(t.changeDates, "Cambiar fechas");
     assert.equal(t.whatsappCta, "Solicitar por WhatsApp");
-    assert.equal(t.priceColSeason, "Temporada");
     assert.ok(t.weekdays.includes("Lun"));
   });
 
-  it("returns English copy", () => {
+  it("returns concise English copy", () => {
     const t = getParkingCopy("en");
     assert.equal(t.title, "Private parking in central Guardamar");
+    assert.equal(t.intro, "Check availability and request your dates.");
+    assert.equal(t.pricesTitle, "Prices");
+    assert.equal(t.pricesSupport, "Select your dates to check the rate.");
+    assert.equal(t.pricesDisclaimer, "Final price subject to confirmation.");
+    assert.equal(t.factHeight, "Maximum height: 1.79 m");
+    assert.equal(t.factConfirmation, "Booking requires confirmation");
+    assert.equal(t.registration, "Registration");
+    assert.equal(t.vehicle, "Vehicle model");
+    assert.equal(t.changeDates, "Change dates");
+    assert.equal(t.announceCleared, "Date selection cleared.");
     assert.equal(t.whatsappCta, "Enquire through WhatsApp");
-    assert.equal(t.priceColQuincena, "Fortnight");
     assert.ok(t.weekdays.includes("Mon"));
   });
 
-  it("formats Spanish and British dates", () => {
+  it("keeps past label for accessible calendar cells but legend uses other states", () => {
+    const es = getParkingCopy("es");
+    const en = getParkingCopy("en");
+    assert.equal(es.past, "Pasado");
+    assert.equal(en.past, "Past");
+    assert.equal(es.available, "Disponible");
+    assert.equal(es.unavailable, "No disponible");
+    assert.equal(es.selected, "Seleccionado");
+  });
+
+  it("formats long WhatsApp dates and short UI dates", () => {
     assert.match(formatParkingDate("2026-07-25", "es"), /25.*julio.*2026/i);
     assert.match(formatParkingDate("2026-07-25", "en"), /25.*July.*2026/i);
+    assert.match(formatShortParkingDate("2026-07-25", "es"), /25.*jul.*2026/i);
+    assert.match(formatShortParkingDate("2026-07-25", "en"), /25.*Jul.*2026/i);
   });
 
   it("includes year in month range labels", () => {
@@ -44,10 +77,14 @@ describe("parking i18n", () => {
     assert.match(formatMonthRangeLabel(start, end, "en"), /2026/);
   });
 
-  it("keeps dash for unavailable price cells", () => {
-    const row = getParkingCopy("es").priceRows[0];
-    assert.equal(row.quincena, PRICE_DASH);
-    assert.equal(row.month, PRICE_DASH);
+  it("keeps dash for unavailable price cells and unchanged amounts", () => {
+    const rows = getParkingCopy("es").priceRows;
+    assert.equal(rows[0].day, "€10");
+    assert.equal(rows[0].week, "€70");
+    assert.equal(rows[0].quincena, PRICE_DASH);
+    assert.equal(rows[1].week, "€50");
+    assert.equal(rows[2].quincena, "€40");
+    assert.equal(rows[2].month, "€75");
   });
 });
 
@@ -100,7 +137,7 @@ describe("WhatsApp message", () => {
     assert.doesNotMatch(msg, /\d{2}\/\d{2}\/\d{2}/);
   });
 
-  it("builds English message and uppercases registration", () => {
+  it("maps registration and vehicle model into the English message", () => {
     const msg = buildWhatsAppMessage({
       locale: "en",
       arrival: "2026-07-25",
@@ -111,8 +148,8 @@ describe("WhatsApp message", () => {
       comments: "Evening arrival",
     });
     assert.match(msg, /Hello Ainhoa/);
-    assert.match(msg, /Arrival:.*25.*July.*2026/i);
     assert.match(msg, /Vehicle registration: ABC 123/);
+    assert.match(msg, /Vehicle: Golf/);
     assert.match(msg, /not confirmed until you reply/i);
   });
 

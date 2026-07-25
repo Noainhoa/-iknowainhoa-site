@@ -1,12 +1,13 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { RotateCcw } from "lucide-react";
 import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
 import {
   formatMonthRangeLabel,
   formatMonthWithYear,
-  formatParkingDate,
+  formatShortParkingDate,
   getParkingCopy,
   PRICE_DASH,
 } from "@/lib/parking/i18n";
@@ -298,6 +299,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     clearDates();
     const cal = document.getElementById("pk-availability");
     cal?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => {
+      const firstAvailable = cal?.querySelector<HTMLButtonElement>(
+        "button.pk-cell.day:not([disabled])"
+      );
+      firstAvailable?.focus();
+    }, 50);
   }
 
   function validate(): {
@@ -416,38 +423,57 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             className="pk-logo"
             src="/images/parking/guardamar-parking-logo.png"
             alt=""
-            width={72}
-            height={72}
+            width={80}
+            height={80}
             decoding="async"
           />
           <div className="pk-brand-text">
             <p className="pk-brand-name">{t.brand}</p>
             <h1>{t.title}</h1>
+            <p className="pk-intro">{t.intro}</p>
+            <p className="pk-location">
+              <span>{t.locationLine1}</span>
+              <span>{t.locationLine2}</span>
+            </p>
           </div>
         </div>
-        <p className="pk-intro">{t.intro}</p>
-        <p className="pk-location">
-          <span>{t.locationLine1}</span>
-          <span>{t.locationLine2}</span>
-        </p>
       </header>
-
-      <div className="pk-hero-wrap">
-        <img
-          className="pk-hero"
-          src="/images/parking/guardamar-parking-logo.png"
-          alt={t.heroAlt}
-          width={320}
-          height={320}
-          decoding="async"
-        />
-      </div>
 
       <section className="pk-facts" aria-label={locale === "es" ? "Datos clave" : "Key facts"}>
         <ul>
-          <li>{t.factPrivate}</li>
-          <li>{t.factHeight}</li>
-          <li>{t.factConfirmation}</li>
+          <li>
+            <span className="pk-check" aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="14" height="14" focusable="false">
+                <path
+                  fill="currentColor"
+                  d="M6.4 11.3 3.2 8.1l1.1-1.1 2.1 2.1 5-5.1 1.1 1.1z"
+                />
+              </svg>
+            </span>
+            {t.factPrivate}
+          </li>
+          <li>
+            <span className="pk-check" aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="14" height="14" focusable="false">
+                <path
+                  fill="currentColor"
+                  d="M6.4 11.3 3.2 8.1l1.1-1.1 2.1 2.1 5-5.1 1.1 1.1z"
+                />
+              </svg>
+            </span>
+            {t.factHeight}
+          </li>
+          <li>
+            <span className="pk-check" aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="14" height="14" focusable="false">
+                <path
+                  fill="currentColor"
+                  d="M6.4 11.3 3.2 8.1l1.1-1.1 2.1 2.1 5-5.1 1.1 1.1z"
+                />
+              </svg>
+            </span>
+            {t.factConfirmation}
+          </li>
         </ul>
       </section>
 
@@ -528,9 +554,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </span>
           <span>
             <i className="swatch unavailable" aria-hidden="true" /> {t.unavailable}
-          </span>
-          <span>
-            <i className="swatch past" aria-hidden="true" /> {t.past}
           </span>
           <span>
             <i className="swatch selected" aria-hidden="true" /> {t.selected}
@@ -643,18 +666,24 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           >
             <div className="pk-selected-head">
               <h3 id="pk-selected-heading">{t.selectedDatesTitle}</h3>
-              <button type="button" className="pk-change" onClick={changeDates}>
-                {t.changeDates}
+              <button
+                type="button"
+                className="pk-reset-dates"
+                onClick={changeDates}
+                aria-label={t.changeDates}
+                title={t.changeDates}
+              >
+                <RotateCcw size={18} strokeWidth={2.25} aria-hidden="true" />
               </button>
             </div>
             <dl className="pk-selected-list">
               <div>
                 <dt>{t.labelArrival}</dt>
-                <dd>{formatParkingDate(arrival, locale)}</dd>
+                <dd>{formatShortParkingDate(arrival, locale)}</dd>
               </div>
               <div>
                 <dt>{t.labelDeparture}</dt>
-                <dd>{formatParkingDate(departure, locale)}</dd>
+                <dd>{formatShortParkingDate(departure, locale)}</dd>
               </div>
               <div>
                 <dt>{t.labelDuration}</dt>
@@ -712,27 +741,29 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             ) : null}
           </label>
 
-          <label>
-            <span className="pk-lab">{t.registration}</span>
-            <input
-              name="registration"
-              autoComplete="off"
-              value={registration}
-              onChange={(e) => setRegistration(e.target.value)}
-              placeholder={t.registrationPlaceholder}
-            />
-          </label>
+          <div className="pk-form-row">
+            <label>
+              <span className="pk-lab">{t.registration}</span>
+              <input
+                name="registration"
+                autoComplete="off"
+                value={registration}
+                onChange={(e) => setRegistration(e.target.value)}
+                placeholder={t.registrationPlaceholder}
+              />
+            </label>
 
-          <label>
-            <span className="pk-lab">{t.vehicle}</span>
-            <input
-              name="vehicle"
-              autoComplete="off"
-              value={vehicle}
-              onChange={(e) => setVehicle(e.target.value)}
-              placeholder={t.vehiclePlaceholder}
-            />
-          </label>
+            <label>
+              <span className="pk-lab">{t.vehicle}</span>
+              <input
+                name="vehicle"
+                autoComplete="off"
+                value={vehicle}
+                onChange={(e) => setVehicle(e.target.value)}
+                placeholder={t.vehiclePlaceholder}
+              />
+            </label>
+          </div>
 
           <label>
             <span className="pk-lab">{t.comments}</span>
@@ -781,10 +812,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           --selected: #b7e4c7;
           --wa: #128c7e;
           --wa-hover: #0e6e63;
-          --shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-          max-width: 640px;
+          --shadow: none;
+          --radius: 12px;
+          --space-tight: 8px;
+          --space-group: 20px;
+          --space-section: 36px;
+          max-width: 820px;
           margin: 0 auto;
-          padding: 20px 16px 56px;
+          padding: 14px 16px 48px;
           color: var(--ink);
           background: var(--bg);
           font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -793,7 +828,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-top {
           display: flex;
           justify-content: flex-end;
-          margin-bottom: 16px;
+          margin-bottom: var(--space-tight);
         }
 
         .pk-live {
@@ -808,7 +843,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-header {
-          margin-bottom: 28px;
+          margin-bottom: var(--space-group);
         }
 
         .pk-brand {
@@ -816,14 +851,13 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          gap: 12px;
-          margin-bottom: 14px;
+          gap: 10px;
           width: 100%;
         }
 
         .pk-logo {
-          width: 64px;
-          height: 64px;
+          width: 80px;
+          height: 80px;
           flex-shrink: 0;
           border-radius: 50%;
           display: block;
@@ -832,32 +866,34 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-brand-text {
           min-width: 0;
+          display: grid;
+          gap: 6px;
         }
 
         .pk-brand-name {
-          margin: 0 0 4px;
-          font-size: 0.78rem;
+          margin: 0;
+          font-size: 0.72rem;
           font-weight: 700;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
           color: var(--pk-navy);
         }
 
         .pk-header h1 {
           margin: 0;
-          font-size: clamp(1.45rem, 6.2vw, 1.75rem);
-          line-height: 1.15;
+          font-size: clamp(2rem, 9vw, 3rem);
+          line-height: 1.05;
           font-weight: 750;
-          letter-spacing: -0.01em;
+          letter-spacing: -0.02em;
           color: var(--ink);
         }
 
         .pk-intro {
-          margin: 0 0 12px;
+          margin: 0;
           color: var(--muted);
-          line-height: 1.5;
-          font-size: 1rem;
-          text-align: center;
+          line-height: 1.4;
+          font-size: 0.98rem;
+          font-weight: 450;
         }
 
         .pk-location {
@@ -865,121 +901,117 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           display: grid;
           gap: 2px;
           color: var(--muted);
-          font-size: 0.92rem;
-          line-height: 1.4;
-          text-align: center;
+          font-size: 0.9rem;
+          line-height: 1.35;
         }
 
-        @media (min-width: 520px) {
+        @media (min-width: 560px) {
           .pk-brand {
             flex-direction: row;
-            align-items: center;
+            align-items: flex-start;
             text-align: left;
             gap: 16px;
           }
           .pk-logo {
-            width: 80px;
-            height: 80px;
+            width: 76px;
+            height: 76px;
+            margin-top: 2px;
           }
           .pk-header h1 {
-            font-size: clamp(1.7rem, 3.5vw, 2rem);
-            line-height: 1.12;
+            font-size: clamp(1.85rem, 3.2vw, 2.35rem);
+            line-height: 1.08;
           }
+        }
+
+        .pk-card {
+          background: var(--card);
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+        }
+
+        .pk-facts {
+          margin: 0 0 var(--space-section);
+          padding: 12px 14px;
+          background: var(--card);
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
+          border-radius: var(--radius);
+        }
+
+        .pk-facts ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          gap: 8px;
+        }
+
+        .pk-facts li {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          margin: 0;
+          font-size: 0.95rem;
+          line-height: 1.35;
+          color: var(--ink);
+        }
+
+        .pk-check {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 18px;
+          height: 18px;
+          margin-top: 1px;
+          flex-shrink: 0;
+          color: var(--pk-navy);
+        }
+
+        @media (min-width: 560px) {
           .pk-intro,
           .pk-location {
             text-align: left;
           }
         }
 
-        .pk-hero-wrap {
-          display: flex;
-          justify-content: center;
-          margin: 0 0 28px;
-        }
-
-        .pk-hero {
-          width: min(100%, 220px);
-          aspect-ratio: 1 / 1;
-          height: auto;
-          object-fit: contain;
-          display: block;
-        }
-
-        .pk-facts {
-          margin: 0 0 32px;
-          padding: 16px 18px;
-          background: var(--card);
-          border: 1px solid var(--line);
-          border-radius: 14px;
-          box-shadow: var(--shadow);
-        }
-
-        .pk-facts ul {
-          margin: 0;
-          padding: 0;
-          list-style: none;
-          display: grid;
-          gap: 10px;
-        }
-
-        .pk-facts li {
-          position: relative;
-          padding-left: 18px;
-          font-size: 0.95rem;
-          line-height: 1.4;
-          color: var(--ink);
-        }
-
-        .pk-facts li::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 0.55em;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: var(--pk-navy);
-        }
-
         .pk-prices {
-          margin: 0 0 32px;
-          padding: 20px 18px;
+          margin: 0 0 var(--space-section);
+          padding: 14px 16px 16px;
           background: var(--card);
-          border: 1px solid var(--line);
-          border-radius: 14px;
-          box-shadow: var(--shadow);
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
+          border-radius: var(--radius);
         }
 
         .pk-prices h2,
         .pk-availability h2,
         .pk-form-section h2 {
-          margin: 0 0 8px;
-          font-size: 1.2rem;
+          margin: 0 0 6px;
+          font-size: 1.15rem;
           font-weight: 750;
           color: var(--pk-navy);
           letter-spacing: -0.01em;
         }
 
         .pk-prices-support {
-          margin: 0 0 16px;
+          margin: 0 0 12px;
           color: var(--muted);
-          font-size: 0.92rem;
-          line-height: 1.45;
+          font-size: 0.9rem;
+          line-height: 1.4;
         }
 
         .pk-prices-table {
           display: none;
           width: 100%;
           border-collapse: collapse;
-          margin: 0 0 14px;
+          margin: 0 0 10px;
           font-size: 0.9rem;
           line-height: 1.35;
         }
 
         .pk-prices-table thead th {
-          padding: 0 6px 10px;
+          padding: 0 6px 8px;
           text-align: right;
-          font-size: 0.7rem;
+          font-size: 0.68rem;
           font-weight: 650;
           letter-spacing: 0.05em;
           text-transform: uppercase;
@@ -1097,14 +1129,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-availability {
-          margin: 0 0 32px;
+          margin: 0 0 var(--space-section);
         }
 
         .pk-availability-hint {
-          margin: 0 0 14px;
+          margin: 0 0 10px;
           color: var(--muted);
-          font-size: 0.95rem;
-          line-height: 1.45;
+          font-size: 0.9rem;
+          line-height: 1.4;
         }
 
         .pk-legend {
@@ -1199,7 +1231,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-nav-btn:focus-visible,
         .pk-cell.day:focus-visible,
         .pk-clear:focus-visible,
-        .pk-change:focus-visible,
+        .pk-reset-dates:focus-visible,
         .pk-wa:focus-visible,
         .pk-form input:focus-visible,
         .pk-form textarea:focus-visible {
@@ -1296,12 +1328,11 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-selected {
-          margin-top: 16px;
-          padding: 16px 18px;
+          margin-top: 14px;
+          padding: 12px 14px;
           background: var(--card);
-          border: 1px solid var(--line);
-          border-radius: 14px;
-          box-shadow: var(--shadow);
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
+          border-radius: var(--radius);
         }
 
         .pk-selected:focus {
@@ -1317,46 +1348,56 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 12px;
-          margin-bottom: 12px;
+          gap: 8px;
+          margin-bottom: 10px;
         }
 
         .pk-selected-head h3 {
           margin: 0;
-          font-size: 1rem;
+          font-size: 0.95rem;
           font-weight: 700;
           color: var(--pk-navy);
         }
 
-        .pk-change {
-          min-height: 36px;
-          padding: 6px 12px;
-          border-radius: 8px;
-          border: 1px solid var(--line);
-          background: var(--bg);
-          font-size: 0.85rem;
-          font-weight: 600;
+        .pk-reset-dates {
+          width: 44px;
+          height: 44px;
+          margin: -6px -8px -6px 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 0;
+          border-radius: 10px;
+          background: transparent;
+          color: var(--pk-navy);
           cursor: pointer;
-          color: var(--ink);
-          white-space: nowrap;
+        }
+
+        .pk-reset-dates:hover {
+          background: color-mix(in srgb, var(--pk-navy) 8%, transparent);
+        }
+
+        .pk-reset-dates:focus-visible {
+          outline: 2px solid var(--pk-navy);
+          outline-offset: 2px;
         }
 
         .pk-selected-list {
           margin: 0;
           display: grid;
-          gap: 10px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 8px 12px;
         }
 
         .pk-selected-list > div {
           display: grid;
-          grid-template-columns: minmax(5.5rem, auto) 1fr;
-          gap: 8px 12px;
-          align-items: baseline;
+          gap: 2px;
+          min-width: 0;
         }
 
         .pk-selected-list dt {
           margin: 0;
-          font-size: 0.82rem;
+          font-size: 0.72rem;
           font-weight: 650;
           color: var(--muted);
           text-transform: uppercase;
@@ -1365,8 +1406,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-selected-list dd {
           margin: 0;
-          font-size: 0.98rem;
-          font-weight: 600;
+          font-size: 0.92rem;
+          font-weight: 650;
+          line-height: 1.25;
+        }
+
+        @media (max-width: 380px) {
+          .pk-selected-list {
+            grid-template-columns: 1fr 1fr;
+          }
+          .pk-selected-list > div:last-child {
+            grid-column: 1 / -1;
+          }
         }
 
         .pk-field-error {
@@ -1390,18 +1441,33 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-form {
           display: grid;
-          gap: 14px;
-          margin-top: 14px;
-          padding: 18px;
+          gap: 12px;
+          margin-top: 10px;
+          padding: 14px 16px 16px;
           background: var(--card);
-          border: 1px solid var(--line);
-          border-radius: 14px;
-          box-shadow: var(--shadow);
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
+          border-radius: var(--radius);
+        }
+
+        .pk-form-row {
+          display: grid;
+          grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+          gap: 12px;
+        }
+
+        .pk-form-row > * {
+          min-width: 0;
+        }
+
+        @media (max-width: 340px) {
+          .pk-form-row {
+            grid-template-columns: 1fr;
+          }
         }
 
         .pk-form label {
           display: grid;
-          gap: 6px;
+          gap: 4px;
           font-size: 0.9rem;
           font-weight: 600;
         }
@@ -1415,10 +1481,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-form textarea {
           width: 100%;
           box-sizing: border-box;
-          min-height: 44px;
+          min-height: 46px;
           padding: 10px 12px;
           border-radius: 10px;
-          border: 1px solid #ccc;
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 18%, transparent);
           font: inherit;
           font-weight: 400;
           background: #fff;
@@ -1426,7 +1492,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-form textarea {
-          min-height: 88px;
+          min-height: 84px;
           resize: vertical;
         }
 

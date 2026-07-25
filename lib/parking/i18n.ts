@@ -83,18 +83,16 @@ const DASH = "—";
 const es: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Parking privado en el centro de Guardamar",
-  intro: "Consulta la disponibilidad y solicita las fechas que necesitas.",
+  intro: "Consulta la disponibilidad y solicita tus fechas.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
-  factPrivate: "Plaza de garaje privada",
-  factHeight: "Altura máxima del vehículo: 1,79 m",
-  factConfirmation: "Reserva sujeta a confirmación",
+  factPrivate: "Plaza privada",
+  factHeight: "Altura máxima: 1,79 m",
+  factConfirmation: "Reserva con confirmación",
   heroAlt: "Plaza de garaje privada en el centro de Guardamar",
-  pricesTitle: "Tarifas orientativas",
-  pricesSupport:
-    "El precio depende de la temporada y de la duración de la estancia. Selecciona tus fechas para consultar el importe aplicable.",
-  pricesDisclaimer:
-    "Las tarifas indicadas son orientativas. El importe final se confirmará antes de reservar.",
+  pricesTitle: "Tarifas",
+  pricesSupport: "Elige tus fechas para consultar la tarifa.",
+  pricesDisclaimer: "Precio final sujeto a confirmación.",
   priceColSeason: "Temporada",
   priceColDay: "Día",
   priceColWeek: "Semana",
@@ -145,13 +143,12 @@ const es: ParkingCopy = {
   formTitle: "Datos para la solicitud",
   name: "Nombre",
   registration: "Matrícula",
-  vehicle: "Modelo o tipo de vehículo",
+  vehicle: "Modelo",
   comments: "Comentarios",
   namePlaceholder: "Tu nombre",
   registrationPlaceholder: "Opcional",
-  vehiclePlaceholder: "Por ejemplo: Volkswagen Golf",
-  commentsPlaceholder:
-    "Información adicional, horario aproximado de llegada, dudas, etc.",
+  vehiclePlaceholder: "Opcional",
+  commentsPlaceholder: "Horario de llegada, dudas…",
   accessImportant:
     "Importante: la altura máxima permitida para el vehículo es de 1,79 m.",
   bookingDisclaimer:
@@ -174,7 +171,7 @@ const es: ParkingCopy = {
   errReviewFields: "Revisa los campos señalados antes de continuar.",
   announceArrival: "Fecha de entrada seleccionada.",
   announceDeparture: "Fecha de salida seleccionada.",
-  announceCleared: "Selección de fechas borrada.",
+  announceCleared: "Selección de fechas eliminada.",
   announceInvalidRange:
     "El periodo incluye fechas no disponibles. Selección reiniciada.",
   languageLabel: "Seleccionar idioma",
@@ -187,18 +184,16 @@ const es: ParkingCopy = {
 const en: ParkingCopy = {
   brand: "Parking Guardamar Centro",
   title: "Private parking in central Guardamar",
-  intro: "Check availability and request the dates you need.",
+  intro: "Check availability and request your dates.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
   factPrivate: "Private parking space",
-  factHeight: "Vehicle height limit: 1.79 m",
-  factConfirmation: "Booking subject to confirmation",
+  factHeight: "Maximum height: 1.79 m",
+  factConfirmation: "Booking requires confirmation",
   heroAlt: "Private parking space in central Guardamar",
-  pricesTitle: "Indicative prices",
-  pricesSupport:
-    "The price depends on the season and length of stay. Select your dates to check the applicable rate.",
-  pricesDisclaimer:
-    "The displayed rates are indicative. The final price will be confirmed before booking.",
+  pricesTitle: "Prices",
+  pricesSupport: "Select your dates to check the rate.",
+  pricesDisclaimer: "Final price subject to confirmation.",
   priceColSeason: "Season",
   priceColDay: "Day",
   priceColWeek: "Week",
@@ -248,14 +243,13 @@ const en: ParkingCopy = {
   duration: (n) => `${n} ${n === 1 ? "day" : "days"}`,
   formTitle: "Enquiry details",
   name: "Name",
-  registration: "Vehicle registration",
-  vehicle: "Vehicle model or type",
+  registration: "Registration",
+  vehicle: "Vehicle model",
   comments: "Comments",
   namePlaceholder: "Your name",
   registrationPlaceholder: "Optional",
-  vehiclePlaceholder: "For example: Volkswagen Golf",
-  commentsPlaceholder:
-    "Additional information, approximate arrival time, questions, etc.",
+  vehiclePlaceholder: "Optional",
+  commentsPlaceholder: "Arrival time, questions…",
   accessImportant:
     "Important: the maximum permitted vehicle height is 1.79 m.",
   bookingDisclaimer:
@@ -298,6 +292,18 @@ export function formatParkingDate(iso: string, locale: Locale): string {
     month: "long",
     year: "numeric",
   });
+}
+
+/** Concise UI dates, e.g. "25 jul 2026" / "25 Jul 2026". */
+export function formatShortParkingDate(iso: string, locale: Locale): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  const formatted = date.toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  return formatted.replace(/\./g, "").replace(/\s+/g, " ").trim();
 }
 
 export function formatMonthLabel(date: Date, locale: Locale): string {
