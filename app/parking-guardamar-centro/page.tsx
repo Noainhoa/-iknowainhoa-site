@@ -31,20 +31,24 @@ export async function generateMetadata({
     icons: {
       icon: [
         {
-          url: "/parking-guardamar-centro/icon.png",
+          url: "/parking-icons/v2/icon-192.png",
+          type: "image/png",
+          sizes: "192x192",
+        },
+        {
+          url: "/parking-icons/v2/icon-512.png",
           type: "image/png",
           sizes: "512x512",
         },
-        { url: "/parking-guardamar-centro/icon.png", type: "image/png" },
       ],
       apple: [
         {
-          url: "/parking-guardamar-centro/apple-icon.png",
+          url: "/parking-icons/v2/apple-touch-icon.png",
           type: "image/png",
           sizes: "180x180",
         },
       ],
-      shortcut: "/parking-guardamar-centro/icon.png",
+      shortcut: "/parking-icons/v2/icon-192.png",
     },
     openGraph: {
       title: t.metaTitle,

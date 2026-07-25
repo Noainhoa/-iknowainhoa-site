@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import ParkingAdminApp from "@/components/parking/ParkingAdminApp";
 
-const ADMIN_ICON = "/parking-guardamar-centro/admin/icon.png";
-const ADMIN_APPLE_ICON = "/parking-guardamar-centro/admin/apple-icon.png";
+const ICON_192 = "/parking-icons/v2/icon-192.png";
+const ICON_512 = "/parking-icons/v2/icon-512.png";
+const APPLE_TOUCH = "/parking-icons/v2/apple-touch-icon.png";
 
 export const metadata: Metadata = {
   title: "Admin — Parking Guardamar Centro",
   icons: {
     icon: [
-      { url: ADMIN_ICON, type: "image/png", sizes: "512x512" },
-      { url: ADMIN_ICON, type: "image/png" },
+      { url: ICON_192, type: "image/png", sizes: "192x192" },
+      { url: ICON_512, type: "image/png", sizes: "512x512" },
     ],
-    apple: [{ url: ADMIN_APPLE_ICON, type: "image/png", sizes: "180x180" }],
-    shortcut: ADMIN_ICON,
+    apple: [{ url: APPLE_TOUCH, type: "image/png", sizes: "180x180" }],
+    shortcut: ICON_192,
   },
   robots: {
     index: false,
