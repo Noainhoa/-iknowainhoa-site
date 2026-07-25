@@ -14,9 +14,6 @@ export type ParkingCopy = {
   intro: string;
   locationLine1: string;
   locationLine2: string;
-  factPrivate: string;
-  factHeight: string;
-  factConfirmation: string;
   heroAlt: string;
   pricesTitle: string;
   pricesSupport: string;
@@ -67,6 +64,7 @@ export type ParkingCopy = {
   errUnavailable: string;
   errRangeUnavailable: string;
   errNeedName: string;
+  errNeedAcceptances: string;
   errReviewFields: string;
   announceArrival: string;
   announceDeparture: string;
@@ -86,9 +84,6 @@ const es: ParkingCopy = {
   intro: "Consulta la disponibilidad y solicita tus fechas.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
-  factPrivate: "Plaza privada",
-  factHeight: "Altura máxima: 1,79 m",
-  factConfirmation: "Reserva con confirmación",
   heroAlt: "Plaza de garaje privada en el centro de Guardamar",
   pricesTitle: "Tarifas",
   pricesSupport: "Elige tus fechas para consultar la tarifa.",
@@ -168,6 +163,7 @@ const es: ParkingCopy = {
   errUnavailable: "El periodo seleccionado incluye fechas no disponibles.",
   errRangeUnavailable: "El periodo seleccionado incluye fechas no disponibles.",
   errNeedName: "Introduce tu nombre.",
+  errNeedAcceptances: "Marca las tres casillas antes de continuar.",
   errReviewFields: "Revisa los campos señalados antes de continuar.",
   announceArrival: "Fecha de entrada seleccionada.",
   announceDeparture: "Fecha de salida seleccionada.",
@@ -187,9 +183,6 @@ const en: ParkingCopy = {
   intro: "Check availability and request your dates.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
-  factPrivate: "Private parking space",
-  factHeight: "Maximum height: 1.79 m",
-  factConfirmation: "Booking requires confirmation",
   heroAlt: "Private parking space in central Guardamar",
   pricesTitle: "Prices",
   pricesSupport: "Select your dates to check the rate.",
@@ -267,6 +260,7 @@ const en: ParkingCopy = {
   errUnavailable: "The selected period includes unavailable dates.",
   errRangeUnavailable: "The selected period includes unavailable dates.",
   errNeedName: "Enter your name.",
+  errNeedAcceptances: "Tick all three boxes before continuing.",
   errReviewFields: "Check the highlighted fields before continuing.",
   announceArrival: "Arrival date selected.",
   announceDeparture: "Departure date selected.",

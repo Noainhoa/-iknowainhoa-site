@@ -137,16 +137,22 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const [vehicle, setVehicle] = useState(() => readPersisted()?.vehicle ?? "");
   const [comments, setComments] = useState(() => readPersisted()?.comments ?? "");
 
+  const [acceptHeight, setAcceptHeight] = useState(false);
+  const [acceptBooking, setAcceptBooking] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{
     arrival?: string;
     departure?: string;
     name?: string;
+    acceptances?: string;
   }>({});
   const [liveMessage, setLiveMessage] = useState("");
   const [preparing, setPreparing] = useState(false);
 
   const nameRef = useRef<HTMLInputElement>(null);
+  const acceptHeightRef = useRef<HTMLInputElement>(null);
   const arrivalSummaryRef = useRef<HTMLDivElement>(null);
   const formErrorRef = useRef<HTMLParagraphElement>(null);
   const preparingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -309,10 +315,20 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
   function validate(): {
     ok: boolean;
-    errors: { arrival?: string; departure?: string; name?: string };
+    errors: {
+      arrival?: string;
+      departure?: string;
+      name?: string;
+      acceptances?: string;
+    };
     summary: string | null;
   } {
-    const errors: { arrival?: string; departure?: string; name?: string } = {};
+    const errors: {
+      arrival?: string;
+      departure?: string;
+      name?: string;
+      acceptances?: string;
+    } = {};
 
     if (!arrival) {
       errors.arrival = t.errNeedArrival;
@@ -334,6 +350,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     if (!name.trim()) {
       errors.name = t.errNeedName;
     }
+    if (!acceptHeight || !acceptBooking || !acceptPrivacy) {
+      errors.acceptances = t.errNeedAcceptances;
+    }
 
     const keys = Object.keys(errors);
     if (keys.length === 0) {
@@ -343,7 +362,11 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     const summary =
       keys.length > 1
         ? t.errReviewFields
-        : (errors.arrival || errors.departure || errors.name || t.errReviewFields);
+        : (errors.arrival ||
+            errors.departure ||
+            errors.name ||
+            errors.acceptances ||
+            t.errReviewFields);
 
     return { ok: false, errors, summary };
   }
@@ -352,6 +375,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     arrival?: string;
     departure?: string;
     name?: string;
+    acceptances?: string;
   }) {
     if (errors.arrival || errors.departure) {
       arrivalSummaryRef.current?.focus();
@@ -361,6 +385,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     }
     if (errors.name) {
       nameRef.current?.focus();
+      return;
+    }
+    if (errors.acceptances) {
+      acceptHeightRef.current?.focus();
     }
   }
 
@@ -438,44 +466,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </div>
         </div>
       </header>
-
-      <section className="pk-facts" aria-label={locale === "es" ? "Datos clave" : "Key facts"}>
-        <ul>
-          <li>
-            <span className="pk-check" aria-hidden="true">
-              <svg viewBox="0 0 16 16" width="14" height="14" focusable="false">
-                <path
-                  fill="currentColor"
-                  d="M6.4 11.3 3.2 8.1l1.1-1.1 2.1 2.1 5-5.1 1.1 1.1z"
-                />
-              </svg>
-            </span>
-            {t.factPrivate}
-          </li>
-          <li>
-            <span className="pk-check" aria-hidden="true">
-              <svg viewBox="0 0 16 16" width="14" height="14" focusable="false">
-                <path
-                  fill="currentColor"
-                  d="M6.4 11.3 3.2 8.1l1.1-1.1 2.1 2.1 5-5.1 1.1 1.1z"
-                />
-              </svg>
-            </span>
-            {t.factHeight}
-          </li>
-          <li>
-            <span className="pk-check" aria-hidden="true">
-              <svg viewBox="0 0 16 16" width="14" height="14" focusable="false">
-                <path
-                  fill="currentColor"
-                  d="M6.4 11.3 3.2 8.1l1.1-1.1 2.1 2.1 5-5.1 1.1 1.1z"
-                />
-              </svg>
-            </span>
-            {t.factConfirmation}
-          </li>
-        </ul>
-      </section>
 
       <section className="pk-prices" aria-labelledby="pk-prices-heading">
         <h2 id="pk-prices-heading">{t.pricesTitle}</h2>
@@ -776,11 +766,68 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             />
           </label>
 
-          <div className="pk-before-book">
-            <p className="pk-access-important">{t.accessImportant}</p>
-            <p>{t.bookingDisclaimer}</p>
-            <p>{t.privacyNote}</p>
-          </div>
+          <fieldset
+            className={`pk-acceptances${fieldErrors.acceptances ? " has-error" : ""}`}
+            aria-describedby={
+              fieldErrors.acceptances ? "pk-acceptances-error" : undefined
+            }
+          >
+            <legend className="sr-only">
+              {locale === "es" ? "Confirmaciones obligatorias" : "Required confirmations"}
+            </legend>
+
+            <label className="pk-check-label">
+              <input
+                ref={acceptHeightRef}
+                type="checkbox"
+                checked={acceptHeight}
+                required
+                onChange={(e) => {
+                  setAcceptHeight(e.target.checked);
+                  if (fieldErrors.acceptances) {
+                    setFieldErrors((prev) => ({ ...prev, acceptances: undefined }));
+                  }
+                }}
+              />
+              <span>{t.accessImportant}</span>
+            </label>
+
+            <label className="pk-check-label">
+              <input
+                type="checkbox"
+                checked={acceptBooking}
+                required
+                onChange={(e) => {
+                  setAcceptBooking(e.target.checked);
+                  if (fieldErrors.acceptances) {
+                    setFieldErrors((prev) => ({ ...prev, acceptances: undefined }));
+                  }
+                }}
+              />
+              <span>{t.bookingDisclaimer}</span>
+            </label>
+
+            <label className="pk-check-label">
+              <input
+                type="checkbox"
+                checked={acceptPrivacy}
+                required
+                onChange={(e) => {
+                  setAcceptPrivacy(e.target.checked);
+                  if (fieldErrors.acceptances) {
+                    setFieldErrors((prev) => ({ ...prev, acceptances: undefined }));
+                  }
+                }}
+              />
+              <span>{t.privacyNote}</span>
+            </label>
+
+            {fieldErrors.acceptances ? (
+              <p className="pk-field-error" id="pk-acceptances-error" role="alert">
+                {fieldErrors.acceptances}
+              </p>
+            ) : null}
+          </fieldset>
 
           <button type="submit" className="pk-wa" disabled={preparing} aria-busy={preparing}>
             {preparing ? t.whatsappPreparing : t.whatsappCta}
@@ -928,43 +975,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
           border-radius: var(--radius);
           box-shadow: var(--shadow);
-        }
-
-        .pk-facts {
-          margin: 0 0 var(--space-section);
-          padding: 12px 14px;
-          background: var(--card);
-          border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
-          border-radius: var(--radius);
-        }
-
-        .pk-facts ul {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-          display: grid;
-          gap: 8px;
-        }
-
-        .pk-facts li {
-          display: flex;
-          align-items: flex-start;
-          gap: 10px;
-          margin: 0;
-          font-size: 0.95rem;
-          line-height: 1.35;
-          color: var(--ink);
-        }
-
-        .pk-check {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 18px;
-          height: 18px;
-          margin-top: 1px;
-          flex-shrink: 0;
-          color: var(--pk-navy);
         }
 
         @media (min-width: 560px) {
@@ -1477,7 +1487,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           line-height: 1.2;
         }
 
-        .pk-form input,
+        .pk-form input:not([type="checkbox"]),
         .pk-form textarea {
           width: 100%;
           box-sizing: border-box;
@@ -1496,7 +1506,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           resize: vertical;
         }
 
-        .pk-form label.has-error input {
+        .pk-form label.has-error input:not([type="checkbox"]) {
           border-color: #c44;
         }
 
@@ -1505,21 +1515,58 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           font-weight: 700;
         }
 
-        .pk-before-book {
+        .pk-acceptances {
+          margin: 2px 0 0;
+          padding: 0;
+          border: 0;
           display: grid;
-          gap: 8px;
-          margin: 4px 0 0;
+          gap: 12px;
+          min-width: 0;
         }
 
-        .pk-before-book p {
-          margin: 0;
-          font-size: 0.84rem;
-          color: var(--muted);
+        .pk-acceptances.has-error {
+          padding: 10px 12px;
+          border-radius: 10px;
+          border: 1px solid #f0bcbc;
+          background: #fde8e8;
+        }
+
+        .pk-check-label {
+          display: grid !important;
+          grid-template-columns: 22px minmax(0, 1fr);
+          gap: 10px;
+          align-items: start;
+          font-size: 0.86rem !important;
+          font-weight: 450 !important;
           line-height: 1.45;
+          color: var(--muted);
+          cursor: pointer;
         }
 
-        .pk-access-important {
-          color: var(--ink) !important;
+        .pk-check-label input[type="checkbox"] {
+          appearance: auto;
+          -webkit-appearance: checkbox;
+          width: 18px !important;
+          height: 18px !important;
+          min-width: 18px;
+          min-height: 18px !important;
+          max-width: 18px;
+          margin: 2px 0 0;
+          padding: 0 !important;
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 40%, transparent) !important;
+          border-radius: 4px !important;
+          background: #fff !important;
+          accent-color: var(--pk-navy);
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        .pk-check-label span {
+          min-width: 0;
+        }
+
+        .pk-check-label:first-of-type span {
+          color: var(--ink);
           font-weight: 600;
         }
 

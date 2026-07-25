@@ -24,9 +24,6 @@ describe("parking i18n", () => {
     assert.equal(t.pricesTitle, "Tarifas");
     assert.equal(t.pricesSupport, "Elige tus fechas para consultar la tarifa.");
     assert.equal(t.pricesDisclaimer, "Precio final sujeto a confirmación.");
-    assert.equal(t.factPrivate, "Plaza privada");
-    assert.equal(t.factHeight, "Altura máxima: 1,79 m");
-    assert.equal(t.factConfirmation, "Reserva con confirmación");
     assert.equal(t.vehicle, "Modelo");
     assert.equal(t.vehiclePlaceholder, "Opcional");
     assert.equal(t.commentsPlaceholder, "Horario de llegada, dudas…");
@@ -43,8 +40,6 @@ describe("parking i18n", () => {
     assert.equal(t.pricesTitle, "Prices");
     assert.equal(t.pricesSupport, "Select your dates to check the rate.");
     assert.equal(t.pricesDisclaimer, "Final price subject to confirmation.");
-    assert.equal(t.factHeight, "Maximum height: 1.79 m");
-    assert.equal(t.factConfirmation, "Booking requires confirmation");
     assert.equal(t.registration, "Registration");
     assert.equal(t.vehicle, "Vehicle model");
     assert.equal(t.changeDates, "Change dates");
