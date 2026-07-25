@@ -30,6 +30,7 @@ describe("parking i18n", () => {
     assert.equal(t.announceCleared, "Selección de fechas eliminada.");
     assert.equal(t.changeDates, "Cambiar fechas");
     assert.equal(t.whatsappCta, "Solicitar por WhatsApp");
+    assert.equal(t.whatsappSentTitle, "Mensaje enviado");
     assert.ok(t.weekdays.includes("Lun"));
   });
 
@@ -45,6 +46,7 @@ describe("parking i18n", () => {
     assert.equal(t.changeDates, "Change dates");
     assert.equal(t.announceCleared, "Date selection cleared.");
     assert.equal(t.whatsappCta, "Enquire through WhatsApp");
+    assert.equal(t.whatsappSentTitle, "Message sent");
     assert.ok(t.weekdays.includes("Mon"));
   });
 

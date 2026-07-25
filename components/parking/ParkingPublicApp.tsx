@@ -150,12 +150,16 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   }>({});
   const [liveMessage, setLiveMessage] = useState("");
   const [preparing, setPreparing] = useState(false);
+  const [waStatus, setWaStatus] = useState<"idle" | "opened" | "sent" | "blocked">(
+    "idle"
+  );
+  const [waHref, setWaHref] = useState<string | null>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
   const acceptHeightRef = useRef<HTMLInputElement>(null);
   const arrivalSummaryRef = useRef<HTMLDivElement>(null);
   const formErrorRef = useRef<HTMLParagraphElement>(null);
-  const preparingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const waStatusRef = useRef<HTMLDivElement>(null);
 
   const announce = useCallback((message: string) => {
     setLiveMessage("");
@@ -181,12 +185,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
-
-  useEffect(() => {
-    return () => {
-      if (preparingTimer.current) clearTimeout(preparingTimer.current);
-    };
-  }, []);
 
   const load = useCallback(async () => {
     if (!configured) {
@@ -416,14 +414,32 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       comments,
     });
     const href = whatsAppHref(message);
-
+    setWaHref(href);
     setPreparing(true);
-    if (preparingTimer.current) clearTimeout(preparingTimer.current);
-    preparingTimer.current = setTimeout(() => {
-      window.open(href, "_blank", "noopener,noreferrer");
-      setPreparing(false);
-      preparingTimer.current = null;
-    }, 450);
+
+    const popup = window.open(href, "_blank", "noopener,noreferrer");
+    setPreparing(false);
+
+    if (!popup) {
+      setWaStatus("blocked");
+    } else {
+      setWaStatus("opened");
+    }
+
+    requestAnimationFrame(() => {
+      waStatusRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      waStatusRef.current?.focus();
+    });
+  }
+
+  function reopenWhatsApp() {
+    if (!waHref) return;
+    const popup = window.open(waHref, "_blank", "noopener,noreferrer");
+    if (!popup) {
+      window.location.href = waHref;
+      return;
+    }
+    setWaStatus("opened");
   }
 
   const priceCols = [
@@ -835,6 +851,70 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             </p>
           ) : null}
         </form>
+
+        {waStatus !== "idle" ? (
+          <div
+            ref={waStatusRef}
+            className={`pk-wa-status${waStatus === "sent" ? " is-sent" : ""}`}
+            tabIndex={-1}
+            role="status"
+            aria-live="polite"
+          >
+            {waStatus === "sent" ? (
+              <>
+                <p className="pk-wa-status-title">
+                  <span className="pk-wa-status-check" aria-hidden="true">
+                    ✓
+                  </span>
+                  {t.whatsappSentTitle}
+                </p>
+                <p className="pk-wa-status-body">{t.whatsappSentBody}</p>
+                <button
+                  type="button"
+                  className="pk-wa-status-secondary"
+                  onClick={() => setWaStatus("idle")}
+                >
+                  {t.whatsappEditEnquiry}
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="pk-wa-status-title">
+                  {waStatus === "blocked" ? t.whatsappBlocked : t.whatsappOpenedTitle}
+                </p>
+                {waStatus === "opened" ? (
+                  <p className="pk-wa-status-body">{t.whatsappOpenedBody}</p>
+                ) : null}
+                <div className="pk-wa-status-actions">
+                  <button
+                    type="button"
+                    className="pk-wa-status-primary"
+                    onClick={() => {
+                      setWaStatus("sent");
+                      announce(t.whatsappSentTitle);
+                    }}
+                  >
+                    {t.whatsappConfirmSent}
+                  </button>
+                  <button
+                    type="button"
+                    className="pk-wa-status-secondary"
+                    onClick={reopenWhatsApp}
+                  >
+                    {t.whatsappOpenAgain}
+                  </button>
+                  <button
+                    type="button"
+                    className="pk-wa-status-secondary"
+                    onClick={() => setWaStatus("idle")}
+                  >
+                    {t.whatsappEditEnquiry}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : null}
       </section>
 
       <style jsx>{`
@@ -1564,6 +1644,85 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-wa:disabled {
           opacity: 0.85;
           cursor: wait;
+        }
+
+        .pk-wa-status {
+          margin-top: 14px;
+          padding: 14px 16px 16px;
+          border-radius: var(--radius);
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 18%, transparent);
+          background: color-mix(in srgb, var(--pk-navy) 6%, #fff);
+          outline: none;
+        }
+
+        .pk-wa-status.is-sent {
+          border-color: color-mix(in srgb, var(--wa) 35%, transparent);
+          background: color-mix(in srgb, var(--wa) 10%, #fff);
+        }
+
+        .pk-wa-status-title {
+          margin: 0 0 6px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 1.05rem;
+          font-weight: 750;
+          color: var(--pk-navy);
+        }
+
+        .pk-wa-status.is-sent .pk-wa-status-title {
+          color: var(--wa);
+        }
+
+        .pk-wa-status-check {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 22px;
+          height: 22px;
+          border-radius: 999px;
+          background: var(--wa);
+          color: #fff;
+          font-size: 0.85rem;
+          font-weight: 700;
+          line-height: 1;
+        }
+
+        .pk-wa-status-body {
+          margin: 0 0 12px;
+          color: var(--muted);
+          font-size: 0.9rem;
+          line-height: 1.45;
+        }
+
+        .pk-wa-status-actions {
+          display: grid;
+          gap: 8px;
+        }
+
+        .pk-wa-status-primary,
+        .pk-wa-status-secondary {
+          min-height: 44px;
+          border-radius: 10px;
+          font: inherit;
+          font-weight: 650;
+          cursor: pointer;
+        }
+
+        .pk-wa-status-primary {
+          border: 0;
+          background: var(--wa);
+          color: #fff;
+        }
+
+        .pk-wa-status-primary:hover {
+          background: var(--wa-hover);
+        }
+
+        .pk-wa-status-secondary {
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 18%, transparent);
+          background: #fff;
+          color: var(--pk-navy);
         }
 
         .pk-form-error {

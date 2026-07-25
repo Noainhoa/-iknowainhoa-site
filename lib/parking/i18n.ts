@@ -56,6 +56,14 @@ export type ParkingCopy = {
   privacyNote: string;
   whatsappCta: string;
   whatsappPreparing: string;
+  whatsappOpenedTitle: string;
+  whatsappOpenedBody: string;
+  whatsappConfirmSent: string;
+  whatsappOpenAgain: string;
+  whatsappEditEnquiry: string;
+  whatsappSentTitle: string;
+  whatsappSentBody: string;
+  whatsappBlocked: string;
   supabaseHint: string;
   loadError: string;
   errNeedArrival: string;
@@ -152,6 +160,17 @@ const es: ParkingCopy = {
     "Los datos introducidos se utilizarán únicamente para responder a esta solicitud por WhatsApp.",
   whatsappCta: "Solicitar por WhatsApp",
   whatsappPreparing: "Preparando solicitud…",
+  whatsappOpenedTitle: "WhatsApp abierto",
+  whatsappOpenedBody:
+    "Envía el mensaje en WhatsApp. Cuando lo hayas enviado, confírmalo aquí.",
+  whatsappConfirmSent: "Sí, ya lo he enviado",
+  whatsappOpenAgain: "Abrir WhatsApp otra vez",
+  whatsappEditEnquiry: "Editar solicitud",
+  whatsappSentTitle: "Mensaje enviado",
+  whatsappSentBody:
+    "Gracias. Te responderé por WhatsApp para confirmar la disponibilidad, el precio y el pago.",
+  whatsappBlocked:
+    "No se ha podido abrir WhatsApp automáticamente. Usa el botón de abajo para abrirlo.",
   supabaseHint:
     "Calendario en modo local: falta configurar Supabase. Todas las fechas futuras aparecen como disponibles hasta que se conecte la base de datos.",
   loadError:
@@ -251,6 +270,17 @@ const en: ParkingCopy = {
     "The information entered will only be used to respond to this enquiry through WhatsApp.",
   whatsappCta: "Enquire through WhatsApp",
   whatsappPreparing: "Preparing enquiry…",
+  whatsappOpenedTitle: "WhatsApp opened",
+  whatsappOpenedBody:
+    "Send the message in WhatsApp. When you have sent it, confirm here.",
+  whatsappConfirmSent: "Yes, I sent it",
+  whatsappOpenAgain: "Open WhatsApp again",
+  whatsappEditEnquiry: "Edit enquiry",
+  whatsappSentTitle: "Message sent",
+  whatsappSentBody:
+    "Thank you. I will reply through WhatsApp to confirm availability, the price and payment.",
+  whatsappBlocked:
+    "WhatsApp could not open automatically. Use the button below to open it.",
   supabaseHint:
     "Calendar in local mode: Supabase is not configured. All future dates show as available until the database is connected.",
   loadError: "Could not load availability. Please try again later.",
