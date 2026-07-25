@@ -830,7 +830,22 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </fieldset>
 
           <button type="submit" className="pk-wa" disabled={preparing} aria-busy={preparing}>
-            {preparing ? t.whatsappPreparing : t.whatsappCta}
+            <span className="pk-wa-inner">
+              <svg
+                className="pk-wa-icon"
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12.04 2a9.9 9.9 0 0 0-9.9 9.9c0 1.75.46 3.45 1.33 4.95L2 22l5.3-1.39a9.87 9.87 0 0 0 4.74 1.21h.01a9.9 9.9 0 0 0 9.9-9.9 9.86 9.86 0 0 0-9.91-9.92Zm5.76 14.07c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.29.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.59.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.39-.43.52-.14.14-.29.3-.12.58.16.29.73 1.2 1.56 1.94 1.08.96 1.98 1.26 2.27 1.4.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.19-.29.38-.24.64-.14.26.1 1.66.78 1.95.92.28.15.47.21.54.33.07.12.07.68-.17 1.36Z"
+                />
+              </svg>
+              {preparing ? t.whatsappPreparing : t.whatsappCta}
+            </span>
           </button>
 
           {formError ? (
@@ -1580,6 +1595,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           font-weight: 700;
           cursor: pointer;
           transition: background 0.15s ease, transform 0.12s ease;
+        }
+
+        .pk-wa-inner {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        .pk-wa-icon {
+          flex-shrink: 0;
+          display: block;
         }
 
         .pk-wa:hover:not(:disabled) {
