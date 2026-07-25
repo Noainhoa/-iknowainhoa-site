@@ -199,16 +199,13 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       </header>
 
       <section className="pk-prices" aria-label={t.pricesTitle}>
-        <div className="pk-prices-head">
-          <span className="pk-prices-mark" aria-hidden="true" />
-          <h2>{t.pricesTitle}</h2>
-        </div>
         <table className="pk-prices-table">
           <thead>
             <tr>
               <th scope="col" className="pk-prices-period">
-                <span className="pk-visually-hidden">
-                  {locale === "es" ? "Periodo" : "Period"}
+                <span className="pk-prices-title">
+                  <span className="pk-prices-mark" aria-hidden="true" />
+                  {t.pricesTitle}
                 </span>
               </th>
               <th scope="col">{t.priceColDay}</th>
@@ -526,30 +523,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           border-top: 1px solid color-mix(in srgb, var(--pk-navy) 22%, transparent);
           border-bottom: 1px solid color-mix(in srgb, var(--pk-navy) 22%, transparent);
         }
-        .pk-prices-head {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin: 14px 0 10px;
-        }
-        .pk-prices-mark {
-          width: 14px;
-          height: 1px;
-          background: var(--pk-red);
-          flex-shrink: 0;
-        }
-        .pk-prices h2 {
-          margin: 0;
-          font-size: 0.72rem;
-          font-weight: 650;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: var(--pk-navy);
-        }
         .pk-prices-table {
           width: 100%;
           border-collapse: collapse;
-          margin: 0 0 14px;
+          margin: 14px 0;
           font-size: 0.86rem;
           line-height: 1.35;
           table-layout: fixed;
@@ -563,11 +540,29 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           text-transform: uppercase;
           color: var(--muted);
           white-space: nowrap;
+          vertical-align: middle;
         }
         .pk-prices-table thead th.pk-prices-period {
           text-align: left;
           padding-left: 0;
           padding-right: 8px;
+          color: var(--pk-navy);
+        }
+        .pk-prices-title {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.72rem;
+          font-weight: 650;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--pk-navy);
+        }
+        .pk-prices-mark {
+          width: 14px;
+          height: 1px;
+          background: var(--pk-red);
+          flex-shrink: 0;
         }
         .pk-prices-table tbody tr + tr th,
         .pk-prices-table tbody tr + tr td {
@@ -598,17 +593,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-prices-table tbody td.pk-price-empty {
           color: color-mix(in srgb, var(--muted) 70%, transparent);
           font-weight: 450;
-        }
-        .pk-visually-hidden {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
         }
         .pk-banner {
           margin: 16px 0 0;
