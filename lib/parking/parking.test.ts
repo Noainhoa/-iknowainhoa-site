@@ -65,11 +65,12 @@ describe("parking i18n", () => {
     assert.match(formatShortParkingDate("2026-07-25", "en"), /25.*Jul.*2026/i);
   });
 
-  it("includes year in month range labels", () => {
+  it("includes year in month range labels without Spanish de", () => {
     const start = new Date(2026, 6, 1);
     const end = new Date(2026, 8, 1);
-    assert.match(formatMonthRangeLabel(start, end, "es"), /2026/);
-    assert.match(formatMonthRangeLabel(start, end, "en"), /2026/);
+    assert.equal(formatMonthRangeLabel(start, end, "es"), "Julio–septiembre 2026");
+    assert.equal(formatMonthRangeLabel(start, end, "en"), "July–September 2026");
+    assert.equal(formatMonthRangeLabel(start, start, "es"), "Julio 2026");
   });
 
   it("keeps dash for unavailable price cells and unchanged amounts", () => {
