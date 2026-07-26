@@ -192,8 +192,7 @@ const es: ParkingCopy = {
   registrationPlaceholder: "Opcional",
   vehiclePlaceholder: "Opcional",
   commentsPlaceholder: "Horario de llegada, dudas…",
-  accessImportant:
-    "Importante: altura máxima de **acceso** al garaje es de 1,79 m.",
+  accessImportant: "Máxima altura de acceso: 1,79 m.",
   bookingDisclaimer: "Enviar la solicitud no confirma la reserva.",
   privacyNote:
     "Los datos introducidos se utilizarán únicamente para responder a esta solicitud por WhatsApp.",
@@ -326,8 +325,7 @@ const en: ParkingCopy = {
   registrationPlaceholder: "Optional",
   vehiclePlaceholder: "Optional",
   commentsPlaceholder: "Arrival time, questions…",
-  accessImportant:
-    "Important: maximum garage **access** height is 1.79 m.",
+  accessImportant: "Maximum access height: 1.79 m.",
   bookingDisclaimer: "Sending this enquiry does not confirm the booking.",
   privacyNote:
     "The information entered will only be used to respond to this enquiry through WhatsApp.",
