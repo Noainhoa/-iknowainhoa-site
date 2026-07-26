@@ -698,7 +698,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
       <section className="pk-prices" aria-labelledby="pk-prices-heading">
         <h2 id="pk-prices-heading">{t.pricesTitle}</h2>
-        <p className="pk-prices-support">{t.pricesSupport}</p>
 
         <table className="pk-prices-table">
           <thead>
@@ -1473,13 +1472,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           font-weight: 750;
           color: var(--pk-navy);
           letter-spacing: -0.01em;
-        }
-
-        .pk-prices-support {
-          margin: 0 0 8px;
-          color: var(--muted);
-          font-size: 0.86rem;
-          line-height: 1.35;
         }
 
         .pk-prices-table {

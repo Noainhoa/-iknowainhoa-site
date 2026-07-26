@@ -19,7 +19,6 @@ export type ParkingCopy = {
   galleryLabel: string;
   photoAlts: [string, string, string];
   pricesTitle: string;
-  pricesSupport: string;
   pricesDisclaimer: string;
   priceColSeason: string;
   priceColDay: string;
@@ -121,7 +120,6 @@ const es: ParkingCopy = {
     "Plaza de aparcamiento privada con armarios en garaje cubierto en Guardamar",
   ],
   pricesTitle: "Tarifas",
-  pricesSupport: "Elige tus fechas para consultar la tarifa.",
   pricesDisclaimer: "Precio final sujeto a confirmación.",
   priceColSeason: "Temporada",
   priceColDay: "Día",
@@ -252,7 +250,6 @@ const en: ParkingCopy = {
     "Private parking space with cabinets in a covered garage in Guardamar",
   ],
   pricesTitle: "Prices",
-  pricesSupport: "Select your dates to check the rate.",
   pricesDisclaimer: "Final price subject to confirmation.",
   priceColSeason: "Season",
   priceColDay: "Day",
