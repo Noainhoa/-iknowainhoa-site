@@ -693,11 +693,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           ))}
         </div>
 
-        <ul className="pk-space-facts">
-          <li>{t.spaceWidth}</li>
-          <li>{t.spaceLength}</li>
-          <li>{t.spaceCovered}</li>
-        </ul>
+        <p className="pk-space-facts">{t.spaceFact}</p>
       </section>
 
       <section className="pk-prices" aria-labelledby="pk-prices-heading">
@@ -1443,37 +1439,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-space-facts {
-          list-style: none;
           margin: 0;
           padding: 0;
-          display: flex;
-          flex-wrap: nowrap;
-          align-items: baseline;
-          gap: 10px 14px;
           color: var(--ink);
-          font-size: 0.82rem;
-          line-height: 1.3;
-          overflow-x: auto;
-          -webkit-overflow-scrolling: touch;
-        }
-
-        .pk-space-facts li {
-          margin: 0;
-          padding-left: 0.85rem;
-          position: relative;
-          flex: 0 0 auto;
-          white-space: nowrap;
-        }
-
-        .pk-space-facts li::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 0.4em;
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: var(--pk-navy);
+          font-size: 0.88rem;
+          line-height: 1.35;
+          font-weight: 500;
         }
 
         @media (min-width: 560px) {
@@ -1482,9 +1453,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             gap: 8px;
           }
           .pk-space-facts {
-            font-size: 0.9rem;
-            gap: 12px 20px;
-            overflow: visible;
+            font-size: 0.95rem;
           }
         }
 

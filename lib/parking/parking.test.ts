@@ -25,8 +25,7 @@ describe("parking i18n", () => {
     const t = getParkingCopy("es");
     assert.equal(t.title, "Parking privado en Guardamar");
     assert.match(t.intro, /agosto/i);
-    assert.equal(t.spaceWidth, "Ancho: 240 cm");
-    assert.equal(t.spaceLength, "Largo: 490 cm");
+    assert.equal(t.spaceFact, "Garaje cubierto · 4,90 m × 2,40 m");
     assert.match(t.metaTitle, /agosto/i);
     assert.equal(t.pricesTitle, "Tarifas");
     assert.equal(t.addPeriod, "Añadir estas fechas");

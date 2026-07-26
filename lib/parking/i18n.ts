@@ -15,9 +15,7 @@ export type ParkingCopy = {
   locationLine1: string;
   locationLine2: string;
   heroAlt: string;
-  spaceWidth: string;
-  spaceLength: string;
-  spaceCovered: string;
+  spaceFact: string;
   galleryLabel: string;
   photoAlts: [string, string, string];
   pricesTitle: string;
@@ -115,9 +113,7 @@ const es: ParkingCopy = {
   locationLine2: "Guardamar del Segura",
   heroAlt:
     "Plaza de garaje privada cubierta en el centro de Guardamar del Segura",
-  spaceWidth: "Ancho: 240 cm",
-  spaceLength: "Largo: 490 cm",
-  spaceCovered: "Garaje cubierto",
+  spaceFact: "Garaje cubierto · 4,90 m × 2,40 m",
   galleryLabel: "Fotos de la plaza de garaje",
   photoAlts: [
     "Plaza de garaje privada cubierta en Guardamar del Segura, 240 cm de ancho y 490 cm de largo",
@@ -248,9 +244,7 @@ const en: ParkingCopy = {
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
   heroAlt: "Covered private parking space in central Guardamar del Segura",
-  spaceWidth: "Width: 240 cm",
-  spaceLength: "Length: 490 cm",
-  spaceCovered: "Covered garage",
+  spaceFact: "Covered garage · 4.90 m × 2.40 m",
   galleryLabel: "Photos of the parking space",
   photoAlts: [
     "Covered private parking bay in Guardamar del Segura, 240 cm wide by 490 cm long",
