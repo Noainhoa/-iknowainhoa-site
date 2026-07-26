@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { RotateCcw } from "lucide-react";
 import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
@@ -11,6 +12,7 @@ import {
   getParkingCopy,
   PRICE_DASH,
 } from "@/lib/parking/i18n";
+import { PARKING_PRIVACY_PATH } from "@/lib/parking/privacyContent";
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
   buildWhatsAppMessage,
@@ -126,6 +128,17 @@ function isPriceDash(value: string) {
   return value === PRICE_DASH || value === "—";
 }
 
+/** Renders `**bold**` markers from i18n strings as <strong>. */
+function withBold(text: string): ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return part ? <span key={i}>{part}</span> : null;
+  });
+}
+
 function PriceCell({ value, unavailableLabel }: { value: string; unavailableLabel: string }) {
   if (isPriceDash(value)) {
     return (
@@ -169,6 +182,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const [acceptHeight, setAcceptHeight] = useState(false);
   const [acceptBooking, setAcceptBooking] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [acceptPolicy, setAcceptPolicy] = useState(false);
 
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{
@@ -414,7 +428,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     if (!name.trim()) {
       errors.name = t.errNeedName;
     }
-    if (!acceptHeight || !acceptBooking || !acceptPrivacy) {
+    if (
+      !acceptHeight ||
+      !acceptBooking ||
+      !acceptPrivacy ||
+      !acceptPolicy
+    ) {
       errors.acceptances = t.errNeedAcceptances;
     }
 
@@ -871,7 +890,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                   }
                 }}
               />
-              <span>{t.accessImportant}</span>
+              <span>{withBold(t.accessImportant)}</span>
             </label>
 
             <label className="pk-check-label">
@@ -902,6 +921,33 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                 }}
               />
               <span>{t.privacyNote}</span>
+            </label>
+
+            <label className="pk-check-label">
+              <input
+                type="checkbox"
+                checked={acceptPolicy}
+                required
+                onChange={(e) => {
+                  setAcceptPolicy(e.target.checked);
+                  if (fieldErrors.acceptances) {
+                    setFieldErrors((prev) => ({ ...prev, acceptances: undefined }));
+                  }
+                }}
+              />
+              <span>
+                {t.privacyPolicyAcceptBefore}
+                <Link
+                  href={`${PARKING_PRIVACY_PATH}?lang=${locale}`}
+                  className="pk-inline-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {t.privacyPolicyLinkLabel}
+                </Link>
+                {t.privacyPolicyAcceptAfter}
+              </span>
             </label>
 
             {fieldErrors.acceptances ? (
@@ -997,6 +1043,15 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </div>
         ) : null}
       </section>
+
+      <footer className="pk-footer">
+        <Link
+          href={`${PARKING_PRIVACY_PATH}?lang=${locale}`}
+          className="pk-footer-link"
+        >
+          {t.footerPrivacyLabel}
+        </Link>
+      </footer>
 
       <style jsx>{`
         .pk {
@@ -1769,6 +1824,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           min-width: 0;
         }
 
+        .pk-check-label :global(strong) {
+          font-weight: 700;
+          color: var(--ink);
+        }
+
+        .pk-check-label :global(.pk-inline-link) {
+          color: var(--pk-navy);
+          font-weight: 650;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+
         .pk-check-label:first-of-type span {
           color: var(--ink);
           font-weight: 600;
@@ -1895,6 +1962,25 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           color: #7a2e2e;
           font-size: 0.92rem;
           font-weight: 550;
+        }
+
+        .pk-footer {
+          margin-top: 28px;
+          padding-top: 14px;
+          border-top: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
+          text-align: center;
+        }
+
+        .pk-footer :global(.pk-footer-link) {
+          color: var(--muted);
+          font-size: 0.86rem;
+          font-weight: 550;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+
+        .pk-footer :global(.pk-footer-link:hover) {
+          color: var(--pk-navy);
         }
 
         .sr-only {

@@ -32,6 +32,10 @@ describe("parking i18n", () => {
     assert.equal(t.commentsPlaceholder, "Horario de llegada, dudas…");
     assert.equal(t.announceCleared, "Selección de fechas eliminada.");
     assert.equal(t.changeDates, "Cambiar fechas");
+    assert.equal(t.bookingDisclaimer, "Enviar la solicitud no confirma la reserva.");
+    assert.match(t.accessImportant, /\*\*acceso\*\*/);
+    assert.equal(t.privacyPolicyLinkLabel, "Política de Privacidad");
+    assert.equal(t.errNeedAcceptances, "Marca las cuatro casillas antes de continuar.");
     assert.equal(t.whatsappCta, "Solicitar por WhatsApp");
     assert.equal(t.whatsappSentTitle, "Mensaje enviado");
     assert.ok(t.weekdays.includes("Lun"));
@@ -50,6 +54,9 @@ describe("parking i18n", () => {
     assert.equal(t.vehicle, "Vehicle model");
     assert.equal(t.changeDates, "Change dates");
     assert.equal(t.announceCleared, "Date selection cleared.");
+    assert.equal(t.bookingDisclaimer, "Sending this enquiry does not confirm the booking.");
+    assert.equal(t.privacyPolicyLinkLabel, "Privacy Policy");
+    assert.equal(t.errNeedAcceptances, "Tick all four boxes before continuing.");
     assert.equal(t.whatsappCta, "Enquire through WhatsApp");
     assert.equal(t.whatsappSentTitle, "Message sent");
     assert.ok(t.weekdays.includes("Mon"));

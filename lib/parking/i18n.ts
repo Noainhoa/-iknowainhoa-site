@@ -62,6 +62,10 @@ export type ParkingCopy = {
   accessImportant: string;
   bookingDisclaimer: string;
   privacyNote: string;
+  privacyPolicyAcceptBefore: string;
+  privacyPolicyLinkLabel: string;
+  privacyPolicyAcceptAfter: string;
+  footerPrivacyLabel: string;
   whatsappCta: string;
   whatsappPreparing: string;
   whatsappOpenedTitle: string;
@@ -175,11 +179,14 @@ const es: ParkingCopy = {
   vehiclePlaceholder: "Opcional",
   commentsPlaceholder: "Horario de llegada, dudas…",
   accessImportant:
-    "Importante: la altura máxima de acceso al garaje es de 1,79 m.",
-  bookingDisclaimer:
-    "Enviar la solicitud no confirma la reserva. Te responderé por WhatsApp para confirmar la disponibilidad, el precio y el pago.",
+    "Importante: altura máxima de **acceso** al garaje es de 1,79 m.",
+  bookingDisclaimer: "Enviar la solicitud no confirma la reserva.",
   privacyNote:
     "Los datos introducidos se utilizarán únicamente para responder a esta solicitud por WhatsApp.",
+  privacyPolicyAcceptBefore: "He leído y acepto la ",
+  privacyPolicyLinkLabel: "Política de Privacidad",
+  privacyPolicyAcceptAfter: ".",
+  footerPrivacyLabel: "Política de Privacidad",
   whatsappCta: "Solicitar por WhatsApp",
   whatsappPreparing: "Preparando solicitud…",
   whatsappOpenedTitle: "WhatsApp abierto",
@@ -202,7 +209,7 @@ const es: ParkingCopy = {
   errUnavailable: "El periodo seleccionado incluye fechas no disponibles.",
   errRangeUnavailable: "El periodo seleccionado incluye fechas no disponibles.",
   errNeedName: "Introduce tu nombre.",
-  errNeedAcceptances: "Marca las tres casillas antes de continuar.",
+  errNeedAcceptances: "Marca las cuatro casillas antes de continuar.",
   errReviewFields: "Revisa los campos señalados antes de continuar.",
   announceArrival: "Fecha de entrada seleccionada.",
   announceDeparture: "Fecha de salida seleccionada.",
@@ -298,11 +305,14 @@ const en: ParkingCopy = {
   vehiclePlaceholder: "Optional",
   commentsPlaceholder: "Arrival time, questions…",
   accessImportant:
-    "Important: the maximum garage access height is 1.79 m.",
-  bookingDisclaimer:
-    "Sending this enquiry does not confirm the booking. I will reply through WhatsApp to confirm availability, the price and payment.",
+    "Important: maximum garage **access** height is 1.79 m.",
+  bookingDisclaimer: "Sending this enquiry does not confirm the booking.",
   privacyNote:
     "The information entered will only be used to respond to this enquiry through WhatsApp.",
+  privacyPolicyAcceptBefore: "I have read and accept the ",
+  privacyPolicyLinkLabel: "Privacy Policy",
+  privacyPolicyAcceptAfter: ".",
+  footerPrivacyLabel: "Privacy Policy",
   whatsappCta: "Enquire through WhatsApp",
   whatsappPreparing: "Preparing enquiry…",
   whatsappOpenedTitle: "WhatsApp opened",
@@ -323,7 +333,7 @@ const en: ParkingCopy = {
   errUnavailable: "The selected period includes unavailable dates.",
   errRangeUnavailable: "The selected period includes unavailable dates.",
   errNeedName: "Enter your name.",
-  errNeedAcceptances: "Tick all three boxes before continuing.",
+  errNeedAcceptances: "Tick all four boxes before continuing.",
   errReviewFields: "Check the highlighted fields before continuing.",
   announceArrival: "Arrival date selected.",
   announceDeparture: "Departure date selected.",
