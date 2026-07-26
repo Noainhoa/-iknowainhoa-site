@@ -1,8 +1,7 @@
 import { site } from "@/lib/site";
+import SiteCopyright from "@/components/SiteCopyright";
 
 export default function SiteFooter() {
-  const currentYear = new Date().getFullYear();
-
   return (
     <footer
       style={{
@@ -35,15 +34,9 @@ export default function SiteFooter() {
         >
           {site.description}
         </p>
-        <p
-          style={{
-            fontSize: "0.75rem",
-            color: "var(--foreground-muted)",
-            margin: "12px 0 0 0",
-          }}
-        >
-          © {currentYear} {site.name}
-        </p>
+        <div style={{ marginTop: 12 }}>
+          <SiteCopyright style={{ textAlign: "left" }} />
+        </div>
       </div>
     </footer>
   );
