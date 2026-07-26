@@ -925,7 +925,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               const monthKey = `${monthDate.getFullYear()}-${monthDate.getMonth()}`;
               return (
                 <div key={monthKey} className="pk-month">
-                  <h3>{formatMonthWithYear(monthDate, locale)}</h3>
+                  {months.length > 1 ? (
+                    <h3>{formatMonthLabel(monthDate, locale)}</h3>
+                  ) : null}
                   <div className="pk-weekdays" aria-hidden="true">
                     {t.weekdays.map((d) => (
                       <div key={d}>{d}</div>
