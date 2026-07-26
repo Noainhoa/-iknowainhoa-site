@@ -172,71 +172,12 @@ function PriceCell({ value, unavailableLabel }: { value: string; unavailableLabe
 
 export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const t = getParkingCopy(locale);
-  const brandRef = useRef<HTMLDivElement>(null);
   const today = useMemo(() => startOfToday(), []);
   const currentMonth = useMemo(
     () => new Date(today.getFullYear(), today.getMonth(), 1),
     [today]
   );
   const visibleMonthCount = useVisibleMonthCount();
-
-  // #region agent log
-  useEffect(() => {
-    const el = brandRef.current;
-    const header = el?.closest(".pk-header") as HTMLElement | null;
-    if (!el || !header) return;
-    const logo = el.querySelector(".pk-logo") as HTMLElement | null;
-    const text = el.querySelector(".pk-brand-text") as HTMLElement | null;
-    const h1 = el.querySelector("h1");
-    const loc = el.querySelector(".pk-location");
-    const logoH = logo?.getBoundingClientRect().height ?? 0;
-    const textH = text?.getBoundingClientRect().height ?? 0;
-    const brandH = el.getBoundingClientRect().height;
-    const headerH = header.getBoundingClientRect().height;
-    const cs = getComputedStyle(el);
-    const headerThs = [
-      ...document.querySelectorAll(".pk-prices-table thead th"),
-    ].map((th) => th.textContent?.trim() ?? "");
-    const brandPct = Math.round((brandH / window.innerHeight) * 100);
-    fetch("http://127.0.0.1:7736/ingest/ed8edfac-b1ea-41ca-bead-699b28d53a6c", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "ade241",
-      },
-      body: JSON.stringify({
-        sessionId: "ade241",
-        runId: "post-fix",
-        hypothesisId: "A-D",
-        location: "ParkingPublicApp.tsx:brand-layout",
-        message: "Header compactness + columns",
-        data: {
-          viewportW: window.innerWidth,
-          viewportH: window.innerHeight,
-          flexDir: cs.flexDirection,
-          logoH: Math.round(logoH),
-          textH: Math.round(textH),
-          brandH: Math.round(brandH),
-          headerH: Math.round(headerH),
-          brandPct,
-          heightDelta: Math.round(logoH - textH),
-          h1H: h1 ? Math.round(h1.getBoundingClientRect().height) : null,
-          locH: loc ? Math.round(loc.getBoundingClientRect().height) : null,
-          compactOk: brandPct <= 12,
-          balanced:
-            cs.flexDirection === "column"
-              ? true
-              : Math.abs(logoH - textH) <= 12,
-          priceHeaders: headerThs,
-          hasFortnightHeader: headerThs.some((h) =>
-            /fortnight|quincena/i.test(h)
-          ),
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }, [locale]);
-  // #endregion
 
   const [view, setView] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [ranges, setRanges] = useState<ParkingUnavailableRange[]>([]);
@@ -710,7 +651,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       </div>
 
       <header className="pk-header">
-        <div className="pk-brand" ref={brandRef}>
+        <div className="pk-brand">
           <img
             className="pk-logo"
             src="/images/parking/guardamar-parking-logo.png"
