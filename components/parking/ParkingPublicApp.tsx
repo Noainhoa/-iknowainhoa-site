@@ -172,12 +172,57 @@ function PriceCell({ value, unavailableLabel }: { value: string; unavailableLabe
 
 export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const t = getParkingCopy(locale);
+  const brandRef = useRef<HTMLDivElement>(null);
   const today = useMemo(() => startOfToday(), []);
   const currentMonth = useMemo(
     () => new Date(today.getFullYear(), today.getMonth(), 1),
     [today]
   );
   const visibleMonthCount = useVisibleMonthCount();
+
+  // #region agent log
+  useEffect(() => {
+    const el = brandRef.current;
+    if (!el) return;
+    const logo = el.querySelector(".pk-logo") as HTMLElement | null;
+    const text = el.querySelector(".pk-brand-text") as HTMLElement | null;
+    const h1 = el.querySelector("h1");
+    const loc = el.querySelector(".pk-location");
+    const logoH = logo?.getBoundingClientRect().height ?? 0;
+    const textH = text?.getBoundingClientRect().height ?? 0;
+    const cs = getComputedStyle(el);
+    fetch("http://127.0.0.1:7736/ingest/ed8edfac-b1ea-41ca-bead-699b28d53a6c", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "ade241",
+      },
+      body: JSON.stringify({
+        sessionId: "ade241",
+        runId: "post-fix",
+        hypothesisId: "C",
+        location: "ParkingPublicApp.tsx:brand-layout",
+        message: "Header lockup geometry",
+        data: {
+          viewportW: window.innerWidth,
+          flexDir: cs.flexDirection,
+          align: cs.alignItems,
+          textAlign: cs.textAlign,
+          logoH: Math.round(logoH),
+          textH: Math.round(textH),
+          heightDelta: Math.round(logoH - textH),
+          h1H: h1 ? Math.round(h1.getBoundingClientRect().height) : null,
+          locH: loc ? Math.round(loc.getBoundingClientRect().height) : null,
+          balanced:
+            cs.flexDirection === "column"
+              ? true
+              : Math.abs(logoH - textH) <= 8,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+  }, [locale]);
+  // #endregion
 
   const [view, setView] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [ranges, setRanges] = useState<ParkingUnavailableRange[]>([]);
@@ -652,13 +697,13 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       </div>
 
       <header className="pk-header">
-        <div className="pk-brand">
+        <div className="pk-brand" ref={brandRef}>
           <img
             className="pk-logo"
             src="/images/parking/guardamar-parking-logo.png"
             alt=""
-            width={80}
-            height={80}
+            width={88}
+            height={88}
             decoding="async"
           />
           <div className="pk-brand-text">
@@ -1321,16 +1366,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-brand {
           display: flex;
-          flex-direction: row;
+          flex-direction: column;
           align-items: center;
-          gap: 14px;
+          text-align: center;
+          gap: 10px;
           width: 100%;
-          max-width: 36rem;
+          max-width: 26rem;
+          margin: 0 auto;
         }
 
         .pk-logo {
-          width: 76px;
-          height: 76px;
+          width: 88px;
+          height: 88px;
           flex-shrink: 0;
           border-radius: 50%;
           display: block;
@@ -1341,15 +1388,15 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           min-width: 0;
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          gap: 3px;
+          align-items: center;
+          gap: 4px;
         }
 
         .pk-brand-name {
           margin: 0;
-          font-size: 0.68rem;
+          font-size: 0.7rem;
           font-weight: 700;
-          letter-spacing: 0.09em;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
           color: var(--pk-navy);
           line-height: 1.2;
@@ -1357,39 +1404,46 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-header h1 {
           margin: 0;
-          font-size: clamp(1.2rem, 4.2vw, 1.4rem);
-          line-height: 1.18;
+          font-size: clamp(1.25rem, 5.2vw, 1.45rem);
+          line-height: 1.2;
           font-weight: 750;
           letter-spacing: -0.02em;
           color: var(--ink);
+          max-width: 16ch;
         }
 
         .pk-location {
           margin: 0;
           color: var(--muted);
-          font-size: 0.8rem;
-          line-height: 1.3;
+          font-size: 0.84rem;
+          line-height: 1.35;
+          max-width: 22rem;
         }
 
         @media (min-width: 560px) {
           .pk-brand {
+            flex-direction: row;
+            align-items: center;
+            text-align: left;
             gap: 18px;
             max-width: 42rem;
+            margin: 0;
           }
           .pk-logo {
-            width: 92px;
-            height: 92px;
+            width: 96px;
+            height: 96px;
           }
           .pk-brand-text {
+            align-items: flex-start;
             gap: 4px;
           }
           .pk-brand-name {
             font-size: 0.75rem;
-            letter-spacing: 0.1em;
           }
           .pk-header h1 {
             font-size: clamp(1.55rem, 2.4vw, 1.85rem);
             line-height: 1.12;
+            max-width: none;
           }
           .pk-location {
             font-size: 0.92rem;
