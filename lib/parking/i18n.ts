@@ -37,6 +37,15 @@ export type ParkingCopy = {
   availabilityHint: string;
   availabilityHintDeparture: string;
   selectedDatesTitle: string;
+  periodsTitle: string;
+  addPeriod: string;
+  removePeriod: string;
+  multiModeLegend: string;
+  multiModeOr: string;
+  multiModeAnd: string;
+  labelEstimate: string;
+  labelTotalEstimate: string;
+  labelTotalDuration: string;
   legend: string;
   available: string;
   unavailable: string;
@@ -83,6 +92,9 @@ export type ParkingCopy = {
   errUnavailable: string;
   errRangeUnavailable: string;
   errNeedName: string;
+  errNeedPeriod: string;
+  errMaxPeriods: string;
+  errPeriodsOverlap: string;
   errNeedAcceptances: string;
   errReviewFields: string;
   announceArrival: string;
@@ -156,6 +168,15 @@ const es: ParkingCopy = {
     "Selecciona primero la fecha de entrada y después la fecha de salida.",
   availabilityHintDeparture: "Ahora selecciona la fecha de salida.",
   selectedDatesTitle: "Fechas seleccionadas",
+  periodsTitle: "Periodos de la solicitud",
+  addPeriod: "Añadir estas fechas",
+  removePeriod: "Quitar periodo",
+  multiModeLegend: "¿Cómo quieres consultar estas fechas?",
+  multiModeOr: "Cualquiera de estas opciones (alternativas)",
+  multiModeAnd: "Necesito todas estas estancias",
+  labelEstimate: "Estimación",
+  labelTotalEstimate: "Estimación total",
+  labelTotalDuration: "Total",
   legend: "Leyenda",
   available: "Disponible",
   unavailable: "No disponible",
@@ -209,6 +230,9 @@ const es: ParkingCopy = {
   errUnavailable: "El periodo seleccionado incluye fechas no disponibles.",
   errRangeUnavailable: "El periodo seleccionado incluye fechas no disponibles.",
   errNeedName: "Introduce tu nombre.",
+  errNeedPeriod: "Añade al menos un periodo de fechas.",
+  errMaxPeriods: "Puedes añadir hasta 3 periodos.",
+  errPeriodsOverlap: "Los periodos no pueden solaparse.",
   errNeedAcceptances: "Marca las cuatro casillas antes de continuar.",
   errReviewFields: "Revisa los campos señalados antes de continuar.",
   announceArrival: "Fecha de entrada seleccionada.",
@@ -282,6 +306,15 @@ const en: ParkingCopy = {
     "Select your arrival date, followed by your departure date.",
   availabilityHintDeparture: "Now select your departure date.",
   selectedDatesTitle: "Selected dates",
+  periodsTitle: "Enquiry periods",
+  addPeriod: "Add these dates",
+  removePeriod: "Remove period",
+  multiModeLegend: "How should these dates be checked?",
+  multiModeOr: "Any of these options (alternatives)",
+  multiModeAnd: "I need all of these stays",
+  labelEstimate: "Estimate",
+  labelTotalEstimate: "Total estimate",
+  labelTotalDuration: "Total",
   legend: "Legend",
   available: "Available",
   unavailable: "Unavailable",
@@ -333,6 +366,9 @@ const en: ParkingCopy = {
   errUnavailable: "The selected period includes unavailable dates.",
   errRangeUnavailable: "The selected period includes unavailable dates.",
   errNeedName: "Enter your name.",
+  errNeedPeriod: "Add at least one date period.",
+  errMaxPeriods: "You can add up to 3 periods.",
+  errPeriodsOverlap: "Periods cannot overlap.",
   errNeedAcceptances: "Tick all four boxes before continuing.",
   errReviewFields: "Check the highlighted fields before continuing.",
   announceArrival: "Arrival date selected.",

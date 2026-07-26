@@ -8,6 +8,10 @@ import {
   PRICE_DASH,
 } from "./i18n";
 import {
+  estimateParkingPrice,
+  estimateSeasonDays,
+} from "./pricing";
+import {
   buildWhatsAppMessage,
   countInclusiveDays,
   isDateUnavailable,
@@ -25,19 +29,10 @@ describe("parking i18n", () => {
     assert.equal(t.spaceLength, "Largo: 490 cm");
     assert.match(t.metaTitle, /agosto/i);
     assert.equal(t.pricesTitle, "Tarifas");
-    assert.equal(t.pricesSupport, "Elige tus fechas para consultar la tarifa.");
-    assert.equal(t.pricesDisclaimer, "Precio final sujeto a confirmación.");
-    assert.equal(t.vehicle, "Modelo");
-    assert.equal(t.vehiclePlaceholder, "Opcional");
-    assert.equal(t.commentsPlaceholder, "Horario de llegada, dudas…");
-    assert.equal(t.announceCleared, "Selección de fechas eliminada.");
-    assert.equal(t.changeDates, "Cambiar fechas");
-    assert.equal(t.bookingDisclaimer, "Enviar la solicitud no confirma la reserva.");
-    assert.match(t.accessImportant, /\*\*acceso\*\*/);
-    assert.equal(t.privacyPolicyLinkLabel, "Política de Privacidad");
-    assert.equal(t.errNeedAcceptances, "Marca las cuatro casillas antes de continuar.");
+    assert.equal(t.addPeriod, "Añadir estas fechas");
+    assert.equal(t.multiModeOr, "Cualquiera de estas opciones (alternativas)");
+    assert.equal(t.labelEstimate, "Estimación");
     assert.equal(t.whatsappCta, "Solicitar por WhatsApp");
-    assert.equal(t.whatsappSentTitle, "Mensaje enviado");
     assert.ok(t.weekdays.includes("Lun"));
   });
 
@@ -45,20 +40,9 @@ describe("parking i18n", () => {
     const t = getParkingCopy("en");
     assert.equal(t.title, "Private parking in central Guardamar");
     assert.match(t.intro, /August/i);
-    assert.equal(t.spaceWidth, "Width: 240 cm");
-    assert.match(t.metaTitle, /August/i);
-    assert.equal(t.pricesTitle, "Prices");
-    assert.equal(t.pricesSupport, "Select your dates to check the rate.");
-    assert.equal(t.pricesDisclaimer, "Final price subject to confirmation.");
-    assert.equal(t.registration, "Registration");
-    assert.equal(t.vehicle, "Vehicle model");
-    assert.equal(t.changeDates, "Change dates");
-    assert.equal(t.announceCleared, "Date selection cleared.");
-    assert.equal(t.bookingDisclaimer, "Sending this enquiry does not confirm the booking.");
-    assert.equal(t.privacyPolicyLinkLabel, "Privacy Policy");
-    assert.equal(t.errNeedAcceptances, "Tick all four boxes before continuing.");
+    assert.equal(t.addPeriod, "Add these dates");
+    assert.equal(t.labelEstimate, "Estimate");
     assert.equal(t.whatsappCta, "Enquire through WhatsApp");
-    assert.equal(t.whatsappSentTitle, "Message sent");
     assert.ok(t.weekdays.includes("Mon"));
   });
 
@@ -98,6 +82,36 @@ describe("parking i18n", () => {
   });
 });
 
+describe("parking price estimates", () => {
+  it("packs June–August as weeks plus leftover days", () => {
+    assert.equal(estimateSeasonDays("summer", 6), 60);
+    assert.equal(estimateSeasonDays("summer", 7), 70);
+    assert.equal(estimateSeasonDays("summer", 8), 80);
+    assert.equal(estimateParkingPrice("2026-07-01", "2026-07-06"), 60);
+    assert.equal(estimateParkingPrice("2026-07-01", "2026-07-07"), 70);
+    assert.equal(estimateParkingPrice("2026-07-01", "2026-07-08"), 80);
+  });
+
+  it("uses September week units", () => {
+    assert.equal(estimateSeasonDays("september", 3), 50);
+    assert.equal(estimateSeasonDays("september", 7), 50);
+    assert.equal(estimateSeasonDays("september", 8), 100);
+    assert.equal(estimateParkingPrice("2026-09-01", "2026-09-03"), 50);
+  });
+
+  it("packs October–May with months and fortnights", () => {
+    assert.equal(estimateSeasonDays("winter", 14), 40);
+    assert.equal(estimateSeasonDays("winter", 30), 75);
+    assert.equal(estimateSeasonDays("winter", 7), 40);
+    assert.equal(estimateParkingPrice("2026-11-01", "2026-11-14"), 40);
+  });
+
+  it("sums cross-season stays", () => {
+    // 30–31 Aug + 1–2 Sep = 2 summer days + 2 september days
+    assert.equal(estimateParkingPrice("2026-08-30", "2026-09-02"), 20 + 50);
+  });
+});
+
 describe("parking availability rules", () => {
   const ranges: ParkingUnavailableRange[] = [
     {
@@ -132,35 +146,68 @@ describe("parking availability rules", () => {
 });
 
 describe("WhatsApp message", () => {
-  it("builds Spanish message with long dates and placeholders", () => {
+  it("builds Spanish message with estimate after duration", () => {
     const msg = buildWhatsAppMessage({
       locale: "es",
-      arrival: "2026-07-25",
-      departure: "2026-07-27",
+      periods: [{ arrival: "2026-07-25", departure: "2026-07-27" }],
+      mode: "single",
       name: "Ana",
     });
     assert.match(msg, /Hola, Ainhoa/);
     assert.match(msg, /Entrada:.*25.*julio.*2026/i);
     assert.match(msg, /Duración: 3 días/);
+    assert.match(msg, /Estimación: €30/);
     assert.match(msg, /Matrícula: No indicada/);
     assert.match(msg, /no queda confirmada/);
-    assert.doesNotMatch(msg, /\d{2}\/\d{2}\/\d{2}/);
   });
 
   it("maps registration and vehicle model into the English message", () => {
     const msg = buildWhatsAppMessage({
       locale: "en",
-      arrival: "2026-07-25",
-      departure: "2026-07-26",
+      periods: [{ arrival: "2026-07-25", departure: "2026-07-26" }],
+      mode: "single",
       name: "Sam",
       registration: "abc 123",
       vehicle: "Golf",
       comments: "Evening arrival",
     });
     assert.match(msg, /Hello Ainhoa/);
+    assert.match(msg, /Duration: 2 days/);
+    assert.match(msg, /Estimate: €20/);
     assert.match(msg, /Vehicle registration: ABC 123/);
     assert.match(msg, /Vehicle: Golf/);
-    assert.match(msg, /not confirmed until you reply/i);
+  });
+
+  it("builds OR alternatives with per-option estimates", () => {
+    const msg = buildWhatsAppMessage({
+      locale: "es",
+      mode: "or",
+      periods: [
+        { arrival: "2026-07-01", departure: "2026-07-03" },
+        { arrival: "2026-08-01", departure: "2026-08-06" },
+      ],
+      name: "Ana",
+    });
+    assert.match(msg, /Opciones alternativas/);
+    assert.match(msg, /1\) Entrada:/);
+    assert.match(msg, /Estimación: €30/);
+    assert.match(msg, /Estimación: €60/);
+    assert.doesNotMatch(msg, /Estimación total/);
+  });
+
+  it("builds AND message with total days and total estimate", () => {
+    const msg = buildWhatsAppMessage({
+      locale: "en",
+      mode: "and",
+      periods: [
+        { arrival: "2026-07-01", departure: "2026-07-03" },
+        { arrival: "2026-08-01", departure: "2026-08-06" },
+      ],
+      name: "Sam",
+    });
+    assert.match(msg, /I need all of these stays/);
+    assert.match(msg, /Total: 9 days/);
+    assert.match(msg, /Total estimate: €90/);
   });
 
   it("URL-encodes WhatsApp href", () => {

@@ -17,13 +17,20 @@ import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/sup
 import {
   buildWhatsAppMessage,
   countInclusiveDays,
+  enquiryPeriodsOverlap,
   isDateUnavailable,
+  MAX_ENQUIRY_PERIODS,
   parseISODate,
   rangeContainsUnavailable,
   toISODate,
   whatsAppHref,
+  type EnquiryPeriod,
   type ParkingUnavailableRange,
 } from "@/lib/parking/types";
+import {
+  estimateParkingPrice,
+  formatEuroEstimate,
+} from "@/lib/parking/pricing";
 
 const STORAGE_KEY = "parking-enquiry";
 const WA_STATUS_KEY = "parking-wa-status";
@@ -31,6 +38,8 @@ const WA_STATUS_KEY = "parking-wa-status";
 type PersistedEnquiry = {
   arrival: string | null;
   departure: string | null;
+  periods: EnquiryPeriod[];
+  multiMode: "or" | "and";
   name: string;
   registration: string;
   vehicle: string;
@@ -110,9 +119,20 @@ function readPersisted(): PersistedEnquiry | null {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<PersistedEnquiry>;
+    const periods = Array.isArray(parsed.periods)
+      ? parsed.periods.filter(
+          (p): p is EnquiryPeriod =>
+            !!p &&
+            typeof p.arrival === "string" &&
+            typeof p.departure === "string" &&
+            p.departure >= p.arrival
+        )
+      : [];
     return {
       arrival: typeof parsed.arrival === "string" ? parsed.arrival : null,
       departure: typeof parsed.departure === "string" ? parsed.departure : null,
+      periods,
+      multiMode: parsed.multiMode === "and" ? "and" : "or",
       name: typeof parsed.name === "string" ? parsed.name : "",
       registration:
         typeof parsed.registration === "string" ? parsed.registration : "",
@@ -170,6 +190,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const [departure, setDeparture] = useState<string | null>(
     () => readPersisted()?.departure ?? null
   );
+  const [periods, setPeriods] = useState<EnquiryPeriod[]>(
+    () => readPersisted()?.periods ?? []
+  );
+  const [multiMode, setMultiMode] = useState<"or" | "and">(
+    () => readPersisted()?.multiMode ?? "or"
+  );
   const [hover, setHover] = useState<string | null>(null);
 
   const [name, setName] = useState(() => readPersisted()?.name ?? "");
@@ -188,6 +214,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const [fieldErrors, setFieldErrors] = useState<{
     arrival?: string;
     departure?: string;
+    periods?: string;
     name?: string;
     acceptances?: string;
   }>({});
@@ -228,6 +255,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     const payload: PersistedEnquiry = {
       arrival,
       departure,
+      periods,
+      multiMode,
       name,
       registration,
       vehicle,
@@ -238,7 +267,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     } catch {
       /* ignore quota / private mode */
     }
-  }, [arrival, departure, name, registration, vehicle, comments]);
+  }, [arrival, departure, periods, multiMode, name, registration, vehicle, comments]);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -310,6 +339,16 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const bothDatesSelected = Boolean(arrival && departure);
   const durationDays =
     arrival && departure ? countInclusiveDays(arrival, departure) : 0;
+  const draftEstimate =
+    arrival && departure ? estimateParkingPrice(arrival, departure) : 0;
+
+  function effectivePeriods(): EnquiryPeriod[] {
+    if (periods.length > 0) return periods;
+    if (arrival && departure && departure >= arrival) {
+      return [{ arrival, departure }];
+    }
+    return [];
+  }
 
   function dayState(
     iso: string
@@ -317,6 +356,13 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     const d = parseISODate(iso);
     if (d < today) return "past";
     if (isDateUnavailable(iso, ranges)) return "unavailable";
+
+    for (const p of periods) {
+      if (iso >= p.arrival && iso <= p.departure) {
+        return iso === p.arrival || iso === p.departure ? "selected" : "inrange";
+      }
+    }
+
     if (arrival && departure && iso >= arrival && iso <= departure) {
       return iso === arrival || iso === departure ? "selected" : "inrange";
     }
@@ -341,7 +387,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       setDeparture(null);
       setHover(null);
       setFormError(null);
-      setFieldErrors((prev) => ({ ...prev, arrival: undefined, departure: undefined }));
+      setFieldErrors((prev) => ({
+        ...prev,
+        arrival: undefined,
+        departure: undefined,
+        periods: undefined,
+      }));
       announce(t.announceArrival);
       return;
     }
@@ -363,7 +414,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       return;
     }
     setFormError(null);
-    setFieldErrors((prev) => ({ ...prev, arrival: undefined, departure: undefined }));
+    setFieldErrors((prev) => ({
+      ...prev,
+      arrival: undefined,
+      departure: undefined,
+      periods: undefined,
+    }));
     setArrival(start);
     setDeparture(end);
     setHover(null);
@@ -375,8 +431,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     setDeparture(null);
     setHover(null);
     setFormError(null);
-    setFieldErrors((prev) => ({ ...prev, arrival: undefined, departure: undefined }));
+    setFieldErrors((prev) => ({
+      ...prev,
+      arrival: undefined,
+      departure: undefined,
+      periods: undefined,
+    }));
     announce(t.announceCleared);
+  }
+
+  function clearAllPeriods() {
+    setPeriods([]);
+    clearDates();
   }
 
   function changeDates() {
@@ -391,40 +457,92 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     }, 50);
   }
 
+  function addCurrentPeriod() {
+    if (!arrival || !departure) return;
+    if (periods.length >= MAX_ENQUIRY_PERIODS) {
+      setFieldErrors((prev) => ({ ...prev, periods: t.errMaxPeriods }));
+      setFormError(t.errMaxPeriods);
+      return;
+    }
+    const next: EnquiryPeriod = { arrival, departure };
+    if (rangeContainsUnavailable(next.arrival, next.departure, ranges)) {
+      setFieldErrors({ arrival: t.errRangeUnavailable });
+      setFormError(t.errRangeUnavailable);
+      return;
+    }
+    for (const p of periods) {
+      if (enquiryPeriodsOverlap(p, next)) {
+        setFieldErrors((prev) => ({ ...prev, periods: t.errPeriodsOverlap }));
+        setFormError(t.errPeriodsOverlap);
+        return;
+      }
+    }
+    setPeriods((prev) => [...prev, next]);
+    setArrival(null);
+    setDeparture(null);
+    setHover(null);
+    setFormError(null);
+    setFieldErrors((prev) => ({
+      ...prev,
+      arrival: undefined,
+      departure: undefined,
+      periods: undefined,
+    }));
+    announce(t.addPeriod);
+  }
+
+  function removePeriodAt(index: number) {
+    setPeriods((prev) => prev.filter((_, i) => i !== index));
+    setFieldErrors((prev) => ({ ...prev, periods: undefined }));
+  }
+
   function validate(): {
     ok: boolean;
     errors: {
       arrival?: string;
       departure?: string;
+      periods?: string;
       name?: string;
       acceptances?: string;
     };
     summary: string | null;
+    periodsOut: EnquiryPeriod[];
   } {
     const errors: {
       arrival?: string;
       departure?: string;
+      periods?: string;
       name?: string;
       acceptances?: string;
     } = {};
 
-    if (!arrival) {
-      errors.arrival = t.errNeedArrival;
+    let periodsOut = effectivePeriods();
+
+    if (periodsOut.length === 0) {
+      if (!arrival) errors.arrival = t.errNeedArrival;
+      if (!departure) errors.departure = t.errNeedDeparture;
+      if (!errors.arrival && !errors.departure) {
+        errors.periods = t.errNeedPeriod;
+      }
+    } else {
+      if (periodsOut.length > MAX_ENQUIRY_PERIODS) {
+        errors.periods = t.errMaxPeriods;
+      }
+      for (const p of periodsOut) {
+        if (rangeContainsUnavailable(p.arrival, p.departure, ranges)) {
+          errors.periods = t.errRangeUnavailable;
+          break;
+        }
+      }
+      for (let i = 0; i < periodsOut.length; i++) {
+        for (let j = i + 1; j < periodsOut.length; j++) {
+          if (enquiryPeriodsOverlap(periodsOut[i], periodsOut[j])) {
+            errors.periods = t.errPeriodsOverlap;
+          }
+        }
+      }
     }
-    if (!departure) {
-      errors.departure = t.errNeedDeparture;
-    }
-    if (arrival && departure && departure < arrival) {
-      errors.departure = t.errDepartureAfter;
-    }
-    if (
-      arrival &&
-      departure &&
-      departure >= arrival &&
-      rangeContainsUnavailable(arrival, departure, ranges)
-    ) {
-      errors.arrival = t.errRangeUnavailable;
-    }
+
     if (!name.trim()) {
       errors.name = t.errNeedName;
     }
@@ -439,7 +557,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
     const keys = Object.keys(errors);
     if (keys.length === 0) {
-      return { ok: true, errors: {}, summary: null };
+      return { ok: true, errors: {}, summary: null, periodsOut };
     }
 
     const summary =
@@ -447,20 +565,22 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         ? t.errReviewFields
         : (errors.arrival ||
             errors.departure ||
+            errors.periods ||
             errors.name ||
             errors.acceptances ||
             t.errReviewFields);
 
-    return { ok: false, errors, summary };
+    return { ok: false, errors, summary, periodsOut };
   }
 
   function focusFirstInvalid(errors: {
     arrival?: string;
     departure?: string;
+    periods?: string;
     name?: string;
     acceptances?: string;
   }) {
-    if (errors.arrival || errors.departure) {
+    if (errors.arrival || errors.departure || errors.periods) {
       arrivalSummaryRef.current?.focus();
       const cal = document.getElementById("pk-availability");
       cal?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -487,12 +607,13 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       return;
     }
 
-    if (!arrival || !departure) return;
+    const periodsOut = result.periodsOut;
+    if (periodsOut.length === 0) return;
 
     const message = buildWhatsAppMessage({
       locale,
-      arrival,
-      departure,
+      periods: periodsOut,
+      mode: periodsOut.length <= 1 ? "single" : multiMode,
       name: name.trim(),
       registration,
       vehicle,
@@ -501,8 +622,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     const href = whatsAppHref(message);
 
     setPreparing(true);
-    // Same-tab navigation avoids a blank Safari/in-app browser sheet on iOS
-    // after WhatsApp opens. Status is restored when the user comes back.
     updateWaStatus("opened", href);
     window.location.assign(href);
   }
@@ -741,8 +860,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             })}
           </div>
 
-          {(arrival || departure) && (
-            <button type="button" className="pk-clear" onClick={clearDates}>
+          {(arrival || departure || periods.length > 0) && (
+            <button type="button" className="pk-clear" onClick={clearAllPeriods}>
               {t.clearDates}
             </button>
           )}
@@ -780,17 +899,124 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                 <dt>{t.labelDuration}</dt>
                 <dd>{t.duration(durationDays)}</dd>
               </div>
+              <div>
+                <dt>{t.labelEstimate}</dt>
+                <dd>{formatEuroEstimate(draftEstimate)}</dd>
+              </div>
             </dl>
-            {(fieldErrors.arrival || fieldErrors.departure) && (
+            {periods.length < MAX_ENQUIRY_PERIODS ? (
+              <button
+                type="button"
+                className="pk-add-period"
+                onClick={addCurrentPeriod}
+              >
+                {t.addPeriod}
+              </button>
+            ) : null}
+            {(fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods) && (
               <p className="pk-field-error" id="pk-dates-error" role="alert">
-                {fieldErrors.arrival || fieldErrors.departure}
+                {fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods}
               </p>
             )}
           </div>
-        ) : (fieldErrors.arrival || fieldErrors.departure) ? (
+        ) : (fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods) ? (
           <p className="pk-field-error pk-field-error-alone" id="pk-dates-error" role="alert">
-            {fieldErrors.arrival || fieldErrors.departure}
+            {fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods}
           </p>
+        ) : null}
+
+        {periods.length > 0 ? (
+          <div className="pk-periods" aria-labelledby="pk-periods-heading">
+            <h3 id="pk-periods-heading">{t.periodsTitle}</h3>
+            <ul className="pk-periods-list">
+              {periods.map((p, index) => {
+                const days = countInclusiveDays(p.arrival, p.departure);
+                const estimate = estimateParkingPrice(p.arrival, p.departure);
+                return (
+                  <li key={`${p.arrival}-${p.departure}-${index}`}>
+                    <div className="pk-period-main">
+                      <span className="pk-period-index">{index + 1}.</span>
+                      <span>
+                        {formatShortParkingDate(p.arrival, locale)}
+                        {" → "}
+                        {formatShortParkingDate(p.departure, locale)}
+                      </span>
+                      <button
+                        type="button"
+                        className="pk-period-remove"
+                        onClick={() => removePeriodAt(index)}
+                        aria-label={t.removePeriod}
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="pk-period-meta">
+                      {t.duration(days)} · {t.labelEstimate}:{" "}
+                      {formatEuroEstimate(estimate)}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {periods.length >= 2 ? (
+              <fieldset className="pk-multi-mode">
+                <legend>{t.multiModeLegend}</legend>
+                <label className="pk-mode-option">
+                  <input
+                    type="radio"
+                    name="multiMode"
+                    checked={multiMode === "or"}
+                    onChange={() => setMultiMode("or")}
+                  />
+                  <span>{t.multiModeOr}</span>
+                </label>
+                <label className="pk-mode-option">
+                  <input
+                    type="radio"
+                    name="multiMode"
+                    checked={multiMode === "and"}
+                    onChange={() => setMultiMode("and")}
+                  />
+                  <span>{t.multiModeAnd}</span>
+                </label>
+                {multiMode === "and" ? (
+                  <p className="pk-multi-summary">
+                    {t.labelTotalDuration}:{" "}
+                    {t.duration(
+                      periods.reduce(
+                        (sum, p) =>
+                          sum + countInclusiveDays(p.arrival, p.departure),
+                        0
+                      )
+                    )}
+                    {" · "}
+                    {t.labelTotalEstimate}:{" "}
+                    {formatEuroEstimate(
+                      periods.reduce(
+                        (sum, p) =>
+                          sum + estimateParkingPrice(p.arrival, p.departure),
+                        0
+                      )
+                    )}
+                  </p>
+                ) : (
+                  <p className="pk-multi-summary">
+                    {periods
+                      .map((p, i) => {
+                        const days = countInclusiveDays(p.arrival, p.departure);
+                        const estimate = estimateParkingPrice(
+                          p.arrival,
+                          p.departure
+                        );
+                        return `${i + 1}: ${t.duration(days)} / ${formatEuroEstimate(estimate)}`;
+                      })
+                      .join(" · ")}
+                  </p>
+                )}
+              </fieldset>
+            ) : null}
+          </div>
         ) : null}
       </section>
 
@@ -1654,8 +1880,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-selected-list {
           margin: 0;
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 8px 12px;
+        }
+
+        @media (min-width: 480px) {
+          .pk-selected-list {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+          }
         }
 
         .pk-selected-list > div {
@@ -1680,12 +1912,137 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           line-height: 1.25;
         }
 
+        .pk-add-period {
+          margin-top: 12px;
+          width: 100%;
+          min-height: 44px;
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 22%, transparent);
+          border-radius: 10px;
+          background: color-mix(in srgb, var(--pk-navy) 6%, #fff);
+          color: var(--pk-navy);
+          font: inherit;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .pk-add-period:hover {
+          background: color-mix(in srgb, var(--pk-navy) 12%, #fff);
+        }
+
+        .pk-periods {
+          margin-top: 14px;
+          padding: 12px 14px;
+          background: var(--card);
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
+          border-radius: var(--radius);
+        }
+
+        .pk-periods h3 {
+          margin: 0 0 10px;
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: var(--pk-navy);
+        }
+
+        .pk-periods-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          gap: 10px;
+        }
+
+        .pk-periods-list li {
+          margin: 0;
+          padding-bottom: 10px;
+          border-bottom: 1px solid color-mix(in srgb, var(--pk-navy) 10%, transparent);
+        }
+
+        .pk-periods-list li:last-child {
+          padding-bottom: 0;
+          border-bottom: 0;
+        }
+
+        .pk-period-main {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.92rem;
+          font-weight: 600;
+        }
+
+        .pk-period-index {
+          color: var(--pk-navy);
+          font-variant-numeric: tabular-nums;
+        }
+
+        .pk-period-remove {
+          margin-left: auto;
+          width: 36px;
+          height: 36px;
+          border: 0;
+          border-radius: 8px;
+          background: transparent;
+          color: var(--muted);
+          font-size: 1.35rem;
+          line-height: 1;
+          cursor: pointer;
+        }
+
+        .pk-period-remove:hover {
+          background: #fde8e8;
+          color: #7a2e2e;
+        }
+
+        .pk-period-meta {
+          margin: 4px 0 0 1.35rem;
+          font-size: 0.84rem;
+          color: var(--muted);
+        }
+
+        .pk-multi-mode {
+          margin: 12px 0 0;
+          padding: 10px 0 0;
+          border: 0;
+          border-top: 1px solid color-mix(in srgb, var(--pk-navy) 10%, transparent);
+          display: grid;
+          gap: 8px;
+        }
+
+        .pk-multi-mode legend {
+          padding: 0;
+          margin: 0 0 4px;
+          font-size: 0.86rem;
+          font-weight: 700;
+          color: var(--pk-navy);
+        }
+
+        .pk-mode-option {
+          display: grid !important;
+          grid-template-columns: 18px minmax(0, 1fr);
+          gap: 8px;
+          align-items: start;
+          font-size: 0.88rem !important;
+          font-weight: 450 !important;
+          color: var(--ink);
+          cursor: pointer;
+        }
+
+        .pk-mode-option input {
+          margin-top: 3px;
+          accent-color: var(--pk-navy);
+        }
+
+        .pk-multi-summary {
+          margin: 4px 0 0;
+          font-size: 0.84rem;
+          color: var(--muted);
+          line-height: 1.4;
+        }
+
         @media (max-width: 380px) {
           .pk-selected-list {
             grid-template-columns: 1fr 1fr;
-          }
-          .pk-selected-list > div:last-child {
-            grid-column: 1 / -1;
           }
         }
 
