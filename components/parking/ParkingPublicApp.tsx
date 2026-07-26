@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { Navigation, RotateCcw } from "lucide-react";
+import { MapPin, RotateCcw } from "lucide-react";
 import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
 import {
@@ -663,7 +663,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           <div className="pk-brand-text">
             <p className="pk-brand-name">{t.brand}</p>
             <h1 className="pk-title-row">
-              <span>{t.title}</span>
+              <span className="pk-title-text">{t.title}</span>
               <a
                 className="pk-directions"
                 href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
@@ -674,7 +674,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                 aria-label={t.directionsLabel}
                 title={t.directionsLabel}
               >
-                <Navigation aria-hidden="true" size={16} strokeWidth={2.25} />
+                <MapPin aria-hidden="true" size={18} strokeWidth={2.5} />
               </a>
             </h1>
             <p className="pk-location">
@@ -1383,26 +1383,38 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-title-row {
-          display: inline-flex;
+          display: flex;
           align-items: center;
-          gap: 6px;
-          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .pk-title-text {
+          min-width: 0;
+          flex: 1 1 auto;
         }
 
         .pk-directions {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          flex-shrink: 0;
-          width: 1.35em;
-          height: 1.35em;
-          color: var(--pk-navy);
+          flex: 0 0 auto;
+          width: 32px;
+          height: 32px;
+          color: #fff;
+          background: var(--pk-navy);
           border-radius: 999px;
           text-decoration: none;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
         }
 
         .pk-directions:hover {
-          background: color-mix(in srgb, var(--pk-navy) 10%, transparent);
+          background: color-mix(in srgb, var(--pk-navy) 88%, #000);
+        }
+
+        .pk-directions :global(svg) {
+          width: 18px;
+          height: 18px;
+          display: block;
         }
 
         .pk-location {
@@ -1438,12 +1450,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             line-height: 1.15;
           }
           .pk-directions {
-            width: 1.25em;
-            height: 1.25em;
+            width: 34px;
+            height: 34px;
           }
           .pk-directions :global(svg) {
-            width: 18px;
-            height: 18px;
+            width: 19px;
+            height: 19px;
           }
           .pk-location {
             font-size: 0.88rem;
