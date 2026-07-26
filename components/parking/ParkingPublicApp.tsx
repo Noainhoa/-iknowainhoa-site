@@ -1286,12 +1286,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           --wa-hover: #0e6e63;
           --shadow: none;
           --radius: 12px;
-          --space-tight: 8px;
-          --space-group: 20px;
-          --space-section: 36px;
+          --space-tight: 6px;
+          --space-group: 12px;
+          --space-section: 18px;
           max-width: 820px;
           margin: 0 auto;
-          padding: 14px 16px 48px;
+          padding: 10px 16px 32px;
           color: var(--ink);
           background: var(--bg);
           font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -1315,7 +1315,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-header {
-          margin-bottom: 12px;
+          margin-bottom: 8px;
         }
 
         .pk-brand {
@@ -1419,7 +1419,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           grid-template-columns: 1.35fr 0.9fr;
           grid-template-rows: minmax(140px, 28vw) minmax(140px, 28vw);
           gap: 6px;
-          margin: 0 0 12px;
+          margin: 0 0 8px;
           border-radius: var(--radius);
           overflow: hidden;
         }
@@ -1463,7 +1463,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-prices {
           margin: 0 0 var(--space-section);
-          padding: 12px 14px 12px;
+          padding: 10px 12px;
           background: var(--card);
           border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
           border-radius: var(--radius);
@@ -1471,8 +1471,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-availability h2,
         .pk-form-section h2 {
-          margin: 0 0 4px;
-          font-size: 1.15rem;
+          margin: 0 0 6px;
+          font-size: 1.1rem;
           font-weight: 750;
           color: var(--pk-navy);
           letter-spacing: -0.01em;
@@ -1482,7 +1482,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           display: table;
           width: 100%;
           border-collapse: collapse;
-          margin: 0 0 8px;
+          margin: 0 0 6px;
           font-size: 0.84rem;
           line-height: 1.2;
           table-layout: fixed;
@@ -1565,8 +1565,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-banner {
-          margin: 0 0 20px;
-          padding: 12px 14px;
+          margin: 0 0 12px;
+          padding: 10px 12px;
           border-radius: 10px;
           background: #fff6d6;
           border: 1px solid #f0e0a0;
@@ -1584,7 +1584,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-availability-hint {
-          margin: 0 0 10px;
+          margin: 0 0 6px;
           color: var(--muted);
           font-size: 0.9rem;
           line-height: 1.4;
@@ -1593,8 +1593,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-legend {
           display: flex;
           flex-wrap: wrap;
-          gap: 10px 14px;
-          margin: 0 0 14px;
+          gap: 8px 12px;
+          margin: 0 0 8px;
           font-size: 0.82rem;
           color: var(--muted);
         }
@@ -1632,7 +1632,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           background: var(--card);
           border: 1px solid var(--line);
           border-radius: 14px;
-          padding: 14px;
+          padding: 10px;
           box-shadow: var(--shadow);
         }
 
@@ -1641,7 +1641,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           align-items: center;
           justify-content: space-between;
           gap: 8px;
-          margin-bottom: 14px;
+          margin-bottom: 8px;
         }
 
         .pk-cal-range {
@@ -1692,11 +1692,11 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-months {
           display: grid;
-          gap: 18px;
+          gap: 12px;
         }
 
         .pk-month h3 {
-          margin: 0 0 10px;
+          margin: 0 0 6px;
           font-size: 1rem;
           text-transform: capitalize;
           font-weight: 700;
@@ -1779,8 +1779,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-selected {
-          margin-top: 14px;
-          padding: 12px 14px;
+          margin-top: 10px;
+          padding: 10px 12px;
           background: var(--card);
           border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
           border-radius: var(--radius);
@@ -2023,9 +2023,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-form {
           display: grid;
-          gap: 12px;
-          margin-top: 10px;
-          padding: 14px 16px 16px;
+          gap: 10px;
+          margin-top: 6px;
+          padding: 12px 14px 14px;
           background: var(--card);
           border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
           border-radius: var(--radius);
@@ -2278,8 +2278,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-footer {
-          margin-top: 28px;
-          padding-top: 14px;
+          margin-top: 16px;
+          padding-top: 10px;
           border-top: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
           text-align: center;
         }
