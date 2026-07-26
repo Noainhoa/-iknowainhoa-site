@@ -20,7 +20,6 @@ export type ParkingCopy = {
   spaceWidth: string;
   spaceLength: string;
   spaceCovered: string;
-  spaceAugust: string;
   galleryLabel: string;
   photoAlts: [string, string, string];
   pricesTitle: string;
@@ -124,7 +123,6 @@ const es: ParkingCopy = {
   spaceWidth: "Ancho: 240 cm",
   spaceLength: "Largo: 490 cm",
   spaceCovered: "Garaje cubierto y cerrado",
-  spaceAugust: "Disponible para agosto y temporada alta (consulta fechas)",
   galleryLabel: "Fotos de la plaza de garaje",
   photoAlts: [
     "Plaza de garaje privada cubierta en Guardamar del Segura, 240 cm de ancho y 490 cm de largo",
@@ -262,7 +260,6 @@ const en: ParkingCopy = {
   spaceWidth: "Width: 240 cm",
   spaceLength: "Length: 490 cm",
   spaceCovered: "Covered, enclosed garage",
-  spaceAugust: "Available for August and high season (check dates)",
   galleryLabel: "Photos of the parking space",
   photoAlts: [
     "Covered private parking bay in Guardamar del Segura, 240 cm wide by 490 cm long",

@@ -701,7 +701,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           <li>{t.spaceWidth}</li>
           <li>{t.spaceLength}</li>
           <li>{t.spaceCovered}</li>
-          <li>{t.spaceAugust}</li>
         </ul>
       </section>
 
@@ -1466,16 +1465,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           margin: 0;
           padding: 0;
           display: grid;
-          gap: 6px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 6px 12px;
           color: var(--ink);
-          font-size: 0.9rem;
+          font-size: 0.86rem;
           line-height: 1.35;
         }
 
         .pk-space-facts li {
           margin: 0;
-          padding-left: 1rem;
+          padding-left: 0.9rem;
           position: relative;
+          min-width: 0;
         }
 
         .pk-space-facts li::before {
@@ -1489,6 +1490,13 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           background: var(--pk-navy);
         }
 
+        @media (max-width: 420px) {
+          .pk-space-facts {
+            font-size: 0.78rem;
+            gap: 6px 8px;
+          }
+        }
+
         @media (min-width: 560px) {
           .pk-intro,
           .pk-location {
@@ -1499,7 +1507,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             gap: 8px;
           }
           .pk-space-facts {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            font-size: 0.9rem;
             gap: 8px 16px;
           }
         }
