@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getParkingLocale } from "@/lib/parking/locale";
-import "./parking-critical.css";
+import "./parking.css";
 
 const ICON_192 = "/parking-icons/v2/icon-192.png";
 const ICON_512 = "/parking-icons/v2/icon-512.png";
