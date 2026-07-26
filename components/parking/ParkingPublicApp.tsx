@@ -238,6 +238,104 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     requestAnimationFrame(() => setLiveMessage(message));
   }, []);
 
+  // #region agent log
+  useEffect(() => {
+    const t0 = performance.now();
+    const host = window.location.hostname;
+    const isLocal = host === "localhost" || host === "127.0.0.1";
+    const send = (message: string, hypothesisId: string, data: Record<string, unknown>) => {
+      if (!isLocal) return;
+      fetch("http://127.0.0.1:7736/ingest/ed8edfac-b1ea-41ca-bead-699b28d53a6c", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Debug-Session-Id": "267dce",
+        },
+        body: JSON.stringify({
+          sessionId: "267dce",
+          runId: "perf-baseline",
+          hypothesisId,
+          location: "ParkingPublicApp.tsx:perf",
+          message,
+          data: { ...data, host, href: window.location.href },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+    };
+
+    send("component_mount", "B", { t0 });
+
+    const logo = document.querySelector<HTMLImageElement>("img.pk-logo");
+    const plaza1 = document.querySelector<HTMLImageElement>(".pk-gallery-item img");
+    const gallery = document.querySelector(".pk-gallery");
+    const galleryCs = gallery ? getComputedStyle(gallery) : null;
+
+    send("above_fold_snapshot", "B", {
+      galleryDisplay: galleryCs?.display ?? null,
+      galleryGridTemplateColumns: galleryCs?.gridTemplateColumns ?? null,
+      logoComplete: logo?.complete ?? null,
+      logoNaturalW: logo?.naturalWidth ?? null,
+      plaza1Complete: plaza1?.complete ?? null,
+      plaza1NaturalW: plaza1?.naturalWidth ?? null,
+      plaza1CurrentSrc: plaza1?.currentSrc ?? null,
+    });
+
+    const onLoad = (label: string, hypothesisId: string, el: HTMLImageElement | null) => {
+      if (!el) return;
+      const fire = () =>
+        send(label, hypothesisId, {
+          complete: el.complete,
+          naturalWidth: el.naturalWidth,
+          naturalHeight: el.naturalHeight,
+          ms: Math.round(performance.now() - t0),
+        });
+      if (el.complete && el.naturalWidth > 0) fire();
+      else el.addEventListener("load", fire, { once: true });
+    };
+    onLoad("logo_loaded", "A", logo);
+    onLoad("plaza1_loaded", "C", plaza1);
+
+    const po =
+      typeof PerformanceObserver !== "undefined"
+        ? new PerformanceObserver((list) => {
+            for (const e of list.getEntries()) {
+              if (e.entryType === "largest-contentful-paint") {
+                send("lcp", "E", {
+                  ms: Math.round(e.startTime),
+                  size: (e as PerformanceEntry & { size?: number }).size ?? null,
+                  url:
+                    (e as PerformanceEntry & { url?: string }).url ??
+                    (e as PerformanceEntry & { element?: Element }).element?.tagName ??
+                    null,
+                });
+              }
+            }
+          })
+        : null;
+    try {
+      po?.observe({ type: "largest-contentful-paint", buffered: true });
+    } catch {
+      /* ignore */
+    }
+
+    const onReady = () => {
+      const nav = performance.getEntriesByType("navigation")[0] as
+        | PerformanceNavigationTiming
+        | undefined;
+      send("nav_timing", "D", {
+        domContentLoadedMs: nav ? Math.round(nav.domContentLoadedEventEnd) : null,
+        loadEventMs: nav ? Math.round(nav.loadEventEnd) : null,
+        transferSize: nav?.transferSize ?? null,
+        ms: Math.round(performance.now() - t0),
+      });
+    };
+    if (document.readyState === "complete") onReady();
+    else window.addEventListener("load", onReady, { once: true });
+
+    return () => po?.disconnect();
+  }, []);
+  // #endregion
+
   function updateWaStatus(status: WaStatus, nextHref?: string | null) {
     if (status === "idle") {
       setWaStatus("idle");
@@ -659,6 +757,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             width={56}
             height={56}
             decoding="async"
+            fetchPriority="high"
           />
           <div className="pk-brand-text">
             <p className="pk-brand-name">{t.brand}</p>
@@ -714,10 +813,11 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               <img
                 src={src}
                 alt={t.photoAlts[i]}
-                width={i === 1 ? 1025 : 1400}
-                height={i === 1 ? 1400 : i === 0 ? 793 : 1047}
+                width={i === 1 ? 659 : 900}
+                height={i === 1 ? 900 : i === 0 ? 509 : 673}
                 loading={i === 0 ? "eager" : "lazy"}
-                decoding="async"
+                decoding={i === 0 ? "sync" : "async"}
+                fetchPriority={i === 0 ? "high" : "low"}
               />
             </figure>
           ))}

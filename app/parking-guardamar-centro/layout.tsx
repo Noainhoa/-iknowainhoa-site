@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getParkingLocale } from "@/lib/parking/locale";
+import "./parking-critical.css";
 
 const ICON_192 = "/parking-icons/v2/icon-192.png";
 const ICON_512 = "/parking-icons/v2/icon-512.png";
@@ -25,8 +26,22 @@ export default async function ParkingLayout({
 }) {
   const locale = await getParkingLocale();
   return (
-    <div lang={locale} className="parking-root">
-      {children}
-    </div>
+    <>
+      <link
+        rel="preload"
+        as="image"
+        href="/images/parking/plaza-1.jpg"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/images/parking/guardamar-parking-logo.png"
+        fetchPriority="high"
+      />
+      <div lang={locale} className="parking-root">
+        {children}
+      </div>
+    </>
   );
 }
