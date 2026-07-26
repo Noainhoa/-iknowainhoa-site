@@ -672,10 +672,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         </div>
       </header>
 
-      <section className="pk-space" aria-labelledby="pk-space-heading">
-        <h2 id="pk-space-heading">{t.spaceTitle}</h2>
-        <p className="pk-space-intro">{t.spaceIntro}</p>
-
+      <section className="pk-space" aria-label={t.galleryLabel}>
         <div className="pk-gallery" role="group" aria-label={t.galleryLabel}>
           {(
             [
@@ -1414,22 +1411,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-space {
           margin: 0 0 var(--space-section);
-        }
-
-        .pk-space h2 {
-          margin: 0 0 6px;
-          font-size: 1.15rem;
-          font-weight: 750;
-          color: var(--pk-navy);
-          letter-spacing: -0.01em;
-        }
-
-        .pk-space-intro {
-          margin: 0 0 12px;
-          color: var(--muted);
-          font-size: 0.92rem;
-          line-height: 1.45;
-          max-width: 42rem;
         }
 
         .pk-gallery {
