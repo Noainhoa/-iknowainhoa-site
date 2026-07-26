@@ -1425,28 +1425,28 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             flex-direction: row;
             align-items: center;
             text-align: left;
-            gap: 18px;
+            gap: 16px;
             max-width: 42rem;
             margin: 0;
           }
           .pk-logo {
-            width: 96px;
-            height: 96px;
+            width: 72px;
+            height: 72px;
           }
           .pk-brand-text {
             align-items: flex-start;
-            gap: 4px;
+            gap: 3px;
           }
           .pk-brand-name {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
           }
           .pk-header h1 {
-            font-size: clamp(1.55rem, 2.4vw, 1.85rem);
-            line-height: 1.12;
+            font-size: clamp(1.4rem, 2.2vw, 1.65rem);
+            line-height: 1.15;
             max-width: none;
           }
           .pk-location {
-            font-size: 0.92rem;
+            font-size: 0.88rem;
           }
         }
 
