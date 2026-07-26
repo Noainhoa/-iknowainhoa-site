@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { MapPin, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
 import {
@@ -674,7 +674,15 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                 aria-label={t.directionsLabel}
                 title={t.directionsLabel}
               >
-                <MapPin aria-hidden="true" size={18} strokeWidth={2.5} />
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  width="22"
+                  height="22"
+                  fill="currentColor"
+                >
+                  <path d="M21.71 11.29l-9-9a.996.996 0 0 0-1.41 0l-9 9a.996.996 0 0 0 0 1.41l9 9c.39.39 1.02.39 1.41 0l9-9a.996.996 0 0 0 0-1.41ZM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5L17.5 11 14 14.5Z" />
+                </svg>
               </a>
             </h1>
             <p className="pk-location">
@@ -1398,22 +1406,21 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           align-items: center;
           justify-content: center;
           flex: 0 0 auto;
-          width: 32px;
-          height: 32px;
-          color: #fff;
-          background: var(--pk-navy);
-          border-radius: 999px;
+          width: 28px;
+          height: 28px;
+          color: var(--pk-navy);
+          background: transparent;
+          border-radius: 6px;
           text-decoration: none;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
         }
 
         .pk-directions:hover {
-          background: color-mix(in srgb, var(--pk-navy) 88%, #000);
+          background: color-mix(in srgb, var(--pk-navy) 10%, transparent);
         }
 
         .pk-directions :global(svg) {
-          width: 18px;
-          height: 18px;
+          width: 22px;
+          height: 22px;
           display: block;
         }
 
@@ -1450,12 +1457,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             line-height: 1.15;
           }
           .pk-directions {
-            width: 34px;
-            height: 34px;
+            width: 30px;
+            height: 30px;
           }
           .pk-directions :global(svg) {
-            width: 19px;
-            height: 19px;
+            width: 24px;
+            height: 24px;
           }
           .pk-location {
             font-size: 0.88rem;
