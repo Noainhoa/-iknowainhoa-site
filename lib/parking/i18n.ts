@@ -117,7 +117,7 @@ const es: ParkingCopy = {
     "Plaza de garaje privada cubierta en el centro de Guardamar del Segura",
   spaceWidth: "Ancho: 240 cm",
   spaceLength: "Largo: 490 cm",
-  spaceCovered: "Garaje cubierto y cerrado",
+  spaceCovered: "Garaje cubierto",
   galleryLabel: "Fotos de la plaza de garaje",
   photoAlts: [
     "Plaza de garaje privada cubierta en Guardamar del Segura, 240 cm de ancho y 490 cm de largo",
@@ -251,7 +251,7 @@ const en: ParkingCopy = {
   heroAlt: "Covered private parking space in central Guardamar del Segura",
   spaceWidth: "Width: 240 cm",
   spaceLength: "Length: 490 cm",
-  spaceCovered: "Covered, enclosed garage",
+  spaceCovered: "Covered garage",
   galleryLabel: "Photos of the parking space",
   photoAlts: [
     "Covered private parking bay in Guardamar del Segura, 240 cm wide by 490 cm long",

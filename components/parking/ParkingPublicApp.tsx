@@ -1445,37 +1445,34 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           list-style: none;
           margin: 0;
           padding: 0;
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 6px 12px;
+          display: flex;
+          flex-wrap: nowrap;
+          align-items: baseline;
+          gap: 10px 14px;
           color: var(--ink);
-          font-size: 0.86rem;
-          line-height: 1.35;
+          font-size: 0.82rem;
+          line-height: 1.3;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
         }
 
         .pk-space-facts li {
           margin: 0;
-          padding-left: 0.9rem;
+          padding-left: 0.85rem;
           position: relative;
-          min-width: 0;
+          flex: 0 0 auto;
+          white-space: nowrap;
         }
 
         .pk-space-facts li::before {
           content: "";
           position: absolute;
           left: 0;
-          top: 0.45em;
-          width: 6px;
-          height: 6px;
+          top: 0.4em;
+          width: 5px;
+          height: 5px;
           border-radius: 50%;
           background: var(--pk-navy);
-        }
-
-        @media (max-width: 420px) {
-          .pk-space-facts {
-            font-size: 0.78rem;
-            gap: 6px 8px;
-          }
         }
 
         @media (min-width: 560px) {
@@ -1489,7 +1486,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           }
           .pk-space-facts {
             font-size: 0.9rem;
-            gap: 8px 16px;
+            gap: 12px 20px;
+            overflow: visible;
           }
         }
 
