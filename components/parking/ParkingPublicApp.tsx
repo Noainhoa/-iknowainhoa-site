@@ -183,17 +183,21 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   // #region agent log
   useEffect(() => {
     const el = brandRef.current;
-    if (!el) return;
+    const header = el?.closest(".pk-header") as HTMLElement | null;
+    if (!el || !header) return;
     const logo = el.querySelector(".pk-logo") as HTMLElement | null;
     const text = el.querySelector(".pk-brand-text") as HTMLElement | null;
     const h1 = el.querySelector("h1");
     const loc = el.querySelector(".pk-location");
     const logoH = logo?.getBoundingClientRect().height ?? 0;
     const textH = text?.getBoundingClientRect().height ?? 0;
+    const brandH = el.getBoundingClientRect().height;
+    const headerH = header.getBoundingClientRect().height;
     const cs = getComputedStyle(el);
     const headerThs = [
       ...document.querySelectorAll(".pk-prices-table thead th"),
     ].map((th) => th.textContent?.trim() ?? "");
+    const brandPct = Math.round((brandH / window.innerHeight) * 100);
     fetch("http://127.0.0.1:7736/ingest/ed8edfac-b1ea-41ca-bead-699b28d53a6c", {
       method: "POST",
       headers: {
@@ -203,23 +207,26 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       body: JSON.stringify({
         sessionId: "ade241",
         runId: "post-fix",
-        hypothesisId: "C+F",
+        hypothesisId: "A-D",
         location: "ParkingPublicApp.tsx:brand-layout",
-        message: "Header + price columns",
+        message: "Header compactness + columns",
         data: {
           viewportW: window.innerWidth,
+          viewportH: window.innerHeight,
           flexDir: cs.flexDirection,
-          align: cs.alignItems,
-          textAlign: cs.textAlign,
           logoH: Math.round(logoH),
           textH: Math.round(textH),
+          brandH: Math.round(brandH),
+          headerH: Math.round(headerH),
+          brandPct,
           heightDelta: Math.round(logoH - textH),
           h1H: h1 ? Math.round(h1.getBoundingClientRect().height) : null,
           locH: loc ? Math.round(loc.getBoundingClientRect().height) : null,
+          compactOk: brandPct <= 12,
           balanced:
             cs.flexDirection === "column"
               ? true
-              : Math.abs(logoH - textH) <= 8,
+              : Math.abs(logoH - textH) <= 12,
           priceHeaders: headerThs,
           hasFortnightHeader: headerThs.some((h) =>
             /fortnight|quincena/i.test(h)
@@ -1367,23 +1374,23 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         .pk-header {
-          margin-bottom: var(--space-group);
+          margin-bottom: 12px;
         }
 
         .pk-brand {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           align-items: center;
-          text-align: center;
+          text-align: left;
           gap: 10px;
           width: 100%;
-          max-width: 26rem;
-          margin: 0 auto;
+          max-width: none;
+          margin: 0;
         }
 
         .pk-logo {
-          width: 88px;
-          height: 88px;
+          width: 56px;
+          height: 56px;
           flex-shrink: 0;
           border-radius: 50%;
           display: block;
@@ -1394,62 +1401,61 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           min-width: 0;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          gap: 4px;
+          justify-content: center;
+          align-items: flex-start;
+          gap: 1px;
         }
 
         .pk-brand-name {
           margin: 0;
-          font-size: 0.7rem;
+          font-size: 0.62rem;
           font-weight: 700;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           color: var(--pk-navy);
-          line-height: 1.2;
+          line-height: 1.15;
         }
 
         .pk-header h1 {
           margin: 0;
-          font-size: clamp(1.25rem, 5.2vw, 1.45rem);
-          line-height: 1.2;
+          font-size: 1.05rem;
+          line-height: 1.15;
           font-weight: 750;
           letter-spacing: -0.02em;
           color: var(--ink);
-          max-width: 16ch;
+          max-width: none;
         }
 
         .pk-location {
           margin: 0;
           color: var(--muted);
-          font-size: 0.84rem;
-          line-height: 1.35;
-          max-width: 22rem;
+          font-size: 0.72rem;
+          line-height: 1.25;
+          max-width: none;
         }
 
         @media (min-width: 560px) {
+          .pk-header {
+            margin-bottom: var(--space-group);
+          }
           .pk-brand {
-            flex-direction: row;
-            align-items: center;
-            text-align: left;
             gap: 16px;
             max-width: 42rem;
-            margin: 0;
           }
           .pk-logo {
             width: 72px;
             height: 72px;
           }
           .pk-brand-text {
-            align-items: flex-start;
             gap: 3px;
           }
           .pk-brand-name {
             font-size: 0.72rem;
+            letter-spacing: 0.1em;
           }
           .pk-header h1 {
             font-size: clamp(1.4rem, 2.2vw, 1.65rem);
             line-height: 1.15;
-            max-width: none;
           }
           .pk-location {
             font-size: 0.88rem;
