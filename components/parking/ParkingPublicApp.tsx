@@ -1549,13 +1549,13 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-prices-table thead th:first-child {
           text-align: left;
           padding-left: 0;
-          width: 38%;
+          width: 42%;
           text-transform: none;
-          font-size: 1.05rem;
+          font-size: clamp(0.72rem, 2.8vw, 1.05rem);
           font-weight: 750;
           letter-spacing: -0.01em;
           color: var(--pk-navy);
-          white-space: normal;
+          white-space: nowrap;
           line-height: 1.2;
         }
 
