@@ -58,8 +58,7 @@ const es: ParkingPrivacyCopy = {
     {
       heading: "5. Conservación",
       paragraphs: [
-        "Los datos de una consulta sin reserva se conservan el tiempo necesario para atenderla y un plazo razonable posterior por si hay seguimiento (habitualmente hasta 12 meses, salvo que pidas su borrado antes).",
-        "Si hay reserva, los datos se conservan durante la vigencia del alquiler y, después, el tiempo exigido por la normativa aplicable (por ejemplo obligaciones fiscales o de responsabilidad civil), normalmente hasta 6 años desde el fin de la relación, salvo plazos distintos legalmente obligatorios.",
+        "Los datos se conservan solo el tiempo necesario para atender tu consulta o gestionar la reserva, y se eliminan cuando ya no son necesarios, salvo que pidas su borrado antes o la ley exija conservarlos por más tiempo.",
       ],
     },
     {
@@ -146,8 +145,7 @@ const en: ParkingPrivacyCopy = {
     {
       heading: "5. Retention",
       paragraphs: [
-        "Data from an enquiry without a booking is kept for as long as needed to handle it and for a reasonable follow-up period (usually up to 12 months, unless you ask for deletion sooner).",
-        "If there is a booking, data is kept for the rental period and afterwards for as long as required by applicable law (for example tax or civil-liability rules), normally up to 6 years after the relationship ends, unless a different legal period applies.",
+        "Data is kept only for as long as needed to handle your enquiry or manage the booking, and is deleted when it is no longer needed, unless you ask for deletion sooner or the law requires keeping it longer.",
       ],
     },
     {
