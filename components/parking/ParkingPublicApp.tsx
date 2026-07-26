@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { RotateCcw } from "lucide-react";
+import { Navigation, RotateCcw } from "lucide-react";
 import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
 import {
@@ -662,18 +662,23 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           />
           <div className="pk-brand-text">
             <p className="pk-brand-name">{t.brand}</p>
-            <h1>{t.title}</h1>
-            <p className="pk-location">
+            <h1 className="pk-title-row">
+              <span>{t.title}</span>
               <a
-                className="pk-location-link"
+                className="pk-directions"
                 href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
                   `${t.locationLine1}, ${t.locationLine2}`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={t.directionsLabel}
+                title={t.directionsLabel}
               >
-                {t.locationLine1}, {t.locationLine2}
+                <Navigation aria-hidden="true" size={16} strokeWidth={2.25} />
               </a>
+            </h1>
+            <p className="pk-location">
+              {t.locationLine1}, {t.locationLine2}
             </p>
           </div>
         </div>
@@ -1366,7 +1371,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           line-height: 1.15;
         }
 
-        .pk-header h1 {
+        .pk-header h1,
+        .pk-title-row {
           margin: 0;
           font-size: 1.05rem;
           line-height: 1.15;
@@ -1376,24 +1382,35 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           max-width: none;
         }
 
+        .pk-title-row {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: wrap;
+        }
+
+        .pk-directions {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          width: 1.35em;
+          height: 1.35em;
+          color: var(--pk-navy);
+          border-radius: 999px;
+          text-decoration: none;
+        }
+
+        .pk-directions:hover {
+          background: color-mix(in srgb, var(--pk-navy) 10%, transparent);
+        }
+
         .pk-location {
           margin: 0;
           color: var(--muted);
           font-size: 0.72rem;
           line-height: 1.25;
           max-width: none;
-        }
-
-        .pk-location-link {
-          color: inherit;
-          text-decoration: underline;
-          text-underline-offset: 2px;
-          text-decoration-color: color-mix(in srgb, var(--muted) 45%, transparent);
-        }
-
-        .pk-location-link:hover {
-          color: var(--pk-navy);
-          text-decoration-color: var(--pk-navy);
         }
 
         @media (min-width: 560px) {
@@ -1415,9 +1432,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             font-size: 0.72rem;
             letter-spacing: 0.1em;
           }
-          .pk-header h1 {
+          .pk-header h1,
+          .pk-title-row {
             font-size: clamp(1.4rem, 2.2vw, 1.65rem);
             line-height: 1.15;
+          }
+          .pk-directions {
+            width: 1.25em;
+            height: 1.25em;
+          }
+          .pk-directions :global(svg) {
+            width: 18px;
+            height: 18px;
           }
           .pk-location {
             font-size: 0.88rem;

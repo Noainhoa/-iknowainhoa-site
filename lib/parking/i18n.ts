@@ -13,6 +13,7 @@ export type ParkingCopy = {
   intro: string;
   locationLine1: string;
   locationLine2: string;
+  directionsLabel: string;
   heroAlt: string;
   spaceFact: string;
   galleryLabel: string;
@@ -106,6 +107,7 @@ const es: ParkingCopy = {
     "Plaza de garaje cubierta en Carrer de Jorge Juan. Ideal para agosto y el resto del año.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
+  directionsLabel: "Cómo llegar en Google Maps",
   heroAlt:
     "Plaza de garaje privada cubierta en el centro de Guardamar del Segura",
   spaceFact: "Garaje cubierto · 4,90 m × 2,40 m",
@@ -230,6 +232,7 @@ const en: ParkingCopy = {
     "Covered private garage space on Carrer de Jorge Juan. Ideal for August and the rest of the year.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
+  directionsLabel: "Directions in Google Maps",
   heroAlt: "Covered private parking space in central Guardamar del Segura",
   spaceFact: "Covered garage · 4.90 m × 2.40 m",
   galleryLabel: "Photos of the parking space",
