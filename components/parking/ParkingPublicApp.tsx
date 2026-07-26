@@ -657,18 +657,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             className="pk-logo"
             src="/images/parking/guardamar-parking-logo.png"
             alt=""
-            width={72}
-            height={72}
+            width={80}
+            height={80}
             decoding="async"
           />
           <div className="pk-brand-text">
             <p className="pk-brand-name">{t.brand}</p>
             <h1>{t.title}</h1>
+            <p className="pk-location">
+              {t.locationLine1}, {t.locationLine2}
+            </p>
           </div>
         </div>
-        <p className="pk-location">
-          {t.locationLine1}, {t.locationLine2}
-        </p>
       </header>
 
       <section className="pk-space" aria-label={t.galleryLabel}>
@@ -1330,14 +1330,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           display: flex;
           flex-direction: row;
           align-items: center;
-          text-align: left;
-          gap: 12px;
+          gap: 14px;
           width: 100%;
+          max-width: 36rem;
         }
 
         .pk-logo {
-          width: 64px;
-          height: 64px;
+          width: 76px;
+          height: 76px;
           flex-shrink: 0;
           border-radius: 50%;
           display: block;
@@ -1346,58 +1346,60 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-brand-text {
           min-width: 0;
-          display: grid;
-          gap: 2px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 3px;
         }
 
         .pk-brand-name {
           margin: 0;
-          font-size: 0.62rem;
+          font-size: 0.68rem;
           font-weight: 700;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.09em;
           text-transform: uppercase;
           color: var(--pk-navy);
-          line-height: 1.25;
+          line-height: 1.2;
         }
 
         .pk-header h1 {
           margin: 0;
-          font-size: clamp(1.15rem, 4.6vw, 1.45rem);
-          line-height: 1.2;
+          font-size: clamp(1.2rem, 4.2vw, 1.4rem);
+          line-height: 1.18;
           font-weight: 750;
           letter-spacing: -0.02em;
           color: var(--ink);
         }
 
         .pk-location {
-          margin: 10px 0 0;
+          margin: 0;
           color: var(--muted);
-          font-size: 0.82rem;
-          line-height: 1.35;
-          text-align: left;
+          font-size: 0.8rem;
+          line-height: 1.3;
         }
 
         @media (min-width: 560px) {
           .pk-brand {
-            gap: 16px;
-            align-items: flex-start;
+            gap: 18px;
+            max-width: 42rem;
           }
           .pk-logo {
-            width: 72px;
-            height: 72px;
-            margin-top: 2px;
+            width: 92px;
+            height: 92px;
+          }
+          .pk-brand-text {
+            gap: 4px;
           }
           .pk-brand-name {
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             letter-spacing: 0.1em;
           }
           .pk-header h1 {
-            font-size: clamp(1.55rem, 2.8vw, 2rem);
+            font-size: clamp(1.55rem, 2.4vw, 1.85rem);
             line-height: 1.12;
           }
           .pk-location {
-            margin-top: 12px;
-            font-size: 0.9rem;
+            font-size: 0.92rem;
           }
         }
 
