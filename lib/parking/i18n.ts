@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n/shared";
+import { localeTag } from "@/lib/i18n/shared";
 
 export type ParkingPriceRow = {
   period: string;
@@ -347,14 +348,140 @@ const en: ParkingCopy = {
     "Rent a private covered garage space in central Guardamar del Segura (Jorge Juan 13). 240×490 cm. Ideal for August and summer. Check availability.",
 };
 
+const fr: ParkingCopy = {
+  brand: "Parking Guardamar Centro",
+  title: "Parking privé à Guardamar",
+  intro:
+    "Place de garage couverte au Carrer de Jorge Juan. Idéale pour août et le reste de l’année.",
+  locationLine1: "Carrer de Jorge Juan, 13",
+  locationLine2: "Guardamar del Segura",
+  directionsLabel: "Itinéraire sur Google Maps",
+  heroAlt: "Place de parking privée couverte au centre de Guardamar del Segura",
+  spaceFact: "Garage couvert · 4,90 m × 2,40 m",
+  galleryLabel: "Photos de la place de parking",
+  photoAlts: [
+    "Place de parking privée couverte à Guardamar del Segura, 240 cm de large et 490 cm de long",
+    "Vue de face de la place dans un garage fermé, centre de Guardamar",
+    "Place de parking privée avec armoires dans un garage couvert à Guardamar",
+  ],
+  pricesDisclaimer: "Prix final sous réserve de confirmation.",
+  priceColSeason: "Tarifs par saison",
+  priceColDay: "Jour",
+  priceColWeek: "Semaine",
+  priceColMonth: "Mois",
+  priceRows: [
+    {
+      period: "Juin–août",
+      day: "€10",
+      week: "€70",
+      month: DASH,
+    },
+    {
+      period: "Septembre",
+      day: DASH,
+      week: "€50",
+      month: DASH,
+    },
+    {
+      period: "Octobre–mai",
+      day: DASH,
+      week: DASH,
+      month: "€75",
+    },
+  ],
+  priceUnavailableLabel: "Non disponible",
+  availabilityTitle: "Choisissez vos dates",
+  availabilityHintDeparture: "Sélectionnez maintenant la date de départ.",
+  selectedDatesTitle: "Dates sélectionnées",
+  periodsTitle: "Périodes de la demande",
+  addPeriod: "Ajouter ces dates",
+  removePeriod: "Retirer la période",
+  multiModeLegend: "Comment souhaitez-vous vérifier ces dates ?",
+  multiModeOr: "N’importe laquelle de ces options (alternatives)",
+  multiModeAnd: "J’ai besoin de tous ces séjours",
+  labelEstimate: "Estimation",
+  labelTotalEstimate: "Estimation totale",
+  labelTotalDuration: "Total",
+  legend: "Légende",
+  available: "Disponible",
+  unavailable: "Indisponible",
+  past: "Passé",
+  selected: "Sélectionné",
+  prevMonths: "Mois précédents",
+  nextMonths: "Mois suivants",
+  clearDates: "Effacer les dates",
+  changeDates: "Modifier les dates",
+  labelArrival: "Arrivée",
+  labelDeparture: "Départ",
+  labelDuration: "Durée",
+  duration: (n) => `${n} ${n === 1 ? "jour" : "jours"}`,
+  formTitle: "Coordonnées pour la demande",
+  name: "Nom",
+  registration: "Immatriculation",
+  vehicle: "Modèle",
+  comments: "Commentaires",
+  namePlaceholder: "Votre nom",
+  registrationPlaceholder: "Facultatif",
+  vehiclePlaceholder: "Facultatif",
+  commentsPlaceholder: "Heure d’arrivée, questions…",
+  accessImportant: "Hauteur maximale d’accès : 1,79 m.",
+  bookingDisclaimer: "Envoyer la demande ne confirme pas la réservation.",
+  privacyNote:
+    "Les données saisies seront utilisées uniquement pour répondre à cette demande via WhatsApp.",
+  privacyPolicyAcceptBefore: "J’ai lu et j’accepte la ",
+  privacyPolicyLinkLabel: "Politique de confidentialité",
+  privacyPolicyAcceptAfter: ".",
+  footerPrivacyLabel: "Politique de confidentialité",
+  whatsappCta: "Demander via WhatsApp",
+  whatsappPreparing: "Préparation de la demande…",
+  whatsappOpenedTitle: "WhatsApp ouvert",
+  whatsappOpenedBody:
+    "Envoyez le message dans WhatsApp. Quand c’est fait, confirmez ici.",
+  whatsappConfirmSent: "Oui, je l’ai envoyé",
+  whatsappOpenAgain: "Rouvrir WhatsApp",
+  whatsappEditEnquiry: "Modifier la demande",
+  whatsappSentTitle: "Message envoyé",
+  whatsappSentBody:
+    "Merci. Je vous répondrai sur WhatsApp pour confirmer la disponibilité, le prix et le paiement.",
+  supabaseHint:
+    "Calendrier en mode local : Supabase n’est pas configuré. Toutes les dates futures apparaissent comme disponibles jusqu’à la connexion à la base de données.",
+  loadError:
+    "Impossible de charger la disponibilité. Réessayez plus tard.",
+  errNeedArrival: "Sélectionnez une date d’arrivée.",
+  errNeedDeparture: "Sélectionnez une date de départ.",
+  errDepartureAfter:
+    "La date de départ doit être postérieure à la date d’arrivée.",
+  errUnavailable: "La période sélectionnée inclut des dates indisponibles.",
+  errRangeUnavailable: "La période sélectionnée inclut des dates indisponibles.",
+  errNeedName: "Indiquez votre nom.",
+  errNeedPeriod: "Ajoutez au moins une période de dates.",
+  errMaxPeriods: "Vous pouvez ajouter jusqu’à 3 périodes.",
+  errPeriodsOverlap: "Les périodes ne peuvent pas se chevaucher.",
+  errNeedAcceptances: "Cochez les quatre cases avant de continuer.",
+  errReviewFields: "Vérifiez les champs signalés avant de continuer.",
+  announceArrival: "Date d’arrivée sélectionnée.",
+  announceDeparture: "Date de départ sélectionnée.",
+  announceCleared: "Sélection de dates effacée.",
+  announceInvalidRange:
+    "La période inclut des dates indisponibles. Sélection réinitialisée.",
+  languageLabel: "Choisir la langue",
+  weekdays: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+  metaTitle:
+    "Parking Guardamar août | Place de garage centre Guardamar del Segura",
+  metaDescription:
+    "Louez une place de garage privée et couverte au centre de Guardamar del Segura (Jorge Juan 13). 240×490 cm. Idéal en août et en été. Consultez la disponibilité.",
+};
+
+const copyByLocale: Record<Locale, ParkingCopy> = { es, en, fr };
+
 export function getParkingCopy(locale: Locale): ParkingCopy {
-  return locale === "es" ? es : en;
+  return copyByLocale[locale];
 }
 
 export function formatParkingDate(iso: string, locale: Locale): string {
   const [y, m, d] = iso.split("-").map(Number);
   const date = new Date(y, m - 1, d);
-  return date.toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
+  return date.toLocaleDateString(localeTag(locale), {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -365,7 +492,7 @@ export function formatParkingDate(iso: string, locale: Locale): string {
 export function formatShortParkingDate(iso: string, locale: Locale): string {
   const [y, m, d] = iso.split("-").map(Number);
   const date = new Date(y, m - 1, d);
-  const formatted = date.toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
+  const formatted = date.toLocaleDateString(localeTag(locale), {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -374,7 +501,7 @@ export function formatShortParkingDate(iso: string, locale: Locale): string {
 }
 
 export function formatMonthLabel(date: Date, locale: Locale): string {
-  const month = date.toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
+  const month = date.toLocaleDateString(localeTag(locale), {
     month: "long",
   });
   return month.charAt(0).toUpperCase() + month.slice(1);
@@ -402,11 +529,11 @@ export function formatMonthRangeLabel(
   }
 
   if (startY === endY) {
-    const endLabel = locale === "es" ? endM.toLowerCase() : endM;
+    const endLabel = locale === "en" ? endM : endM.toLowerCase();
     return `${startM}–${endLabel} ${startY}`;
   }
 
-  const endLabel = locale === "es" ? endM.toLowerCase() : endM;
+  const endLabel = locale === "en" ? endM : endM.toLowerCase();
   return `${startM} ${startY}–${endLabel} ${endY}`;
 }
 

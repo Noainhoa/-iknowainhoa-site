@@ -92,6 +92,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/parking-guardamar-centro?lang=fr`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/parking-guardamar-centro/privacidad`,
       lastModified: new Date(),
       changeFrequency: "yearly" as const,
@@ -105,6 +111,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/parking-guardamar-centro/privacidad?lang=en`,
+      lastModified: new Date(),
+      changeFrequency: "yearly" as const,
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/parking-guardamar-centro/privacidad?lang=fr`,
       lastModified: new Date(),
       changeFrequency: "yearly" as const,
       priority: 0.5,

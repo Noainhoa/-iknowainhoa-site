@@ -2,6 +2,8 @@ import {
   estimateParkingPrice,
   formatEuroEstimate,
 } from "@/lib/parking/pricing";
+import type { Locale } from "@/lib/i18n/shared";
+import { localeTag } from "@/lib/i18n/shared";
 
 export const PARKING_WHATSAPP_NUMBER = "34636670103";
 /** Official click-to-chat (works with WhatsApp Business accounts). */
@@ -136,8 +138,8 @@ export function formatSpanishDate(iso: string): string {
   });
 }
 
-export function formatLocaleDate(iso: string, locale: "en" | "es"): string {
-  return parseISODate(iso).toLocaleDateString(locale === "es" ? "es-ES" : "en-GB", {
+export function formatLocaleDate(iso: string, locale: Locale): string {
+  return parseISODate(iso).toLocaleDateString(localeTag(locale), {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -185,7 +187,7 @@ export function enquiryPeriodsOverlap(
 }
 
 export function buildWhatsAppMessage(input: {
-  locale: "en" | "es";
+  locale: Locale;
   periods: EnquiryPeriod[];
   mode: EnquiryMultiMode;
   name: string;
@@ -193,33 +195,47 @@ export function buildWhatsAppMessage(input: {
   vehicle?: string;
   comments?: string;
 }): string {
-  const es = input.locale === "es";
+  const { locale } = input;
   const periods = input.periods.filter(
     (p) => p.arrival && p.departure && p.departure >= p.arrival
   );
   const mode: EnquiryMultiMode =
     periods.length <= 1 ? "single" : input.mode === "and" ? "and" : "or";
 
+  const emptyReg =
+    locale === "es"
+      ? "No indicada"
+      : locale === "fr"
+        ? "Non indiquée"
+        : "Not provided";
+  const emptyVehicle =
+    locale === "es"
+      ? "No indicado"
+      : locale === "fr"
+        ? "Non indiqué"
+        : "Not provided";
+  const emptyComments =
+    locale === "es"
+      ? "Sin comentarios"
+      : locale === "fr"
+        ? "Aucun commentaire"
+        : "No additional comments";
+
   const registration = input.registration?.trim()
     ? input.registration.trim().toUpperCase()
-    : es
-      ? "No indicada"
-      : "Not provided";
+    : emptyReg;
   const vehicle = input.vehicle?.trim()
     ? input.vehicle.trim()
-    : es
-      ? "No indicado"
-      : "Not provided";
+    : emptyVehicle;
   const comments = input.comments?.trim()
     ? input.comments.trim()
-    : es
-      ? "Sin comentarios"
-      : "No additional comments";
+    : emptyComments;
 
-  const durationLabel = (days: number) =>
-    es
-      ? `${days} ${days === 1 ? "día" : "días"}`
-      : `${days} ${days === 1 ? "day" : "days"}`;
+  const durationLabel = (days: number) => {
+    if (locale === "es") return `${days} ${days === 1 ? "día" : "días"}`;
+    if (locale === "fr") return `${days} ${days === 1 ? "jour" : "jours"}`;
+    return `${days} ${days === 1 ? "day" : "days"}`;
+  };
 
   const periodBlock = (p: EnquiryPeriod, index: number, numbered: boolean) => {
     const days = countInclusiveDays(p.arrival, p.departure);
@@ -227,35 +243,53 @@ export function buildWhatsAppMessage(input: {
       estimateParkingPrice(p.arrival, p.departure)
     );
     const prefix = numbered ? `${index + 1}) ` : "";
-    if (es) {
+    const pad = numbered ? "   " : "";
+    if (locale === "es") {
       return `${prefix}Entrada: ${formatLocaleDate(p.arrival, "es")}
-${numbered ? "   " : ""}Salida: ${formatLocaleDate(p.departure, "es")}
-${numbered ? "   " : ""}Duración: ${durationLabel(days)}
-${numbered ? "   " : ""}Estimación: ${estimate}`;
+${pad}Salida: ${formatLocaleDate(p.departure, "es")}
+${pad}Duración: ${durationLabel(days)}
+${pad}Estimación: ${estimate}`;
+    }
+    if (locale === "fr") {
+      return `${prefix}Arrivée : ${formatLocaleDate(p.arrival, "fr")}
+${pad}Départ : ${formatLocaleDate(p.departure, "fr")}
+${pad}Durée : ${durationLabel(days)}
+${pad}Estimation : ${estimate}`;
     }
     return `${prefix}Arrival: ${formatLocaleDate(p.arrival, "en")}
-${numbered ? "   " : ""}Departure: ${formatLocaleDate(p.departure, "en")}
-${numbered ? "   " : ""}Duration: ${durationLabel(days)}
-${numbered ? "   " : ""}Estimate: ${estimate}`;
+${pad}Departure: ${formatLocaleDate(p.departure, "en")}
+${pad}Duration: ${durationLabel(days)}
+${pad}Estimate: ${estimate}`;
   };
 
   let datesSection: string;
   if (periods.length === 0) {
-    datesSection = es ? "(Sin fechas)" : "(No dates)";
+    datesSection =
+      locale === "es"
+        ? "(Sin fechas)"
+        : locale === "fr"
+          ? "(Aucune date)"
+          : "(No dates)";
   } else if (mode === "single" || periods.length === 1) {
     const p = periods[0];
     datesSection = periodBlock(p, 0, false);
   } else if (mode === "or") {
-    const header = es
-      ? "Opciones alternativas (¿alguna disponible?):"
-      : "Alternative options (is either available?):";
+    const header =
+      locale === "es"
+        ? "Opciones alternativas (¿alguna disponible?):"
+        : locale === "fr"
+          ? "Options alternatives (l’une est-elle disponible ?) :"
+          : "Alternative options (is either available?):";
     datesSection = `${header}\n${periods
       .map((p, i) => periodBlock(p, i, true))
       .join("\n")}`;
   } else {
-    const header = es
-      ? "Necesito todas estas estancias (¿todas disponibles?):"
-      : "I need all of these stays (are all available?):";
+    const header =
+      locale === "es"
+        ? "Necesito todas estas estancias (¿todas disponibles?):"
+        : locale === "fr"
+          ? "J’ai besoin de tous ces séjours (sont-ils tous disponibles ?) :"
+          : "I need all of these stays (are all available?):";
     const totalDays = periods.reduce(
       (sum, p) => sum + countInclusiveDays(p.arrival, p.departure),
       0
@@ -266,15 +300,18 @@ ${numbered ? "   " : ""}Estimate: ${estimate}`;
         0
       )
     );
-    const totals = es
-      ? `Total: ${durationLabel(totalDays)}\nEstimación total: ${totalEstimate}`
-      : `Total: ${durationLabel(totalDays)}\nTotal estimate: ${totalEstimate}`;
+    const totals =
+      locale === "es"
+        ? `Total: ${durationLabel(totalDays)}\nEstimación total: ${totalEstimate}`
+        : locale === "fr"
+          ? `Total : ${durationLabel(totalDays)}\nEstimation totale : ${totalEstimate}`
+          : `Total: ${durationLabel(totalDays)}\nTotal estimate: ${totalEstimate}`;
     datesSection = `${header}\n${periods
       .map((p, i) => periodBlock(p, i, true))
       .join("\n")}\n${totals}`;
   }
 
-  if (es) {
+  if (locale === "es") {
     return `Hola, Ainhoa. Quisiera consultar la disponibilidad de la plaza de garaje de Guardamar.
 
 ${datesSection}
@@ -284,6 +321,18 @@ Vehículo: ${vehicle}
 Comentarios: ${comments}
 
 Entiendo que la reserva no queda confirmada hasta recibir tu respuesta.`;
+  }
+
+  if (locale === "fr") {
+    return `Bonjour Ainhoa, je souhaiterais vérifier la disponibilité de la place de parking à Guardamar.
+
+${datesSection}
+Nom : ${input.name.trim()}
+Immatriculation : ${registration}
+Véhicule : ${vehicle}
+Commentaires : ${comments}
+
+Je comprends que la réservation n’est confirmée qu’après votre réponse.`;
   }
 
   return `Hello Ainhoa, I would like to enquire about the parking space in Guardamar.

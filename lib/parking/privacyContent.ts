@@ -191,6 +191,95 @@ const en: ParkingPrivacyCopy = {
   backToParking: "Back to the parking enquiry",
 };
 
+const fr: ParkingPrivacyCopy = {
+  metaTitle: "Politique de confidentialité | Parking Guardamar Centro",
+  metaDescription:
+    "Traitement des données personnelles des demandes de place de parking à Guardamar del Segura (RGPD / LOPDGDD).",
+  title: "Politique de confidentialité",
+  updated: "Dernière mise à jour : 26 juillet 2026",
+  intro:
+    "Cette politique explique comment sont traitées les données personnelles que vous envoyez via la page de demande de Parking Guardamar Centro, conformément au règlement (UE) 2016/679 (RGPD) et à la loi organique espagnole 3/2018 (LOPDGDD).",
+  sections: [
+    {
+      heading: "1. Responsable du traitement",
+      paragraphs: [
+        "Responsable : Ainhoa Ferrandis Perea.",
+        "Activité : gestion d’une place de garage privée au Carrer de Jorge Juan, 13, 03140 Guardamar del Segura (Alicante), Espagne.",
+        "Contact pour la confidentialité et l’exercice des droits : WhatsApp +34 636 670 103 (même canal que pour les demandes).",
+      ],
+    },
+    {
+      heading: "2. Données collectées",
+      paragraphs: [
+        "Via le formulaire de demande et le message WhatsApp, vous pouvez fournir, entre autres : nom, immatriculation, modèle du véhicule, dates d’arrivée et de départ, commentaires (par ex. heure d’arrivée) et le numéro de téléphone utilisé sur WhatsApp.",
+        "Aucun compte utilisateur n’est créé sur le site. La demande est envoyée via WhatsApp pour être traitée.",
+      ],
+    },
+    {
+      heading: "3. Finalité du traitement",
+      paragraphs: [
+        "Les données sont traitées pour : (a) répondre à votre demande de disponibilité ; (b) confirmer ou refuser la réservation ; (c) gérer la location de la place, le prix et le paiement ; (d) communiquer avec vous au sujet de la réservation ; et (e) respecter les obligations légales le cas échéant.",
+      ],
+    },
+    {
+      heading: "4. Base juridique",
+      paragraphs: [
+        "Traitement nécessaire à l’exécution de mesures précontractuelles à votre demande et, le cas échéant, à l’exécution du contrat de location de la place (art. 6.1.b RGPD).",
+        "Le cas échéant, respect d’obligations légales (par ex. fiscales ou de responsabilité) (art. 6.1.c RGPD).",
+        "Cocher la case d’acceptation de cette politique atteste que vous avez été informé(e) et que vous acceptez le traitement décrit.",
+      ],
+    },
+    {
+      heading: "5. Conservation",
+      paragraphs: [
+        "Les données sont conservées uniquement le temps nécessaire pour traiter votre demande ou gérer la réservation, puis supprimées lorsqu’elles ne sont plus nécessaires, sauf si vous demandez leur effacement plus tôt ou si la loi impose une conservation plus longue.",
+      ],
+    },
+    {
+      heading: "6. Destinataires et sous-traitants",
+      paragraphs: [
+        "Vos données ne sont pas vendues. Elles peuvent être traitées via des outils nécessaires au service, notamment WhatsApp (Meta Platforms) pour la communication de la demande, et des prestataires techniques d’hébergement ou de base de données s’ils sont utilisés pour la disponibilité ou l’administration.",
+        "Ces prestataires agissent selon leurs propres conditions et, le cas échéant, en tant que sous-traitants.",
+      ],
+    },
+    {
+      heading: "7. Transferts internationaux",
+      paragraphs: [
+        "Certains prestataires (par ex. WhatsApp/Meta) peuvent traiter des données hors de l’Espace économique européen. Dans ce cas, les garanties prévues par la réglementation applicable sont utilisées (clauses contractuelles types ou autres mesures admises).",
+      ],
+    },
+    {
+      heading: "8. Vos droits",
+      paragraphs: [
+        "Vous pouvez demander l’accès, la rectification, l’effacement, l’opposition, la limitation du traitement et la portabilité de vos données, ainsi que retirer votre consentement lorsque le traitement en dépend, sans affecter la licéité du traitement antérieur.",
+        "Pour exercer ces droits, écrivez sur WhatsApp au +34 636 670 103 en indiquant votre nom et l’objet de la demande. Une vérification raisonnable d’identité pourra être demandée.",
+        "Vous pouvez aussi déposer une réclamation auprès de l’Agence espagnole de protection des données (AEPD) : https://www.aepd.es",
+      ],
+    },
+    {
+      heading: "9. Sécurité",
+      paragraphs: [
+        "Des mesures raisonnables sont appliquées pour protéger les données contre l’accès, la perte ou l’usage non autorisés. Une sécurité absolue sur Internet ne peut pas être garantie.",
+      ],
+    },
+    {
+      heading: "10. Mineurs",
+      paragraphs: [
+        "Cette page ne s’adresse pas aux mineurs de moins de 14 ans. N’envoyez pas de données de mineurs via le formulaire ou WhatsApp.",
+      ],
+    },
+    {
+      heading: "11. Modifications",
+      paragraphs: [
+        "Cette politique peut être mise à jour. La version en vigueur est publiée à cette URL avec la date de mise à jour indiquée ci-dessus.",
+      ],
+    },
+  ],
+  backToParking: "Retour à la demande de parking",
+};
+
+const privacyByLocale: Record<Locale, ParkingPrivacyCopy> = { es, en, fr };
+
 export function getParkingPrivacyCopy(locale: Locale): ParkingPrivacyCopy {
-  return locale === "es" ? es : en;
+  return privacyByLocale[locale];
 }

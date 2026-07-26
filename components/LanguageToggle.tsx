@@ -3,6 +3,12 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import type { Locale } from "@/lib/i18n/shared";
 
+const LABELS: Record<Locale, string> = {
+  es: "ES",
+  en: "EN",
+  fr: "FR",
+};
+
 function languageHref(
   pathname: string,
   searchParams: { toString(): string },
@@ -17,16 +23,23 @@ function languageHref(
 export default function LanguageToggle({
   locale,
   label,
+  locales = ["es", "en", "fr"],
 }: {
   locale: Locale;
   label?: string;
+  /** Languages to show (parking shows all three; main site can pass fewer). */
+  locales?: Locale[];
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const hrefEs = languageHref(pathname, searchParams, "es");
-  const hrefEn = languageHref(pathname, searchParams, "en");
-  const ariaLabel = label ?? (locale === "es" ? "Seleccionar idioma" : "Select language");
+  const ariaLabel =
+    label ??
+    (locale === "es"
+      ? "Seleccionar idioma"
+      : locale === "fr"
+        ? "Choisir la langue"
+        : "Select language");
 
   return (
     <nav aria-label={ariaLabel}>
@@ -38,37 +51,29 @@ export default function LanguageToggle({
           fontSize: 12,
         }}
       >
-        <a
-          href={hrefEs}
-          hrefLang="es"
-          lang="es"
-          aria-current={locale === "es" ? "true" : undefined}
-          style={{
-            textDecoration: "none",
-            color: "inherit",
-            opacity: locale === "es" ? 1 : 0.55,
-            fontWeight: locale === "es" ? 700 : 500,
-          }}
-        >
-          ES
-        </a>
-        <span style={{ opacity: 0.35 }} aria-hidden="true">
-          /
-        </span>
-        <a
-          href={hrefEn}
-          hrefLang="en"
-          lang="en"
-          aria-current={locale === "en" ? "true" : undefined}
-          style={{
-            textDecoration: "none",
-            color: "inherit",
-            opacity: locale === "en" ? 1 : 0.55,
-            fontWeight: locale === "en" ? 700 : 500,
-          }}
-        >
-          EN
-        </a>
+        {locales.map((code, index) => (
+          <span key={code} style={{ display: "contents" }}>
+            {index > 0 ? (
+              <span style={{ opacity: 0.35 }} aria-hidden="true">
+                /
+              </span>
+            ) : null}
+            <a
+              href={languageHref(pathname, searchParams, code)}
+              hrefLang={code}
+              lang={code}
+              aria-current={locale === code ? "true" : undefined}
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                opacity: locale === code ? 1 : 0.55,
+                fontWeight: locale === code ? 700 : 500,
+              }}
+            >
+              {LABELS[code]}
+            </a>
+          </span>
+        ))}
       </div>
     </nav>
   );

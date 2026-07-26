@@ -10,7 +10,9 @@ export default function SiteHeader({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
   const t = getDictionary(locale);
   const navLinks = [
+    { href: "/work", label: t.header.work },
     { href: "/blog", label: t.header.blog },
+    { href: "/gallery/blue", label: "Gallery" },
     { href: "/contact", label: t.header.contact },
   ];
 
@@ -42,7 +44,7 @@ export default function SiteHeader({ locale }: { locale: Locale }) {
         </nav>
 
         <div className="lang desktop-lang">
-          <LanguageToggle locale={locale} />
+          <LanguageToggle locale={locale} locales={["es", "en"]} />
         </div>
 
         <button
@@ -71,7 +73,7 @@ export default function SiteHeader({ locale }: { locale: Locale }) {
             </div>
             <div className="mobile-links">
               <div style={{ marginBottom: 8 }}>
-                <LanguageToggle locale={locale} />
+                <LanguageToggle locale={locale} locales={["es", "en"]} />
               </div>
               {navLinks.map((link) => (
                 <Link
@@ -92,9 +94,9 @@ export default function SiteHeader({ locale }: { locale: Locale }) {
         .header {
           border-bottom: 1px solid var(--border);
           padding: 14px 20px;
-          font-family: system-ui, -apple-system, sans-serif;
+          font-family: var(--font-geist-sans);
           position: sticky;
-          top: 0;
+          top: var(--accent-height);
           z-index: 20;
           background: var(--background);
         }
@@ -107,8 +109,10 @@ export default function SiteHeader({ locale }: { locale: Locale }) {
           gap: 16px;
         }
         .brand {
-          font-size: 18px;
-          font-weight: 700;
+          font-size: 14px;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
           text-decoration: none;
           color: inherit;
         }
@@ -118,17 +122,17 @@ export default function SiteHeader({ locale }: { locale: Locale }) {
         }
         .nav-link {
           text-decoration: none;
-          color: inherit;
-          opacity: 0.8;
-          transition: opacity 0.2s;
+          color: var(--foreground-muted);
+          font-size: 14px;
+          transition: color 0.2s;
         }
         .nav-link:hover {
-          opacity: 1;
+          color: var(--foreground);
         }
         .hamburger {
           width: 42px;
           height: 42px;
-          border-radius: 12px;
+          border-radius: 8px;
           border: 1px solid var(--border);
           background: var(--card);
           display: none;
@@ -177,6 +181,7 @@ export default function SiteHeader({ locale }: { locale: Locale }) {
           font-size: 26px;
           line-height: 1;
           cursor: pointer;
+          color: var(--foreground);
         }
         .mobile-links {
           display: flex;

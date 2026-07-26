@@ -21,16 +21,16 @@ export async function generateMetadata({
   const params = await searchParams;
   const locale = await getParkingLocale(params.lang);
   const p = getParkingPrivacyCopy(locale);
-  const es = locale === "es";
 
   return {
     title: p.metaTitle,
     description: p.metaDescription,
     alternates: {
-      canonical: `https://iknowainhoa.com${PARKING_PRIVACY_PATH}${es ? "?lang=es" : "?lang=en"}`,
+      canonical: `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=${locale}`,
       languages: {
         es: `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=es`,
         en: `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=en`,
+        fr: `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=fr`,
         "x-default": `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=es`,
       },
     },

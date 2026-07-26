@@ -16,12 +16,9 @@ export async function generateMetadata({
   const params = await searchParams;
   const locale = await getParkingLocale(params.lang);
   const t = getParkingCopy(locale);
-  const es = locale === "es";
 
-  return {
-    title: t.metaTitle,
-    description: t.metaDescription,
-    keywords: es
+  const keywords =
+    locale === "es"
       ? [
           "parking Guardamar agosto",
           "plaza garaje Guardamar del Segura",
@@ -30,19 +27,43 @@ export async function generateMetadata({
           "garaje Jorge Juan Guardamar",
           "parking verano Guardamar",
         ]
-      : [
-          "August parking Guardamar",
-          "private garage Guardamar del Segura",
-          "central Guardamar parking",
-          "rent parking Guardamar",
-          "Jorge Juan garage Guardamar",
-          "summer parking Guardamar",
-        ],
+      : locale === "fr"
+        ? [
+            "parking Guardamar août",
+            "place garage Guardamar del Segura",
+            "parking centre Guardamar",
+            "location parking Guardamar",
+            "garage Jorge Juan Guardamar",
+            "parking été Guardamar",
+          ]
+        : [
+            "August parking Guardamar",
+            "private garage Guardamar del Segura",
+            "central Guardamar parking",
+            "rent parking Guardamar",
+            "Jorge Juan garage Guardamar",
+            "summer parking Guardamar",
+          ];
+
+  const ogLocale =
+    locale === "es" ? "es_ES" : locale === "fr" ? "fr_FR" : "en_GB";
+  const ogAlternate =
+    locale === "es"
+      ? ["en_GB", "fr_FR"]
+      : locale === "fr"
+        ? ["es_ES", "en_GB"]
+        : ["es_ES", "fr_FR"];
+
+  return {
+    title: t.metaTitle,
+    description: t.metaDescription,
+    keywords,
     alternates: {
-      canonical: `${PATH}${es ? "?lang=es" : "?lang=en"}`,
+      canonical: `${PATH}?lang=${locale}`,
       languages: {
         es: `${PATH}?lang=es`,
         en: `${PATH}?lang=en`,
+        fr: `${PATH}?lang=fr`,
         "x-default": `${PATH}?lang=es`,
       },
     },
@@ -72,26 +93,26 @@ export async function generateMetadata({
       title: t.metaTitle,
       description: t.metaDescription,
       url: `${PATH}?lang=${locale}`,
-      locale: es ? "es_ES" : "en_GB",
-      alternateLocale: es ? ["en_GB"] : ["es_ES"],
+      locale: ogLocale,
+      alternateLocale: ogAlternate,
       type: "website",
       images: [
         {
           url: OG_IMAGE,
-          width: 1400,
-          height: 793,
+          width: 900,
+          height: 509,
           alt: t.photoAlts[0],
         },
         {
           url: "https://iknowainhoa.com/images/parking/plaza-2.jpg",
-          width: 1025,
-          height: 1400,
+          width: 659,
+          height: 900,
           alt: t.photoAlts[1],
         },
         {
           url: "https://iknowainhoa.com/images/parking/plaza-3.jpg",
-          width: 1400,
-          height: 1047,
+          width: 900,
+          height: 673,
           alt: t.photoAlts[2],
         },
       ],
@@ -115,9 +136,26 @@ export async function generateMetadata({
   };
 }
 
-function parkingJsonLd(locale: "es" | "en") {
+function parkingJsonLd(locale: "es" | "en" | "fr") {
   const t = getParkingCopy(locale);
-  const es = locale === "es";
+
+  const widthName =
+    locale === "es" ? "Ancho" : locale === "fr" ? "Largeur" : "Width";
+  const lengthName =
+    locale === "es" ? "Largo" : locale === "fr" ? "Longueur" : "Length";
+  const typeName = locale === "es" ? "Tipo" : locale === "fr" ? "Type" : "Type";
+  const typeValue =
+    locale === "es"
+      ? "Plaza privada en garaje cubierto"
+      : locale === "fr"
+        ? "Place privée en garage couvert"
+        : "Private covered garage bay";
+  const actionName =
+    locale === "es"
+      ? "Solicitar por WhatsApp"
+      : locale === "fr"
+        ? "Demander via WhatsApp"
+        : "Enquire through WhatsApp";
 
   return {
     "@context": "https://schema.org",
@@ -148,18 +186,18 @@ function parkingJsonLd(locale: "es" | "en") {
     additionalProperty: [
       {
         "@type": "PropertyValue",
-        name: es ? "Ancho" : "Width",
+        name: widthName,
         value: "240 cm",
       },
       {
         "@type": "PropertyValue",
-        name: es ? "Largo" : "Length",
+        name: lengthName,
         value: "490 cm",
       },
       {
         "@type": "PropertyValue",
-        name: es ? "Tipo" : "Type",
-        value: es ? "Plaza privada en garaje cubierto" : "Private covered garage bay",
+        name: typeName,
+        value: typeValue,
       },
     ],
     openingHoursSpecification: {
@@ -179,7 +217,7 @@ function parkingJsonLd(locale: "es" | "en") {
     potentialAction: {
       "@type": "ReserveAction",
       target: `${PATH}?lang=${locale}#pk-form-heading`,
-      name: es ? "Solicitar por WhatsApp" : "Enquire through WhatsApp",
+      name: actionName,
     },
   };
 }

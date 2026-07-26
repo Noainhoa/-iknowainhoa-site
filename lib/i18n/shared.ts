@@ -1,8 +1,15 @@
-export const LOCALES = ["en", "es"] as const;
+export const LOCALES = ["en", "es", "fr"] as const;
 export type Locale = (typeof LOCALES)[number];
 
 export function isLocale(value: unknown): value is Locale {
   return typeof value === "string" && (LOCALES as readonly string[]).includes(value);
+}
+
+/** BCP 47 tag for dates / Intl. */
+export function localeTag(locale: Locale): string {
+  if (locale === "es") return "es-ES";
+  if (locale === "fr") return "fr-FR";
+  return "en-GB";
 }
 
 type Dictionary = {
@@ -73,8 +80,9 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     work: {
       title: "Work",
-      subtitle: "Apps, products, and projects in one quiet list.",
-      empty: "Nothing to show yet.",
+      subtitle:
+        "Selected apps, websites, systems, and product design — one place for the things I make.",
+      empty: "Nothing in this filter yet.",
     },
     about: {
       title: "About Ainhoa",
@@ -106,7 +114,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
   },
   es: {
-    header: { blog: "Blog", work: "Proyectos", about: "Sobre mí", contact: "Contacto" },
+    header: { blog: "Blog", work: "Trabajo", about: "Sobre mí", contact: "Contacto" },
     footer: { support: "Apoyar este trabajo" },
     home: {
       heroTitle: "Ainhoa diseña y desarrolla webs, apps y pequeños productos con calma y enfoque humano.",
@@ -120,9 +128,10 @@ const dictionaries: Record<Locale, Dictionary> = {
       contactButton: "Empezar una conversación",
     },
     work: {
-      title: "Proyectos",
-      subtitle: "Apps, productos y proyectos en una sola vista.",
-      empty: "Todavía no hay nada para mostrar.",
+      title: "Trabajo",
+      subtitle:
+        "Apps, webs, sistemas y diseño de producto — un solo lugar para lo que hago.",
+      empty: "Todavía no hay nada en este filtro.",
     },
     about: {
       title: "Sobre Ainhoa",
@@ -151,6 +160,56 @@ const dictionaries: Record<Locale, Dictionary> = {
       responseTitle: "Tiempo de respuesta",
       responseBody:
         "Intento responder todos los mensajes en menos de 48 horas. Si es urgente, también puedes escribirme por redes sociales o LinkedIn.",
+    },
+  },
+  // Site chrome falls back to English until a full French site copy exists.
+  fr: {
+    header: { blog: "Blog", work: "Work", about: "About", contact: "Contact" },
+    footer: { support: "Support this work" },
+    home: {
+      heroTitle: "Ainhoa designs and builds calm, human websites, apps, and small products.",
+      heroSubtitle: "This is where new experiments, client work, and tiny tools quietly ship.",
+      featuredTitle: "Featured work",
+      viewAllWork: "View all work",
+      aboutCtaTitle: "About & contact",
+      aboutCtaBody:
+        "I work with small teams and individuals who care about thoughtful, quiet internet things: simple product pages, tiny tools, and honest personal sites.",
+      aboutButton: "Read a bit more",
+      contactButton: "Start a conversation",
+    },
+    work: {
+      title: "Work",
+      subtitle:
+        "Selected apps, websites, systems, and product design — one place for the things I make.",
+      empty: "Nothing in this filter yet.",
+    },
+    about: {
+      title: "About Ainhoa",
+      intro1:
+        "I design and build small, honest internet things — from simple landing pages and personal sites to tiny tools and experiments that make everyday work a bit lighter.",
+      intro2:
+        "My defaults are calm: minimal interfaces, clear language, and considerate flows that respect people's time and attention.",
+      whatIDoTitle: "What I do",
+      whatIDoIntro: "I work with individuals and small teams on:",
+      bullet1: "New or refreshed personal sites and portfolios",
+      bullet2: "Focused product pages for small launches",
+      bullet3: "Simple web tools and interfaces built with Next.js",
+      touchTitle: "How to get in touch",
+      touchBody:
+        "If you'd like to work together, or you're curious about something I've built, you can reach out any time.",
+      touchButton: "Go to contact page",
+    },
+    contact: {
+      title: "Get in Touch",
+      intro: "Get in touch with Ainhoa. Questions, collaborations, or just to say hello.",
+      emailTitle: "Email",
+      emailSubtitle: "The most direct way to reach me:",
+      socialTitle: "Social Media",
+      socialSubtitle: "Connect or follow along:",
+      formTitle: "Send a Message",
+      responseTitle: "Response Time",
+      responseBody:
+        "I try to respond to all messages within 48 hours. If it is urgent, feel free to reach out on social media or LinkedIn as well.",
     },
   },
 };

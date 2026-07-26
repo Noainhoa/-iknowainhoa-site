@@ -45,11 +45,25 @@ describe("parking i18n", () => {
     assert.ok(t.weekdays.includes("Mon"));
   });
 
+  it("returns concise French copy", () => {
+    const t = getParkingCopy("fr");
+    assert.equal(t.title, "Parking privé à Guardamar");
+    assert.match(t.intro, /août/i);
+    assert.equal(t.spaceFact, "Garage couvert · 4,90 m × 2,40 m");
+    assert.equal(t.priceColSeason, "Tarifs par saison");
+    assert.equal(t.addPeriod, "Ajouter ces dates");
+    assert.equal(t.whatsappCta, "Demander via WhatsApp");
+    assert.equal(t.accessImportant, "Hauteur maximale d’accès : 1,79 m.");
+    assert.ok(t.weekdays.includes("Lun"));
+  });
+
   it("keeps past label for accessible calendar cells but legend uses other states", () => {
     const es = getParkingCopy("es");
     const en = getParkingCopy("en");
+    const fr = getParkingCopy("fr");
     assert.equal(es.past, "Pasado");
     assert.equal(en.past, "Past");
+    assert.equal(fr.past, "Passé");
     assert.equal(es.available, "Disponible");
     assert.equal(es.unavailable, "No disponible");
     assert.equal(es.selected, "Seleccionado");
@@ -58,8 +72,10 @@ describe("parking i18n", () => {
   it("formats long WhatsApp dates and short UI dates", () => {
     assert.match(formatParkingDate("2026-07-25", "es"), /25.*julio.*2026/i);
     assert.match(formatParkingDate("2026-07-25", "en"), /25.*July.*2026/i);
+    assert.match(formatParkingDate("2026-07-25", "fr"), /25.*juillet.*2026/i);
     assert.match(formatShortParkingDate("2026-07-25", "es"), /25.*jul.*2026/i);
     assert.match(formatShortParkingDate("2026-07-25", "en"), /25.*Jul.*2026/i);
+    assert.match(formatShortParkingDate("2026-07-25", "fr"), /25.*juil.*2026/i);
   });
 
   it("includes year in month range labels without Spanish de", () => {
@@ -67,6 +83,7 @@ describe("parking i18n", () => {
     const end = new Date(2026, 8, 1);
     assert.equal(formatMonthRangeLabel(start, end, "es"), "Julio–septiembre 2026");
     assert.equal(formatMonthRangeLabel(start, end, "en"), "July–September 2026");
+    assert.equal(formatMonthRangeLabel(start, end, "fr"), "Juillet–septembre 2026");
     assert.equal(formatMonthRangeLabel(start, start, "es"), "Julio 2026");
   });
 
