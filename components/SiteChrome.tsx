@@ -6,7 +6,11 @@ import type { Locale } from "@/lib/i18n/shared";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
-/** Hide global header/footer on blog routes — blog uses its own Seth-style shell. */
+/**
+ * Site chrome: joy-yellow accent + header/footer.
+ * Blog uses its own Seth-style shell (no global header/footer).
+ * Parking is a standalone mini-app (no chrome at all).
+ */
 export default function SiteChrome({
   locale,
   children,
@@ -15,18 +19,21 @@ export default function SiteChrome({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  // Parking is a standalone mini-app (no site header/footer).
-  const hideChrome =
+  const isParking =
     pathname === "/parking-guardamar-centro" ||
     pathname.startsWith("/parking-guardamar-centro/") ||
     pathname === "/parking" ||
     pathname.startsWith("/parking/");
+  const isBlog = pathname === "/blog" || pathname.startsWith("/blog/");
+  const showAccent = !isParking;
+  const showHeaderFooter = !isParking && !isBlog;
 
   return (
     <>
-      {!hideChrome ? <SiteHeader locale={locale} /> : null}
+      {showAccent ? <div className="site-accent" aria-hidden /> : null}
+      {showHeaderFooter ? <SiteHeader locale={locale} /> : null}
       {children}
-      {!hideChrome ? <SiteFooter /> : null}
+      {showHeaderFooter ? <SiteFooter /> : null}
     </>
   );
 }

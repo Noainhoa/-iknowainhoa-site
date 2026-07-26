@@ -4,7 +4,6 @@ description: ""
 slug: ""
 draft: true
 tags: []
-coverImage: "/images/blog/cover.jpg"
 ---
 
 # Title

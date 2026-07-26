@@ -6,7 +6,8 @@ slug: ""
 draft: true
 tags:
   - daily
-coverImage: "/images/blog/cover.jpg"
+coverImage: "" # set to a real path under /public when you have a cover
+
 ---
 
 # Your Title
@@ -60,10 +61,10 @@ You can place a gallery anywhere in the post with plain HTML.
 
 ```html
 <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0;">
-  <img src="/images/blog/YYYY/Month/photo-1.jpg" alt="Describe image 1" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
-  <img src="/images/blog/YYYY/Month/photo-2.jpg" alt="Describe image 2" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
-  <img src="/images/blog/YYYY/Month/photo-3.jpg" alt="Describe image 3" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
-  <img src="/images/blog/YYYY/Month/photo-4.jpg" alt="Describe image 4" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
+  <img src="/images/blog/YYYY/MM-month/photo-1.jpg" alt="Describe image 1" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
+  <img src="/images/blog/YYYY/MM-month/photo-2.jpg" alt="Describe image 2" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
+  <img src="/images/blog/YYYY/MM-month/photo-3.jpg" alt="Describe image 3" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
+  <img src="/images/blog/YYYY/MM-month/photo-4.jpg" alt="Describe image 4" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
 </div>
 ```
 

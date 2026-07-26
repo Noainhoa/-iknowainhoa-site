@@ -1,9 +1,9 @@
 import { publicPages } from "@/lib/site";
 import BlankPage from "@/components/BlankPage";
 import Link from "next/link";
-import { getAllWork } from "@/lib/content";
 import { getLocale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n/shared";
+import { categoryLabel, getAllWork } from "@/lib/work";
 
 export default async function Home() {
   if (!publicPages.homeContent) {
@@ -16,15 +16,15 @@ export default async function Home() {
   const featured = work.slice(0, 3);
 
   return (
-    <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 960, margin: "0 auto" }}>
+    <main style={{ padding: 32, fontFamily: "var(--font-geist-sans)", maxWidth: 960, margin: "0 auto" }}>
       <section style={{ marginBottom: 40 }}>
-        <p style={{ fontSize: 14, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.6, marginBottom: 8 }}>
+        <p style={{ fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", fontWeight: 800, opacity: 0.55, marginBottom: 8 }}>
           iknowainhoa
         </p>
-        <h1 style={{ fontSize: 42, fontWeight: 750, margin: 0, lineHeight: 1.1 }}>
+        <h1 style={{ fontSize: 42, fontWeight: 750, margin: 0, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
           {t.home.heroTitle}
         </h1>
-        <p style={{ fontSize: 18, opacity: 0.8, marginTop: 16, maxWidth: 720, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 18, color: "var(--foreground-muted)", marginTop: 16, maxWidth: 720, lineHeight: 1.6, fontFamily: "var(--font-serif)" }}>
           {t.home.heroSubtitle}
         </p>
       </section>
@@ -59,7 +59,7 @@ export default async function Home() {
           >
             {featured.map((item) => (
               <Link
-                key={`${item.kind}-${item.href}`}
+                key={item.slug}
                 href={item.href}
                 style={{
                   textDecoration: "none",
@@ -81,7 +81,7 @@ export default async function Home() {
                     opacity: 0.6,
                   }}
                 >
-                  {item.kind}
+                  {categoryLabel(item.category)}
                 </span>
                 <span style={{ fontWeight: 600 }}>{item.title}</span>
                 {item.description && (

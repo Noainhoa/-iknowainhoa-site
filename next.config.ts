@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Allow LAN access during local development (phone / other devices).
+  allowedDevOrigins: ["192.168.1.51", "127.0.0.1", "localhost"],
   images: {
     remotePatterns: [
       {

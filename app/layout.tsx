@@ -1,9 +1,29 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Bebas_Neue, DM_Sans, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import SiteChrome from "@/components/SiteChrome";
 import { getLocale } from "@/lib/i18n";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-site-sans",
+  display: "swap",
+});
+
+const bebasNeue = Bebas_Neue({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-blog-brand",
+  display: "swap",
+});
+
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-site-serif",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -41,7 +61,7 @@ export default async function RootLayout({
   const locale = await getLocale();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={`${dmSans.variable} ${bebasNeue.variable} ${sourceSerif.variable}`}>
       <body className="antialiased">
         <SiteChrome locale={locale}>{children}</SiteChrome>
       </body>

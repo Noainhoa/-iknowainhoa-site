@@ -6,7 +6,6 @@ slug: "jar-of-awesome"
 draft: false
 tags:
   - daily
-coverImage: "/images/blog/cover.jpg"
 ---
 Short opening paragraph. Say what happened, what you learned, or why this matters.
 

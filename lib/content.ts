@@ -1,5 +1,5 @@
 // lib/content.ts
-//*This will: read nested folders like content/blog/2026/January/...
+//*This will: read nested folders like content/blog/2026/01-january/...
 // ignore content/_templates
 // hide drafts if either:
 // frontmatter has draft: true, or
@@ -156,6 +156,22 @@ function isDraft(fullPath: string, data: Frontmatter) {
   return data?.draft === true || base.startsWith("draft-");
 }
 
+/** Drop cover paths that don't exist under /public (avoids Next/Image 404 noise). */
+async function resolveCoverImage(cover?: unknown): Promise<string | undefined> {
+  if (typeof cover !== "string" || !cover.trim()) return undefined;
+  const trimmed = cover.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (!trimmed.startsWith("/")) return undefined;
+
+  const fullPath = path.join(process.cwd(), "public", trimmed.replace(/^\//, ""));
+  try {
+    await fs.access(fullPath);
+    return trimmed;
+  } catch {
+    return undefined;
+  }
+}
+
 function readTags(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((tag): tag is string => typeof tag === "string");
@@ -271,7 +287,7 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
     const { data } = parseFrontmatter(raw);
 
     const draft = isDraft(fullPath, data);
-    if (draft) continue;
+    if (draft && process.env.NODE_ENV === "production") continue;
 
     const slug = computeSlug(collectionDir, fullPath, data.slug);
 
@@ -288,7 +304,7 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
       slug,
       draft,
       tags: readTags(data.tags),
-      coverImage: data.coverImage as string | undefined,
+      coverImage: await resolveCoverImage(data.coverImage),
       cta: readCta(data.cta),
       type: data.type as ProductType | undefined,
       status: data.status as ProductStatus | undefined,
@@ -302,14 +318,35 @@ export async function getAll(collection: Collection): Promise<ContentIndexItem[]
     });
   }
 
+  // Prefer non-draft, then newest date when multiple files share a slug
+  const bySlug = new Map<string, ContentIndexItem>();
+  for (const item of items) {
+    const existing = bySlug.get(item.slug);
+    if (!existing) {
+      bySlug.set(item.slug, item);
+      continue;
+    }
+    const itemDraft = item.draft ? 1 : 0;
+    const existingDraft = existing.draft ? 1 : 0;
+    if (itemDraft !== existingDraft) {
+      if (itemDraft < existingDraft) bySlug.set(item.slug, item);
+      continue;
+    }
+    if ((item.date || "").localeCompare(existing.date || "") > 0) {
+      bySlug.set(item.slug, item);
+    }
+  }
+
+  const unique = [...bySlug.values()];
   // sort by date (newest first) if available
-  items.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-  return items;
+  unique.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  return unique;
 }
 
 /**
  * Get one published item by slug (recursive).
- * (Drafts return null)
+ * If several files share a slug, prefer non-draft, then newest date.
+ * (Drafts return null in production)
  */
 export async function getBySlug(
   collection: Collection,
@@ -321,6 +358,7 @@ export async function getBySlug(
   const stripeLinks = collection === "products" ? await loadStripePaymentLinks() : undefined;
 
   const files = await walkMarkdownFiles(collectionDir);
+  const matches: { fullPath: string; data: Frontmatter; content: string }[] = [];
 
   for (const fullPath of files) {
     const raw = await fs.readFile(fullPath, "utf8");
@@ -328,45 +366,56 @@ export async function getBySlug(
 
     const computed = computeSlug(collectionDir, fullPath, data.slug);
     if (computed !== slug) continue;
-
-    if (isDraft(fullPath, data)) return null;
-
-    const ctaUrl = sanitizeProductCtaUrl(
-      computed,
-      data.ctaUrl as string | undefined,
-      stripeLinks?.[computed]
-    );
-
-    const processed = await remark()
-      .use(remarkGfm)
-      .use(html, { sanitize: false })
-      .process(content);
-    const renderedHtml = processed.toString();
-
-    return {
-      title: (data.title as string) || slug,
-      description: data.description as string | undefined,
-      date: data.date as string | undefined,
-      slug,
-      draft: false,
-      tags: readTags(data.tags),
-      coverImage: data.coverImage as string | undefined,
-      cta: readCta(data.cta),
-      type: data.type as ProductType | undefined,
-      status: data.status as ProductStatus | undefined,
-      price: data.price as string | undefined,
-      ctaText: data.ctaText as string | undefined,
-      ctaUrl,
-      waitlistUrl: data.waitlistUrl as string | undefined,
-      features: readFeatures(data.features),
-      body: content,
-      html: renderedHtml,
-      filePath: fullPath,
-      metadata: data,
-    };
+    matches.push({ fullPath, data, content });
   }
 
-  return null;
+  if (matches.length === 0) return null;
+
+  matches.sort((a, b) => {
+    const aDraft = isDraft(a.fullPath, a.data) ? 1 : 0;
+    const bDraft = isDraft(b.fullPath, b.data) ? 1 : 0;
+    if (aDraft !== bDraft) return aDraft - bDraft;
+    return String(b.data.date || "").localeCompare(String(a.data.date || ""));
+  });
+
+  const best = matches[0];
+  if (isDraft(best.fullPath, best.data) && process.env.NODE_ENV === "production") {
+    return null;
+  }
+
+  const ctaUrl = sanitizeProductCtaUrl(
+    slug,
+    best.data.ctaUrl as string | undefined,
+    stripeLinks?.[slug]
+  );
+
+  const processed = await remark()
+    .use(remarkGfm)
+    .use(html, { sanitize: false })
+    .process(best.content);
+  const renderedHtml = processed.toString();
+
+  return {
+    title: (best.data.title as string) || slug,
+    description: best.data.description as string | undefined,
+    date: best.data.date as string | undefined,
+    slug,
+    draft: isDraft(best.fullPath, best.data),
+    tags: readTags(best.data.tags),
+      coverImage: await resolveCoverImage(best.data.coverImage),
+    cta: readCta(best.data.cta),
+    type: best.data.type as ProductType | undefined,
+    status: best.data.status as ProductStatus | undefined,
+    price: best.data.price as string | undefined,
+    ctaText: best.data.ctaText as string | undefined,
+    ctaUrl,
+    waitlistUrl: best.data.waitlistUrl as string | undefined,
+    features: readFeatures(best.data.features),
+    body: best.content,
+    html: renderedHtml,
+    filePath: best.fullPath,
+    metadata: best.data,
+  };
 }
 
 /**
@@ -403,54 +452,24 @@ export type WorkItem = {
   externalHref?: string;
 };
 
+/** @deprecated Prefer `@/lib/work` — kept for any legacy imports. */
 export async function getAllWork(): Promise<WorkItem[]> {
-  const [apps, products, projects] = await Promise.all([
-    getAllApps(),
-    getAllProducts(),
-    getAllProjects(),
-  ]);
-
-  const mapped: (WorkItem & { _dateKey: string })[] = [];
-
-  for (const app of apps) {
-    mapped.push({
-      title: app.title,
-      description: app.description,
-      date: app.date,
-      coverImage: app.coverImage,
-      kind: "App",
-      href: `/apps/${app.slug}`,
-      _dateKey: app.date || "",
-    });
-  }
-
-  for (const product of products) {
-    mapped.push({
-      title: product.title,
-      description: product.description,
-      date: product.date,
-      coverImage: product.coverImage,
-      kind: "Product",
-      href: `/products/${product.slug}`,
-      _dateKey: product.date || "",
-    });
-  }
-
-  for (const project of projects) {
-    const isWebsiteTag = (project.tags || []).some((t) => t.toLowerCase() === "website");
-    mapped.push({
-      title: project.title,
-      description: project.description,
-      date: project.date,
-      coverImage: project.coverImage,
-      kind: isWebsiteTag ? "Website" : "Project",
-      href: `/projects/${project.slug}`,
-      externalHref: typeof project.cta?.link === "string" ? project.cta.link : undefined,
-      _dateKey: project.date || "",
-    });
-  }
-
-  mapped.sort((a, b) => b._dateKey.localeCompare(a._dateKey));
-
-  return mapped.map(({ _dateKey, ...rest }) => rest);
+  const { getAllWork: getWork } = await import("@/lib/work");
+  const items = await getWork();
+  return items.map((item) => ({
+    title: item.title,
+    description: item.description,
+    date: item.date,
+    coverImage: item.coverImage,
+    kind:
+      item.category === "apps"
+        ? "App"
+        : item.category === "websites"
+          ? "Website"
+          : item.category === "product-design"
+            ? "Product"
+            : "Project",
+    href: item.href,
+    externalHref: item.externalHref,
+  }));
 }

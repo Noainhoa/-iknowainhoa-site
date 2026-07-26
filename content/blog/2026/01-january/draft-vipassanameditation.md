@@ -1,14 +1,13 @@
 ---
-title: "Blue, The Great Dane"
+title: "Vipassana meditation (draft)"
 date: "2026-01-17"
-description: "My Journey to my own reactivity."
-slug: "blue"
+description: "Draft placeholder — not Blue."
+slug: "vipassana-meditation"
 draft: true
-tags: ["dogs", "training", "grief"]
+tags: ["daily"]
 
 ---
 
-# Blue, The Great Dane
+# Vipassana meditation
 
-Write here...
-bla bla bla
+Draft placeholder. Writing TBD.

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- Archived avatar crescent (previous design) -->
+  <g transform="rotate(38 12 12)">
+    <path
+      fill="#334155"
+      stroke="#1157be"
+      stroke-width="0.32"
+      stroke-linejoin="round"
+      d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+    />
+  </g>
+</svg>

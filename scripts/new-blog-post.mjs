@@ -19,14 +19,23 @@ function slugify(value) {
     .replace(/-{2,}/g, "-");
 }
 
+/** Matches existing posts: 01-january, 02-february, … */
+function monthFolderName(date) {
+  const monthNumber = String(date.getMonth() + 1).padStart(2, "0");
+  const monthName = date
+    .toLocaleString("en-US", { month: "long" })
+    .toLowerCase();
+  return `${monthNumber}-${monthName}`;
+}
+
 const now = new Date();
 const year = String(now.getFullYear());
-const month = now.toLocaleString("en-US", { month: "long" });
+const monthFolder = monthFolderName(now);
 const date = now.toISOString().slice(0, 10);
 const slug = slugify(title);
 
 const templatePath = path.join(process.cwd(), "content", "_templates", "blog.md");
-const targetDir = path.join(process.cwd(), "content", "blog", year, month);
+const targetDir = path.join(process.cwd(), "content", "blog", year, monthFolder);
 const targetPath = path.join(targetDir, `${slug}.md`);
 
 const template = await fs.readFile(templatePath, "utf8");
@@ -34,8 +43,10 @@ const filled = template
   .replace('title: ""', `title: "${title.replace(/"/g, '\\"')}"`)
   .replace('date: "YYYY-MM-DD"', `date: "${date}"`)
   .replace('slug: ""', `slug: "${slug}"`)
+  .replace("# Your Title", `# ${title}`)
   .replaceAll("YYYY", year)
-  .replaceAll("Month", month);
+  .replaceAll("MM-month", monthFolder)
+  .replaceAll("Month", monthFolder);
 
 await fs.mkdir(targetDir, { recursive: true });
 
@@ -48,3 +59,4 @@ try {
 }
 
 console.log(`Created ${path.relative(process.cwd(), targetPath)}`);
+console.log(`URL when published: /blog/${slug}`);

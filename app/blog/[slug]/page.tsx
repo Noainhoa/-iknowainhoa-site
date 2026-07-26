@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import Image from "next/image";
 import { getBlogPost, getAllBlogSlugs } from "@/lib/content";
 import { SupportCard } from "@/components/SupportCard";
+import BlogAsideGallery from "@/components/gallery/BlogAsideGallery";
+import { getAsideGallery } from "@/lib/galleries/blue";
 import { site } from "@/lib/site";
 
 export async function generateStaticParams() {
@@ -54,60 +57,152 @@ export default async function BlogPostPage({
   const post = await getBlogPost(slug);
   if (!post) return notFound();
 
+  const asideId =
+    typeof post.metadata?.asideGallery === "string" ? post.metadata.asideGallery : null;
+  const aside = asideId ? getAsideGallery(asideId) : null;
+  const hasAside = Boolean(aside?.items.length);
+
   return (
-    <main style={{ padding: "32px 24px", fontFamily: "system-ui", maxWidth: 800, margin: "0 auto" }}>
-      {/* Header */}
-      <article>
-        <h1 style={{ fontSize: "2.5rem", fontWeight: 700, margin: "0 0 16px 0", lineHeight: 1.2 }}>
-          {post.title}
-        </h1>
-
-        {/* Meta Info */}
-        <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 24, fontSize: 14, opacity: 0.7 }}>
-          {post.date && <time dateTime={post.date}>{post.date}</time>}
-          {post.tags && post.tags.length > 0 && (
-            <div style={{ display: "flex", gap: 8 }}>
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  style={{
-                    backgroundColor: "var(--muted)",
-                    color: "var(--foreground)",
-                    border: "1px solid var(--border)",
-                    padding: "4px 8px",
-                    borderRadius: 6,
-                    fontWeight: 600,
-                  }}
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Description */}
-        {post.description && (
-          <p style={{ fontSize: "1.125rem", lineHeight: 1.6, marginBottom: 32, opacity: 0.8 }}>
-            {post.description}
-          </p>
-        )}
-
-        {/* Body */}
-        <div
-          className="prose"
+    <main>
+      {post.draft ? (
+        <p
           style={{
-            marginTop: 32,
-            lineHeight: 1.8,
-            fontSize: "1rem",
+            margin: "0 0 16px",
+            fontSize: 11,
+            letterSpacing: 0.14,
+            textTransform: "uppercase",
+            opacity: 0.5,
+            fontFamily: "var(--blog-sans)",
           }}
-          dangerouslySetInnerHTML={{ __html: post.html }}
-        />
-      </article>
+        >
+          Draft — visible locally, hidden in production
+        </p>
+      ) : null}
 
-      <div style={{ marginTop: 64 }}>
-        <SupportCard buttonText="Send a thank you" variant="compact" hideBadges />
+      {post.coverImage ? (
+        <div
+          className="blog-hero"
+          style={{
+            position: "relative",
+            width: "100%",
+            aspectRatio: "16 / 9",
+            maxHeight: 420,
+            marginBottom: 28,
+            overflow: "hidden",
+            background: "#f3f3f3",
+          }}
+        >
+          <Image
+            src={post.coverImage}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 900px) 100vw, 900px"
+            style={{ objectFit: "cover" }}
+          />
+        </div>
+      ) : null}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: hasAside ? "minmax(0, 1fr) minmax(180px, 220px)" : "1fr",
+          gap: hasAside ? 36 : 0,
+          alignItems: "start",
+        }}
+        className="post-layout"
+      >
+        <article>
+          <h1
+            style={{
+              fontFamily: "var(--blog-sans)",
+              fontSize: "clamp(2rem, 4vw, 3rem)",
+              fontWeight: 800,
+              margin: "0 0 14px",
+              lineHeight: 1.1,
+              letterSpacing: "-0.03em",
+            }}
+          >
+            {post.title}
+          </h1>
+
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              alignItems: "center",
+              marginBottom: 18,
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: 0.08,
+              textTransform: "uppercase",
+              opacity: 0.65,
+              flexWrap: "wrap",
+              fontFamily: "var(--blog-sans)",
+            }}
+          >
+            {post.date ? <time dateTime={post.date}>{post.date}</time> : null}
+            {post.tags?.map((tag) => (
+              <span key={tag}>#{tag}</span>
+            ))}
+          </div>
+
+          {post.description ? (
+            <p
+              style={{
+                fontFamily: "var(--blog-serif)",
+                fontSize: "1.2rem",
+                lineHeight: 1.55,
+                margin: "0 0 28px",
+                opacity: 0.85,
+              }}
+            >
+              {post.description}
+            </p>
+          ) : null}
+
+          {hasAside && aside ? (
+            <div className="aside-mobile" style={{ marginBottom: 28 }}>
+              <BlogAsideGallery items={aside.items} href={aside.href} title={aside.title} />
+            </div>
+          ) : null}
+
+          <div
+            className="prose blog-prose"
+            dangerouslySetInnerHTML={{ __html: post.html }}
+          />
+        </article>
+
+        {hasAside && aside ? (
+          <div className="aside-desktop">
+            <BlogAsideGallery items={aside.items} href={aside.href} title={aside.title} />
+          </div>
+        ) : null}
       </div>
+
+      <div style={{ marginTop: 56 }}>
+        <SupportCard variant="compact" />
+      </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .post-layout {
+            grid-template-columns: 1fr !important;
+          }
+          .aside-desktop {
+            display: none !important;
+          }
+          .blog-hero {
+            max-height: 280px !important;
+            aspect-ratio: 4 / 3 !important;
+          }
+        }
+        @media (min-width: 901px) {
+          .aside-mobile {
+            display: none !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }

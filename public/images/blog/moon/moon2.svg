@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Archived — more open tips / thinner midsection -->
+  <g transform="rotate(-16 50 50)">
+    <path
+      fill="#334155"
+      stroke="#1157be"
+      stroke-width="1.4"
+      stroke-linejoin="round"
+      d="M72 20 A38 38 0 1 0 72 80 A26 26 0 1 1 72 20 Z"
+    />
+  </g>
+</svg>

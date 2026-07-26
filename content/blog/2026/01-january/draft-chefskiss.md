@@ -1,14 +1,13 @@
 ---
-title: "BCheflue, The Great Dane"
+title: "Chef's Kiss (draft)"
 date: "2026-01-17"
-description: "My Journey to my own reactivity."
-slug: "blue"
+description: "Draft placeholder — not Blue."
+slug: "chefs-kiss"
 draft: true
-tags: ["dogs", "training", "grief"]
+tags: ["daily"]
 
 ---
 
-# Blue, The Great Dane
+# Chef's Kiss
 
-Write here...
-bla bla bla
+Draft placeholder. Writing TBD.

@@ -18,7 +18,7 @@ export default async function SupportPage() {
           If you’ve enjoyed the writing, guides, or resources here, you can send a pay-what-you-want thank you.
         </p>
         <div className="mt-2">
-          <SupportCard buttonText="Send a thank you" />
+          <SupportCard />
         </div>
       </section>
 
