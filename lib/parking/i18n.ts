@@ -25,7 +25,6 @@ export type ParkingCopy = {
   priceRows: ParkingPriceRow[];
   priceUnavailableLabel: string;
   availabilityTitle: string;
-  availabilityHint: string;
   availabilityHintDeparture: string;
   selectedDatesTitle: string;
   periodsTitle: string;
@@ -143,8 +142,6 @@ const es: ParkingCopy = {
   ],
   priceUnavailableLabel: "No disponible",
   availabilityTitle: "Selecciona tus fechas",
-  availabilityHint:
-    "Selecciona primero la fecha de entrada y después la fecha de salida.",
   availabilityHintDeparture: "Ahora selecciona la fecha de salida.",
   selectedDatesTitle: "Fechas seleccionadas",
   periodsTitle: "Periodos de la solicitud",
@@ -268,8 +265,6 @@ const en: ParkingCopy = {
   ],
   priceUnavailableLabel: "Not available",
   availabilityTitle: "Select your dates",
-  availabilityHint:
-    "Select your arrival date, followed by your departure date.",
   availabilityHintDeparture: "Now select your departure date.",
   selectedDatesTitle: "Selected dates",
   periodsTitle: "Enquiry periods",

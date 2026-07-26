@@ -741,9 +741,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         aria-labelledby="pk-availability-heading"
       >
         <h2 id="pk-availability-heading">{t.availabilityTitle}</h2>
-        <p className="pk-availability-hint">
-          {arrival && !departure ? t.availabilityHintDeparture : t.availabilityHint}
-        </p>
+        {arrival && !departure ? (
+          <p className="pk-availability-hint">{t.availabilityHintDeparture}</p>
+        ) : null}
 
         <div className="pk-legend" aria-label={t.legend}>
           <span>
