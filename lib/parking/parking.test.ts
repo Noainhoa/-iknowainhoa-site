@@ -27,7 +27,7 @@ describe("parking i18n", () => {
     assert.match(t.intro, /agosto/i);
     assert.equal(t.spaceFact, "Garaje cubierto · 4,90 m × 2,40 m");
     assert.match(t.metaTitle, /agosto/i);
-    assert.equal(t.pricesTitle, "Tarifas");
+    assert.equal(t.priceColSeason, "Tarifas por temporada");
     assert.equal(t.addPeriod, "Añadir estas fechas");
     assert.equal(t.multiModeOr, "Cualquiera de estas opciones (alternativas)");
     assert.equal(t.labelEstimate, "Estimación");

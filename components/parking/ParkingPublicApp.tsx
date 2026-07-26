@@ -696,9 +696,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         <p className="pk-space-facts">{t.spaceFact}</p>
       </section>
 
-      <section className="pk-prices" aria-labelledby="pk-prices-heading">
-        <h2 id="pk-prices-heading">{t.pricesTitle}</h2>
-
+      <section className="pk-prices" aria-label={t.priceColSeason}>
         <table className="pk-prices-table">
           <thead>
             <tr>
@@ -1464,7 +1462,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           border-radius: var(--radius);
         }
 
-        .pk-prices h2,
         .pk-availability h2,
         .pk-form-section h2 {
           margin: 0 0 4px;
@@ -1498,7 +1495,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-prices-table thead th:first-child {
           text-align: left;
           padding-left: 0;
-          width: 34%;
+          width: 38%;
+          text-transform: none;
+          font-size: 1.05rem;
+          font-weight: 750;
+          letter-spacing: -0.01em;
+          color: var(--pk-navy);
+          white-space: normal;
+          line-height: 1.2;
         }
 
         .pk-prices-table tbody th,
