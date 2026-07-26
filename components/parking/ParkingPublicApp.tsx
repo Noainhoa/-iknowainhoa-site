@@ -686,7 +686,16 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               </a>
             </h1>
             <p className="pk-location">
-              {t.locationLine1}, {t.locationLine2}
+              <a
+                className="pk-location-link"
+                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                  `${t.locationLine1}, ${t.locationLine2}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t.locationLine1}, {t.locationLine2}
+              </a>
             </p>
           </div>
         </div>
@@ -1430,6 +1439,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           font-size: 0.72rem;
           line-height: 1.25;
           max-width: none;
+        }
+
+        .pk-location-link {
+          color: inherit;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          text-decoration-color: color-mix(in srgb, var(--muted) 50%, transparent);
+        }
+
+        .pk-location-link:hover {
+          color: var(--pk-navy);
+          text-decoration-color: var(--pk-navy);
         }
 
         @media (min-width: 560px) {
