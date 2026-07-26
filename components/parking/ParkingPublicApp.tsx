@@ -715,8 +715,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             className="pk-logo"
             src="/images/parking/guardamar-parking-logo.png"
             alt=""
-            width={88}
-            height={88}
+            width={56}
+            height={56}
             decoding="async"
           />
           <div className="pk-brand-text">
