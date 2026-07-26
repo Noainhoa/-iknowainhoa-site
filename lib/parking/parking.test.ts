@@ -23,7 +23,7 @@ import {
 describe("parking i18n", () => {
   it("returns concise Spanish copy", () => {
     const t = getParkingCopy("es");
-    assert.equal(t.title, "Parking privado en el centro de Guardamar");
+    assert.equal(t.title, "Parking privado en Guardamar");
     assert.match(t.intro, /agosto/i);
     assert.equal(t.spaceWidth, "Ancho: 240 cm");
     assert.equal(t.spaceLength, "Largo: 490 cm");
@@ -38,7 +38,7 @@ describe("parking i18n", () => {
 
   it("returns concise English copy", () => {
     const t = getParkingCopy("en");
-    assert.equal(t.title, "Private parking in central Guardamar");
+    assert.equal(t.title, "Private parking in Guardamar");
     assert.match(t.intro, /August/i);
     assert.equal(t.addPeriod, "Add these dates");
     assert.equal(t.labelEstimate, "Estimate");

@@ -657,19 +657,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             className="pk-logo"
             src="/images/parking/guardamar-parking-logo.png"
             alt=""
-            width={80}
-            height={80}
+            width={72}
+            height={72}
             decoding="async"
           />
           <div className="pk-brand-text">
             <p className="pk-brand-name">{t.brand}</p>
             <h1>{t.title}</h1>
-            <p className="pk-intro">{t.intro}</p>
-            <p className="pk-location">
-              {t.locationLine1}, {t.locationLine2}
-            </p>
           </div>
         </div>
+        <p className="pk-location">
+          {t.locationLine1}, {t.locationLine2}
+        </p>
       </header>
 
       <section className="pk-space" aria-label={t.galleryLabel}>
@@ -1329,16 +1328,16 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
         .pk-brand {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           align-items: center;
-          text-align: center;
-          gap: 10px;
+          text-align: left;
+          gap: 12px;
           width: 100%;
         }
 
         .pk-logo {
-          width: 80px;
-          height: 80px;
+          width: 64px;
+          height: 64px;
           flex-shrink: 0;
           border-radius: 50%;
           display: block;
@@ -1348,57 +1347,57 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         .pk-brand-text {
           min-width: 0;
           display: grid;
-          gap: 6px;
+          gap: 2px;
         }
 
         .pk-brand-name {
           margin: 0;
-          font-size: 0.72rem;
+          font-size: 0.62rem;
           font-weight: 700;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           color: var(--pk-navy);
+          line-height: 1.25;
         }
 
         .pk-header h1 {
           margin: 0;
-          font-size: clamp(2rem, 9vw, 3rem);
-          line-height: 1.05;
+          font-size: clamp(1.15rem, 4.6vw, 1.45rem);
+          line-height: 1.2;
           font-weight: 750;
           letter-spacing: -0.02em;
           color: var(--ink);
         }
 
-        .pk-intro {
-          margin: 0;
-          color: var(--muted);
-          line-height: 1.4;
-          font-size: 0.98rem;
-          font-weight: 450;
-        }
-
         .pk-location {
-          margin: 0;
+          margin: 10px 0 0;
           color: var(--muted);
-          font-size: 0.9rem;
+          font-size: 0.82rem;
           line-height: 1.35;
+          text-align: left;
         }
 
         @media (min-width: 560px) {
           .pk-brand {
-            flex-direction: row;
-            align-items: flex-start;
-            text-align: left;
             gap: 16px;
+            align-items: flex-start;
           }
           .pk-logo {
-            width: 76px;
-            height: 76px;
+            width: 72px;
+            height: 72px;
             margin-top: 2px;
           }
+          .pk-brand-name {
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+          }
           .pk-header h1 {
-            font-size: clamp(1.85rem, 3.2vw, 2.35rem);
-            line-height: 1.08;
+            font-size: clamp(1.55rem, 2.8vw, 2rem);
+            line-height: 1.12;
+          }
+          .pk-location {
+            margin-top: 12px;
+            font-size: 0.9rem;
           }
         }
 
@@ -1476,10 +1475,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         }
 
         @media (min-width: 560px) {
-          .pk-intro,
-          .pk-location {
-            text-align: left;
-          }
           .pk-gallery {
             grid-template-rows: 200px 200px;
             gap: 8px;

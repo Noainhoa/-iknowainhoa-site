@@ -108,7 +108,7 @@ const DASH = "—";
 
 const es: ParkingCopy = {
   brand: "Parking Guardamar Centro",
-  title: "Parking privado en el centro de Guardamar",
+  title: "Parking privado en Guardamar",
   intro:
     "Plaza de garaje cubierta en Carrer de Jorge Juan. Ideal para agosto y el resto del año.",
   locationLine1: "Carrer de Jorge Juan, 13",
@@ -242,7 +242,7 @@ const es: ParkingCopy = {
 
 const en: ParkingCopy = {
   brand: "Parking Guardamar Centro",
-  title: "Private parking in central Guardamar",
+  title: "Private parking in Guardamar",
   intro:
     "Covered private garage space on Carrer de Jorge Juan. Ideal for August and the rest of the year.",
   locationLine1: "Carrer de Jorge Juan, 13",
