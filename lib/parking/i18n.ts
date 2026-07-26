@@ -4,7 +4,6 @@ export type ParkingPriceRow = {
   period: string;
   day: string;
   week: string;
-  quincena: string;
   month: string;
 };
 
@@ -22,7 +21,6 @@ export type ParkingCopy = {
   priceColSeason: string;
   priceColDay: string;
   priceColWeek: string;
-  priceColQuincena: string;
   priceColMonth: string;
   priceRows: ParkingPriceRow[];
   priceUnavailableLabel: string;
@@ -122,28 +120,24 @@ const es: ParkingCopy = {
   priceColSeason: "Tarifas por temporada",
   priceColDay: "Día",
   priceColWeek: "Semana",
-  priceColQuincena: "Quincena",
   priceColMonth: "Mes",
   priceRows: [
     {
       period: "Junio–agosto",
       day: "€10",
       week: "€70",
-      quincena: DASH,
       month: DASH,
     },
     {
       period: "Septiembre",
       day: DASH,
       week: "€50",
-      quincena: DASH,
       month: DASH,
     },
     {
       period: "Octubre–mayo",
       day: DASH,
       week: DASH,
-      quincena: "€40",
       month: "€75",
     },
   ],
@@ -251,28 +245,24 @@ const en: ParkingCopy = {
   priceColSeason: "Seasonal rates",
   priceColDay: "Day",
   priceColWeek: "Week",
-  priceColQuincena: "Fortnight",
   priceColMonth: "Month",
   priceRows: [
     {
       period: "June–August",
       day: "€10",
       week: "€70",
-      quincena: DASH,
       month: DASH,
     },
     {
       period: "September",
       day: DASH,
       week: "€50",
-      quincena: DASH,
       month: DASH,
     },
     {
       period: "October–May",
       day: DASH,
       week: DASH,
-      quincena: "€40",
       month: "€75",
     },
   ],

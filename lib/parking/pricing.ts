@@ -52,17 +52,8 @@ export function estimateSeasonDays(season: ParkingSeason, days: number): number 
     return Math.ceil(days / 7) * 50;
   }
 
-  // Oct–May: months €75, fortnights €40
-  let left = days;
-  let total = 0;
-  const months = Math.floor(left / 30);
-  total += months * 75;
-  left -= months * 30;
-  const fortnights = Math.floor(left / 14);
-  total += fortnights * 40;
-  left -= fortnights * 14;
-  if (left > 0) total += Math.ceil(left / 14) * 40;
-  return total;
+  // Oct–May: months €75 (no fortnight rate)
+  return Math.ceil(days / 30) * 75;
 }
 
 /**

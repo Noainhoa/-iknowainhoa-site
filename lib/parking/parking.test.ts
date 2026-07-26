@@ -74,10 +74,12 @@ describe("parking i18n", () => {
     const rows = getParkingCopy("es").priceRows;
     assert.equal(rows[0].day, "€10");
     assert.equal(rows[0].week, "€70");
-    assert.equal(rows[0].quincena, PRICE_DASH);
     assert.equal(rows[1].week, "€50");
-    assert.equal(rows[2].quincena, "€40");
     assert.equal(rows[2].month, "€75");
+    assert.equal(
+      Object.prototype.hasOwnProperty.call(rows[0], "quincena"),
+      false
+    );
   });
 });
 
@@ -98,11 +100,12 @@ describe("parking price estimates", () => {
     assert.equal(estimateParkingPrice("2026-09-01", "2026-09-03"), 50);
   });
 
-  it("packs October–May with months and fortnights", () => {
-    assert.equal(estimateSeasonDays("winter", 14), 40);
+  it("packs October–May as whole months only", () => {
+    assert.equal(estimateSeasonDays("winter", 14), 75);
     assert.equal(estimateSeasonDays("winter", 30), 75);
-    assert.equal(estimateSeasonDays("winter", 7), 40);
-    assert.equal(estimateParkingPrice("2026-11-01", "2026-11-14"), 40);
+    assert.equal(estimateSeasonDays("winter", 7), 75);
+    assert.equal(estimateSeasonDays("winter", 31), 150);
+    assert.equal(estimateParkingPrice("2026-11-01", "2026-11-14"), 75);
   });
 
   it("sums cross-season stays", () => {

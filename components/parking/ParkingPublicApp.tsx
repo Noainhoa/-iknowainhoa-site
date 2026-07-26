@@ -191,6 +191,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     const logoH = logo?.getBoundingClientRect().height ?? 0;
     const textH = text?.getBoundingClientRect().height ?? 0;
     const cs = getComputedStyle(el);
+    const headerThs = [
+      ...document.querySelectorAll(".pk-prices-table thead th"),
+    ].map((th) => th.textContent?.trim() ?? "");
     fetch("http://127.0.0.1:7736/ingest/ed8edfac-b1ea-41ca-bead-699b28d53a6c", {
       method: "POST",
       headers: {
@@ -200,9 +203,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       body: JSON.stringify({
         sessionId: "ade241",
         runId: "post-fix",
-        hypothesisId: "C",
+        hypothesisId: "C+F",
         location: "ParkingPublicApp.tsx:brand-layout",
-        message: "Header lockup geometry",
+        message: "Header + price columns",
         data: {
           viewportW: window.innerWidth,
           flexDir: cs.flexDirection,
@@ -217,6 +220,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             cs.flexDirection === "column"
               ? true
               : Math.abs(logoH - textH) <= 8,
+          priceHeaders: headerThs,
+          hasFortnightHeader: headerThs.some((h) =>
+            /fortnight|quincena/i.test(h)
+          ),
         },
         timestamp: Date.now(),
       }),
@@ -680,7 +687,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const priceCols = [
     { key: "day" as const, label: t.priceColDay },
     { key: "week" as const, label: t.priceColWeek },
-    { key: "quincena" as const, label: t.priceColQuincena },
     { key: "month" as const, label: t.priceColMonth },
   ];
 
