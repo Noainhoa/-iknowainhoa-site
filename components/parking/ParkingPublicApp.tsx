@@ -6,6 +6,7 @@ import { RotateCcw } from "lucide-react";
 import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
 import {
+  formatMonthLabel,
   formatMonthRangeLabel,
   formatMonthWithYear,
   formatShortParkingDate,
