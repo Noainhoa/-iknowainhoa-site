@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { site } from "@/lib/site";
 
 /** Minimal copyright line shown on every page. */
@@ -6,7 +7,7 @@ export default function SiteCopyright({
   style,
 }: {
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }) {
   const year = new Date().getFullYear();
 
