@@ -2,7 +2,6 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { RotateCcw } from "lucide-react";
 import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
 import {
@@ -340,42 +339,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     const y1 = end.getFullYear();
     return y0 === y1 ? String(y0) : `${y0}–${y1}`;
   }, [months, locale]);
-  const columnMonthLabels = useMemo(
-    () =>
-      months.length > 1 ? months.map((m) => formatMonthLabel(m, locale)) : [],
-    [months, locale]
-  );
 
-  // #region agent log
-  useEffect(() => {
-    const monthNamesInNav = columnMonthLabels.filter((label) =>
-      navRangeLabel.toLowerCase().includes(label.toLowerCase())
-    );
-    fetch("http://127.0.0.1:7645/ingest/d7517cf6-5e4e-41b1-b62d-f2da7e949738", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "0e2a44",
-      },
-      body: JSON.stringify({
-        sessionId: "0e2a44",
-        runId: "post-fix",
-        hypothesisId: "A",
-        location: "ParkingPublicApp.tsx:calendar-labels",
-        message: "Calendar nav vs column month labels",
-        data: {
-          monthsLength: months.length,
-          visibleMonthCount,
-          navRangeLabel,
-          columnMonthLabels,
-          monthNamesDuplicatedInNavAndColumns: monthNamesInNav.length > 0,
-          duplicatedMonthNames: monthNamesInNav,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }, [months, months.length, visibleMonthCount, navRangeLabel, columnMonthLabels]);
-  // #endregion
 
   const canGoPrev =
     view.getFullYear() > currentMonth.getFullYear() ||
@@ -951,7 +915,20 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                 aria-label={t.changeDates}
                 title={t.changeDates}
               >
-                <RotateCcw size={18} strokeWidth={2.25} aria-hidden="true" />
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
               </button>
             </div>
             <dl className="pk-selected-list">

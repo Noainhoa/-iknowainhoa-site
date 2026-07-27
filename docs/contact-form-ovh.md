@@ -8,7 +8,7 @@ Use OVH's SMTP to send contact form submissions from Vercel without a third-part
   - `SMTP_HOST = smtp.mail.ovh.net`
   - `SMTP_PORT = 465`
   - `SMTP_USER = hola@iknowainhoa.com`
-  - `SMTP_PASS = jpf3ub9Cb846NiiWJ9v3PXxKW6H`
+  - `SMTP_PASS = <set in Vercel / .env.local — do not commit>`
   - `CONTACT_TO = hola@iknowainhoa.com`
   - `CONTACT_FROM = hola@iknowainhoa.com` (optional; defaults to SMTP_USER)
 - Save, then trigger a redeploy.
