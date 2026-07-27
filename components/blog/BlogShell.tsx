@@ -83,17 +83,11 @@ function SearchBox({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-function Brand({
-  compact = false,
-  avatarSources,
-}: {
-  compact?: boolean;
-  avatarSources: string[];
-}) {
+function Brand({ avatarSources }: { avatarSources: string[] }) {
   const moon = activeBlogMoon;
 
   return (
-    <Link href="/" className={`blog-brand${compact ? " blog-brand-compact" : ""}`}>
+    <Link href="/" className="blog-brand">
       <span
         className="blog-avatar-wrap"
         aria-hidden
@@ -122,6 +116,29 @@ function Brand({
   );
 }
 
+function MenuIcon({ open }: { open: boolean }) {
+  if (open) {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+        <path
+          d="M6 6l12 12M18 6L6 18"
+          stroke="currentColor"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <>
+      <span />
+      <span />
+      <span />
+    </>
+  );
+}
+
 export default function BlogShell({
   children,
   avatarSources = [],
@@ -144,38 +161,29 @@ export default function BlogShell({
   }, [open]);
 
   return (
-    <div className="blog-shell">
-      <aside className="blog-sidebar blog-sidebar-desktop">
-        <Brand avatarSources={avatarSources} />
-        <SearchBox />
-        <NavSections />
+    <div className={`blog-shell${open ? " is-menu-open" : ""}`}>
+      <aside
+        className="blog-sidebar"
+        role={open ? "dialog" : undefined}
+        aria-label={open ? "Blog menu" : undefined}
+      >
+        <div className="blog-sidebar-header">
+          <Brand avatarSources={avatarSources} />
+          <button
+            type="button"
+            className="blog-menu-btn"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <MenuIcon open={open} />
+          </button>
+        </div>
+        <div className="blog-sidebar-body">
+          <SearchBox onNavigate={() => setOpen(false)} />
+          <NavSections onNavigate={() => setOpen(false)} />
+        </div>
       </aside>
-
-      <header className="blog-mobile-bar">
-        <Brand compact avatarSources={avatarSources} />
-        <button
-          type="button"
-          className="blog-menu-btn"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-      </header>
-
-      {open ? (
-        <>
-          <div className="blog-drawer-backdrop" onClick={() => setOpen(false)} />
-          <aside className="blog-drawer" role="dialog" aria-label="Blog menu">
-            <Brand avatarSources={avatarSources} />
-            <SearchBox onNavigate={() => setOpen(false)} />
-            <NavSections onNavigate={() => setOpen(false)} />
-          </aside>
-        </>
-      ) : null}
 
       <div className="blog-main">{children}</div>
     </div>
