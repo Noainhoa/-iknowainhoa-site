@@ -336,47 +336,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     return formatMonthRangeLabel(start, end, locale);
   }, [months, locale]);
 
-  // #region agent log
-  useEffect(() => {
-    const host = window.location.hostname;
-    const isLocal = host === "localhost" || host === "127.0.0.1";
-    const measure = () => {
-      const navLabel = document.querySelector(".pk-cal-range")?.textContent?.trim() ?? "";
-      const columnHeaders = [...document.querySelectorAll(".pk-month h3")].map(
-        (el) => el.textContent?.trim() ?? ""
-      );
-      const payload = {
-        sessionId: "267dce",
-        runId: "post-fix",
-        hypothesisId: "A",
-        location: "ParkingPublicApp.tsx:month-headers",
-        message: "month_header_counts",
-        data: {
-          visibleMonthCount,
-          navLabel,
-          columnHeaders,
-          columnHeaderCount: columnHeaders.length,
-          doubleLine: columnHeaders.length > 0,
-          host,
-        },
-        timestamp: Date.now(),
-      };
-      if (isLocal) {
-        fetch("http://127.0.0.1:7736/ingest/ed8edfac-b1ea-41ca-bead-699b28d53a6c", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "267dce",
-          },
-          body: JSON.stringify(payload),
-        }).catch(() => {});
-      }
-    };
-    const t = window.setTimeout(measure, 50);
-    return () => window.clearTimeout(t);
-  }, [visibleMonthCount, navRangeLabel]);
-  // #endregion
-
   const canGoPrev =
     view.getFullYear() > currentMonth.getFullYear() ||
     (view.getFullYear() === currentMonth.getFullYear() &&
