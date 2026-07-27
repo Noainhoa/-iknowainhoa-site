@@ -260,7 +260,7 @@
         }
 
 .parking-root .pk-prices {
-          margin: 0 0 var(--space-section);
+          margin: 0 0 var(--space-group);
           padding: 10px 12px;
           background: var(--card);
           border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
@@ -280,7 +280,7 @@
           display: table;
           width: 100%;
           border-collapse: collapse;
-          margin: 0 0 6px;
+          margin: 0;
           font-size: 0.84rem;
           line-height: 1.2;
           table-layout: fixed;
@@ -563,20 +563,29 @@
           opacity: 1;
         }
 
+.parking-root .pk-clear-row {
+          margin-top: 10px;
+          display: flex;
+          justify-content: flex-end;
+        }
+
 .parking-root .pk-clear {
-          margin-top: 12px;
-          width: 100%;
-          min-height: 44px;
-          border-radius: 10px;
+          width: auto;
+          min-height: 36px;
+          padding: 6px 12px;
+          border-radius: 8px;
           border: 1px solid var(--line);
-          background: var(--bg);
+          background: transparent;
           cursor: pointer;
-          font-size: 0.95rem;
-          transition: background 0.15s ease;
+          font-size: 0.86rem;
+          font-weight: 550;
+          color: var(--muted);
+          transition: background 0.15s ease, color 0.15s ease;
         }
 
 .parking-root .pk-clear:hover {
           background: #f0f0ee;
+          color: var(--ink);
         }
 
 .parking-root .pk-selected {

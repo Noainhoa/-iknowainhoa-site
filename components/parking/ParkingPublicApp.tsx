@@ -6,6 +6,7 @@ import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
 import {
   formatMonthLabel,
+  formatMonthRangeLabel,
   formatMonthWithYear,
   formatShortParkingDate,
   getParkingCopy,
@@ -330,14 +331,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     [view, visibleMonthCount]
   );
 
-  // Multi-month: year in nav, month names on columns (avoid "July–September" + July/August/September).
+  // Multi-month: range in nav (with year once); columns = month names only.
   const navRangeLabel = useMemo(() => {
     const start = months[0];
     const end = months[months.length - 1];
     if (months.length === 1) return formatMonthWithYear(start, locale);
-    const y0 = start.getFullYear();
-    const y1 = end.getFullYear();
-    return y0 === y1 ? String(y0) : `${y0}–${y1}`;
+    return formatMonthRangeLabel(start, end, locale);
   }, [months, locale]);
 
 
@@ -893,9 +892,11 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </div>
 
           {(arrival || departure || periods.length > 0) && (
-            <button type="button" className="pk-clear" onClick={clearAllPeriods}>
-              {t.clearDates}
-            </button>
+            <div className="pk-clear-row">
+              <button type="button" className="pk-clear" onClick={clearAllPeriods}>
+                {t.clearDates}
+              </button>
+            </div>
           )}
         </div>
 
