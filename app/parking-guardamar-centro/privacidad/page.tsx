@@ -4,12 +4,12 @@ import { Suspense } from "react";
 import LanguageToggle from "@/components/LanguageToggle";
 import { getParkingCopy } from "@/lib/parking/i18n";
 import { getParkingLocale } from "@/lib/parking/locale";
+import { getParkingPrivacyCopy } from "@/lib/parking/privacyContent";
 import {
-  getParkingPrivacyCopy,
-  PARKING_PRIVACY_PATH,
-} from "@/lib/parking/privacyContent";
-
-const PARKING_PATH = "/parking-guardamar-centro";
+  parkingHref as parkingPageHref,
+  parkingPrivacyCanonicalUrl,
+  parkingPrivacyHreflangMap,
+} from "@/lib/parking/seo";
 
 type PageProps = {
   searchParams: Promise<{ lang?: string | string[] }>;
@@ -23,16 +23,11 @@ export async function generateMetadata({
   const p = getParkingPrivacyCopy(locale);
 
   return {
-    title: p.metaTitle,
+    title: { absolute: p.metaTitle },
     description: p.metaDescription,
     alternates: {
-      canonical: `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=${locale}`,
-      languages: {
-        es: `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=es`,
-        en: `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=en`,
-        fr: `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=fr`,
-        "x-default": `https://iknowainhoa.com${PARKING_PRIVACY_PATH}?lang=es`,
-      },
+      canonical: parkingPrivacyCanonicalUrl(locale),
+      languages: parkingPrivacyHreflangMap(),
     },
     robots: { index: true, follow: true },
   };
@@ -43,7 +38,7 @@ export default async function ParkingPrivacyPage({ searchParams }: PageProps) {
   const locale = await getParkingLocale(params.lang);
   const p = getParkingPrivacyCopy(locale);
   const t = getParkingCopy(locale);
-  const parkingHref = `${PARKING_PATH}?lang=${locale}`;
+  const parkingHref = parkingPageHref(locale);
 
   return (
     <main

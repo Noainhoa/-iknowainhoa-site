@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import ParkingPublicApp from "@/components/parking/ParkingPublicApp";
 import { getParkingCopy } from "@/lib/parking/i18n";
+import { buildParkingJsonLd } from "@/lib/parking/jsonLd";
 import { getParkingLocale } from "@/lib/parking/locale";
+import {
+  PARKING_ORIGIN,
+  parkingCanonicalUrl,
+  parkingHreflangMap,
+} from "@/lib/parking/seo";
 
-const PATH = "https://iknowainhoa.com/parking-guardamar-centro";
-const OG_IMAGE = "https://iknowainhoa.com/images/parking/plaza-1.jpg";
+const OG_IMAGE = `${PARKING_ORIGIN}/images/parking/plaza-1.jpg`;
 
 type PageProps = {
   searchParams: Promise<{ lang?: string | string[] }>;
@@ -16,33 +21,34 @@ export async function generateMetadata({
   const params = await searchParams;
   const locale = await getParkingLocale(params.lang);
   const t = getParkingCopy(locale);
+  const canonical = parkingCanonicalUrl(locale);
 
   const keywords =
     locale === "es"
       ? [
-          "parking Guardamar agosto",
-          "plaza garaje Guardamar del Segura",
-          "parking centro Guardamar",
+          "parking Guardamar",
+          "parking Guardamar centro",
+          "parking Guardamar del Segura",
+          "parking privado Guardamar",
+          "aparcamiento Guardamar",
           "alquiler parking Guardamar",
-          "garaje Jorge Juan Guardamar",
-          "parking verano Guardamar",
+          "plaza de garaje Guardamar",
+          "parking por días Guardamar",
         ]
       : locale === "fr"
         ? [
-            "parking Guardamar août",
-            "place garage Guardamar del Segura",
-            "parking centre Guardamar",
+            "parking Guardamar",
+            "parking privé Guardamar",
+            "stationnement Guardamar",
+            "parking centre Guardamar del Segura",
             "location parking Guardamar",
-            "garage Jorge Juan Guardamar",
-            "parking été Guardamar",
           ]
         : [
-            "August parking Guardamar",
-            "private garage Guardamar del Segura",
-            "central Guardamar parking",
-            "rent parking Guardamar",
-            "Jorge Juan garage Guardamar",
-            "summer parking Guardamar",
+            "parking Guardamar",
+            "parking in Guardamar",
+            "private parking Guardamar",
+            "Guardamar town centre parking",
+            "parking space Guardamar del Segura",
           ];
 
   const ogLocale =
@@ -55,17 +61,12 @@ export async function generateMetadata({
         : ["es_ES", "fr_FR"];
 
   return {
-    title: t.metaTitle,
+    title: { absolute: t.metaTitle },
     description: t.metaDescription,
     keywords,
     alternates: {
-      canonical: `${PATH}?lang=${locale}`,
-      languages: {
-        es: `${PATH}?lang=es`,
-        en: `${PATH}?lang=en`,
-        fr: `${PATH}?lang=fr`,
-        "x-default": `${PATH}?lang=es`,
-      },
+      canonical,
+      languages: parkingHreflangMap(),
     },
     icons: {
       icon: [
@@ -92,7 +93,7 @@ export async function generateMetadata({
     openGraph: {
       title: t.metaTitle,
       description: t.metaDescription,
-      url: `${PATH}?lang=${locale}`,
+      url: canonical,
       locale: ogLocale,
       alternateLocale: ogAlternate,
       type: "website",
@@ -104,13 +105,13 @@ export async function generateMetadata({
           alt: t.photoAlts[0],
         },
         {
-          url: "https://iknowainhoa.com/images/parking/plaza-2.jpg",
+          url: `${PARKING_ORIGIN}/images/parking/plaza-2.jpg`,
           width: 659,
           height: 900,
           alt: t.photoAlts[1],
         },
         {
-          url: "https://iknowainhoa.com/images/parking/plaza-3.jpg",
+          url: `${PARKING_ORIGIN}/images/parking/plaza-3.jpg`,
           width: 900,
           height: 673,
           alt: t.photoAlts[2],
@@ -136,96 +137,10 @@ export async function generateMetadata({
   };
 }
 
-function parkingJsonLd(locale: "es" | "en" | "fr") {
-  const t = getParkingCopy(locale);
-
-  const widthName =
-    locale === "es" ? "Ancho" : locale === "fr" ? "Largeur" : "Width";
-  const lengthName =
-    locale === "es" ? "Largo" : locale === "fr" ? "Longueur" : "Length";
-  const typeName = locale === "es" ? "Tipo" : locale === "fr" ? "Type" : "Type";
-  const typeValue =
-    locale === "es"
-      ? "Plaza privada en garaje cubierto"
-      : locale === "fr"
-        ? "Place privée en garage couvert"
-        : "Private covered garage bay";
-  const actionName =
-    locale === "es"
-      ? "Solicitar por WhatsApp"
-      : locale === "fr"
-        ? "Demander via WhatsApp"
-        : "Enquire through WhatsApp";
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "ParkingFacility",
-    "@id": `${PATH}#facility`,
-    name: t.brand,
-    description: t.metaDescription,
-    url: `${PATH}?lang=${locale}`,
-    image: [
-      "https://iknowainhoa.com/images/parking/plaza-1.jpg",
-      "https://iknowainhoa.com/images/parking/plaza-2.jpg",
-      "https://iknowainhoa.com/images/parking/plaza-3.jpg",
-    ],
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "Carrer de Jorge Juan, 13",
-      addressLocality: "Guardamar del Segura",
-      addressRegion: "Alicante",
-      postalCode: "03140",
-      addressCountry: "ES",
-    },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: 38.0901,
-      longitude: -0.6551,
-    },
-    publicAccess: false,
-    additionalProperty: [
-      {
-        "@type": "PropertyValue",
-        name: widthName,
-        value: "240 cm",
-      },
-      {
-        "@type": "PropertyValue",
-        name: lengthName,
-        value: "490 cm",
-      },
-      {
-        "@type": "PropertyValue",
-        name: typeName,
-        value: typeValue,
-      },
-    ],
-    openingHoursSpecification: {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ],
-      opens: "00:00",
-      closes: "23:59",
-    },
-    potentialAction: {
-      "@type": "ReserveAction",
-      target: `${PATH}?lang=${locale}#pk-form-heading`,
-      name: actionName,
-    },
-  };
-}
-
 export default async function ParkingPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const locale = await getParkingLocale(params.lang);
-  const jsonLd = parkingJsonLd(locale);
+  const jsonLd = buildParkingJsonLd(locale);
 
   return (
     <main style={{ margin: 0, minHeight: "100vh", background: "#fafaf8" }}>

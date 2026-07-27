@@ -1075,6 +1075,92 @@
           color: var(--pk-navy);
         }
 
+.parking-root .pk-prices-note {
+          margin: 8px 0 0;
+          color: var(--muted);
+          font-size: 0.82rem;
+          line-height: 1.4;
+        }
+
+.parking-root .pk-seo {
+          margin-top: var(--space-section);
+          padding-top: var(--space-section);
+          border-top: 1px solid var(--line);
+          display: grid;
+          gap: 14px;
+        }
+
+.parking-root .pk-breadcrumb ol {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          color: var(--muted);
+          font-size: 0.8rem;
+        }
+
+.parking-root .pk-breadcrumb li:not(:last-child)::after {
+          content: "/";
+          margin-left: 6px;
+          opacity: 0.5;
+        }
+
+.parking-root .pk-breadcrumb a {
+          color: var(--muted);
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+
+.parking-root .pk-seo-intro,
+.parking-root .pk-seo-location {
+          margin: 0;
+          color: var(--muted);
+          font-size: 0.92rem;
+          line-height: 1.45;
+        }
+
+.parking-root .pk-seo-heading {
+          margin: 0 0 8px;
+          font-size: 1rem;
+          font-weight: 700;
+          color: var(--ink);
+        }
+
+.parking-root .pk-about ul {
+          margin: 0;
+          padding-left: 1.1rem;
+          color: var(--muted);
+          font-size: 0.9rem;
+          line-height: 1.45;
+        }
+
+.parking-root .pk-faq {
+          display: grid;
+          gap: 6px;
+        }
+
+.parking-root .pk-faq-item {
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: var(--card);
+          padding: 8px 10px;
+        }
+
+.parking-root .pk-faq-item summary {
+          cursor: pointer;
+          font-weight: 600;
+          font-size: 0.9rem;
+        }
+
+.parking-root .pk-faq-item p {
+          margin: 8px 0 2px;
+          color: var(--muted);
+          font-size: 0.88rem;
+          line-height: 1.45;
+        }
+
 .parking-root .sr-only {
           position: absolute;
           width: 1px;

@@ -2,6 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import type { Locale } from "@/lib/i18n/shared";
+import { trackParkingEvent } from "@/lib/parking/analytics";
 
 const LABELS: Record<Locale, string> = {
   es: "ES",
@@ -15,7 +16,18 @@ function languageHref(
   locale: Locale
 ) {
   const params = new URLSearchParams(searchParams.toString());
-  params.set("lang", locale);
+  const path = pathname.toLowerCase();
+  const isParkingPublic =
+    path === "/parking-guardamar-centro" ||
+    path === "/parking-guardamar-centro/privacidad";
+
+  // Spanish parking pages use the bare path as the canonical URL.
+  if (isParkingPublic && locale === "es") {
+    params.delete("lang");
+  } else {
+    params.set("lang", locale);
+  }
+
   const query = params.toString();
   return query ? `${pathname}?${query}` : pathname;
 }
@@ -32,6 +44,7 @@ export default function LanguageToggle({
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isParking = pathname.toLowerCase().startsWith("/parking-guardamar-centro");
 
   const ariaLabel =
     label ??
@@ -63,6 +76,15 @@ export default function LanguageToggle({
               hrefLang={code}
               lang={code}
               aria-current={locale === code ? "true" : undefined}
+              onClick={() => {
+                if (isParking && code !== locale) {
+                  trackParkingEvent({
+                    name: "parking_language_change",
+                    language: locale,
+                    to: code,
+                  });
+                }
+              }}
               style={{
                 textDecoration: "none",
                 color: "inherit",

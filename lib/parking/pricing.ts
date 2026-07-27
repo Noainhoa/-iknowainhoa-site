@@ -31,6 +31,48 @@ function eachDateInclusive(startIso: string, endIso: string): string[] {
 
 export type ParkingSeason = "summer" | "september" | "winter";
 
+export type SeasonRates = {
+  day: number | null;
+  week: number | null;
+  month: number | null;
+};
+
+/** Single source of truth for public rates (EUR). Null = not offered. */
+export const SEASON_RATES: Record<ParkingSeason, SeasonRates> = {
+  summer: { day: 10, week: 70, month: null },
+  september: { day: null, week: 50, month: null },
+  winter: { day: null, week: null, month: 75 },
+};
+
+export const PRICE_DASH = "—";
+
+export function formatRateCell(amount: number | null): string {
+  return amount == null ? PRICE_DASH : `€${amount}`;
+}
+
+export type ParkingPriceRow = {
+  period: string;
+  day: string;
+  week: string;
+  month: string;
+};
+
+/** Visible price table rows from shared rates + locale period labels. */
+export function localizedPriceRows(
+  periodLabels: [string, string, string]
+): ParkingPriceRow[] {
+  const seasons: ParkingSeason[] = ["summer", "september", "winter"];
+  return seasons.map((season, i) => {
+    const rates = SEASON_RATES[season];
+    return {
+      period: periodLabels[i],
+      day: formatRateCell(rates.day),
+      week: formatRateCell(rates.week),
+      month: formatRateCell(rates.month),
+    };
+  });
+}
+
 /** Month index 0–11 → tariff season from the public price list. */
 export function seasonForMonth(monthIndex: number): ParkingSeason {
   if (monthIndex >= 5 && monthIndex <= 7) return "summer"; // Jun–Aug
@@ -41,19 +83,23 @@ export function seasonForMonth(monthIndex: number): ParkingSeason {
 /** Estimate euros for a contiguous run of days in one season. */
 export function estimateSeasonDays(season: ParkingSeason, days: number): number {
   if (days <= 0) return 0;
+  const rates = SEASON_RATES[season];
 
   if (season === "summer") {
+    const week = rates.week ?? 0;
+    const day = rates.day ?? 0;
     const weeks = Math.floor(days / 7);
     const rem = days % 7;
-    return weeks * 70 + rem * 10;
+    return weeks * week + rem * day;
   }
 
   if (season === "september") {
-    return Math.ceil(days / 7) * 50;
+    const week = rates.week ?? 0;
+    return Math.ceil(days / 7) * week;
   }
 
-  // Oct–May: months €75 (no fortnight rate)
-  return Math.ceil(days / 30) * 75;
+  const month = rates.month ?? 0;
+  return Math.ceil(days / 30) * month;
 }
 
 /**
@@ -82,4 +128,57 @@ export function estimateParkingPrice(arrival: string, departure: string): number
 
 export function formatEuroEstimate(amount: number): string {
   return `€${amount}`;
+}
+
+export type ParkingOfferSpec = {
+  season: ParkingSeason;
+  unit: "day" | "week" | "month";
+  price: number;
+  name: { es: string; en: string; fr: string };
+};
+
+/** Seasonal offers for JSON-LD (only units that have a published rate). */
+export function parkingOfferSpecs(): ParkingOfferSpec[] {
+  return [
+    {
+      season: "summer",
+      unit: "day",
+      price: SEASON_RATES.summer.day!,
+      name: {
+        es: "Tarifa diaria junio–agosto",
+        en: "Daily rate June–August",
+        fr: "Tarif journalier juin–août",
+      },
+    },
+    {
+      season: "summer",
+      unit: "week",
+      price: SEASON_RATES.summer.week!,
+      name: {
+        es: "Tarifa semanal junio–agosto",
+        en: "Weekly rate June–August",
+        fr: "Tarif hebdomadaire juin–août",
+      },
+    },
+    {
+      season: "september",
+      unit: "week",
+      price: SEASON_RATES.september.week!,
+      name: {
+        es: "Tarifa semanal septiembre",
+        en: "Weekly rate September",
+        fr: "Tarif hebdomadaire septembre",
+      },
+    },
+    {
+      season: "winter",
+      unit: "month",
+      price: SEASON_RATES.winter.month!,
+      name: {
+        es: "Tarifa mensual octubre–mayo",
+        en: "Monthly rate October–May",
+        fr: "Tarif mensuel octobre–mai",
+      },
+    },
+  ];
 }

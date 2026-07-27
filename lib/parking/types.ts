@@ -194,6 +194,7 @@ export function buildWhatsAppMessage(input: {
   registration?: string;
   vehicle?: string;
   comments?: string;
+  pageUrl?: string;
 }): string {
   const { locale } = input;
   const periods = input.periods.filter(
@@ -319,6 +320,7 @@ Nombre: ${input.name.trim()}
 Matrícula: ${registration}
 Vehículo: ${vehicle}
 Comentarios: ${comments}
+${input.pageUrl ? `\nPágina: ${input.pageUrl}` : ""}
 
 Entiendo que la reserva no queda confirmada hasta recibir tu respuesta.`;
   }
@@ -331,6 +333,7 @@ Nom : ${input.name.trim()}
 Immatriculation : ${registration}
 Véhicule : ${vehicle}
 Commentaires : ${comments}
+${input.pageUrl ? `\nPage : ${input.pageUrl}` : ""}
 
 Je comprends que la réservation n’est confirmée qu’après votre réponse.`;
   }
@@ -342,6 +345,7 @@ Name: ${input.name.trim()}
 Vehicle registration: ${registration}
 Vehicle: ${vehicle}
 Comments: ${comments}
+${input.pageUrl ? `\nPage: ${input.pageUrl}` : ""}
 
 I understand that the booking is not confirmed until you reply.`;
 }

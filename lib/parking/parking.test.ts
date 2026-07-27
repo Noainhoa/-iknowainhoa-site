@@ -7,10 +7,18 @@ import {
   getParkingCopy,
   PRICE_DASH,
 } from "./i18n";
+import { buildParkingJsonLd } from "./jsonLd";
 import {
   estimateParkingPrice,
   estimateSeasonDays,
+  parkingOfferSpecs,
+  SEASON_RATES,
 } from "./pricing";
+import {
+  parkingCanonicalUrl,
+  parkingHreflangMap,
+  shouldStripParkingLangParam,
+} from "./seo";
 import {
   buildWhatsAppMessage,
   countInclusiveDays,
@@ -23,22 +31,32 @@ import {
 describe("parking i18n", () => {
   it("returns concise Spanish copy", () => {
     const t = getParkingCopy("es");
-    assert.equal(t.title, "Parking privado en Guardamar");
-    assert.match(t.intro, /agosto/i);
+    assert.equal(t.title, "Parking privado en el centro de Guardamar");
+    assert.match(t.intro, /Jorge Juan/i);
     assert.equal(t.spaceFact, "Garaje cubierto · 4,90 m × 2,40 m");
-    assert.match(t.metaTitle, /agosto/i);
+    assert.equal(
+      t.metaTitle,
+      "Parking en Guardamar Centro por Días | Plaza Privada"
+    );
+    assert.match(t.metaDescription, /1,79/);
     assert.equal(t.priceColSeason, "Tarifas por temporada");
     assert.equal(t.addPeriod, "Añadir estas fechas");
     assert.equal(t.multiModeOr, "Cualquiera de estas opciones (alternativas)");
     assert.equal(t.labelEstimate, "Estimación");
     assert.equal(t.whatsappCta, "Solicitar por WhatsApp");
+    assert.ok(t.faqItems.length >= 4);
+    assert.ok(t.aboutItems.length >= 4);
     assert.ok(t.weekdays.includes("Lun"));
   });
 
   it("returns concise English copy", () => {
     const t = getParkingCopy("en");
-    assert.equal(t.title, "Private parking in Guardamar");
-    assert.match(t.intro, /August/i);
+    assert.equal(t.title, "Private parking in central Guardamar");
+    assert.match(t.intro, /Jorge Juan/i);
+    assert.equal(
+      t.metaTitle,
+      "Private Parking in Guardamar Centre | Daily Rental"
+    );
     assert.equal(t.addPeriod, "Add these dates");
     assert.equal(t.labelEstimate, "Estimate");
     assert.equal(t.whatsappCta, "Enquire through WhatsApp");
@@ -47,9 +65,13 @@ describe("parking i18n", () => {
 
   it("returns concise French copy", () => {
     const t = getParkingCopy("fr");
-    assert.equal(t.title, "Parking privé à Guardamar");
-    assert.match(t.intro, /août/i);
+    assert.equal(t.title, "Parking privé au centre de Guardamar");
+    assert.match(t.intro, /Jorge Juan/i);
     assert.equal(t.spaceFact, "Garage couvert · 4,90 m × 2,40 m");
+    assert.equal(
+      t.metaTitle,
+      "Parking privé au centre de Guardamar | Location"
+    );
     assert.equal(t.priceColSeason, "Tarifs par saison");
     assert.equal(t.addPeriod, "Ajouter ces dates");
     assert.equal(t.whatsappCta, "Demander via WhatsApp");
@@ -91,6 +113,7 @@ describe("parking i18n", () => {
     const rows = getParkingCopy("es").priceRows;
     assert.equal(rows[0].day, "€10");
     assert.equal(rows[0].week, "€70");
+    assert.equal(rows[0].month, PRICE_DASH);
     assert.equal(rows[1].week, "€50");
     assert.equal(rows[2].month, "€75");
     assert.equal(
@@ -100,7 +123,91 @@ describe("parking i18n", () => {
   });
 });
 
+describe("parking SEO helpers", () => {
+  it("uses bare Spanish canonical and query locales for EN/FR", () => {
+    assert.equal(
+      parkingCanonicalUrl("es"),
+      "https://iknowainhoa.com/parking-guardamar-centro"
+    );
+    assert.equal(
+      parkingCanonicalUrl("en"),
+      "https://iknowainhoa.com/parking-guardamar-centro?lang=en"
+    );
+    assert.equal(
+      parkingCanonicalUrl("fr"),
+      "https://iknowainhoa.com/parking-guardamar-centro?lang=fr"
+    );
+    assert.equal(
+      parkingHreflangMap()["x-default"],
+      parkingCanonicalUrl("es")
+    );
+  });
+
+  it("strips lang=es and invalid lang on public parking URLs", () => {
+    assert.equal(
+      shouldStripParkingLangParam("/parking-guardamar-centro", "es"),
+      true
+    );
+    assert.equal(
+      shouldStripParkingLangParam("/parking-guardamar-centro", "de"),
+      true
+    );
+    assert.equal(
+      shouldStripParkingLangParam("/parking-guardamar-centro", "en"),
+      false
+    );
+    assert.equal(
+      shouldStripParkingLangParam("/parking-guardamar-centro/admin", "es"),
+      false
+    );
+  });
+
+  it("keeps verified geo and seasonal offers in JSON-LD", () => {
+    const graph = buildParkingJsonLd("es");
+    const json = JSON.stringify(graph);
+    assert.match(json, /ParkingFacility/);
+    assert.match(json, /FAQPage/);
+    assert.match(json, /BreadcrumbList/);
+    assert.match(json, /38\.08556260856233/);
+    assert.match(json, /-0\.6488313283580208/);
+    assert.equal(json.includes("openingHoursSpecification"), false);
+    assert.equal(json.includes("00:00"), false);
+    const offers = parkingOfferSpecs();
+    assert.equal(offers.length, 4);
+    assert.ok(offers.every((o) => o.price > 0));
+    assert.deepEqual(
+      offers.map((o) => o.price).sort((a, b) => a - b),
+      [10, 50, 70, 75]
+    );
+  });
+});
+
+describe("parking analytics privacy", () => {
+  it("event payloads never include enquiry PII field names as values", () => {
+    const event = {
+      name: "parking_whatsapp_click" as const,
+      language: "es" as const,
+      stayDays: 3,
+      season: "summer" as const,
+      hasQuote: true,
+    };
+    const keys = Object.keys(event);
+    assert.equal(keys.includes("name") && event.name === "parking_whatsapp_click", true);
+    assert.equal("registration" in event, false);
+    assert.equal("comments" in event, false);
+    assert.equal("vehicle" in event, false);
+  });
+});
+
 describe("parking price estimates", () => {
+  it("shares one rate table for estimates and visible cells", () => {
+    assert.equal(SEASON_RATES.summer.day, 10);
+    assert.equal(SEASON_RATES.summer.week, 70);
+    assert.equal(SEASON_RATES.september.week, 50);
+    assert.equal(SEASON_RATES.winter.month, 75);
+    assert.equal(getParkingCopy("es").priceRows[0].day, `€${SEASON_RATES.summer.day}`);
+  });
+
   it("packs June–August as weeks plus leftover days", () => {
     assert.equal(estimateSeasonDays("summer", 6), 60);
     assert.equal(estimateSeasonDays("summer", 7), 70);
@@ -171,12 +278,14 @@ describe("WhatsApp message", () => {
       periods: [{ arrival: "2026-07-25", departure: "2026-07-27" }],
       mode: "single",
       name: "Ana",
+      pageUrl: "https://iknowainhoa.com/parking-guardamar-centro",
     });
     assert.match(msg, /Hola, Ainhoa/);
     assert.match(msg, /Entrada:.*25.*julio.*2026/i);
     assert.match(msg, /Duración: 3 días/);
     assert.match(msg, /Estimación: €30/);
     assert.match(msg, /Matrícula: No indicada/);
+    assert.match(msg, /Página: https:\/\/iknowainhoa\.com\/parking-guardamar-centro/);
     assert.match(msg, /no queda confirmada/);
   });
 

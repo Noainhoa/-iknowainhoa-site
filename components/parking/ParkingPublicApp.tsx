@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type React
 import Link from "next/link";
 import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
+import { trackParkingEvent } from "@/lib/parking/analytics";
 import {
   formatMonthRangeLabel,
   formatMonthWithYear,
@@ -11,7 +12,13 @@ import {
   getParkingCopy,
   PRICE_DASH,
 } from "@/lib/parking/i18n";
-import { PARKING_PRIVACY_PATH } from "@/lib/parking/privacyContent";
+import {
+  estimateParkingPrice,
+  formatEuroEstimate,
+  seasonForMonth,
+  type ParkingSeason,
+} from "@/lib/parking/pricing";
+import { parkingCanonicalUrl, parkingPrivacyHref } from "@/lib/parking/seo";
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
   buildWhatsAppMessage,
@@ -26,10 +33,6 @@ import {
   type EnquiryPeriod,
   type ParkingUnavailableRange,
 } from "@/lib/parking/types";
-import {
-  estimateParkingPrice,
-  formatEuroEstimate,
-} from "@/lib/parking/pricing";
 
 const STORAGE_KEY = "parking-enquiry";
 const WA_STATUS_KEY = "parking-wa-status";
@@ -236,6 +239,26 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     setLiveMessage("");
     requestAnimationFrame(() => setLiveMessage(message));
   }, []);
+
+  useEffect(() => {
+    trackParkingEvent({ name: "parking_view", language: locale });
+  }, [locale]);
+
+  useEffect(() => {
+    if (!arrival || !departure || departure < arrival) return;
+    const stayDays = countInclusiveDays(arrival, departure);
+    const startSeason = seasonForMonth(parseISODate(arrival).getMonth());
+    const endSeason = seasonForMonth(parseISODate(departure).getMonth());
+    const season: ParkingSeason | "mixed" =
+      startSeason === endSeason ? startSeason : "mixed";
+    trackParkingEvent({
+      name: "parking_dates_selected",
+      language: locale,
+      stayDays,
+      season,
+      hasQuote: estimateParkingPrice(arrival, departure) > 0,
+    });
+  }, [arrival, departure, locale]);
 
   function updateWaStatus(status: WaStatus, nextHref?: string | null) {
     if (status === "idle") {
@@ -604,12 +627,41 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     setFormError(result.summary);
 
     if (!result.ok) {
+      trackParkingEvent({
+        name: "parking_form_error",
+        language: locale,
+        errorKeys: Object.keys(result.errors),
+      });
       focusFirstInvalid(result.errors);
       return;
     }
 
     const periodsOut = result.periodsOut;
     if (periodsOut.length === 0) return;
+
+    const primary = periodsOut[0];
+    const stayDays = periodsOut.reduce(
+      (sum, p) => sum + countInclusiveDays(p.arrival, p.departure),
+      0
+    );
+    const startSeason = seasonForMonth(parseISODate(primary.arrival).getMonth());
+    const endSeason = seasonForMonth(
+      parseISODate(periodsOut[periodsOut.length - 1].departure).getMonth()
+    );
+    const season: ParkingSeason | "mixed" =
+      periodsOut.length === 1 && startSeason === endSeason
+        ? startSeason
+        : "mixed";
+
+    trackParkingEvent({
+      name: "parking_whatsapp_click",
+      language: locale,
+      stayDays,
+      season,
+      hasQuote: periodsOut.some(
+        (p) => estimateParkingPrice(p.arrival, p.departure) > 0
+      ),
+    });
 
     const message = buildWhatsAppMessage({
       locale,
@@ -619,6 +671,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       registration,
       vehicle,
       comments,
+      pageUrl: parkingCanonicalUrl(locale),
     });
     const href = whatsAppHref(message);
 
@@ -638,6 +691,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     { key: "week" as const, label: t.priceColWeek },
     { key: "month" as const, label: t.priceColMonth },
   ];
+
+  const mapsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+    `${t.locationLine1}, ${t.locationLine2}`
+  )}`;
+
+  function onMapClick() {
+    trackParkingEvent({ name: "parking_map_click", language: locale });
+  }
 
   return (
     <div className="pk" lang={locale}>
@@ -668,13 +729,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               <span className="pk-title-text">{t.title}</span>
               <a
                 className="pk-directions"
-                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                  `${t.locationLine1}, ${t.locationLine2}`
-                )}`}
+                href={mapsHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={t.directionsLabel}
                 title={t.directionsLabel}
+                onClick={onMapClick}
               >
                 <svg
                   aria-hidden="true"
@@ -690,11 +750,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             <p className="pk-location">
               <a
                 className="pk-location-link"
-                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                  `${t.locationLine1}, ${t.locationLine2}`
-                )}`}
+                href={mapsHref}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={onMapClick}
               >
                 {t.locationLine1}, {t.locationLine2}
               </a>
@@ -754,7 +813,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             ))}
           </tbody>
         </table>
-
+        <p className="pk-prices-note">{t.pricesDisclaimer}</p>
       </section>
 
       {!configured ? (
@@ -1193,7 +1252,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               <span>
                 {t.privacyPolicyAcceptBefore}
                 <Link
-                  href={`${PARKING_PRIVACY_PATH}?lang=${locale}`}
+                  href={parkingPrivacyHref(locale)}
                   className="pk-inline-link"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -1299,9 +1358,43 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         ) : null}
       </section>
 
+      <section className="pk-seo" aria-label={t.aboutTitle}>
+        <nav className="pk-breadcrumb" aria-label="Breadcrumb">
+          <ol>
+            <li>
+              <Link href="/">{t.breadcrumbHome}</Link>
+            </li>
+            <li aria-current="page">{t.breadcrumbCurrent}</li>
+          </ol>
+        </nav>
+
+        <p className="pk-seo-intro">{t.intro}</p>
+
+        <div className="pk-about">
+          <h2 className="pk-seo-heading">{t.aboutTitle}</h2>
+          <ul>
+            {t.aboutItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="pk-seo-location">{t.locationSeo}</p>
+
+        <div className="pk-faq">
+          <h2 className="pk-seo-heading">{t.faqTitle}</h2>
+          {t.faqItems.map((item) => (
+            <details key={item.question} className="pk-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
       <footer className="pk-footer">
         <Link
-          href={`${PARKING_PRIVACY_PATH}?lang=${locale}`}
+          href={parkingPrivacyHref(locale)}
           className="pk-footer-link"
         >
           {t.footerPrivacyLabel}

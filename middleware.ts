@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isLocale } from "@/lib/i18n/shared";
+import { shouldStripParkingLangParam } from "@/lib/parking/seo";
 import { updateSession } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
@@ -18,6 +19,19 @@ export async function middleware(request: NextRequest) {
     }
     return response;
   };
+
+  // Spanish parking URLs are bare (no ?lang=es). Invalid lang → bare Spanish.
+  if (shouldStripParkingLangParam(pathname, langParam)) {
+    const cleaned = request.nextUrl.clone();
+    cleaned.searchParams.delete("lang");
+    const redirect = NextResponse.redirect(cleaned, 302);
+    redirect.cookies.set("preferred_locale", "es", {
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+    return redirect;
+  }
 
   // Block spam/hacked URL patterns and return 404
   const spamPatterns = [
