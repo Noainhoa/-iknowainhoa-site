@@ -40,3 +40,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# local agent / IDE tooling
+.agents/
+.cursor/
+skills-lock.json
+
+# local archives
+*.zip
