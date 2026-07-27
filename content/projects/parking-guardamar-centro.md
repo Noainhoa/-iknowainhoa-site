@@ -1,35 +1,29 @@
 ---
 title: "Parking Guardamar Centro"
-description: "A calendar system to check availability and request a private garage space in Guardamar del Segura."
+description: "A calendar system for checking availability and sending a WhatsApp enquiry for a private garage space in Guardamar del Segura."
+summary: "Checking garage availability without the back-and-forth."
 date: "2026-07-26"
 slug: "parking-guardamar-centro"
 draft: false
-tags: ["systems", "calendar", "availability", "hospitality"]
+tags: ["Product design", "UI design", "systems"]
 coverImage: "/images/projects/parking-guardamar-centro/cover.jpg"
 cta:
   text: "Open calendar"
   link: "https://iknowainhoa.com/parking-guardamar-centro"
 ---
 
-# Parking Guardamar Centro
+![Phone overview of Parking Guardamar Centro](/images/projects/parking-guardamar-centro/phone-overview.jpg)
 
-A small booking system for a private covered garage space in the centre of Guardamar del Segura.
+Space, rates, and entry point on mobile
 
-## Goal
+![Availability calendar with selected dates](/images/projects/parking-guardamar-centro/calendar.jpg)
 
-Make it easy for guests to see when the space is free, pick dates, and send an enquiry — without back-and-forth about availability.
+Availability calendar with live estimate
 
-## What I made
+![Enquiry form with WhatsApp CTA](/images/projects/parking-guardamar-centro/enquiry.jpg)
 
-- Calendar to check availability in real time
-- Seasonal pricing estimates for the selected stay
-- Multi-language enquiry flow (Spanish, English, French)
-- Admin tools to manage bookings and confirmations
+Enquiry details, confirmations, and WhatsApp handoff
 
-## Outcome
+The product includes seasonal pricing, Spanish / English / French copy, and an admin side for managing bookings and confirmations.
 
-Visitors can check dates themselves and send a clear request. Bookings stay organised on the admin side.
-
-## Live system
-
-[Open the availability calendar](https://iknowainhoa.com/parking-guardamar-centro)
+[Visit the live system](https://iknowainhoa.com/parking-guardamar-centro)
