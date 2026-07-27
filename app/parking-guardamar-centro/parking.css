@@ -338,13 +338,6 @@
           font-weight: 450;
         }
 
-.parking-root .pk-prices-disclaimer {
-          margin: 0;
-          font-size: 0.78rem;
-          color: var(--muted);
-          line-height: 1.35;
-        }
-
 @media (min-width: 560px) {
           .parking-root .pk-prices-table {
             font-size: 0.9rem;

@@ -19,7 +19,6 @@ export type ParkingCopy = {
   spaceFact: string;
   galleryLabel: string;
   photoAlts: [string, string, string];
-  pricesDisclaimer: string;
   priceColSeason: string;
   priceColDay: string;
   priceColWeek: string;
@@ -118,7 +117,6 @@ const es: ParkingCopy = {
     "Vista frontal de la plaza de parking en garaje cerrado, centro de Guardamar",
     "Plaza de aparcamiento privada con armarios en garaje cubierto en Guardamar",
   ],
-  pricesDisclaimer: "Precio final sujeto a confirmación.",
   priceColSeason: "Tarifas por temporada",
   priceColDay: "Día",
   priceColWeek: "Semana",
@@ -242,7 +240,6 @@ const en: ParkingCopy = {
     "Front view of the enclosed garage parking space in central Guardamar",
     "Private parking space with cabinets in a covered garage in Guardamar",
   ],
-  pricesDisclaimer: "Final price subject to confirmation.",
   priceColSeason: "Seasonal rates",
   priceColDay: "Day",
   priceColWeek: "Week",
@@ -364,7 +361,6 @@ const fr: ParkingCopy = {
     "Vue de face de la place dans un garage fermé, centre de Guardamar",
     "Place de parking privée avec armoires dans un garage couvert à Guardamar",
   ],
-  pricesDisclaimer: "Prix final sous réserve de confirmation.",
   priceColSeason: "Tarifs par saison",
   priceColDay: "Jour",
   priceColWeek: "Semaine",

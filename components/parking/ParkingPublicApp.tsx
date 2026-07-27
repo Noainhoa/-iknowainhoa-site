@@ -7,7 +7,6 @@ import LanguageToggle from "@/components/LanguageToggle";
 import type { Locale } from "@/lib/i18n/shared";
 import {
   formatMonthLabel,
-  formatMonthRangeLabel,
   formatMonthWithYear,
   formatShortParkingDate,
   getParkingCopy,
@@ -331,6 +330,52 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       ),
     [view, visibleMonthCount]
   );
+
+  // Multi-month: year in nav, month names on columns (avoid "July–September" + July/August/September).
+  const navRangeLabel = useMemo(() => {
+    const start = months[0];
+    const end = months[months.length - 1];
+    if (months.length === 1) return formatMonthWithYear(start, locale);
+    const y0 = start.getFullYear();
+    const y1 = end.getFullYear();
+    return y0 === y1 ? String(y0) : `${y0}–${y1}`;
+  }, [months, locale]);
+  const columnMonthLabels = useMemo(
+    () =>
+      months.length > 1 ? months.map((m) => formatMonthLabel(m, locale)) : [],
+    [months, locale]
+  );
+
+  // #region agent log
+  useEffect(() => {
+    const monthNamesInNav = columnMonthLabels.filter((label) =>
+      navRangeLabel.toLowerCase().includes(label.toLowerCase())
+    );
+    fetch("http://127.0.0.1:7645/ingest/d7517cf6-5e4e-41b1-b62d-f2da7e949738", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "0e2a44",
+      },
+      body: JSON.stringify({
+        sessionId: "0e2a44",
+        runId: "post-fix",
+        hypothesisId: "A",
+        location: "ParkingPublicApp.tsx:calendar-labels",
+        message: "Calendar nav vs column month labels",
+        data: {
+          monthsLength: months.length,
+          visibleMonthCount,
+          navRangeLabel,
+          columnMonthLabels,
+          monthNamesDuplicatedInNavAndColumns: monthNamesInNav.length > 0,
+          duplicatedMonthNames: monthNamesInNav,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+  }, [months, months.length, visibleMonthCount, navRangeLabel, columnMonthLabels]);
+  // #endregion
 
   const canGoPrev =
     view.getFullYear() > currentMonth.getFullYear() ||
@@ -756,7 +801,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </tbody>
         </table>
 
-        <p className="pk-prices-disclaimer">{t.pricesDisclaimer}</p>
       </section>
 
       {!configured ? (
@@ -806,7 +850,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               ‹
             </button>
             <h3 className="pk-cal-range">
-              {formatMonthRangeLabel(months[0], months[months.length - 1], locale)}
+              {navRangeLabel}
             </h3>
             <button
               type="button"
