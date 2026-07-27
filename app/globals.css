@@ -95,6 +95,7 @@ a:hover {
   --blog-ink: #111111;
   --blog-muted: #555555;
   --blog-line: #dddddd;
+  --blog-mobile-bar-height: 7.5rem;
   /* Blue Treats cobalt — sampled from the Blue logo accents */
   --moon-edge: #fcd93e;
   min-height: calc(100vh - var(--accent-height));
@@ -412,10 +413,16 @@ a:hover {
     gap: 5px;
   }
 
+  .blog-menu-btn svg {
+    width: 30px;
+    height: 30px;
+    display: block;
+  }
+
   .blog-menu-btn span {
     display: block;
-    width: 22px;
-    height: 2px;
+    width: 28px;
+    height: 3px;
     background: #111;
   }
 
@@ -438,7 +445,7 @@ a:hover {
 
   .blog-main {
     margin-left: 0;
-    margin-top: 72px;
+    margin-top: var(--blog-mobile-bar-height);
     padding: 20px 18px 72px;
     max-width: none;
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useId, useState } from "react";
+import { FormEvent, useEffect, useId, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import BlogAvatarLoop from "@/components/blog/BlogAvatarLoop";
 import { blogNavSections } from "@/lib/blogNav";
@@ -119,13 +119,9 @@ function Brand({ avatarSources }: { avatarSources: string[] }) {
 function MenuIcon({ open }: { open: boolean }) {
   if (open) {
     return (
-      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none">
-        <path
-          d="M6 6l12 12M18 6L6 18"
-          stroke="currentColor"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-        />
+      <svg viewBox="0 0 28 28" aria-hidden="true" fill="none">
+        <rect x="0" y="12.5" width="28" height="3" fill="currentColor" transform="rotate(45 14 14)" />
+        <rect x="0" y="12.5" width="28" height="3" fill="currentColor" transform="rotate(-45 14 14)" />
       </svg>
     );
   }
@@ -148,6 +144,7 @@ export default function BlogShell({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const sidebarRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setOpen(false);
@@ -160,9 +157,30 @@ export default function BlogShell({
     };
   }, [open]);
 
+  // Keep main content below the fixed mobile header — height varies with avatar/brand.
+  useEffect(() => {
+    const sidebar = sidebarRef.current;
+    const shell = sidebar?.closest(".blog-shell") as HTMLElement | null;
+    if (!sidebar || !shell) return;
+
+    const syncBarHeight = () => {
+      shell.style.setProperty("--blog-mobile-bar-height", `${sidebar.offsetHeight}px`);
+    };
+
+    syncBarHeight();
+    const observer = new ResizeObserver(syncBarHeight);
+    observer.observe(sidebar);
+    window.addEventListener("resize", syncBarHeight);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", syncBarHeight);
+    };
+  }, []);
+
   return (
     <div className={`blog-shell${open ? " is-menu-open" : ""}`}>
       <aside
+        ref={sidebarRef}
         className="blog-sidebar"
         role={open ? "dialog" : undefined}
         aria-label={open ? "Blog menu" : undefined}
