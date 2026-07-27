@@ -105,6 +105,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     },
     {
+      url: `${baseUrl}/parking-guardamar-centro/condiciones`,
+      changeFrequency: "yearly" as const,
+      priority: 0.55,
+    },
+    {
+      url: `${baseUrl}/parking-guardamar-centro/condiciones?lang=en`,
+      changeFrequency: "yearly" as const,
+      priority: 0.55,
+    },
+    {
+      url: `${baseUrl}/parking-guardamar-centro/condiciones?lang=fr`,
+      changeFrequency: "yearly" as const,
+      priority: 0.55,
+    },
+    {
       url: `${baseUrl}/blog`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,

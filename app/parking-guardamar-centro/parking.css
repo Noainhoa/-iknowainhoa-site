@@ -933,6 +933,32 @@
           font-weight: 600;
         }
 
+.parking-root .pk-conditions-note {
+          margin: 0 0 var(--space-group);
+          padding: 10px 12px;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: #f3f6f8;
+        }
+
+.parking-root .pk-conditions-note p {
+          margin: 0 0 6px;
+          color: var(--muted);
+          font-size: 0.84rem;
+          line-height: 1.4;
+        }
+
+.parking-root .pk-conditions-note p:last-child {
+          margin-bottom: 0;
+        }
+
+.parking-root .pk-conditions-note .pk-inline-link {
+          color: var(--pk-navy);
+          font-weight: 650;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+
 .parking-root .pk-wa {
           min-height: 52px;
           border: 0;

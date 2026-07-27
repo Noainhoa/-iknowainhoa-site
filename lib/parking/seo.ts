@@ -1,7 +1,8 @@
 import type { Locale } from "@/lib/i18n/shared";
+import { PARKING_CONDITIONS_PATH } from "@/lib/parking/conditionsContent";
 import { PARKING_PRIVACY_PATH } from "@/lib/parking/privacyContent";
 
-export { PARKING_PRIVACY_PATH };
+export { PARKING_PRIVACY_PATH, PARKING_CONDITIONS_PATH };
 export const PARKING_ORIGIN = "https://iknowainhoa.com";
 export const PARKING_PATH = "/parking-guardamar-centro";
 
@@ -33,6 +34,16 @@ export function parkingPrivacyHref(locale: Locale): string {
   return `${PARKING_PRIVACY_PATH}?lang=${locale}`;
 }
 
+export function parkingConditionsCanonicalUrl(locale: Locale): string {
+  if (locale === "es") return `${PARKING_ORIGIN}${PARKING_CONDITIONS_PATH}`;
+  return `${PARKING_ORIGIN}${PARKING_CONDITIONS_PATH}?lang=${locale}`;
+}
+
+export function parkingConditionsHref(locale: Locale): string {
+  if (locale === "es") return PARKING_CONDITIONS_PATH;
+  return `${PARKING_CONDITIONS_PATH}?lang=${locale}`;
+}
+
 export function parkingHreflangMap(): Record<string, string> {
   return {
     es: parkingCanonicalUrl("es"),
@@ -51,6 +62,15 @@ export function parkingPrivacyHreflangMap(): Record<string, string> {
   };
 }
 
+export function parkingConditionsHreflangMap(): Record<string, string> {
+  return {
+    es: parkingConditionsCanonicalUrl("es"),
+    en: parkingConditionsCanonicalUrl("en"),
+    fr: parkingConditionsCanonicalUrl("fr"),
+    "x-default": parkingConditionsCanonicalUrl("es"),
+  };
+}
+
 /** True when a parking public page should drop `lang` from the URL. */
 export function shouldStripParkingLangParam(
   pathname: string,
@@ -58,7 +78,9 @@ export function shouldStripParkingLangParam(
 ): boolean {
   const path = pathname.toLowerCase();
   const isPublicParking =
-    path === PARKING_PATH || path === PARKING_PRIVACY_PATH;
+    path === PARKING_PATH ||
+    path === PARKING_PRIVACY_PATH ||
+    path === PARKING_CONDITIONS_PATH;
   if (!isPublicParking || lang == null) return false;
   if (lang === "es") return true;
   return lang !== "en" && lang !== "fr";

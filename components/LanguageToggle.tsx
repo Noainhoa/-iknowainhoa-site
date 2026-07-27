@@ -19,7 +19,8 @@ function languageHref(
   const path = pathname.toLowerCase();
   const isParkingPublic =
     path === "/parking-guardamar-centro" ||
-    path === "/parking-guardamar-centro/privacidad";
+    path === "/parking-guardamar-centro/privacidad" ||
+    path === "/parking-guardamar-centro/condiciones";
 
   // Spanish parking pages use the bare path as the canonical URL.
   if (isParkingPublic && locale === "es") {

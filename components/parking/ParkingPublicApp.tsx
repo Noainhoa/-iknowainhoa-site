@@ -18,7 +18,7 @@ import {
   seasonForMonth,
   type ParkingSeason,
 } from "@/lib/parking/pricing";
-import { parkingCanonicalUrl, parkingPrivacyHref } from "@/lib/parking/seo";
+import { parkingCanonicalUrl, parkingConditionsHref, parkingPrivacyHref } from "@/lib/parking/seo";
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
   buildWhatsAppMessage,
@@ -540,7 +540,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       acceptances?: string;
     } = {};
 
-    let periodsOut = effectivePeriods();
+    const periodsOut = effectivePeriods();
 
     if (periodsOut.length === 0) {
       if (!arrival) errors.arrival = t.errNeedArrival;
@@ -1270,6 +1270,19 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               </p>
             ) : null}
           </fieldset>
+
+          <aside className="pk-conditions-note" aria-label={t.conditionsLinkLabel}>
+            <p>{t.conditionsNoticeHold}</p>
+            <p>{t.conditionsNoticeVehicle}</p>
+            <p>
+              <Link
+                href={parkingConditionsHref(locale)}
+                className="pk-inline-link"
+              >
+                {t.conditionsLinkLabel}
+              </Link>
+            </p>
+          </aside>
 
           <button type="submit" className="pk-wa" disabled={preparing} aria-busy={preparing}>
             <span className="pk-wa-inner">

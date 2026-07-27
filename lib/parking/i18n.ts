@@ -78,6 +78,9 @@ export type ParkingCopy = {
   privacyPolicyLinkLabel: string;
   privacyPolicyAcceptAfter: string;
   footerPrivacyLabel: string;
+  conditionsNoticeHold: string;
+  conditionsNoticeVehicle: string;
+  conditionsLinkLabel: string;
   whatsappCta: string;
   whatsappPreparing: string;
   whatsappOpenedTitle: string;
@@ -220,6 +223,11 @@ const es: ParkingCopySource = {
   privacyPolicyLinkLabel: "Política de Privacidad",
   privacyPolicyAcceptAfter: ".",
   footerPrivacyLabel: "Política de Privacidad",
+  conditionsNoticeHold:
+    "La solicitud no bloquea las fechas. La reserva se confirma tras aceptar las condiciones y realizar el pago.",
+  conditionsNoticeVehicle:
+    "Plaza para turismos convencionales. Altura máxima de acceso: 1,79 m.",
+  conditionsLinkLabel: "Ver condiciones de reserva",
   whatsappCta: "Solicitar por WhatsApp",
   whatsappPreparing: "Preparando solicitud…",
   whatsappOpenedTitle: "WhatsApp abierto",
@@ -364,6 +372,11 @@ const en: ParkingCopySource = {
   privacyPolicyLinkLabel: "Privacy Policy",
   privacyPolicyAcceptAfter: ".",
   footerPrivacyLabel: "Privacy Policy",
+  conditionsNoticeHold:
+    "Sending an enquiry does not hold the dates. The booking is confirmed after accepting the conditions and completing payment.",
+  conditionsNoticeVehicle:
+    "Space for conventional passenger cars. Maximum access height: 1.79 m.",
+  conditionsLinkLabel: "View booking conditions",
   whatsappCta: "Enquire through WhatsApp",
   whatsappPreparing: "Preparing enquiry…",
   whatsappOpenedTitle: "WhatsApp opened",
@@ -506,6 +519,11 @@ const fr: ParkingCopySource = {
   privacyPolicyLinkLabel: "Politique de confidentialité",
   privacyPolicyAcceptAfter: ".",
   footerPrivacyLabel: "Politique de confidentialité",
+  conditionsNoticeHold:
+    "La demande ne bloque pas les dates. La réservation est confirmée après acceptation des conditions et paiement.",
+  conditionsNoticeVehicle:
+    "Place destinée aux voitures particulières conventionnelles. Hauteur maximale d’accès : 1,79 m.",
+  conditionsLinkLabel: "Voir les conditions de réservation",
   whatsappCta: "Demander via WhatsApp",
   whatsappPreparing: "Préparation de la demande…",
   whatsappOpenedTitle: "WhatsApp ouvert",
