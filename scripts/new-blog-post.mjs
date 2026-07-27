@@ -43,7 +43,6 @@ const filled = template
   .replace('title: ""', `title: "${title.replace(/"/g, '\\"')}"`)
   .replace('date: "YYYY-MM-DD"', `date: "${date}"`)
   .replace('slug: ""', `slug: "${slug}"`)
-  .replace("# Your Title", `# ${title}`)
   .replaceAll("YYYY", year)
   .replaceAll("MM-month", monthFolder)
   .replaceAll("Month", monthFolder);

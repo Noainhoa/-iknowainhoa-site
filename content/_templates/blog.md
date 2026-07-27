@@ -6,30 +6,35 @@ slug: ""
 draft: true
 tags:
   - daily
-coverImage: "" # set to a real path under /public when you have a cover
-
+# coverImage: "/images/blog/YYYY/MM-month/cover.jpg"
 ---
 
-# Your Title
+Write the note here. One idea. Link words as you go — [like this](https://example.com).
 
-Short opening paragraph. Say what happened, what you learned, or why this matters.
+<!-- DEFINITION / QUOTE (uncomment to use)
+<aside class="blog-pull">
+  <p class="blog-pull-term">patience</p>
+  <p class="blog-pull-def">the capacity, habit, or fact of being patient…</p>
+  <p class="blog-pull-source"><a href="https://www.merriam-webster.com/dictionary/patience">Merriam-Webster</a></p>
+</aside>
+-->
 
-## Quick take
+<!-- IMAGE (uncomment to use)
+<figure class="blog-figure">
+  <img src="/images/blog/YYYY/MM-month/photo.jpg" alt="Describe the photo" />
+  <figcaption>Optional caption</figcaption>
+</figure>
+-->
 
-- What this post is about
-- Who it helps
-- What changed for you
+<!-- INSTAGRAM (uncomment to use)
+<div class="blog-embed">
+  [paste Instagram embed iframe here]
+  <p class="blog-embed-credit">Post by <a href="https://instagram.com/…">@author</a></p>
+</div>
+-->
 
-## Story
-
-Write the body here. Keep it simple. One idea per section.
-
-## Embedded video
-
-Paste a YouTube, Instagram, or other embed if you want it inside the post.
-
-```html
-<div style="margin:24px 0;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;">
+<!-- VIDEO (uncomment to use)
+<div class="blog-embed">
   <iframe
     src="https://www.youtube.com/embed/VIDEO_ID"
     title="Video title"
@@ -41,42 +46,10 @@ Paste a YouTube, Instagram, or other embed if you want it inside the post.
     allowfullscreen
   ></iframe>
 </div>
-```
+-->
 
-## Product or reference links
+## Notes
 
-Use normal markdown links when you mention tools, books, products, or references.
-
-- [Laptop stand](https://example.com)
-- [Camera I use](https://example.com)
-- [Article that helped me](https://example.com)
-
-If one of those is an affiliate link, mention it plainly:
-
-> Some links may be affiliate links. I only link what I actually use or rate.
-
-## Gallery block
-
-You can place a gallery anywhere in the post with plain HTML.
-
-```html
-<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0;">
-  <img src="/images/blog/YYYY/MM-month/photo-1.jpg" alt="Describe image 1" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
-  <img src="/images/blog/YYYY/MM-month/photo-2.jpg" alt="Describe image 2" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
-  <img src="/images/blog/YYYY/MM-month/photo-3.jpg" alt="Describe image 3" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
-  <img src="/images/blog/YYYY/MM-month/photo-4.jpg" alt="Describe image 4" style="width:100%;height:280px;object-fit:cover;border-radius:14px;" />
-</div>
-```
-
-## Optional post types
-
-Use one or two tags only. Suggested structure:
-
-- `daily`: quick life update, where you are, what you are building
-- `solution`: problem, fix, result
-- `ideas`: rough thinking, experiments, questions
-- `life-in-uk`: citizenship, paperwork, cultural notes, lived experience
-
-## Close
-
-Finish with one useful takeaway, one feeling, or one next step.
+- Building: [ListenEasy](https://example.com)
+- Reading: [Clear Thinking](https://example.com) by [Shane Parrish](https://example.com)
+- Looking at: [word / author / thing](https://example.com)

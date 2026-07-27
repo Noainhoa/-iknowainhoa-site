@@ -12,11 +12,12 @@ The public URL uses only the post `slug` from frontmatter — never the month fo
 ## The simple model
 
 1. Create a new draft from the template.
-2. Write in markdown.
-3. Paste HTML only for special blocks like embeds or image galleries.
-4. Preview locally.
-5. Run `npm run post:publish -- path/to/post.md` (sets draft false, commits, pushes).
-6. Vercel auto-deploys production from `main`.
+2. Write a short note in markdown (one idea, ~150–400 words).
+3. Link words inline as you write. Uncomment optional blocks only when you need them.
+4. Finish with a **Notes** list (building / reading / looking at).
+5. Preview locally.
+6. Run `npm run post:publish -- path/to/post.md` (sets draft false, commits, pushes).
+7. Vercel auto-deploys production from `main`.
 
 ## Create a new post
 
@@ -34,19 +35,37 @@ Open the generated file and fill in:
 - `title`
 - `description`
 - `tags`
-- `coverImage`
 - body content
+- `## Notes` links
 
 Keep `draft: true` while writing. Change it to `draft: false` when ready to publish.
 Keep `slug` short and stable — that is what appears in the URL.
 
-## Add richer content
+The page already renders the title from frontmatter — do **not** add a duplicate `# Title` in the body.
 
-- Normal text: markdown
-- Links to products or references: markdown links
-- Affiliate links: same format, just disclose that some links may be affiliate links
-- Embedded video: paste iframe HTML from the template
-- Image gallery: paste the gallery block from the template anywhere in the post
+### Style
+
+- One idea. Stop when the point lands.
+- Direct, warm, a little playful. Short sentences.
+- Hyperlink words as you go (`[patience](https://…)`). External links open in a new tab automatically.
+- End every post with **Notes**: what you’re building, reading, and who/what you’re pointing to.
+
+### Optional blocks (commented out in the template)
+
+The template includes HTML comments for:
+
+- **Definition / quote** (`.blog-pull`) — stylish term + definition + source
+- **Image** (`.blog-figure`) — photo + optional caption
+- **Instagram** (`.blog-embed`) — paste the embed iframe + author credit
+- **Video** (`.blog-embed`) — YouTube or similar iframe
+
+To use one: delete the surrounding `<!-- … -->` comment markers so the HTML is live. Leave the rest commented.
+
+Uncomment `coverImage` in frontmatter only when you have a real image under `/public`.
+
+### Tags
+
+Use one or two: `daily`, `solution`, `ideas`, `life-in-uk`. One blog, unified index.
 
 ## Preview locally
 
@@ -84,14 +103,3 @@ git add content/blog/YYYY/MM-month/your-post.md public/images/blog/YYYY/MM-month
 git commit -m "Publish your-post"
 git push
 ```
-
-## Post families inside this site
-
-Use one blog, not four separate sections. Separate them by tags:
-
-- `daily` for everyday posts and travel notes
-- `solution` for tutorials, fixes, and how-tos
-- `ideas` for half-formed thinking and experiments
-- `life-in-uk` for citizenship, paperwork, systems, and lived experience
-
-This keeps publishing simple and lets the blog index stay unified.
