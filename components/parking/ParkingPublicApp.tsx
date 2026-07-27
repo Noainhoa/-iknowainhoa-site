@@ -238,6 +238,49 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     requestAnimationFrame(() => setLiveMessage(message));
   }, []);
 
+  // #region agent log
+  useEffect(() => {
+    const host = window.location.hostname;
+    const isLocal = host === "localhost" || host === "127.0.0.1";
+    const measure = () => {
+      const btn = document.querySelector<HTMLElement>(".pk-clear");
+      const row = document.querySelector<HTMLElement>(".pk-clear-row");
+      const cal = document.querySelector<HTMLElement>(".pk-cal");
+      if (!btn || !row || !cal) return;
+      const br = btn.getBoundingClientRect();
+      const rr = row.getBoundingClientRect();
+      const cr = cal.getBoundingClientRect();
+      const payload = {
+        sessionId: "267dce",
+        runId: "post-fix",
+        hypothesisId: "A",
+        location: "ParkingPublicApp.tsx:clear-layout",
+        message: "clear_dates_box_sizes",
+        data: {
+          btnW: Math.round(br.width),
+          rowW: Math.round(rr.width),
+          calW: Math.round(cr.width),
+          emptyLeftPx: Math.round(br.left - rr.left),
+          rowFitsButton: Math.abs(rr.width - br.width) < 8,
+          host,
+        },
+        timestamp: Date.now(),
+      };
+      if (isLocal) {
+        fetch("http://127.0.0.1:7736/ingest/ed8edfac-b1ea-41ca-bead-699b28d53a6c", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "267dce",
+          },
+          body: JSON.stringify(payload),
+        }).catch(() => {});
+      }
+    };
+    const t = window.setTimeout(measure, 50);
+    return () => window.clearTimeout(t);
+  }, [arrival, departure, periods.length]);
+  // #endregion
 
   function updateWaStatus(status: WaStatus, nextHref?: string | null) {
     if (status === "idle") {

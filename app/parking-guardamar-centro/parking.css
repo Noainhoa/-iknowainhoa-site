@@ -426,6 +426,8 @@
         }
 
 .parking-root .pk-cal {
+          display: flex;
+          flex-direction: column;
           background: var(--card);
           border: 1px solid var(--line);
           border-radius: 14px;
@@ -565,11 +567,15 @@
 
 .parking-root .pk-clear-row {
           margin-top: 10px;
-          display: flex;
-          justify-content: flex-end;
+          align-self: flex-end;
+          width: fit-content;
+          display: block;
         }
 
 .parking-root .pk-clear {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           width: auto;
           min-height: 36px;
           padding: 6px 12px;
