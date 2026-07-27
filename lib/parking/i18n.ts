@@ -45,7 +45,6 @@ export type ParkingCopy = {
   prevMonths: string;
   nextMonths: string;
   clearDates: string;
-  changeDates: string;
   labelArrival: string;
   labelDeparture: string;
   labelDuration: string;
@@ -162,7 +161,6 @@ const es: ParkingCopy = {
   prevMonths: "Meses anteriores",
   nextMonths: "Meses siguientes",
   clearDates: "Borrar fechas",
-  changeDates: "Cambiar fechas",
   labelArrival: "Entrada",
   labelDeparture: "Salida",
   labelDuration: "Duración",
@@ -285,7 +283,6 @@ const en: ParkingCopy = {
   prevMonths: "Previous months",
   nextMonths: "Next months",
   clearDates: "Clear dates",
-  changeDates: "Change dates",
   labelArrival: "Arrival",
   labelDeparture: "Departure",
   labelDuration: "Duration",
@@ -406,7 +403,6 @@ const fr: ParkingCopy = {
   prevMonths: "Mois précédents",
   nextMonths: "Mois suivants",
   clearDates: "Effacer les dates",
-  changeDates: "Modifier les dates",
   labelArrival: "Arrivée",
   labelDeparture: "Départ",
   labelDuration: "Durée",
