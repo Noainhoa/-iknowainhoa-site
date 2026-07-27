@@ -72,7 +72,29 @@ export default function ParkingAdminApp() {
   const refreshSession = useCallback(async () => {
     if (!supabase) return;
     const { data } = await supabase.auth.getSession();
-    setSessionEmail(data.session?.user?.email ?? null);
+    const email = data.session?.user?.email ?? null;
+    if (!email) {
+      setSessionEmail(null);
+      return;
+    }
+    const { data: isAdmin, error } = await supabase.rpc("is_parking_admin");
+    // Before parking-admin-rls.sql is applied the RPC is missing — allow session.
+    if (error && !/could not find|PGRST202|42883/i.test(error.message)) {
+      await supabase.auth.signOut();
+      setSessionEmail(null);
+      setRows([]);
+      setAuthError(error.message);
+      return;
+    }
+    if (!error && !isAdmin) {
+      await supabase.auth.signOut();
+      setSessionEmail(null);
+      setRows([]);
+      setAuthError("No tienes permiso de administrador.");
+      return;
+    }
+    setAuthError(null);
+    setSessionEmail(email);
   }, [supabase]);
 
   const loadRows = useCallback(async () => {
@@ -93,6 +115,14 @@ export default function ParkingAdminApp() {
   useEffect(() => {
     void refreshSession();
   }, [refreshSession]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("admin") === "denied") {
+      setAuthError("No tienes permiso de administrador.");
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   useEffect(() => {
     if (sessionEmail) void loadRows();
@@ -473,8 +503,11 @@ export default function ParkingAdminApp() {
         </div>
         <p className="warn">
           Configura <code>NEXT_PUBLIC_SUPABASE_URL</code> y la publishable/anon
-          key, ejecuta <code>supabase/parking.sql</code> y crea un usuario
-          administrador en Supabase Auth.
+          key, ejecuta <code>supabase/parking.sql</code> y{" "}
+          <code>supabase/parking-admin-rls.sql</code>, crea un usuario en
+          Supabase Auth y añade su email a{" "}
+          <code>parking_admin_allowlist</code> y a{" "}
+          <code>PARKING_ADMIN_EMAILS</code> en Vercel.
         </p>
         <style jsx>{styles}</style>
       </div>
@@ -812,30 +845,77 @@ export default function ParkingAdminApp() {
                   <td>{r.customer_phone || "—"}</td>
                   <td>{r.price_eur != null ? r.price_eur : "—"}</td>
                   <td className="ops">
-                    <button type="button" onClick={() => editRow(r)}>
-                      Editar
+                    <button
+                      type="button"
+                      className="icon-btn"
+                      onClick={() => editRow(r)}
+                      aria-label="Editar"
+                      title="Editar"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.25"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                      </svg>
                     </button>
                     {r.customer_phone &&
                     (r.status === "reserved" || r.status === "completed") ? (
                       <button
                         type="button"
-                        className="wa"
+                        className="icon-btn wa"
                         onClick={() => {
                           setLastSaved(r);
                           void makeConfirmation(r).then(() =>
                             openCustomerWhatsApp(r)
                           );
                         }}
+                        aria-label="WhatsApp Business"
+                        title="WhatsApp Business"
                       >
-                        WhatsApp Business
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 24 24"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                        >
+                          <path d="M12.04 2a9.9 9.9 0 0 0-9.9 9.9c0 1.75.46 3.45 1.33 4.95L2 22l5.3-1.39a9.87 9.87 0 0 0 4.74 1.21h.01a9.9 9.9 0 0 0 9.9-9.9 9.86 9.86 0 0 0-9.91-9.92Zm5.76 14.07c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.29.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.59.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.39-.43.52-.14.14-.29.3-.12.58.16.29.73 1.2 1.56 1.94 1.08.96 1.98 1.26 2.27 1.4.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.19-.29.38-.24.64-.14.26.1 1.66.78 1.95.92.28.15.47.21.54.33.07.12.07.68-.17 1.36Z" />
+                        </svg>
                       </button>
                     ) : null}
                     <button
                       type="button"
-                      className="danger"
+                      className="icon-btn danger"
                       onClick={() => void onDelete(r.id)}
+                      aria-label="Eliminar"
+                      title="Eliminar"
                     >
-                      Eliminar
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.25"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M3 6h18" />
+                        <path d="M8 6V4h8v2" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                      </svg>
                     </button>
                   </td>
                 </tr>
@@ -921,6 +1001,17 @@ const styles = `
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
   th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
-  .ops { display: flex; flex-wrap: wrap; gap: 6px; }
-  .ops button { min-height: 36px; font-size: 0.8rem; }
+  .ops { display: flex; flex-wrap: nowrap; gap: 6px; align-items: center; }
+  .ops .icon-btn {
+    min-height: 36px;
+    min-width: 36px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+  .ops .icon-btn svg { display: block; }
 `;
