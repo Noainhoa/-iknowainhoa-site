@@ -1,6 +1,37 @@
 -- Public seasonal tariffs for Parking Guardamar Centro.
--- Run in Supabase SQL Editor after parking.sql / parking-admin-rls.sql.
+-- Safe to re-run. Creates admin helper if missing, then rates + public RPC.
 
+-- 1) Admin allowlist + is_parking_admin() (needed for RLS on parking_rates)
+CREATE TABLE IF NOT EXISTS parking_admin_allowlist (
+  email TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE parking_admin_allowlist ENABLE ROW LEVEL SECURITY;
+
+CREATE OR REPLACE FUNCTION public.is_parking_admin()
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM parking_admin_allowlist a
+    WHERE lower(a.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+  );
+$$;
+
+REVOKE ALL ON FUNCTION public.is_parking_admin() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_parking_admin() TO authenticated;
+
+-- Replace with your real admin login email(s) if not already seeded.
+INSERT INTO parking_admin_allowlist (email)
+VALUES ('admin@iknowainhoa.com')
+ON CONFLICT (email) DO NOTHING;
+
+-- 2) Rates table
 CREATE TABLE IF NOT EXISTS parking_rates (
   season TEXT PRIMARY KEY
     CHECK (season IN ('summer', 'september', 'winter')),
