@@ -195,8 +195,10 @@ export function buildWhatsAppMessage(input: {
   vehicle?: string;
   comments?: string;
   pageUrl?: string;
+  rates?: import("@/lib/parking/pricing").ParkingRatesMap;
 }): string {
   const { locale } = input;
+  const rates = input.rates;
   const periods = input.periods.filter(
     (p) => p.arrival && p.departure && p.departure >= p.arrival
   );
@@ -241,7 +243,7 @@ export function buildWhatsAppMessage(input: {
   const periodBlock = (p: EnquiryPeriod, index: number, numbered: boolean) => {
     const days = countInclusiveDays(p.arrival, p.departure);
     const estimate = formatEuroEstimate(
-      estimateParkingPrice(p.arrival, p.departure)
+      estimateParkingPrice(p.arrival, p.departure, rates)
     );
     const prefix = numbered ? `${index + 1}) ` : "";
     const pad = numbered ? "   " : "";
@@ -297,7 +299,7 @@ ${pad}Estimate: ${estimate}`;
     );
     const totalEstimate = formatEuroEstimate(
       periods.reduce(
-        (sum, p) => sum + estimateParkingPrice(p.arrival, p.departure),
+        (sum, p) => sum + estimateParkingPrice(p.arrival, p.departure, rates),
         0
       )
     );

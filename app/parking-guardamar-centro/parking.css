@@ -373,6 +373,16 @@
           border-color: #f0bcbc;
         }
 
+.parking-root .pk-cal-loading {
+          margin: 12px 0 4px;
+          padding: 28px 12px;
+          text-align: center;
+          color: #005288;
+          font-size: 0.95rem;
+          font-weight: 600;
+          line-height: 1.4;
+        }
+
 .parking-root .pk-availability {
           margin: 0 0 var(--space-section);
         }

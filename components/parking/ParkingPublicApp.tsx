@@ -13,9 +13,12 @@ import {
   PRICE_DASH,
 } from "@/lib/parking/i18n";
 import {
+  DEFAULT_PARKING_RATES,
   estimateParkingPrice,
   formatEuroEstimate,
+  ratesMapFromRows,
   seasonForMonth,
+  type ParkingRateRow,
   type ParkingSeason,
 } from "@/lib/parking/pricing";
 import { parkingCanonicalUrl, parkingConditionsHref, parkingPrivacyHref } from "@/lib/parking/seo";
@@ -173,7 +176,8 @@ function PriceCell({ value, unavailableLabel }: { value: string; unavailableLabe
 }
 
 export default function ParkingPublicApp({ locale }: { locale: Locale }) {
-  const t = getParkingCopy(locale);
+  const [rates, setRates] = useState(() => DEFAULT_PARKING_RATES);
+  const t = useMemo(() => getParkingCopy(locale, rates), [locale, rates]);
   const today = useMemo(() => startOfToday(), []);
   const currentMonth = useMemo(
     () => new Date(today.getFullYear(), today.getMonth(), 1),
@@ -185,6 +189,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const [ranges, setRanges] = useState<ParkingUnavailableRange[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [configured] = useState(() => parkingSupabaseConfigured());
+  const [loadingAvailability, setLoadingAvailability] = useState(
+    () => parkingSupabaseConfigured()
+  );
 
   const [arrival, setArrival] = useState<string | null>(
     () => readPersisted()?.arrival ?? null
@@ -256,9 +263,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       language: locale,
       stayDays,
       season,
-      hasQuote: estimateParkingPrice(arrival, departure) > 0,
+      hasQuote: estimateParkingPrice(arrival, departure, rates) > 0,
     });
-  }, [arrival, departure, locale]);
+  }, [arrival, departure, locale, rates]);
 
   function updateWaStatus(status: WaStatus, nextHref?: string | null) {
     if (status === "idle") {
@@ -317,26 +324,46 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     return () => window.removeEventListener("pageshow", onPageShow);
   }, [waStatus]);
 
+  const loadErrorRef = useRef(t.loadError);
+  loadErrorRef.current = t.loadError;
+
   const load = useCallback(async () => {
     if (!configured) {
       setRanges([]);
       setLoadError(null);
+      setRates(DEFAULT_PARKING_RATES);
+      setLoadingAvailability(false);
       return;
     }
     const supabase = getParkingSupabase();
-    if (!supabase) return;
-    const { data, error } = await supabase.rpc("parking_unavailable_ranges");
-    if (error) {
-      setLoadError(t.loadError);
-      setRanges([]);
+    if (!supabase) {
+      setLoadingAvailability(false);
       return;
     }
-    setLoadError(null);
-    setRanges((data || []) as ParkingUnavailableRange[]);
-  }, [configured, t.loadError]);
+    setLoadingAvailability(true);
+    try {
+      const [rangesResult, ratesResult] = await Promise.all([
+        supabase.rpc("parking_unavailable_ranges"),
+        supabase.rpc("parking_public_rates"),
+      ]);
+      if (rangesResult.error) {
+        setLoadError(loadErrorRef.current);
+        setRanges([]);
+      } else {
+        setLoadError(null);
+        setRanges((rangesResult.data || []) as ParkingUnavailableRange[]);
+      }
+      if (!ratesResult.error && ratesResult.data) {
+        setRates(ratesMapFromRows(ratesResult.data as ParkingRateRow[]));
+      } else {
+        setRates(DEFAULT_PARKING_RATES);
+      }
+    } finally {
+      setLoadingAvailability(false);
+    }
+  }, [configured]);
 
   useEffect(() => {
-    // Fetch availability once on mount / when locale copy changes loadError text.
     const timer = window.setTimeout(() => {
       void load();
     }, 0);
@@ -369,7 +396,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const durationDays =
     arrival && departure ? countInclusiveDays(arrival, departure) : 0;
   const draftEstimate =
-    arrival && departure ? estimateParkingPrice(arrival, departure) : 0;
+    arrival && departure ? estimateParkingPrice(arrival, departure, rates) : 0;
 
   function effectivePeriods(): EnquiryPeriod[] {
     if (periods.length > 0) return periods;
@@ -408,6 +435,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   }
 
   function onSelectDay(iso: string) {
+    if (loadingAvailability) return;
     const state = dayState(iso);
     if (state === "past" || state === "unavailable") return;
 
@@ -659,7 +687,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       stayDays,
       season,
       hasQuote: periodsOut.some(
-        (p) => estimateParkingPrice(p.arrival, p.departure) > 0
+        (p) => estimateParkingPrice(p.arrival, p.departure, rates) > 0
       ),
     });
 
@@ -672,6 +700,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       vehicle,
       comments,
       pageUrl: parkingCanonicalUrl(locale),
+      rates,
     });
     const href = whatsAppHref(message);
 
@@ -831,6 +860,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         id="pk-availability"
         className="pk-availability"
         aria-labelledby="pk-availability-heading"
+        aria-busy={loadingAvailability || undefined}
       >
         <h2 id="pk-availability-heading">{t.availabilityTitle}</h2>
         {arrival && !departure ? (
@@ -849,13 +879,13 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </span>
         </div>
 
-        <div className="pk-cal">
+        <div className={`pk-cal${loadingAvailability ? " is-loading" : ""}`}>
           <div className="pk-cal-nav">
             <button
               type="button"
               className="pk-nav-btn"
               aria-label={t.prevMonths}
-              disabled={!canGoPrev}
+              disabled={!canGoPrev || loadingAvailability}
               onClick={() =>
                 setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))
               }
@@ -869,6 +899,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               type="button"
               className="pk-nav-btn"
               aria-label={t.nextMonths}
+              disabled={loadingAvailability}
               onClick={() =>
                 setView(new Date(view.getFullYear(), view.getMonth() + 1, 1))
               }
@@ -877,6 +908,11 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             </button>
           </div>
 
+          {loadingAvailability ? (
+            <p className="pk-cal-loading" role="status" aria-live="polite">
+              {t.loadingAvailability}
+            </p>
+          ) : (
           <div
             className="pk-months"
             style={{ gridTemplateColumns: `repeat(${visibleMonthCount}, minmax(0, 1fr))` }}
@@ -937,6 +973,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               );
             })}
           </div>
+          )}
         </div>
 
         {bothDatesSelected && arrival && departure ? (
@@ -1019,7 +1056,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             <ul className="pk-periods-list">
               {periods.map((p, index) => {
                 const days = countInclusiveDays(p.arrival, p.departure);
-                const estimate = estimateParkingPrice(p.arrival, p.departure);
+                const estimate = estimateParkingPrice(p.arrival, p.departure, rates);
                 return (
                   <li key={`${p.arrival}-${p.departure}-${index}`}>
                     <div className="pk-period-main">
@@ -1083,7 +1120,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                     {formatEuroEstimate(
                       periods.reduce(
                         (sum, p) =>
-                          sum + estimateParkingPrice(p.arrival, p.departure),
+                          sum + estimateParkingPrice(p.arrival, p.departure, rates),
                         0
                       )
                     )}
@@ -1095,7 +1132,8 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                         const days = countInclusiveDays(p.arrival, p.departure);
                         const estimate = estimateParkingPrice(
                           p.arrival,
-                          p.departure
+                          p.departure,
+                          rates
                         );
                         return `${i + 1}: ${t.duration(days)} / ${formatEuroEstimate(estimate)}`;
                       })

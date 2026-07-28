@@ -88,9 +88,12 @@ export default function LanguageToggle({
               }}
               style={{
                 textDecoration: "none",
-                color: "inherit",
-                opacity: locale === code ? 1 : 0.55,
+                color: locale === code ? "#005288" : "inherit",
+                opacity: locale === code ? 1 : 0.7,
                 fontWeight: locale === code ? 700 : 500,
+                borderBottom:
+                  locale === code ? "2px solid #005288" : "2px solid transparent",
+                paddingBottom: 1,
               }}
             >
               {LABELS[code]}

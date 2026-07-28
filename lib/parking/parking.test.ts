@@ -208,6 +208,19 @@ describe("parking price estimates", () => {
     assert.equal(getParkingCopy("es").priceRows[0].day, `€${SEASON_RATES.summer.day}`);
   });
 
+  it("applies injected admin rates to estimates and price rows", () => {
+    const custom = {
+      summer: { day: 12, week: 80, month: null },
+      september: { day: null, week: 55, month: null },
+      winter: { day: null, week: null, month: 90 },
+    };
+    assert.equal(estimateParkingPrice("2026-07-01", "2026-07-07", custom), 80);
+    assert.equal(estimateParkingPrice("2026-09-01", "2026-09-03", custom), 55);
+    assert.equal(getParkingCopy("es", custom).priceRows[0].day, "€12");
+    assert.equal(getParkingCopy("es", custom).priceRows[0].week, "€80");
+    assert.equal(getParkingCopy("es", custom).priceRows[2].month, "€90");
+  });
+
   it("packs June–August as weeks plus leftover days", () => {
     assert.equal(estimateSeasonDays("summer", 6), 60);
     assert.equal(estimateSeasonDays("summer", 7), 70);

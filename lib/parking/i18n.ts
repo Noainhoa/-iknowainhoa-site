@@ -4,6 +4,7 @@ import {
   localizedPriceRows,
   PRICE_DASH,
   type ParkingPriceRow,
+  type ParkingRatesMap,
 } from "@/lib/parking/pricing";
 
 export type { ParkingPriceRow };
@@ -91,6 +92,7 @@ export type ParkingCopy = {
   whatsappSentTitle: string;
   whatsappSentBody: string;
   supabaseHint: string;
+  loadingAvailability: string;
   loadError: string;
   errNeedArrival: string;
   errNeedDeparture: string;
@@ -241,6 +243,7 @@ const es: ParkingCopySource = {
     "Gracias. Te responderé por WhatsApp para confirmar la disponibilidad, el precio y el pago.",
   supabaseHint:
     "Calendario en modo local: falta configurar Supabase. Todas las fechas futuras aparecen como disponibles hasta que se conecte la base de datos.",
+  loadingAvailability: "Cargando disponibilidad…",
   loadError:
     "No se ha podido cargar la disponibilidad. Inténtalo de nuevo más tarde.",
   errNeedArrival: "Selecciona una fecha de entrada.",
@@ -390,6 +393,7 @@ const en: ParkingCopySource = {
     "Thank you. I will reply through WhatsApp to confirm availability, the price and payment.",
   supabaseHint:
     "Calendar in local mode: Supabase is not configured. All future dates show as available until the database is connected.",
+  loadingAvailability: "Loading availability…",
   loadError: "Could not load availability. Please try again later.",
   errNeedArrival: "Select an arrival date.",
   errNeedDeparture: "Select a departure date.",
@@ -537,6 +541,7 @@ const fr: ParkingCopySource = {
     "Merci. Je vous répondrai sur WhatsApp pour confirmer la disponibilité, le prix et le paiement.",
   supabaseHint:
     "Calendrier en mode local : Supabase n’est pas configuré. Toutes les dates futures apparaissent comme disponibles jusqu’à la connexion à la base de données.",
+  loadingAvailability: "Chargement de la disponibilité…",
   loadError:
     "Impossible de charger la disponibilité. Réessayez plus tard.",
   errNeedArrival: "Sélectionnez une date d’arrivée.",
@@ -565,12 +570,15 @@ const fr: ParkingCopySource = {
 
 const copyByLocale: Record<Locale, ParkingCopySource> = { es, en, fr };
 
-export function getParkingCopy(locale: Locale): ParkingCopy {
+export function getParkingCopy(
+  locale: Locale,
+  rates?: ParkingRatesMap
+): ParkingCopy {
   const source = copyByLocale[locale];
   const { pricePeriodLabels, ...rest } = source;
   return {
     ...rest,
-    priceRows: localizedPriceRows(pricePeriodLabels),
+    priceRows: localizedPriceRows(pricePeriodLabels, rates),
   };
 }
 

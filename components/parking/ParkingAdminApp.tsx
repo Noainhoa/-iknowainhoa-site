@@ -8,6 +8,13 @@ import {
 } from "@/lib/parking/confirmationImage";
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
+  DEFAULT_PARKING_RATES,
+  PARKING_SEASON_ORDER,
+  type ParkingRateRow,
+  type ParkingSeason,
+  type SeasonRates,
+} from "@/lib/parking/pricing";
+import {
   STATUS_LABELS_ES,
   PARKING_DNI_BUCKET,
   bookingOccupiesDate,
@@ -17,6 +24,38 @@ import {
   type ParkingBooking,
   type ParkingBookingStatus,
 } from "@/lib/parking/types";
+
+const SEASON_LABELS_ES: Record<ParkingSeason, string> = {
+  summer: "Junio–agosto",
+  september: "Septiembre",
+  winter: "Octubre–mayo",
+};
+
+type RateFormRow = Record<
+  ParkingSeason,
+  { day: string; week: string; month: string }
+>;
+
+function ratesToForm(map: Record<ParkingSeason, SeasonRates>): RateFormRow {
+  const out = {} as RateFormRow;
+  for (const season of PARKING_SEASON_ORDER) {
+    const r = map[season];
+    out[season] = {
+      day: r.day == null ? "" : String(r.day),
+      week: r.week == null ? "" : String(r.week),
+      month: r.month == null ? "" : String(r.month),
+    };
+  }
+  return out;
+}
+
+function parseAmount(raw: string): number | null {
+  const t = raw.trim().replace(",", ".");
+  if (!t) return null;
+  const n = Number(t);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return Math.round(n * 100) / 100;
+}
 
 const EMPTY_FORM = {
   id: "" as string,
@@ -68,6 +107,12 @@ export default function ParkingAdminApp() {
   const [dniFile, setDniFile] = useState<File | null>(null);
   const [dniLocalPreview, setDniLocalPreview] = useState<string | null>(null);
   const [ocrBusy, setOcrBusy] = useState(false);
+  const [rateForm, setRateForm] = useState<RateFormRow>(() =>
+    ratesToForm(DEFAULT_PARKING_RATES)
+  );
+  const [ratesSaving, setRatesSaving] = useState(false);
+  const [ratesMessage, setRatesMessage] = useState<string | null>(null);
+  const [ratesError, setRatesError] = useState<string | null>(null);
 
   const refreshSession = useCallback(async () => {
     if (!supabase) return;
@@ -112,6 +157,42 @@ export default function ParkingAdminApp() {
     setRows((data || []) as ParkingBooking[]);
   }, [supabase, sessionEmail]);
 
+  const loadRates = useCallback(async () => {
+    if (!supabase || !sessionEmail) return;
+    const { data, error } = await supabase.rpc("parking_public_rates");
+    if (error) {
+      if (!/could not find|PGRST202|42883|parking_rates|parking_public_rates/i.test(error.message)) {
+        setRatesError(formatParkingError(error.message));
+      } else {
+        setRatesError(
+          "Falta la tabla de tarifas. Ejecuta supabase/parking-rates.sql en el SQL Editor."
+        );
+      }
+      setRateForm(ratesToForm(DEFAULT_PARKING_RATES));
+      return;
+    }
+    setRatesError(null);
+    const map = {
+      summer: { ...DEFAULT_PARKING_RATES.summer },
+      september: { ...DEFAULT_PARKING_RATES.september },
+      winter: { ...DEFAULT_PARKING_RATES.winter },
+    };
+    for (const row of (data || []) as ParkingRateRow[]) {
+      if (
+        row.season === "summer" ||
+        row.season === "september" ||
+        row.season === "winter"
+      ) {
+        map[row.season] = {
+          day: row.day_eur == null ? null : Number(row.day_eur),
+          week: row.week_eur == null ? null : Number(row.week_eur),
+          month: row.month_eur == null ? null : Number(row.month_eur),
+        };
+      }
+    }
+    setRateForm(ratesToForm(map));
+  }, [supabase, sessionEmail]);
+
   useEffect(() => {
     void refreshSession();
   }, [refreshSession]);
@@ -125,8 +206,11 @@ export default function ParkingAdminApp() {
   }, []);
 
   useEffect(() => {
-    if (sessionEmail) void loadRows();
-  }, [sessionEmail, loadRows]);
+    if (sessionEmail) {
+      void loadRows();
+      void loadRates();
+    }
+  }, [sessionEmail, loadRows, loadRates]);
 
   useEffect(() => {
     return () => {
@@ -214,6 +298,74 @@ export default function ParkingAdminApp() {
     setForm(EMPTY_FORM);
     setLastSaved(null);
     resetForm();
+  }
+
+  async function onSaveRates(e: FormEvent) {
+    e.preventDefault();
+    if (!supabase) return;
+    setRatesSaving(true);
+    setRatesMessage(null);
+    setRatesError(null);
+
+    const defaults = {
+      summer: {
+        label_es: "Junio–agosto",
+        label_en: "June–August",
+        label_fr: "Juin–août",
+        sort_order: 1,
+      },
+      september: {
+        label_es: "Septiembre",
+        label_en: "September",
+        label_fr: "Septembre",
+        sort_order: 2,
+      },
+      winter: {
+        label_es: "Octubre–mayo",
+        label_en: "October–May",
+        label_fr: "Octobre–mai",
+        sort_order: 3,
+      },
+    } as const;
+
+    const payload = PARKING_SEASON_ORDER.map((season) => {
+      const f = rateForm[season];
+      const day = parseAmount(f.day);
+      const week = parseAmount(f.week);
+      const month = parseAmount(f.month);
+      if (f.day.trim() && day == null) {
+        throw new Error(`Importe día no válido (${SEASON_LABELS_ES[season]})`);
+      }
+      if (f.week.trim() && week == null) {
+        throw new Error(`Importe semana no válido (${SEASON_LABELS_ES[season]})`);
+      }
+      if (f.month.trim() && month == null) {
+        throw new Error(`Importe mes no válido (${SEASON_LABELS_ES[season]})`);
+      }
+      return {
+        season,
+        day_eur: day,
+        week_eur: week,
+        month_eur: month,
+        ...defaults[season],
+      };
+    });
+
+    try {
+      const { error } = await supabase.from("parking_rates").upsert(payload, {
+        onConflict: "season",
+      });
+      if (error) {
+        setRatesError(formatParkingError(error.message));
+        return;
+      }
+      setRatesMessage("Tarifas guardadas. La página pública las usará al recargar.");
+      await loadRates();
+    } catch (err) {
+      setRatesError(err instanceof Error ? err.message : "No se pudieron guardar las tarifas.");
+    } finally {
+      setRatesSaving(false);
+    }
   }
 
   function editRow(row: ParkingBooking) {
@@ -572,6 +724,71 @@ export default function ParkingAdminApp() {
         <DashCard title="Reservas actuales" rows={current} />
         <DashCard title="Finalizadas" rows={completed} />
       </div>
+
+      <form className="card form" onSubmit={(e) => void onSaveRates(e)}>
+        <h2>Tarifas públicas</h2>
+        <p className="hint">
+          Estos importes actualizan la tabla de precios, las estimaciones del
+          calendario y el mensaje de WhatsApp. Deja un campo vacío para mostrar
+          “—” (unidad no ofrecida).
+        </p>
+        <div className="rates-grid">
+          {PARKING_SEASON_ORDER.map((season) => (
+            <fieldset key={season} className="rates-season">
+              <legend>{SEASON_LABELS_ES[season]}</legend>
+              <label>
+                Día (€)
+                <input
+                  inputMode="decimal"
+                  value={rateForm[season].day}
+                  onChange={(e) =>
+                    setRateForm({
+                      ...rateForm,
+                      [season]: { ...rateForm[season], day: e.target.value },
+                    })
+                  }
+                  placeholder="—"
+                />
+              </label>
+              <label>
+                Semana (€)
+                <input
+                  inputMode="decimal"
+                  value={rateForm[season].week}
+                  onChange={(e) =>
+                    setRateForm({
+                      ...rateForm,
+                      [season]: { ...rateForm[season], week: e.target.value },
+                    })
+                  }
+                  placeholder="—"
+                />
+              </label>
+              <label>
+                Mes (€)
+                <input
+                  inputMode="decimal"
+                  value={rateForm[season].month}
+                  onChange={(e) =>
+                    setRateForm({
+                      ...rateForm,
+                      [season]: { ...rateForm[season], month: e.target.value },
+                    })
+                  }
+                  placeholder="—"
+                />
+              </label>
+            </fieldset>
+          ))}
+        </div>
+        {ratesError ? <p className="err">{ratesError}</p> : null}
+        {ratesMessage ? <p className="msg">{ratesMessage}</p> : null}
+        <div className="actions">
+          <button type="submit" disabled={ratesSaving}>
+            {ratesSaving ? "Guardando…" : "Guardar tarifas"}
+          </button>
+        </div>
+      </form>
 
       <form className="card form" onSubmit={(e) => void onSave(e)}>
         <h2>{form.id ? "Editar registro" : "Confirmar reserva"}</h2>
@@ -979,6 +1196,20 @@ const styles = `
   .msg { color: #1b5e34; }
   .top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 18px; }
   .dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .rates-grid { display: grid; gap: 12px; }
+  .rates-season {
+    margin: 0;
+    padding: 10px 12px;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .rates-season legend { padding: 0 4px; font-weight: 700; }
+  @media (max-width: 560px) {
+    .rates-season { grid-template-columns: 1fr; }
+  }
   .card { background: #fff; border: 1px solid #e6e6e6; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
   .dash-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   .dash-card li { display: grid; gap: 2px; font-size: 0.85rem; }
