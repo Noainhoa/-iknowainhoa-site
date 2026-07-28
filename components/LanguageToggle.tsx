@@ -16,19 +16,9 @@ function languageHref(
   locale: Locale
 ) {
   const params = new URLSearchParams(searchParams.toString());
-  const path = pathname.toLowerCase();
-  const isParkingPublic =
-    path === "/parking-guardamar-centro" ||
-    path === "/parking-guardamar-centro/privacidad" ||
-    path === "/parking-guardamar-centro/condiciones";
-
-  // Spanish parking pages use the bare path as the canonical URL.
-  if (isParkingPublic && locale === "es") {
-    params.delete("lang");
-  } else {
-    params.set("lang", locale);
-  }
-
+  // Always set ?lang= so middleware can persist preferred_locale.
+  // For Spanish parking pages, middleware then strips ?lang=es to the bare canonical URL.
+  params.set("lang", locale);
   const query = params.toString();
   return query ? `${pathname}?${query}` : pathname;
 }
