@@ -28,7 +28,7 @@ GRANT EXECUTE ON FUNCTION public.is_parking_admin() TO authenticated;
 
 -- Replace with your real admin login email(s) if not already seeded.
 INSERT INTO parking_admin_allowlist (email)
-VALUES ('admin@iknowainhoa.com')
+VALUES ('ainhoaferrandis@gmail.com')
 ON CONFLICT (email) DO NOTHING;
 
 -- 2) Rates table

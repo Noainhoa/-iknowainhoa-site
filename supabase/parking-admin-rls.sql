@@ -27,7 +27,7 @@ REVOKE ALL ON FUNCTION public.is_parking_admin() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_parking_admin() TO authenticated;
 
 INSERT INTO parking_admin_allowlist (email)
-VALUES ('admin@iknowainhoa.com')
+VALUES ('ainhoaferrandis@gmail.com')
 ON CONFLICT (email) DO NOTHING;
 
 DROP POLICY IF EXISTS parking_bookings_admin_all ON parking_bookings;
