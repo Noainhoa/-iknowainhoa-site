@@ -10,8 +10,9 @@ Brand name: **Parking Guardamar Centro**
 
 1. Create a Supabase project.
 2. Run `supabase/parking.sql` in the SQL editor.
-3. Authentication → Users → create an admin user (email/password).
-4. Copy project URL + anon key into Vercel / `.env.local`:
+3. Run `supabase/parking-rates.sql` (public seasonal tariffs + admin Tarifas editor).
+4. Authentication → Users → create an admin user (email/password).
+5. Copy project URL + anon key into Vercel / `.env.local`:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
