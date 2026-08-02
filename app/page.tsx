@@ -46,6 +46,18 @@ export default function Home() {
             />
           </a>
         </li>
+        <li>
+          <Link href="/anicca" aria-label="Anicca" className="home-logo">
+            <Image
+              src="/images/projects/anicca/logo.png"
+              alt="Anicca"
+              width={160}
+              height={156}
+              priority
+              className="home-logo-img home-logo-img--anicca"
+            />
+          </Link>
+        </li>
       </ul>
 
       <a
@@ -103,6 +115,10 @@ export default function Home() {
           width: min(168px, 70vw);
           height: auto;
         }
+        .home-logo-img--anicca {
+          width: min(112px, 46vw);
+          height: auto;
+        }
         .home-wa-fab {
           position: fixed;
           z-index: 45;
@@ -135,6 +151,9 @@ export default function Home() {
           }
           .home-logo-img--begui {
             width: 180px;
+          }
+          .home-logo-img--anicca {
+            width: 120px;
           }
           .home-wa-fab {
             right: max(24px, env(safe-area-inset-right, 0px));
