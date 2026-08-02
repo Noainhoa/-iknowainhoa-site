@@ -9,10 +9,6 @@ const WA_ICON_PATH =
 /** Home stays sparse — content is added piece by piece. */
 export default function Home() {
   const whatsappHref = siteWhatsAppEnquiryHref();
-  const fabProps = {
-    href: whatsappHref,
-    ...externalAnchorProps(whatsappHref),
-  };
 
   return (
     <main className="home">
@@ -52,29 +48,11 @@ export default function Home() {
         </li>
       </ul>
 
-      {/* Option A — white fill + black edge on light yellow disc */}
       <a
-        className="home-wa-fab home-wa-fab--outline"
-        {...fabProps}
-        aria-label="WhatsApp enquiry (white icon, black edge)"
-      >
-        <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false">
-          <path
-            d={WA_ICON_PATH}
-            fill="#fff"
-            stroke="#141414"
-            strokeWidth="1.15"
-            strokeLinejoin="round"
-            paintOrder="stroke fill"
-          />
-        </svg>
-      </a>
-
-      {/* Option B — yellow WhatsApp mark only (no disc fill) */}
-      <a
-        className="home-wa-fab home-wa-fab--mark"
-        {...fabProps}
-        aria-label="WhatsApp enquiry (yellow mark)"
+        className="home-wa-fab"
+        href={whatsappHref}
+        {...externalAnchorProps(whatsappHref)}
+        aria-label="WhatsApp enquiry"
       >
         <svg viewBox="0 0 24 24" width="52" height="52" aria-hidden="true" focusable="false">
           <path fill="var(--accent-yellow)" d={WA_ICON_PATH} />
@@ -129,38 +107,23 @@ export default function Home() {
           position: fixed;
           z-index: 45;
           right: max(16px, env(safe-area-inset-right, 0px));
+          bottom: max(16px, env(safe-area-inset-bottom, 0px));
           display: grid;
           place-items: center;
           width: 52px;
           height: 52px;
+          background: transparent;
           text-decoration: none !important;
+          filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
           -webkit-tap-highlight-color: transparent;
           touch-action: manipulation;
+        }
+        .home-wa-fab:hover svg path {
+          fill: var(--accent-orange);
         }
         .home-wa-fab:focus-visible {
           outline: 2px solid var(--accent-orange);
           outline-offset: 3px;
-        }
-        /* A: yellow disc, white WA + black edge */
-        .home-wa-fab--outline {
-          bottom: calc(16px + 52px + 14px + env(safe-area-inset-bottom, 0px));
-          border-radius: 50%;
-          background: var(--accent-yellow);
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
-        .home-wa-fab--outline:hover {
-          background: var(--accent-orange);
-        }
-        /* B: yellow WA logo as the whole control */
-        .home-wa-fab--mark {
-          bottom: max(16px, env(safe-area-inset-bottom, 0px));
-          background: transparent;
-          border-radius: 0;
-          box-shadow: none;
-          filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
-        }
-        .home-wa-fab--mark:hover svg path {
-          fill: var(--accent-orange);
         }
         @media (min-width: 720px) {
           .home-logos {
@@ -175,11 +138,6 @@ export default function Home() {
           }
           .home-wa-fab {
             right: max(24px, env(safe-area-inset-right, 0px));
-          }
-          .home-wa-fab--outline {
-            bottom: calc(24px + 52px + 16px + env(safe-area-inset-bottom, 0px));
-          }
-          .home-wa-fab--mark {
             bottom: max(24px, env(safe-area-inset-bottom, 0px));
           }
         }
