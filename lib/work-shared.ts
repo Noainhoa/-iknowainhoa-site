@@ -15,11 +15,14 @@ export type WorkItem = {
   description?: string;
   date?: string;
   coverImage?: string;
+  /** Compact brand mark on the case page (not a full-bleed hero). */
+  logo?: string;
   category: WorkCategory;
   /** Short one-liner under the title on index cards (Frank-style). */
   summary: string;
   href: string;
   externalHref?: string;
+  externalCtaText?: string;
   source: "apps" | "projects" | "products" | "product-apps";
   tags: string[];
 };

@@ -20,7 +20,19 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 ```
 
 Also set the same two variables in **Vercel → Project → Settings → Environment Variables** (Production), then redeploy.
-5. Deploy. Public URL: `https://iknowainhoa.com/parking-guardamar-centro/`
+
+6. **Auth redirect URLs** (required for password reset emails):
+
+In [Authentication → URL Configuration](https://supabase.com/dashboard/project/cbvpybxuwraovlxxbdpk/auth/url-configuration):
+
+- **Site URL:** `https://iknowainhoa.com`
+- **Redirect URLs** (add both):
+  - `https://iknowainhoa.com/parking-guardamar-centro/admin`
+  - `http://localhost:3000/parking-guardamar-centro/admin` (local only)
+
+If Site URL stays as `http://localhost:3000`, reset emails will open localhost instead of production.
+
+7. Deploy. Public URL: `https://iknowainhoa.com/parking-guardamar-centro/`
 
 ## Behaviour
 

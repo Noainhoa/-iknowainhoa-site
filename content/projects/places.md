@@ -1,10 +1,10 @@
 ---
 title: "Google Reviews"
-description: "Help welcoming places look as good online as they feel in person."
+description: "Helping welcoming places look as good online as they feel in person."
 date: "2026-03-19"
 slug: "places"
 draft: false
-tags: ["places", "hospitality", "local"]
+tags: ["Hospitality", "Local"]
 coverImage: "/images/projects/places/cover.jpg"
 ---
 

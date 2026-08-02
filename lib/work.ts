@@ -8,6 +8,12 @@ import {
   type ContentItem,
   type ContentIndexItem,
 } from "@/lib/content";
+import {
+  markdownToHtml,
+  pickLocalizedField,
+  pickLocalizedMarkdown,
+} from "@/lib/contentLocale";
+import type { Locale } from "@/lib/i18n/shared";
 import { productApps } from "@/lib/productApps";
 import { type WorkCategory, type WorkItem } from "@/lib/work-shared";
 
@@ -20,43 +26,90 @@ export {
 } from "@/lib/work-shared";
 
 function tagsOf(item: ContentIndexItem | ContentItem): string[] {
-  return (item.tags || []).map((t) => t.toLowerCase());
+  return item.tags || [];
 }
 
 function categorize(
   source: WorkItem["source"],
   tags: string[]
 ): WorkCategory {
+  const normalized = tags.map((t) => t.toLowerCase());
   if (source === "apps" || source === "product-apps") return "apps";
-  if (tags.includes("website") || tags.includes("websites")) return "websites";
-  if (tags.includes("system") || tags.includes("systems")) return "systems";
   if (
-    tags.includes("product-design") ||
-    tags.includes("design") ||
+    normalized.includes("website") ||
+    normalized.includes("websites") ||
+    normalized.includes("web design") ||
+    normalized.includes("web-design")
+  ) {
+    return "websites";
+  }
+  if (normalized.includes("system") || normalized.includes("systems")) {
+    return "systems";
+  }
+  if (
+    normalized.includes("product-design") ||
+    normalized.includes("product design") ||
+    normalized.includes("design") ||
+    normalized.includes("ui design") ||
     source === "products"
   ) {
     return "product-design";
   }
-  if (tags.includes("places") || tags.includes("hospitality")) return "systems";
+  if (normalized.includes("places") || normalized.includes("hospitality")) {
+    return "systems";
+  }
   return "product-design";
+}
+
+function readLogo(metadata?: Record<string, unknown>): string | undefined {
+  const logo = metadata?.logo;
+  if (typeof logo !== "string" || !logo.trim()) return undefined;
+  const trimmed = logo.trim();
+  return trimmed.startsWith("/") ? trimmed : undefined;
 }
 
 function toWorkItem(
   item: ContentIndexItem,
-  source: "apps" | "projects" | "products"
+  source: "apps" | "projects" | "products",
+  locale: Locale = "en"
 ): WorkItem {
   const tags = tagsOf(item);
   const category = categorize(source, tags);
+  const meta = (item.metadata || {}) as Record<string, unknown>;
+  const title =
+    pickLocalizedField(meta, "title", locale, item.title) || item.title;
+  const description = pickLocalizedField(meta, "description", locale, item.description);
+  const summary =
+    pickLocalizedField(meta, "summary", locale) ||
+    description?.trim() ||
+    title;
+
+  const cta =
+    meta.cta && typeof meta.cta === "object" && !Array.isArray(meta.cta)
+      ? (meta.cta as Record<string, unknown>)
+      : undefined;
+  const externalHref =
+    typeof cta?.link === "string"
+      ? cta.link
+      : typeof item.cta?.link === "string"
+        ? item.cta.link
+        : undefined;
+  const externalCtaText =
+    (cta ? pickLocalizedField(cta, "text", locale) : undefined) ||
+    (typeof item.cta?.text === "string" ? item.cta.text : undefined);
+
   return {
     slug: item.slug,
-    title: item.title,
-    description: item.description,
+    title,
+    description,
     date: item.date,
     coverImage: item.coverImage,
+    logo: readLogo(meta),
     category,
-    summary: item.description?.trim() || item.title,
+    summary,
     href: `/work/${item.slug}`,
-    externalHref: typeof item.cta?.link === "string" ? item.cta.link : undefined,
+    externalHref,
+    externalCtaText,
     source,
     tags,
   };
@@ -76,7 +129,7 @@ function productAppWorkItems(): WorkItem[] {
   }));
 }
 
-export async function getAllWork(): Promise<WorkItem[]> {
+export async function getAllWork(locale: Locale = "en"): Promise<WorkItem[]> {
   const [apps, products, projects] = await Promise.all([
     getAllApps(),
     getAllProducts(),
@@ -84,13 +137,16 @@ export async function getAllWork(): Promise<WorkItem[]> {
   ]);
 
   const mapped: (WorkItem & { _dateKey: string })[] = [
-    ...apps.map((item) => ({ ...toWorkItem(item, "apps"), _dateKey: item.date || "" })),
+    ...apps.map((item) => ({
+      ...toWorkItem(item, "apps", locale),
+      _dateKey: item.date || "",
+    })),
     ...products.map((item) => ({
-      ...toWorkItem(item, "products"),
+      ...toWorkItem(item, "products", locale),
       _dateKey: item.date || "",
     })),
     ...projects.map((item) => ({
-      ...toWorkItem(item, "projects"),
+      ...toWorkItem(item, "projects", locale),
       _dateKey: item.date || "",
     })),
     ...productAppWorkItems().map((item) => ({
@@ -112,7 +168,10 @@ export async function getAllWork(): Promise<WorkItem[]> {
     .map(({ _dateKey, ...rest }) => rest);
 }
 
-export async function getWorkBySlug(slug: string): Promise<{
+export async function getWorkBySlug(
+  slug: string,
+  locale: Locale = "en"
+): Promise<{
   item: WorkItem;
   bodyHtml?: string;
   body?: string;
@@ -136,11 +195,16 @@ export async function getWorkBySlug(slug: string): Promise<{
 
   if (!hit) return null;
 
-  const item = toWorkItem(hit.content, hit.source);
+  const item = toWorkItem(hit.content, hit.source, locale);
+  const localizedMarkdown = pickLocalizedMarkdown(hit.content.body || "", locale);
+  const bodyHtml = localizedMarkdown
+    ? await markdownToHtml(localizedMarkdown)
+    : hit.content.html;
+
   return {
     item,
-    bodyHtml: hit.content.html,
-    body: hit.content.body,
+    bodyHtml,
+    body: localizedMarkdown || hit.content.body,
   };
 }
 

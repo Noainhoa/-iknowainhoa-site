@@ -1,10 +1,10 @@
 ---
 title: "Muebles Begui"
-description: "A clean website for a physical furniture shop, designed as a window to the store with easy contact options."
+description: "A clean website for a furniture shop — a clear window to the store."
 date: "2026-03-18"
 slug: "muebles-begui"
 draft: false
-tags: ["website", "client work", "small business"]
+tags: ["Web design", "website", "Client work"]
 coverImage: https://image.thum.io/get/width/1200/crop/800/https://mueblesbegui.es
 cta:
   text: "Visit website"

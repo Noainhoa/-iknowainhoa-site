@@ -12,9 +12,9 @@ export const site = {
 /**
  * Flip these to re-enable routes without restoring deleted code.
  * Blog + contact stay on; everything else renders blank for now.
+ * Home is always empty until content is added intentionally.
  */
 export const publicPages = {
-  homeContent: false,
   blog: true,
   contact: true,
   gallery: true,

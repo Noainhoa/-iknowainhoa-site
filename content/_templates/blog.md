@@ -1,6 +1,6 @@
 ---
 title: ""
-date: "YYYY-MM-DD"
+date: "DD-MM-YYYY"
 description: ""
 slug: ""
 draft: true

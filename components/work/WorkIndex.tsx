@@ -2,13 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import {
-  WORK_FILTERS,
-  categoryLabel,
-  type WorkFilterId,
-  type WorkItem,
-} from "@/lib/work-shared";
+import type { WorkItem } from "@/lib/work-shared";
 
 export default function WorkIndex({
   items,
@@ -21,13 +15,6 @@ export default function WorkIndex({
   subtitle: string;
   empty: string;
 }) {
-  const [filter, setFilter] = useState<WorkFilterId>("all");
-
-  const visible = useMemo(() => {
-    if (filter === "all") return items;
-    return items.filter((item) => item.category === filter);
-  }, [filter, items]);
-
   return (
     <main className="work">
       <header className="work-hero">
@@ -35,106 +22,83 @@ export default function WorkIndex({
         <p>{subtitle}</p>
       </header>
 
-      <div className="chips" role="tablist" aria-label="Filter work">
-        {WORK_FILTERS.map((chip) => {
-          const selected = filter === chip.id;
-          return (
-            <button
-              key={chip.id}
-              type="button"
-              role="tab"
-              aria-selected={selected}
-              className={selected ? "chip chip-active" : "chip"}
-              onClick={() => setFilter(chip.id)}
-            >
-              {chip.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {visible.length === 0 ? (
+      {items.length === 0 ? (
         <p className="empty">{empty}</p>
       ) : (
-        <section className="grid" aria-live="polite">
-          {visible.map((item, index) => (
-            <Link key={item.slug} href={item.href} className="card">
+        <section className="grid" aria-label={title}>
+          {items.map((item, index) => (
+            <Link key={item.slug} href={item.href} className="project">
               <div className="media">
                 {item.coverImage ? (
-                  <Image
-                    src={item.coverImage}
-                    alt=""
-                    fill
-                    sizes="(max-width: 700px) 100vw, 50vw"
-                    priority={index < 2}
-                    style={{ objectFit: "cover" }}
-                  />
+                  item.logo && item.coverImage === item.logo ? (
+                    // Logos: skip Next optimizer — it was soft-resizing the badge.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.coverImage}
+                      alt=""
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        objectPosition: "center",
+                        padding: 10,
+                        background: "#0b2a5b",
+                      }}
+                    />
+                  ) : (
+                    <Image
+                      src={item.coverImage}
+                      alt=""
+                      fill
+                      sizes="(max-width: 760px) 50vw, (max-width: 1100px) 33vw, 25vw"
+                      quality={90}
+                      priority={index < 2}
+                      style={{
+                        objectFit: "cover",
+                        objectPosition: "center",
+                      }}
+                    />
+                  )
                 ) : (
-                  <div className="placeholder">{categoryLabel(item.category)}</div>
+                  <div className="placeholder" aria-hidden />
                 )}
               </div>
-              <div className="meta">
-                <h2>{item.title}</h2>
-                <p>{item.summary}</p>
-              </div>
+              <h2>{item.title}</h2>
+              <p>{item.summary}</p>
             </Link>
           ))}
         </section>
       )}
 
-      <style jsx>{`
+      <style>{`
         .work {
-          max-width: 1100px;
+          max-width: 1080px;
           margin: 0 auto;
-          padding: 48px 28px 96px;
+          padding: 56px 28px 120px;
           font-family: var(--font-geist-sans);
-          color: var(--foreground);
+          color: #2a2a2a;
         }
         .work-hero {
-          max-width: 640px;
-          margin-bottom: 36px;
+          max-width: 34em;
+          margin-bottom: 64px;
         }
         .work-hero h1 {
           margin: 0;
-          font-size: clamp(2.4rem, 5vw, 3.6rem);
-          font-weight: 750;
-          letter-spacing: -0.03em;
+          font-size: clamp(2.6rem, 6vw, 3.75rem);
+          font-weight: 700;
+          letter-spacing: -0.04em;
           line-height: 1.05;
+          color: #2a2a2a;
         }
         .work-hero p {
-          margin: 16px 0 0;
-          font-size: 1.125rem;
-          line-height: 1.65;
-          color: var(--foreground-muted);
-          font-family: var(--font-serif);
-          max-width: 34em;
-        }
-        .chips {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-bottom: 40px;
-        }
-        .chip {
-          appearance: none;
-          border: 1px solid var(--border);
-          background: var(--background);
-          color: var(--foreground-muted);
-          font: inherit;
-          font-size: 0.9rem;
-          padding: 8px 14px;
-          border-radius: 999px;
-          cursor: pointer;
-          transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-        }
-        .chip:hover {
-          color: var(--foreground);
-          border-color: #ccc;
-        }
-        .chip-active {
-          background: var(--foreground);
-          border-color: var(--foreground);
-          color: var(--background);
+          margin: 22px 0 0;
+          font-size: clamp(1.15rem, 2.4vw, 1.35rem);
+          line-height: 1.55;
+          color: #5a5a5a;
+          font-weight: 450;
+          max-width: 28em;
         }
         .empty {
           opacity: 0.65;
@@ -142,70 +106,88 @@ export default function WorkIndex({
         }
         .grid {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 48px 28px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 36px 24px;
         }
-        .card {
+        .project {
           display: grid;
-          gap: 16px;
+          gap: 12px;
           text-decoration: none;
-          color: inherit;
+          color: #2a2a2a;
         }
-        .card:hover {
+        .project:hover {
           text-decoration: none;
-          color: inherit;
+          color: #2a2a2a;
+        }
+        .project:hover .media {
+          transform: translateY(-2px);
         }
         .media {
           position: relative;
           aspect-ratio: 4 / 3;
           overflow: hidden;
-          background: var(--muted);
-          border-radius: 2px;
-        }
-        .card:hover .media {
-          opacity: 0.96;
+          background: #eceae6;
+          transition: transform 0.35s ease;
         }
         .placeholder {
           position: absolute;
           inset: 0;
-          display: grid;
-          place-items: center;
-          font-size: 0.8rem;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--foreground-muted);
-          background: linear-gradient(
-            135deg,
-            var(--muted) 0%,
-            #efe9d8 50%,
-            var(--joy-yellow-soft) 100%
-          );
+          background: linear-gradient(145deg, #e8e4dc 0%, #f3efe6 55%, #ddd6c8 100%);
         }
-        .meta h2 {
-          margin: 0;
-          font-size: 1.35rem;
+        .project h2 {
+          margin: 2px 0 0;
+          font-size: 1.1rem;
           font-weight: 700;
-          letter-spacing: -0.02em;
+          letter-spacing: -0.025em;
           line-height: 1.2;
+          color: #2a2a2a;
         }
-        .meta p {
-          margin: 8px 0 0;
-          font-size: 1rem;
-          line-height: 1.55;
-          color: var(--foreground-muted);
+        .project p {
+          margin: 0;
+          font-size: 0.95rem;
+          line-height: 1.45;
+          color: #6a6a6a;
           font-family: var(--font-serif);
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
-        @media (max-width: 720px) {
+        @media (min-width: 1100px) {
+          .grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 32px 20px;
+          }
+        }
+        @media (max-width: 900px) {
+          .grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 32px 20px;
+          }
+        }
+        @media (max-width: 760px) {
           .work {
-            padding: 28px 18px 72px;
+            padding: 28px 16px 72px;
+          }
+          .work-hero {
+            margin-bottom: 28px;
           }
           .grid {
-            grid-template-columns: 1fr;
-            gap: 36px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px 12px;
+          }
+          .media {
+            aspect-ratio: 1 / 1;
+          }
+          .project {
+            gap: 8px;
+          }
+          .project h2 {
+            font-size: 0.95rem;
+          }
+          .project p {
+            font-size: 0.82rem;
+            -webkit-line-clamp: 2;
           }
         }
       `}</style>

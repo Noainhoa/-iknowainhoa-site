@@ -11,23 +11,44 @@ ALTER TABLE parking_admin_allowlist ENABLE ROW LEVEL SECURITY;
 
 CREATE OR REPLACE FUNCTION public.is_parking_admin()
 RETURNS boolean
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
 SET search_path = public
+SET row_security = off
 AS $$
-  SELECT EXISTS (
+DECLARE
+  claim_email text;
+BEGIN
+  claim_email := lower(coalesce(
+    nullif(auth.jwt() ->> 'email', ''),
+    (SELECT u.email FROM auth.users u WHERE u.id = auth.uid()),
+    ''
+  ));
+  IF claim_email = '' THEN
+    RETURN false;
+  END IF;
+  RETURN EXISTS (
     SELECT 1
     FROM parking_admin_allowlist a
-    WHERE lower(a.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+    WHERE lower(a.email) = claim_email
   );
+END;
 $$;
 
 REVOKE ALL ON FUNCTION public.is_parking_admin() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_parking_admin() TO authenticated;
 
 INSERT INTO parking_admin_allowlist (email)
-VALUES ('ainhoaferrandis@gmail.com')
+VALUES
+  ('ainhoaferrandis@gmail.com'),
+  ('noafp@icloud.com')
+ON CONFLICT (email) DO NOTHING;
+
+INSERT INTO parking_admin_allowlist (email)
+SELECT lower(u.email)
+FROM auth.users u
+WHERE u.email IS NOT NULL AND u.email <> ''
 ON CONFLICT (email) DO NOTHING;
 
 DROP POLICY IF EXISTS parking_bookings_admin_all ON parking_bookings;

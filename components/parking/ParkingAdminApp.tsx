@@ -95,6 +95,15 @@ export default function ParkingAdminApp() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [recoveryMode, setRecoveryMode] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const hash = window.location.hash.replace(/^#/, "");
+    return new URLSearchParams(hash).get("type") === "recovery";
+  });
+  const [resetSent, setResetSent] = useState(false);
+  const [authBusy, setAuthBusy] = useState(false);
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [rows, setRows] = useState<ParkingBooking[]>([]);
@@ -122,6 +131,16 @@ export default function ParkingAdminApp() {
       setSessionEmail(null);
       return;
     }
+
+    const hash = window.location.hash.replace(/^#/, "");
+    const isRecovery =
+      recoveryMode || new URLSearchParams(hash).get("type") === "recovery";
+    if (isRecovery) {
+      setRecoveryMode(true);
+      setSessionEmail(email);
+      return;
+    }
+
     const { data: isAdmin, error } = await supabase.rpc("is_parking_admin");
     // Before parking-admin-rls.sql is applied the RPC is missing — allow session.
     if (error && !/could not find|PGRST202|42883/i.test(error.message)) {
@@ -135,12 +154,14 @@ export default function ParkingAdminApp() {
       await supabase.auth.signOut();
       setSessionEmail(null);
       setRows([]);
-      setAuthError("No tienes permiso de administrador.");
+      setAuthError(
+        "No tienes permiso de administrador. En Supabase SQL Editor ejecuta supabase/parking-admin-access-fix.sql (añade tu email a parking_admin_allowlist)."
+      );
       return;
     }
     setAuthError(null);
     setSessionEmail(email);
-  }, [supabase]);
+  }, [supabase, recoveryMode]);
 
   const loadRows = useCallback(async () => {
     if (!supabase || !sessionEmail) return;
@@ -194,16 +215,21 @@ export default function ParkingAdminApp() {
   }, [supabase, sessionEmail]);
 
   useEffect(() => {
-    void refreshSession();
-  }, [refreshSession]);
-
-  useEffect(() => {
+    const hash = window.location.hash.replace(/^#/, "");
+    const hashParams = new URLSearchParams(hash);
+    if (hashParams.get("type") === "recovery") {
+      setRecoveryMode(true);
+    }
     const params = new URLSearchParams(window.location.search);
     if (params.get("admin") === "denied") {
       setAuthError("No tienes permiso de administrador.");
       window.history.replaceState({}, "", window.location.pathname);
     }
   }, []);
+
+  useEffect(() => {
+    void refreshSession();
+  }, [refreshSession]);
 
   useEffect(() => {
     if (sessionEmail) {
@@ -278,15 +304,71 @@ export default function ParkingAdminApp() {
   async function onLogin(e: FormEvent) {
     e.preventDefault();
     setAuthError(null);
+    setResetSent(false);
     if (!supabase) {
       setAuthError("Supabase no está configurado.");
       return;
     }
+    setAuthBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setAuthBusy(false);
     if (error) {
       setAuthError(error.message);
       return;
     }
+    await refreshSession();
+  }
+
+  async function onForgotPassword() {
+    setAuthError(null);
+    setResetSent(false);
+    if (!supabase) {
+      setAuthError("Supabase no está configurado.");
+      return;
+    }
+    if (!email.trim()) {
+      setAuthError("Escribe tu email y pulsa «Olvidé la contraseña».");
+      return;
+    }
+    setAuthBusy(true);
+    const redirectTo = `${window.location.origin}/parking-guardamar-centro/admin`;
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo,
+    });
+    setAuthBusy(false);
+    if (error) {
+      setAuthError(error.message);
+      return;
+    }
+    setResetSent(true);
+  }
+
+  async function onSetNewPassword(e: FormEvent) {
+    e.preventDefault();
+    setAuthError(null);
+    if (!supabase) {
+      setAuthError("Supabase no está configurado.");
+      return;
+    }
+    if (newPassword.length < 8) {
+      setAuthError("La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setAuthError("Las contraseñas no coinciden.");
+      return;
+    }
+    setAuthBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setAuthBusy(false);
+    if (error) {
+      setAuthError(error.message);
+      return;
+    }
+    setRecoveryMode(false);
+    setNewPassword("");
+    setConfirmPassword("");
+    window.history.replaceState({}, "", window.location.pathname);
     await refreshSession();
   }
 
@@ -352,8 +434,8 @@ export default function ParkingAdminApp() {
     });
 
     try {
-      const { error } = await supabase.from("parking_rates").upsert(payload, {
-        onConflict: "season",
+      const { error } = await supabase.rpc("parking_admin_upsert_rates", {
+        p_rows: payload,
       });
       if (error) {
         setRatesError(formatParkingError(error.message));
@@ -666,38 +748,106 @@ export default function ParkingAdminApp() {
     );
   }
 
+  if (recoveryMode) {
+    return (
+      <div className="adm auth-page">
+        <div className="auth-card">
+          <div className="auth-logo">
+            <img src={LOGO_SRC} alt="Guardamar Parking" width={48} height={48} decoding="async" />
+          </div>
+          <h1 className="auth-title">Nueva contraseña</h1>
+          <p className="auth-sub">Elige una contraseña segura para tu cuenta de administrador.</p>
+          <form className="auth-form" onSubmit={(e) => void onSetNewPassword(e)}>
+            <label className="auth-label">
+              Nueva contraseña
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+                className="auth-input"
+                placeholder="Mínimo 8 caracteres"
+              />
+            </label>
+            <label className="auth-label">
+              Confirmar contraseña
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                className="auth-input"
+                placeholder="Repite la contraseña"
+              />
+            </label>
+            {authError ? <p className="auth-err">{authError}</p> : null}
+            <button type="submit" className="auth-btn" disabled={authBusy}>
+              {authBusy ? "Guardando…" : "Guardar contraseña"}
+            </button>
+          </form>
+        </div>
+        <style jsx>{styles}</style>
+      </div>
+    );
+  }
+
   if (!sessionEmail) {
     return (
-      <div className="adm">
-        <div className="brand">
-          <img className="logo" src={LOGO_SRC} alt="Guardamar Parking" width={48} height={48} decoding="async" />
-          <h1>Administración. Parking Guardamar Centro</h1>
+      <div className="adm auth-page">
+        <div className="auth-card">
+          <div className="auth-logo">
+            <img src={LOGO_SRC} alt="Guardamar Parking" width={48} height={48} decoding="async" />
+          </div>
+          <h1 className="auth-title">Administración</h1>
+          <p className="auth-sub">Parking Guardamar Centro · Acceso restringido</p>
+          <form className="auth-form" onSubmit={(e) => void onLogin(e)}>
+            <label className="auth-label">
+              Email
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                className="auth-input"
+                placeholder="tu@email.com"
+              />
+            </label>
+            <label className="auth-label">
+              Contraseña
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                className="auth-input"
+                placeholder="••••••••"
+              />
+            </label>
+            {authError ? <p className="auth-err">{authError}</p> : null}
+            {resetSent ? (
+              <p className="auth-success">
+                ✓ Email enviado. Abre el enlace desde este mismo navegador.
+              </p>
+            ) : null}
+            <button type="submit" className="auth-btn" disabled={authBusy}>
+              {authBusy ? "Entrando…" : "Entrar"}
+            </button>
+            <button
+              type="button"
+              className="auth-link"
+              disabled={authBusy}
+              onClick={() => void onForgotPassword()}
+            >
+              Olvidé la contraseña
+            </button>
+          </form>
         </div>
-        <p className="muted">Acceso restringido. Inicia sesión.</p>
-        <form className="card form" onSubmit={onLogin}>
-          <label>
-            Email
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="username"
-            />
-          </label>
-          <label>
-            Contraseña
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-          </label>
-          {authError ? <p className="err">{authError}</p> : null}
-          <button type="submit">Entrar</button>
-        </form>
         <style jsx>{styles}</style>
       </div>
     );
@@ -1181,6 +1331,119 @@ const styles = `
     font-family: system-ui, -apple-system, sans-serif;
     color: #1a1a1a;
   }
+  /* ── Auth screens (login / recovery) ── */
+  .auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    background: #f5f5f5;
+  }
+  .auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 16px;
+    padding: 36px 32px 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .auth-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .auth-logo img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+  }
+  .auth-title {
+    margin: 0 0 4px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+    color: #111;
+  }
+  .auth-sub {
+    margin: 0 0 24px;
+    font-size: 0.88rem;
+    color: #666;
+    text-align: center;
+  }
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .auth-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #333;
+  }
+  .auth-input {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 1.5px solid #d1d1d1;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+  }
+  .auth-input:focus { border-color: #111; }
+  .auth-err {
+    margin: 0;
+    padding: 10px 12px;
+    background: #fff3f3;
+    border: 1px solid #f5c6c6;
+    border-radius: 8px;
+    color: #8b1e1e;
+    font-size: 0.85rem;
+  }
+  .auth-success {
+    margin: 0;
+    padding: 10px 12px;
+    background: #f0faf4;
+    border: 1px solid #b2dfcc;
+    border-radius: 8px;
+    color: #1b5e34;
+    font-size: 0.85rem;
+  }
+  .auth-btn {
+    width: 100%;
+    min-height: 46px;
+    background: #111;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 650;
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 4px;
+  }
+  .auth-btn:hover:not(:disabled) { background: #333; }
+  .auth-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .auth-link {
+    background: none;
+    border: 0;
+    color: #555;
+    font-size: 0.85rem;
+    text-align: center;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font: inherit;
+  }
+  .auth-link:hover { color: #111; }
+  .auth-link:disabled { opacity: 0.5; cursor: not-allowed; }
+  /* ── End auth screens ── */
   h1 { margin: 0 0 8px; font-size: 1.45rem; }
   h2 { margin: 0 0 12px; font-size: 1.1rem; }
   h3 { margin: 0 0 8px; font-size: 0.95rem; }

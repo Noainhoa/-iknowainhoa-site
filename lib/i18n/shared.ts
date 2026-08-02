@@ -22,20 +22,11 @@ type Dictionary = {
   footer: {
     support: string;
   };
-  home: {
-    heroTitle: string;
-    heroSubtitle: string;
-    featuredTitle: string;
-    viewAllWork: string;
-    aboutCtaTitle: string;
-    aboutCtaBody: string;
-    aboutButton: string;
-    contactButton: string;
-  };
   work: {
     title: string;
     subtitle: string;
     empty: string;
+    more: string;
   };
   about: {
     title: string;
@@ -67,22 +58,12 @@ const dictionaries: Record<Locale, Dictionary> = {
   en: {
     header: { blog: "Blog", work: "Work", about: "About", contact: "Contact" },
     footer: { support: "Support this work" },
-    home: {
-      heroTitle: "Ainhoa designs and builds calm, human websites, apps, and small products.",
-      heroSubtitle: "This is where new experiments, client work, and tiny tools quietly ship.",
-      featuredTitle: "Featured work",
-      viewAllWork: "View all work",
-      aboutCtaTitle: "About & contact",
-      aboutCtaBody:
-        "I work with small teams and individuals who care about thoughtful, quiet internet things: simple product pages, tiny tools, and honest personal sites.",
-      aboutButton: "Read a bit more",
-      contactButton: "Start a conversation",
-    },
     work: {
       title: "Work",
       subtitle:
-        "Selected apps, websites, systems, and product design — one place for the things I make.",
-      empty: "Nothing in this filter yet.",
+        "Apps, websites, systems, and product design — future-focused work for everyday use.",
+      empty: "Nothing here yet.",
+      more: "More work",
     },
     about: {
       title: "About Ainhoa",
@@ -116,22 +97,12 @@ const dictionaries: Record<Locale, Dictionary> = {
   es: {
     header: { blog: "Blog", work: "Trabajo", about: "Sobre mí", contact: "Contacto" },
     footer: { support: "Apoyar este trabajo" },
-    home: {
-      heroTitle: "Ainhoa diseña y desarrolla webs, apps y pequeños productos con calma y enfoque humano.",
-      heroSubtitle: "Aquí comparto experimentos, trabajo con clientes y herramientas pequeñas que voy lanzando.",
-      featuredTitle: "Proyectos destacados",
-      viewAllWork: "Ver todos los proyectos",
-      aboutCtaTitle: "Sobre mí y contacto",
-      aboutCtaBody:
-        "Trabajo con equipos pequeños y personas que valoran un internet más cuidado: páginas de producto simples, herramientas útiles y webs personales honestas.",
-      aboutButton: "Leer un poco más",
-      contactButton: "Empezar una conversación",
-    },
     work: {
       title: "Trabajo",
       subtitle:
-        "Apps, webs, sistemas y diseño de producto — un solo lugar para lo que hago.",
-      empty: "Todavía no hay nada en este filtro.",
+        "Apps, webs, sistemas y diseño de producto — trabajo con foco en el uso diario.",
+      empty: "Todavía no hay nada aquí.",
+      more: "Más proyectos",
     },
     about: {
       title: "Sobre Ainhoa",
@@ -166,22 +137,12 @@ const dictionaries: Record<Locale, Dictionary> = {
   fr: {
     header: { blog: "Blog", work: "Work", about: "About", contact: "Contact" },
     footer: { support: "Support this work" },
-    home: {
-      heroTitle: "Ainhoa designs and builds calm, human websites, apps, and small products.",
-      heroSubtitle: "This is where new experiments, client work, and tiny tools quietly ship.",
-      featuredTitle: "Featured work",
-      viewAllWork: "View all work",
-      aboutCtaTitle: "About & contact",
-      aboutCtaBody:
-        "I work with small teams and individuals who care about thoughtful, quiet internet things: simple product pages, tiny tools, and honest personal sites.",
-      aboutButton: "Read a bit more",
-      contactButton: "Start a conversation",
-    },
     work: {
       title: "Work",
       subtitle:
-        "Selected apps, websites, systems, and product design — one place for the things I make.",
-      empty: "Nothing in this filter yet.",
+        "Apps, websites, systems, and product design — future-focused work for everyday use.",
+      empty: "Nothing here yet.",
+      more: "More work",
     },
     about: {
       title: "About Ainhoa",

@@ -6,6 +6,7 @@ slug: "exactness"
 draft: false
 tags:
   - daily
+  - book
 ---
 
 Every day, when I speak, I pause — (if you have ever crossed paths with me, pause is not something you would quickly associate with how I talk) — but I do pause to think. Sometimes, when the conversation matters more, I even close my eyes for several seconds, right in front of you, to sort through the thoughts and choose my words wisely. Each time I am more careful with the words I use, as I have noticed how carelessly language gets used.
@@ -32,7 +33,7 @@ With this note, let’s revisit [patience](https://www.merriam-webster.com/dicti
 
 <aside class="blog-pull">
   <p class="blog-pull-term">patience</p>
-  <p class="blog-pull-def">the capacity, habit, or fact of being patient — bearing pains or trials calmly, or without complaint.</p>
+  <p class="blog-pull-def">the capacity, habit, or fact of being patient · the ability to give attention to something for a long time without becoming bored or losing interest.</p>
   <p class="blog-pull-source"><a href="https://www.merriam-webster.com/dictionary/patience">Merriam-Webster</a></p>
 </aside>
 
@@ -50,5 +51,5 @@ This post is a wink to a close friend (in case she wanders over here one day, I 
 ## Notes
 
 - Building: [ListenEasy](https://appstoreconnect.apple.com/apps/6780047059/distribution/ios/version/inflight)
-- Reading: [Clear Thinking](https://share.google/3V4Irz1w27PvNxunx) by [Shane Parrish](https://share.google/FIEvxJ1sl1XrT5hIJ)
+- Book I am reading: [Clear Thinking](https://share.google/3V4Irz1w27PvNxunx) by [Shane Parrish](https://share.google/FIEvxJ1sl1XrT5hIJ)
 - Looking at: [acceptation](https://www.merriam-webster.com/dictionary/acceptation), [patience](https://www.merriam-webster.com/dictionary/patience)
