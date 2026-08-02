@@ -88,6 +88,144 @@ a:hover {
 }
 
 /* ------------------------------------------------------------------ */
+/* Site header — desktop nav + mobile hamburger (always available)     */
+/* ------------------------------------------------------------------ */
+.site-header-spacer {
+  display: none;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-geist-sans);
+  position: sticky;
+  top: var(--accent-height);
+  z-index: 40;
+  background: var(--background);
+}
+
+.site-header-bar {
+  padding: 14px 20px;
+}
+
+.site-header-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.site-brand {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  color: inherit !important;
+  flex-shrink: 0;
+}
+
+.site-nav--desktop {
+  display: flex;
+  gap: 24px;
+}
+
+.site-nav-link {
+  text-decoration: none !important;
+  color: var(--foreground-muted) !important;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.site-nav-link:hover {
+  color: var(--foreground) !important;
+}
+
+.site-menu-btn {
+  display: none;
+  flex-shrink: 0;
+  place-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.site-menu-icon {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.site-mobile-body {
+  display: none;
+}
+
+.site-mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 8px 20px 28px;
+}
+
+.site-mobile-lang {
+  margin-bottom: 12px;
+}
+
+.site-mobile-link {
+  text-decoration: none !important;
+  color: var(--foreground) !important;
+  font-size: 1.125rem;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  .site-header-spacer {
+    display: block;
+    height: var(--site-mobile-bar-height, 72px);
+  }
+
+  .site-header {
+    position: fixed;
+    top: var(--accent-height);
+    left: 0;
+    right: 0;
+    bottom: auto;
+    overflow: hidden;
+    z-index: 60;
+  }
+
+  .site-nav--desktop,
+  .site-lang--desktop {
+    display: none;
+  }
+
+  .site-menu-btn {
+    display: grid;
+  }
+
+  .site-header.is-menu-open {
+    bottom: 0;
+    height: calc(100vh - var(--accent-height));
+    max-height: calc(100vh - var(--accent-height));
+    overflow-y: auto;
+    border-bottom: none;
+  }
+
+  .site-header.is-menu-open .site-mobile-body {
+    display: block;
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Blog shell — Seth-inspired sidebar (https://seths.blog/)            */
 /* Joy-yellow accents instead of Seth orange; no subscribe blocks.     */
 /* ------------------------------------------------------------------ */

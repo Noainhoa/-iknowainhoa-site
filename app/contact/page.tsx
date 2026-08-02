@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { ContactForm } from "./ContactForm";
+import { externalAnchorProps } from "@/lib/links";
 import { site } from "@/lib/site";
 import { getLocale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n/shared";
@@ -75,8 +76,7 @@ export default async function ContactPage() {
                 {site.socials?.linkedin && (
                   <a
                     href={site.socials.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    {...externalAnchorProps(site.socials.linkedin)}
                     style={{
                       display: "inline-block",
                       padding: "10px 16px",
@@ -96,8 +96,7 @@ export default async function ContactPage() {
                 {site.socials?.instagram && (
                   <a
                     href={site.socials.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    {...externalAnchorProps(site.socials.instagram)}
                     style={{
                       display: "inline-block",
                       padding: "10px 16px",

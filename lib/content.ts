@@ -12,6 +12,7 @@ import type { GrayMatterFile } from "gray-matter";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import html from "remark-html";
+import { openExternalLinksInNewTab } from "@/lib/links";
 
 export type Collection = "blog" | "products" | "projects" | "landing" | "apps" | "offers";
 
@@ -99,35 +100,6 @@ async function loadStripePaymentLinks(): Promise<StripePaymentLinks> {
 
 function isStripePaymentLink(url: string) {
   return url.startsWith("https://buy.stripe.com/");
-}
-
-/** External http(s) links get a new tab; same-site /… paths stay in-page. */
-function openExternalLinksInNewTab(html: string): string {
-  return html.replace(/<a\b([^>]*)>/gi, (full, attrs: string) => {
-    const hrefMatch = attrs.match(/\bhref\s*=\s*(["'])(.*?)\1/i);
-    if (!hrefMatch) return full;
-
-    const href = hrefMatch[2].trim();
-    const isExternal = /^https?:\/\//i.test(href) || href.startsWith("//");
-    if (!isExternal) return full;
-
-    let next = attrs;
-    if (!/\btarget\s*=/i.test(next)) {
-      next += ' target="_blank"';
-    }
-    if (!/\brel\s*=/i.test(next)) {
-      next += ' rel="noopener noreferrer"';
-    } else if (!/noopener/i.test(next) || !/noreferrer/i.test(next)) {
-      next = next.replace(/\brel\s*=\s*(["'])(.*?)\1/i, (_m, q: string, value: string) => {
-        const parts = new Set(value.split(/\s+/).filter(Boolean));
-        parts.add("noopener");
-        parts.add("noreferrer");
-        return `rel=${q}${[...parts].join(" ")}${q}`;
-      });
-    }
-
-    return `<a${next}>`;
-  });
 }
 
 function sanitizeProductCtaUrl(

@@ -1317,8 +1317,6 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                 <Link
                   href={parkingPrivacyHref(locale)}
                   className="pk-inline-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {t.privacyPolicyLinkLabel}

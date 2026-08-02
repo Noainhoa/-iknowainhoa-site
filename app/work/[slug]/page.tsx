@@ -12,6 +12,7 @@ import {
 } from "@/lib/work";
 import { splitCaseBody } from "@/lib/workCaseBody";
 import { getProductApp } from "@/lib/productApps";
+import { externalAnchorProps } from "@/lib/links";
 import { publicPages } from "@/lib/site";
 
 export async function generateStaticParams() {
@@ -70,8 +71,7 @@ export default async function WorkCaseStudyPage({
             {item.externalHref ? (
               <a
                 href={item.externalHref}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...externalAnchorProps(item.externalHref)}
                 aria-label={item.externalCtaText || item.title}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -99,7 +99,7 @@ export default async function WorkCaseStudyPage({
         {(item.externalHref || productApp) && (
           <p className="actions">
             {item.externalHref ? (
-              <a href={item.externalHref} target="_blank" rel="noopener noreferrer">
+              <a href={item.externalHref} {...externalAnchorProps(item.externalHref)}>
                 {item.externalCtaText || "Visit live site"}
               </a>
             ) : null}

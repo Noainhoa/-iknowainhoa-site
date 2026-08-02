@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import BlogAvatarLoop from "@/components/blog/BlogAvatarLoop";
 import { blogNavSections } from "@/lib/blogNav";
 import { activeBlogMoon, moonMaskDataUri } from "@/lib/blogMoon";
+import { externalAnchorProps, isExternalHref } from "@/lib/links";
 
 function NavSections({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -16,12 +17,14 @@ function NavSections({ onNavigate }: { onNavigate?: () => void }) {
           <ul className="blog-nav-list">
             {section.links.map((link) => (
               <li key={`${section.id}-${link.href}-${link.label}`}>
-                {link.external ? (
+                {isExternalHref(link.href) ||
+                link.href.startsWith("mailto:") ||
+                link.href.startsWith("tel:") ||
+                link.external ? (
                   <a
                     className="blog-nav-link"
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    {...externalAnchorProps(link.href)}
                     onClick={onNavigate}
                   >
                     {link.label}

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import BlankPage from "@/components/BlankPage";
 import { getProject, getAllProjectSlugs } from "@/lib/content";
+import { externalAnchorProps } from "@/lib/links";
 import CopyButton from "../components/copy-button";
 import { publicPages } from "@/lib/site";
 
@@ -77,8 +78,7 @@ export default async function ProjectPage({
               <div className="flex flex-wrap items-center gap-3">
                 <a
                   href="https://watnow.netlify.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  {...externalAnchorProps("https://watnow.netlify.app")}
                   className="inline-flex items-center gap-2 rounded-md bg-slate-900 text-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
                 >
                   Open watnow.netlify.app
@@ -95,8 +95,7 @@ export default async function ProjectPage({
               {websiteHref ? (
                 <a
                   href={websiteHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  {...externalAnchorProps(websiteHref)}
                   aria-label={`Visit ${project.title}`}
                   style={{ display: "block" }}
                 >

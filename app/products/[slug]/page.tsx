@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import BlankPage from "@/components/BlankPage";
 import { getProduct, getAllProductSlugs } from "@/lib/content";
+import { externalAnchorProps } from "@/lib/links";
 import { publicPages } from "@/lib/site";
 
 const statusLabels: Record<string, string> = {
@@ -174,8 +175,7 @@ export default async function ProductPage({
           ) : ctaUrl ? (
             <a
               href={ctaUrl}
-              target={ctaUrl.startsWith("http") ? "_blank" : undefined}
-              rel={ctaUrl.startsWith("http") ? "noopener noreferrer" : undefined}
+              {...externalAnchorProps(ctaUrl)}
               style={{
                 display: "inline-block",
                 padding: "16px 32px",

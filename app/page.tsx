@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { externalAnchorProps } from "@/lib/links";
 
 /** Home stays sparse — content is added piece by piece. */
 export default function Home() {
@@ -22,8 +23,7 @@ export default function Home() {
 
         <a
           href="https://mueblesbegui.es/"
-          target="_blank"
-          rel="noopener noreferrer"
+          {...externalAnchorProps("https://mueblesbegui.es/")}
           aria-label="Muebles Begui"
           className="home-logo home-logo--begui"
         >
@@ -46,17 +46,19 @@ export default function Home() {
           font-family: var(--font-geist-sans);
         }
         .home-logos {
-          display: flex;
-          flex-wrap: wrap;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           align-items: center;
-          justify-content: center;
-          gap: 40px;
-          max-width: 100%;
+          justify-items: center;
+          gap: 28px 40px;
+          width: min(100%, 420px);
         }
         .home-logo {
-          display: block;
+          display: grid;
+          place-items: center;
+          width: 100%;
+          height: 160px;
           line-height: 0;
-          flex-shrink: 0;
           background: transparent;
         }
         .home-logo img {
@@ -64,29 +66,20 @@ export default function Home() {
           width: auto;
           height: auto;
           max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
         }
-        .home-logo--parking img {
-          width: 160px;
-          height: 160px;
-        }
-        .home-logo--begui img {
-          width: 220px;
-          height: auto;
-        }
-        @media (max-width: 480px) {
+        @media (max-width: 520px) {
           .home {
-            padding: 40px 20px;
+            padding: 36px 20px;
           }
           .home-logos {
-            flex-direction: column;
+            grid-template-columns: 1fr;
+            width: min(100%, 220px);
             gap: 28px;
           }
-          .home-logo--parking img {
-            width: 140px;
-            height: 140px;
-          }
-          .home-logo--begui img {
-            width: 200px;
+          .home-logo {
+            height: 148px;
           }
         }
       `}</style>
