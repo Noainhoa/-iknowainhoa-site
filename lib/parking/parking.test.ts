@@ -44,6 +44,8 @@ describe("parking i18n", () => {
     assert.equal(t.multiModeOr, "Cualquiera de estas opciones (alternativas)");
     assert.equal(t.labelEstimate, "Estimación");
     assert.equal(t.whatsappCta, "Solicitar por WhatsApp");
+    assert.equal(t.whatsappTonightLabel, "¿Esta noche?");
+    assert.match(t.whatsappTonightMessage, /esta noche/i);
     assert.ok(t.faqItems.length >= 4);
     assert.ok(t.aboutItems.length >= 4);
     assert.ok(t.weekdays.includes("Lun"));
@@ -60,6 +62,8 @@ describe("parking i18n", () => {
     assert.equal(t.addPeriod, "Add these dates");
     assert.equal(t.labelEstimate, "Estimate");
     assert.equal(t.whatsappCta, "Enquire through WhatsApp");
+    assert.equal(t.whatsappTonightLabel, "Tonight?");
+    assert.match(t.whatsappTonightMessage, /tonight/i);
     assert.ok(t.weekdays.includes("Mon"));
   });
 
@@ -75,6 +79,8 @@ describe("parking i18n", () => {
     assert.equal(t.priceColSeason, "Tarifs par saison");
     assert.equal(t.addPeriod, "Ajouter ces dates");
     assert.equal(t.whatsappCta, "Demander via WhatsApp");
+    assert.equal(t.whatsappTonightLabel, "Ce soir ?");
+    assert.match(t.whatsappTonightMessage, /ce soir/i);
     assert.equal(t.accessImportant, "Hauteur maximale d’accès : 1,79 m.");
     assert.ok(t.weekdays.includes("Lun"));
   });

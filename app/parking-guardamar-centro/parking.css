@@ -24,7 +24,9 @@
           --space-section: 18px;
           max-width: 820px;
           margin: 0 auto;
-          padding: 10px 16px 32px;
+          padding: 10px 16px calc(88px + env(safe-area-inset-bottom, 0px));
+          padding-left: max(16px, env(safe-area-inset-left, 0px));
+          padding-right: max(16px, env(safe-area-inset-right, 0px));
           color: var(--ink);
           background: var(--bg);
           font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -1111,6 +1113,53 @@
           color: var(--pk-navy);
         }
 
+.parking-root .pk-wa-fab {
+          position: fixed;
+          z-index: 40;
+          right: max(12px, env(safe-area-inset-right, 0px));
+          bottom: max(12px, env(safe-area-inset-bottom, 0px));
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          min-height: 48px;
+          padding: 10px 14px 10px 12px;
+          border-radius: 999px;
+          background: var(--wa);
+          color: #fff;
+          font-size: 0.95rem;
+          font-weight: 650;
+          letter-spacing: 0.01em;
+          text-decoration: none;
+          box-shadow: 0 6px 20px color-mix(in srgb, #0b5c52 28%, transparent);
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+        }
+
+.parking-root .pk-wa-fab:hover {
+          background: var(--wa-hover);
+          color: #fff;
+        }
+
+.parking-root .pk-wa-fab:active {
+          transform: scale(0.98);
+        }
+
+.parking-root .pk-wa-fab:focus-visible {
+          outline: 2px solid var(--pk-navy);
+          outline-offset: 3px;
+        }
+
+.parking-root .pk-wa-fab-icon {
+          flex-shrink: 0;
+          width: 22px;
+          height: 22px;
+        }
+
+.parking-root .pk-wa-fab-label {
+          line-height: 1.1;
+          white-space: nowrap;
+        }
+
 .parking-root .pk-prices-note {
           margin: 8px 0 0;
           color: var(--muted);
@@ -1213,11 +1262,13 @@
 .parking-root .pk-cell.day,
 .parking-root .pk-form input,
 .parking-root .pk-form textarea,
-.parking-root .pk-wa {
+.parking-root .pk-wa,
+.parking-root .pk-wa-fab {
             transition: none;
           }
 
-.parking-root .pk-wa:active:not(:disabled) {
+.parking-root .pk-wa:active:not(:disabled),
+.parking-root .pk-wa-fab:active {
             transform: none;
           }
         }

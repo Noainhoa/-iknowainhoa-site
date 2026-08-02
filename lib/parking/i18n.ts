@@ -91,6 +91,9 @@ export type ParkingCopy = {
   whatsappEditEnquiry: string;
   whatsappSentTitle: string;
   whatsappSentBody: string;
+  whatsappTonightLabel: string;
+  whatsappTonightAria: string;
+  whatsappTonightMessage: string;
   supabaseHint: string;
   loadingAvailability: string;
   loadError: string;
@@ -241,6 +244,10 @@ const es: ParkingCopySource = {
   whatsappSentTitle: "Mensaje enviado",
   whatsappSentBody:
     "Gracias. Te responderé por WhatsApp para confirmar la disponibilidad, el precio y el pago.",
+  whatsappTonightLabel: "¿Esta noche?",
+  whatsappTonightAria: "WhatsApp: preguntar por esta noche",
+  whatsappTonightMessage:
+    "Hola, ¿está libre la plaza esta noche? (llegada hoy)",
   supabaseHint:
     "Calendario en modo local: falta configurar Supabase. Todas las fechas futuras aparecen como disponibles hasta que se conecte la base de datos.",
   loadingAvailability: "Cargando disponibilidad…",
@@ -391,6 +398,10 @@ const en: ParkingCopySource = {
   whatsappSentTitle: "Message sent",
   whatsappSentBody:
     "Thank you. I will reply through WhatsApp to confirm availability, the price and payment.",
+  whatsappTonightLabel: "Tonight?",
+  whatsappTonightAria: "WhatsApp: ask about tonight",
+  whatsappTonightMessage:
+    "Hi, is the parking space free tonight? (arrival today)",
   supabaseHint:
     "Calendar in local mode: Supabase is not configured. All future dates show as available until the database is connected.",
   loadingAvailability: "Loading availability…",
@@ -539,6 +550,10 @@ const fr: ParkingCopySource = {
   whatsappSentTitle: "Message envoyé",
   whatsappSentBody:
     "Merci. Je vous répondrai sur WhatsApp pour confirmer la disponibilité, le prix et le paiement.",
+  whatsappTonightLabel: "Ce soir ?",
+  whatsappTonightAria: "WhatsApp : demander pour ce soir",
+  whatsappTonightMessage:
+    "Bonjour, la place est-elle libre ce soir ? (arrivée aujourd’hui)",
   supabaseHint:
     "Calendrier en mode local : Supabase n’est pas configuré. Toutes les dates futures apparaissent comme disponibles jusqu’à la connexion à la base de données.",
   loadingAvailability: "Chargement de la disponibilité…",
