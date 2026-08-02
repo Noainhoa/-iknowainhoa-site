@@ -58,7 +58,6 @@ export default function AniccaLanding() {
   const [checkoutNote, setCheckoutNote] = useState<string | null>(null);
 
   const selected = ANICCA_VARIANTS.find((v) => v.id === selectedId) ?? null;
-  const price = priceLabel();
 
   useEffect(() => {
     trackAniccaEvent({ name: "anicca_view" });
