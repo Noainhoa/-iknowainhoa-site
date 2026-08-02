@@ -1,0 +1,450 @@
+/* Anicca product landing — calm, tactile, independent of parking chrome */
+
+.anicca {
+  --anicca-bg: #f7f4ef;
+  --anicca-panel: #fffcf8;
+  --anicca-ink: #1c1917;
+  --anicca-muted: #5c564e;
+  --anicca-line: #ddd4c8;
+  --anicca-silver: #9a958c;
+  --anicca-focus: #3f3a34;
+  background: var(--anicca-bg);
+  color: var(--anicca-ink);
+  font-family: var(--font-geist-sans);
+  padding-bottom: 80px;
+}
+
+.anicca * {
+  box-sizing: border-box;
+}
+
+.anicca a:not(.anicca-btn):not(.anicca-option) {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.anicca-wrap {
+  width: min(1080px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.anicca-hero {
+  display: grid;
+  gap: 36px;
+  padding: 36px 0 56px;
+}
+
+@media (min-width: 880px) {
+  .anicca-hero {
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    gap: 56px;
+    padding: 48px 0 72px;
+  }
+}
+
+.anicca-hero-media {
+  margin: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--anicca-panel);
+  border: 1px solid var(--anicca-line);
+  aspect-ratio: 4 / 3;
+}
+
+.anicca-hero-media img,
+.anicca-media img,
+.anicca-option-thumbs img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.anicca-hero-copy h1 {
+  margin: 0 0 16px;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.85rem, 4.5vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.anicca-hero-copy .anicca-lead {
+  margin: 0 0 28px;
+  max-width: 36rem;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--anicca-muted);
+}
+
+.anicca-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 20px;
+}
+
+.anicca-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1px solid var(--anicca-ink);
+  background: var(--anicca-ink);
+  color: #f8f5f0 !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.anicca-btn:hover:not(:disabled) {
+  background: #2a2521;
+}
+
+.anicca-btn:focus-visible,
+.anicca-option:focus-visible {
+  outline: 2px solid var(--anicca-focus);
+  outline-offset: 3px;
+}
+
+.anicca-btn:disabled,
+.anicca-btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.anicca-btn--ghost {
+  background: transparent;
+  color: var(--anicca-ink) !important;
+}
+
+.anicca-btn--ghost:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--anicca-ink) 6%, transparent);
+}
+
+.anicca-meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--anicca-muted);
+  letter-spacing: 0.02em;
+}
+
+.anicca-section {
+  padding: 56px 0;
+  border-top: 1px solid var(--anicca-line);
+}
+
+.anicca-section h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.2;
+}
+
+.anicca-eyebrow {
+  margin: 0 0 10px;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--anicca-muted);
+}
+
+.anicca-prose {
+  margin: 0;
+  max-width: 40rem;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--anicca-muted);
+  white-space: pre-line;
+}
+
+.anicca-prose + .anicca-prose {
+  margin-top: 1em;
+}
+
+.anicca-choice-grid {
+  display: grid;
+  gap: 14px;
+  margin: 28px 0 24px;
+}
+
+@media (min-width: 720px) {
+  .anicca-choice-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.anicca-option {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--anicca-line);
+  background: var(--anicca-panel);
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.anicca-option:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--anicca-ink) 35%, var(--anicca-line));
+}
+
+.anicca-option.is-selected {
+  border-color: var(--anicca-ink);
+  box-shadow: inset 0 0 0 1px var(--anicca-ink);
+}
+
+.anicca-option:disabled,
+.anicca-option.is-sold-out {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.anicca-option-thumbs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.anicca-option-thumbs figure {
+  margin: 0;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #ebe6df;
+  border: 1px solid var(--anicca-line);
+}
+
+.anicca-option-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.anicca-option-inscribe {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--anicca-muted);
+}
+
+.anicca-option-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--anicca-muted);
+}
+
+.anicca-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--anicca-line);
+  background: var(--anicca-bg);
+}
+
+.anicca-pill--sold {
+  border-color: color-mix(in srgb, #7f1d1d 30%, var(--anicca-line));
+  color: #7f1d1d;
+}
+
+.anicca-buy-panel {
+  display: grid;
+  gap: 12px;
+  max-width: 28rem;
+}
+
+.anicca-notice {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--anicca-line);
+  background: #f3eee6;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--anicca-muted);
+}
+
+.anicca-meanings {
+  display: grid;
+  gap: 28px;
+}
+
+@media (min-width: 720px) {
+  .anicca-meanings {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+.anicca-meaning h3 {
+  margin: 0 0 4px;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.anicca-gloss {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--anicca-silver);
+}
+
+.anicca-uses {
+  display: grid;
+  gap: 16px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 720px) {
+  .anicca-uses {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+.anicca-uses li {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.anicca-media {
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--anicca-line);
+  background: var(--anicca-panel);
+}
+
+.anicca-uses p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--anicca-muted);
+}
+
+.anicca-list {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  max-width: 36rem;
+}
+
+.anicca-list li {
+  padding-left: 1.1rem;
+  position: relative;
+  color: var(--anicca-muted);
+  line-height: 1.55;
+}
+
+.anicca-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--anicca-silver);
+}
+
+.anicca-stock-table {
+  width: min(100%, 420px);
+  margin-top: 20px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.anicca-stock-table th,
+.anicca-stock-table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--anicca-line);
+}
+
+.anicca-stock-table th {
+  font-weight: 600;
+}
+
+.anicca-faq details {
+  border-bottom: 1px solid var(--anicca-line);
+  padding: 14px 0;
+}
+
+.anicca-faq summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+
+.anicca-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.anicca-faq summary::after {
+  content: "+";
+  float: right;
+  color: var(--anicca-muted);
+  font-weight: 400;
+}
+
+.anicca-faq details[open] summary::after {
+  content: "–";
+}
+
+.anicca-faq p {
+  margin: 10px 0 0;
+  color: var(--anicca-muted);
+  line-height: 1.65;
+  max-width: 40rem;
+}
+
+.anicca-trust {
+  display: grid;
+  gap: 12px;
+  margin-top: 28px;
+  max-width: 40rem;
+  font-size: 0.9rem;
+  color: var(--anicca-muted);
+  line-height: 1.6;
+}
+
+.anicca-trust a {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anicca-btn,
+  .anicca-option {
+    transition: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .anicca-wrap {
+    width: calc(100% - 28px);
+  }
+
+  .anicca-hero-copy h1 {
+    font-size: 1.65rem;
+  }
+}
