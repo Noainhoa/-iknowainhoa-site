@@ -37,7 +37,7 @@ export default function Home() {
         </a>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .home {
           min-height: 60vh;
           display: grid;
@@ -57,18 +57,19 @@ export default function Home() {
           display: block;
           line-height: 0;
           flex-shrink: 0;
+          background: transparent;
         }
-        .home-logo :global(img) {
+        .home-logo img {
           display: block;
           width: auto;
           height: auto;
           max-width: 100%;
         }
-        .home-logo--parking :global(img) {
+        .home-logo--parking img {
           width: 160px;
           height: 160px;
         }
-        .home-logo--begui :global(img) {
+        .home-logo--begui img {
           width: 220px;
           height: auto;
         }
@@ -80,11 +81,11 @@ export default function Home() {
             flex-direction: column;
             gap: 28px;
           }
-          .home-logo--parking :global(img) {
+          .home-logo--parking img {
             width: 140px;
             height: 140px;
           }
-          .home-logo--begui :global(img) {
+          .home-logo--begui img {
             width: 200px;
           }
         }
