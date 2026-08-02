@@ -1124,20 +1124,23 @@
           min-height: 48px;
           padding: 10px 14px 10px 12px;
           border-radius: 999px;
-          /* Logo-family crimson: deeper than alert red, richer than maroon */
-          background: #b81f33;
+          /* Navy like the logo ring / page chrome — red stays in the mark */
+          background: var(--pk-navy);
+          border: none;
           color: #fff;
           font-size: 0.95rem;
           font-weight: 650;
           letter-spacing: 0.01em;
           text-decoration: none;
-          box-shadow: 0 6px 20px color-mix(in srgb, #7a1422 28%, transparent);
+          box-shadow:
+            0 0 0 2px #fff,
+            0 6px 18px color-mix(in srgb, var(--pk-navy) 28%, transparent);
           -webkit-tap-highlight-color: transparent;
           touch-action: manipulation;
         }
 
 .parking-root .pk-wa-fab:hover {
-          background: #961929;
+          background: color-mix(in srgb, var(--pk-navy) 88%, #000);
           color: #fff;
         }
 
