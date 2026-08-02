@@ -35,7 +35,7 @@ export const publicPages = {
   products: false,
   projects: false,
   support: false,
-  thanks: false,
+  thanks: true,
   shortcuts: false,
   photoarc: false,
   listeneasy: false,
