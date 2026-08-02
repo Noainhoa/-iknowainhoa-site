@@ -3,11 +3,20 @@ export const site = {
   url: "https://iknowainhoa.com",
   description: "Writing, projects, and ideas.",
   email: "hola@iknowainhoa.com",
+  /** Digits only, country code included (same channel as parking enquiries). */
+  whatsapp: "34636670103",
   socials: {
     linkedin: "https://www.linkedin.com/in/iknowa/",
     instagram: "https://instagram.com/ainhoaferrandisperea",
   },
 };
+
+export function siteWhatsAppEnquiryHref(message?: string): string {
+  const text = encodeURIComponent(
+    message?.trim() || "Hola — me gustaría hacer una consulta."
+  );
+  return `https://api.whatsapp.com/send/?phone=${site.whatsapp}&text=${text}&type=phone_number&app_absent=0`;
+}
 
 /**
  * Flip these to re-enable routes without restoring deleted code.
