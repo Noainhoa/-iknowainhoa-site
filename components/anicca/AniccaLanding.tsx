@@ -32,11 +32,13 @@ function Media({
   alt,
   sizes = "(max-width: 880px) 100vw, 540px",
   priority = false,
+  objectPosition = "center",
 }: {
   src: string;
   alt: string;
   sizes?: string;
   priority?: boolean;
+  objectPosition?: string;
 }) {
   return (
     <Image
@@ -46,7 +48,12 @@ function Media({
       height={900}
       sizes={sizes}
       priority={priority}
-      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        objectPosition,
+      }}
     />
   );
 }
@@ -103,10 +110,20 @@ export default function AniccaLanding() {
     return item;
   });
 
-  const keepImages = [
+  const keepImages: {
+    src: string;
+    alt: string;
+    label: string;
+    objectPosition?: string;
+  }[] = [
     { src: ANICCA_IMAGES.wallet, alt: "Token carried in a wallet", label: copy.keepClose.uses[0] },
     { src: ANICCA_IMAGES.desk, alt: "Token on a desk", label: copy.keepClose.uses[1] },
-    { src: ANICCA_IMAGES.keyring, alt: "Token on a keyring", label: copy.keepClose.uses[2] },
+    {
+      src: ANICCA_IMAGES.keyring,
+      alt: "Token on a keyring",
+      label: copy.keepClose.uses[2],
+      objectPosition: "bottom",
+    },
     { src: ANICCA_IMAGES.necklace, alt: "Token on a fine cord", label: copy.keepClose.uses[3] },
   ];
 
@@ -248,7 +265,12 @@ export default function AniccaLanding() {
             {keepImages.map((item) => (
               <li key={item.src}>
                 <figure className="anicca-media">
-                  <Media src={item.src} alt={item.alt} sizes="(max-width: 720px) 100vw, 480px" />
+                  <Media
+                    src={item.src}
+                    alt={item.alt}
+                    sizes="(max-width: 720px) 100vw, 480px"
+                    objectPosition={item.objectPosition ?? "center"}
+                  />
                 </figure>
                 <p>{item.label}</p>
               </li>
