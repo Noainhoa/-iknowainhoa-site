@@ -115,17 +115,10 @@ export default function AniccaLanding() {
     alt: string;
     label: string;
     objectPosition?: string;
-    frame?: "portrait";
   }[] = [
     { src: ANICCA_IMAGES.wallet, alt: "Token carried in a wallet", label: copy.keepClose.uses[0] },
     { src: ANICCA_IMAGES.desk, alt: "Token on a desk", label: copy.keepClose.uses[1] },
-    {
-      src: ANICCA_IMAGES.keyring,
-      alt: "Token on a keyring",
-      label: copy.keepClose.uses[2],
-      objectPosition: "center bottom",
-      frame: "portrait",
-    },
+    { src: ANICCA_IMAGES.keyring, alt: "Token on a keyring", label: copy.keepClose.uses[2] },
     { src: ANICCA_IMAGES.necklace, alt: "Token on a fine cord", label: copy.keepClose.uses[3] },
   ];
 
@@ -266,9 +259,7 @@ export default function AniccaLanding() {
           <ul className="anicca-uses">
             {keepImages.map((item) => (
               <li key={item.src}>
-                <figure
-                  className={`anicca-media${item.frame === "portrait" ? " anicca-media--portrait" : ""}`}
-                >
+                <figure className="anicca-media">
                   <Media
                     src={item.src}
                     alt={item.alt}

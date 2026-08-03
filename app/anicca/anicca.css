@@ -334,10 +334,6 @@
   background: var(--anicca-panel);
 }
 
-.anicca-media--portrait {
-  aspect-ratio: 3 / 4;
-}
-
 .anicca-uses p {
   margin: 0;
   font-size: 0.95rem;
