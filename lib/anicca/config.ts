@@ -23,7 +23,7 @@ export const ANICCA_CONTACT_EMAIL = "hola@iknowainhoa.com";
 
 /** Owner-confirm before launch. */
 export const ANICCA_DISPATCH_ESTIMATE =
-  "Usually dispatched within 2–3 working days";
+  "If ordered before 12:00 CET Monday to Friday on the same day, otherwise next day.";
 
 /** Owner-confirm: shown in FAQ until checkout shows live rates. */
 export const ANICCA_SHIPPING_MESSAGE =
@@ -89,7 +89,7 @@ export const ANICCA_VARIANTS: AniccaVariant[] = [
     priceEur: ANICCA_PRICE_EUR,
     stock: 19,
     active: true,
-    stripePaymentUrl: "", // TODO: Stripe Payment Link
+    stripePaymentUrl: "https://buy.stripe.com/00w6oHgzV1Sg9UP4EU3F602",
     images: {
       front: "/anicca/anicca-front.jpg",
       back: "/anicca/anicca-back.jpg",
