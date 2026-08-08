@@ -38,6 +38,6 @@ export const publicPages = {
   thanks: true,
   shortcuts: false,
   photoarc: false,
-  listeneasy: false,
+  listeneasy: true,
   landings: false,
 } as const;

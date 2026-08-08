@@ -1,25 +1,27 @@
 ---
 title: "ListenEasy Support"
-description: "Support information for ListenEasy while the app is in development."
-date: "2026-07-21"
+description: "Support information for the ListenEasy beta."
+date: "2026-08-08"
 ---
 
 # ListenEasy Support
 
-**Status:** In development
+ListenEasy is in open beta on TestFlight.
 
-ListenEasy is not publicly released yet. Support details will expand as the product approaches launch.
+## Join the beta
+
+Install [TestFlight](https://apps.apple.com/app/testflight/id899247664), then open the invite:
+
+[Join ListenEasy on TestFlight](https://testflight.apple.com/join/5uYmScxX)
 
 ## Contact
 
-For questions about ListenEasy, email [hola@iknowainhoa.com](mailto:hola@iknowainhoa.com).
+Questions or feedback: [hola@iknowainhoa.com](mailto:hola@iknowainhoa.com).
 
-## Support
-
-While ListenEasy is in development, there is no in-app support flow and no published troubleshooting guide for unfinished features. If you have a question about the project, use the contact email above.
+You can also send feedback from inside TestFlight while testing.
 
 ## Privacy
 
-Read the [ListenEasy Privacy Policy](/listeneasy/privacy). The policy will be updated before any public release.
+Read the [ListenEasy Privacy Policy](/listeneasy/privacy).
 
-Return to the [ListenEasy product page](/listeneasy).
+Return to the [ListenEasy page](/listeneasy).

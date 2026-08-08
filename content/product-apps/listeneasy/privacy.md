@@ -1,37 +1,26 @@
 ---
 title: "ListenEasy Privacy Policy"
-description: "Preliminary privacy information for ListenEasy. The full policy will be published before release."
-date: "2026-07-21"
+description: "Preliminary privacy information for ListenEasy. The full policy will be published before App Store release."
+date: "2026-08-08"
 ---
 
 # ListenEasy Privacy Policy
 
-**Status:** In development
+ListenEasy is currently in open beta. This page will be expanded before an App Store release.
 
-**Last updated:** July 2026
+## What ListenEasy is for
 
-ListenEasy is not publicly released yet. This page is a placeholder so support and marketing URLs can exist while the app is built.
+ListenEasy is a simple audiobook player for audio files you provide. It is designed to help you import, play, and navigate your own audiobooks on iPhone.
 
-## What this policy covers
+## Data
 
-Because ListenEasy has not shipped, this page does **not** claim specific data practices, collection methods, storage locations, or third-party integrations. Those details will be published here before any public release.
+While the beta is active, detailed collection and storage practices will be documented here before public release. For questions in the meantime, email [hola@iknowainhoa.com](mailto:hola@iknowainhoa.com).
 
-## Before release
+## Beta testing
 
-When ListenEasy approaches a public release, this policy will be updated to describe:
+If you join through [TestFlight](https://testflight.apple.com/join/5uYmScxX), Apple’s TestFlight service also processes crash and usage information as described in Apple’s TestFlight privacy materials.
 
-- What information the app uses, if any
-- How that information is handled
-- What stays on device versus what (if anything) is sent elsewhere
-- How to contact the developer about privacy questions
+## Links
 
-Until then, treat this page as provisional.
-
-## Contact
-
-Questions about this policy: [hola@iknowainhoa.com](mailto:hola@iknowainhoa.com)
-
-## Related pages
-
-- [ListenEasy product page](/listeneasy)
+- [ListenEasy](/listeneasy)
 - [ListenEasy Support](/listeneasy/support)

@@ -58,6 +58,18 @@ export default function Home() {
             />
           </Link>
         </li>
+        <li>
+          <Link href="/listeneasy" aria-label="ListenEasy" className="home-logo">
+            <Image
+              src="/images/projects/listeneasy/logo.png"
+              alt="ListenEasy"
+              width={160}
+              height={160}
+              priority
+              className="home-logo-img home-logo-img--listeneasy"
+            />
+          </Link>
+        </li>
       </ul>
 
       <a
@@ -119,6 +131,11 @@ export default function Home() {
           width: min(112px, 46vw);
           height: auto;
         }
+        .home-logo-img--listeneasy {
+          width: min(112px, 46vw);
+          height: auto;
+          border-radius: 22%;
+        }
         .home-wa-fab {
           position: fixed;
           z-index: 45;
@@ -153,6 +170,9 @@ export default function Home() {
             width: 180px;
           }
           .home-logo-img--anicca {
+            width: 120px;
+          }
+          .home-logo-img--listeneasy {
             width: 120px;
           }
           .home-wa-fab {

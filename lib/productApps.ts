@@ -139,57 +139,33 @@ export const productApps: ProductApp[] = [
     slug: "listeneasy",
     name: "ListenEasy",
     status: "in-development",
-    statusLabel: "In development",
-    tagline: "A lightweight listening experience for narrated notes and writing—coming soon.",
+    statusLabel: "Open beta",
+    tagline: "A simple audiobook player for your own audio files.",
     summary:
-      "ListenEasy is an app currently in development. Early notes in this repository describe a lightweight experience for listening to narrated versions of notes and blog posts. Details will be published here as the product takes shape.",
+      "Import audiobooks from Files or folders, keep your place, navigate chapters, adjust speed, use a sleep timer, and take notes while you listen. Join the open beta on TestFlight.",
+    platform: "iPhone",
     contactEmail: site.email,
     appStoreUrl: null,
-    features: [
-      {
-        title: "Focused listening",
-        description:
-          "Designed around listening to narrated versions of notes and writing—exact capabilities will be confirmed closer to release.",
-      },
-      {
-        title: "Lightweight by design",
-        description:
-          "The goal is a simple listening experience. Feature set, platforms, and availability are not finalized yet.",
-      },
-      {
-        title: "Updates coming",
-        description:
-          "This page will grow as ListenEasy moves toward a public release. Nothing here implies App Store availability yet.",
-      },
-    ],
-    howItWorks: [
-      "ListenEasy is still in development.",
-      "Product details, platforms, and availability will be shared here when ready.",
-      "Support and privacy pages will be updated before any public release.",
-    ],
-    screenshots: [
-      { alt: "ListenEasy screenshot placeholder", label: "Coming soon" },
-      { alt: "ListenEasy screenshot placeholder", label: "Coming soon" },
-      { alt: "ListenEasy screenshot placeholder", label: "Coming soon" },
-    ],
+    features: [],
+    howItWorks: [],
+    screenshots: [],
     notes: [
-      "Status: in development / coming soon.",
-      "No pricing, platform requirements, or release date has been announced.",
+      "Open beta via TestFlight: https://testflight.apple.com/join/5uYmScxX",
     ],
     pages: {
       product: {
         title: "ListenEasy",
         description:
-          "ListenEasy is in development—a lightweight listening experience for narrated notes and writing.",
+          "A simple audiobook player for your own audio files. Join the ListenEasy open beta on TestFlight.",
       },
       support: {
         title: "ListenEasy Support",
-        description: "Support information for ListenEasy while the app is in development.",
+        description: "Support information for the ListenEasy beta.",
       },
       privacy: {
         title: "ListenEasy Privacy Policy",
         description:
-          "Preliminary privacy information for ListenEasy. The full policy will be published before release.",
+          "Preliminary privacy information for ListenEasy. The full policy will be published before App Store release.",
       },
     },
   },
