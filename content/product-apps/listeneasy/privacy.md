@@ -10,7 +10,7 @@ ListenEasy is currently in open beta. This page will be expanded before an App S
 
 ## What ListenEasy is for
 
-ListenEasy is a simple audiobook player for audio files you provide. It is designed to help you import, play, and navigate your own audiobooks on iPhone.
+ListenEasy is for the audiobooks you already own. Import from Files or folders on iPhone, then play, navigate chapters, and keep your place — without a ListenEasy account.
 
 ## Data
 

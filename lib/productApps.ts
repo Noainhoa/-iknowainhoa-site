@@ -140,13 +140,29 @@ export const productApps: ProductApp[] = [
     name: "ListenEasy",
     status: "in-development",
     statusLabel: "Open beta",
-    tagline: "A simple audiobook player for your own audio files.",
+    tagline: "For the audiobooks you already own.",
     summary:
-      "Import audiobooks from Files or folders, keep your place, navigate chapters, adjust speed, use a sleep timer, and take notes while you listen. Join the open beta on TestFlight.",
+      "ListenEasy turns your audiobook files into an organised, comfortable listening library on iPhone — with progress, chapters, notes, and the controls an audiobook player should have.",
     platform: "iPhone",
     contactEmail: site.email,
     appStoreUrl: null,
-    features: [],
+    features: [
+      {
+        title: "Your audiobooks, your library",
+        description:
+          "Import books you already have. No audiobook store, subscription, or account required.",
+      },
+      {
+        title: "Multi-part books stay together",
+        description:
+          "CD, disc and multi-file audiobooks can be grouped into a single book instead of dozens of tracks.",
+      },
+      {
+        title: "Notes made for listening",
+        description:
+          "Timestamped notes and bookmarks while listening. Jump straight back to that exact moment later.",
+      },
+    ],
     howItWorks: [],
     screenshots: [],
     notes: [
@@ -156,7 +172,7 @@ export const productApps: ProductApp[] = [
       product: {
         title: "ListenEasy",
         description:
-          "A simple audiobook player for your own audio files. Join the ListenEasy open beta on TestFlight.",
+          "For the audiobooks you already own. An organised listening library on iPhone — join the ListenEasy open beta on TestFlight.",
       },
       support: {
         title: "ListenEasy Support",
