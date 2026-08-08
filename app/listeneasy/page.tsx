@@ -15,39 +15,60 @@ const SLUG = "listeneasy" as const;
 const TESTFLIGHT_URL = "https://testflight.apple.com/join/5uYmScxX";
 const LOGO_SRC = "/images/projects/listeneasy/logo.png";
 
-/** Three differentiators — read first. */
+/** Three pain points · why bother with the beta. */
 const STANDOUTS = [
   {
-    n: "01",
-    title: "Your audiobooks, your library",
-    line: "Import books you already have. No store, subscription, or account.",
+    title: "Stop living in folders of tracks",
+    line: "Multi-file and CD/disc sets become one book · not dozens of separate files.",
   },
   {
-    n: "02",
-    title: "Multi-part books stay together",
-    line: "CD, disc, and multi-file sets become one book—not dozens of tracks.",
+    title: "A library for books you already own",
+    line: "Import from Files. No audiobook store, subscription, or account.",
   },
   {
-    n: "03",
-    title: "Notes made for listening",
-    line: "Timestamped notes and bookmarks while you listen. Jump back to the exact moment.",
+    title: "Never lose your place",
+    line: "Position saved for every book. Resume exactly where you stopped.",
   },
 ] as const;
 
-/** The rest — scannable, not essay-length. */
+/** The rest · scannable, not essay-length. */
 const MORE = [
   { title: "Easy importing", line: "Files, folders, Share, or AirDrop." },
-  { title: "Never lose your place", line: "Position saved per book. Resume where you stopped." },
-  { title: "Library that shows where you are", line: "Not Started, Continuing, Finished — plus search, sort, favourites, progress." },
+  {
+    title: "Notes made for listening",
+    line: "Timestamped notes and bookmarks. Jump back to the exact moment.",
+  },
+  {
+    title: "Library that shows where you are",
+    line: "Not Started, Continuing, Finished · plus search, sort, favourites, progress.",
+  },
   { title: "Chapters & parts", line: "Browse and jump to the section you want." },
   { title: "Flexible playback", line: "0.5×–3× speed, seek, custom skip intervals." },
   { title: "Sleep timer", line: "Stop automatically after 5–60 minutes." },
-  { title: "Background & lock screen", line: "Listen locked; control from Lock Screen, Control Centre, or Bluetooth." },
-  { title: "Covers & metadata", line: "Use embedded info, or fill in artwork when you want." },
-  { title: "Companion PDFs", line: "Keep a book’s PDF with it and open from details." },
-  { title: "Offline by design", line: "Books live on device. No connection needed to listen." },
-  { title: "Private & account-free", line: "No login. Online metadata lookup is optional and off by default." },
-  { title: "Broad formats", line: "M4B, MP3, M4A, FLAC, WAV, AIFF/AIF, and other iOS media." },
+  {
+    title: "Background & lock screen",
+    line: "Listen locked; control from Lock Screen, Control Centre, or Bluetooth.",
+  },
+  {
+    title: "Covers & metadata",
+    line: "Use embedded info, or fill in artwork when you want.",
+  },
+  {
+    title: "Companion PDFs",
+    line: "Keep a book’s PDF with it and open from details.",
+  },
+  {
+    title: "Offline by design",
+    line: "Books live on device. No connection needed to listen.",
+  },
+  {
+    title: "Private & account-free",
+    line: "No login. Online metadata lookup is optional and off by default.",
+  },
+  {
+    title: "Broad formats",
+    line: "M4B, MP3, M4A, FLAC, WAV, AIFF/AIF, and other iOS media.",
+  },
 ] as const;
 
 export function generateMetadata(): Metadata {
@@ -78,36 +99,18 @@ export default function ListenEasyProductPage() {
 
         <h1 className="le-name">{app.name}</h1>
         <p className="le-prop">For the audiobooks you already own.</p>
-        <p className="le-line">
-          Turns your audiobook files into an organised listening library on iPhone —
-          progress, chapters, notes, and the controls a real audiobook player should have.
-        </p>
 
-        <ListenEasyBetaActions testFlightUrl={TESTFLIGHT_URL} appName={app.name} />
-      </header>
-
-      <section className="le-standouts" aria-labelledby="le-standouts-heading">
-        <h2 id="le-standouts-heading" className="le-section-label">
-          What stands out
-        </h2>
-        <ol className="le-standout-list">
-          {STANDOUTS.map((item, i) => (
-            <li
-              key={item.n}
-              className="le-standout"
-              style={{ animationDelay: `${0.28 + i * 0.08}s` }}
-            >
-              <span className="le-n" aria-hidden="true">
-                {item.n}
-              </span>
-              <div>
-                <h3>{item.title}</h3>
-                <p>{item.line}</p>
-              </div>
+        <ol className="le-pains" aria-label="Why ListenEasy">
+          {STANDOUTS.map((item) => (
+            <li key={item.title}>
+              <strong>{item.title}</strong>
+              <span>{item.line}</span>
             </li>
           ))}
         </ol>
-      </section>
+
+        <ListenEasyBetaActions testFlightUrl={TESTFLIGHT_URL} appName={app.name} />
+      </header>
 
       <section className="le-more" aria-labelledby="le-more-heading">
         <h2 id="le-more-heading" className="le-section-label">
@@ -178,13 +181,34 @@ export default function ListenEasyProductPage() {
           color: var(--le-blue);
           animation: le-rise 0.7s ease 0.1s both;
         }
-        .le-line {
-          margin: 12px 0 0;
-          font-size: 1.02rem;
-          line-height: 1.55;
-          color: var(--le-muted);
-          max-width: 32em;
+        .le-pains {
+          list-style: none;
+          margin: 22px 0 0;
+          padding: 0;
+          width: 100%;
+          max-width: 28rem;
+          text-align: left;
+          display: grid;
+          gap: 14px;
           animation: le-rise 0.7s ease 0.14s both;
+        }
+        .le-pains li {
+          display: grid;
+          gap: 4px;
+          padding-left: 14px;
+          border-left: 3px solid var(--le-blue);
+        }
+        .le-pains strong {
+          font-size: 1.02rem;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+          line-height: 1.25;
+          color: var(--le-ink);
+        }
+        .le-pains span {
+          font-size: 0.92rem;
+          line-height: 1.45;
+          color: var(--le-muted);
         }
         .le-actions {
           margin-top: 28px;
@@ -245,6 +269,45 @@ export default function ListenEasyProductPage() {
           color: var(--le-soft);
           max-width: 24em;
         }
+        .le-steps {
+          margin: 8px 0 0;
+          padding: 0;
+          list-style: none;
+          counter-reset: le-step;
+          text-align: left;
+          max-width: 26em;
+          width: 100%;
+          display: grid;
+          gap: 10px;
+        }
+        .le-steps li {
+          position: relative;
+          padding-left: 2rem;
+          font-size: 0.9rem;
+          line-height: 1.45;
+          color: var(--le-muted);
+          counter-increment: le-step;
+        }
+        .le-steps li::before {
+          content: counter(le-step);
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 1.35rem;
+          height: 1.35rem;
+          border-radius: 999px;
+          background: rgba(28, 111, 220, 0.12);
+          color: var(--le-blue);
+          font-size: 0.75rem;
+          font-weight: 700;
+          line-height: 1.35rem;
+          text-align: center;
+        }
+        .le-steps a {
+          color: var(--le-blue);
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
         .le-section-label {
           margin: 0 0 22px;
           font-size: 0.78rem;
@@ -252,53 +315,6 @@ export default function ListenEasyProductPage() {
           letter-spacing: 0.12em;
           text-transform: uppercase;
           color: var(--le-soft);
-        }
-        .le-standouts {
-          max-width: 40rem;
-          margin: clamp(56px, 10vh, 88px) auto 0;
-          width: 100%;
-        }
-        .le-standout-list {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-          display: grid;
-          gap: 0;
-        }
-        .le-standout {
-          display: grid;
-          grid-template-columns: auto 1fr;
-          gap: 18px;
-          align-items: start;
-          padding: 22px 0;
-          border-top: 1px solid rgba(28, 111, 220, 0.18);
-          text-align: left;
-          animation: le-rise 0.7s ease both;
-        }
-        .le-standout:last-child {
-          border-bottom: 1px solid rgba(28, 111, 220, 0.18);
-        }
-        .le-n {
-          font-size: clamp(1.6rem, 4vw, 2rem);
-          font-weight: 700;
-          letter-spacing: -0.04em;
-          line-height: 1;
-          color: var(--le-blue);
-          font-variant-numeric: tabular-nums;
-          padding-top: 2px;
-        }
-        .le-standout h3 {
-          margin: 0;
-          font-size: clamp(1.15rem, 2.8vw, 1.35rem);
-          font-weight: 700;
-          letter-spacing: -0.025em;
-          line-height: 1.2;
-        }
-        .le-standout p {
-          margin: 8px 0 0;
-          font-size: 0.98rem;
-          line-height: 1.5;
-          color: var(--le-muted);
         }
         .le-more {
           max-width: 52rem;
@@ -381,9 +397,8 @@ export default function ListenEasyProductPage() {
           .le-logo,
           .le-name,
           .le-prop,
-          .le-line,
+          .le-pains,
           .le-actions,
-          .le-standout,
           .le-more-item,
           .le-foot {
             animation: none;

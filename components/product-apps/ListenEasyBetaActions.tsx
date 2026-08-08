@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { externalAnchorProps } from "@/lib/links";
 
+const TESTFLIGHT_APP_STORE =
+  "https://apps.apple.com/app/testflight/id899247664";
+
 type ListenEasyBetaActionsProps = {
   testFlightUrl: string;
   appName: string;
@@ -59,10 +62,21 @@ export default function ListenEasyBetaActions({
       <button type="button" className="le-share" onClick={handleShare}>
         {shareLabel}
       </button>
-      <p className="le-hint">
-        Best on iPhone: install TestFlight, then open the invite. On a computer, share
-        the link to your phone (Messages, Mail, or copy).
-      </p>
+      <ol className="le-steps">
+        <li>
+          Install{" "}
+          <a
+            href={TESTFLIGHT_APP_STORE}
+            {...externalAnchorProps(TESTFLIGHT_APP_STORE)}
+          >
+            TestFlight
+          </a>{" "}
+          from the App Store (on your phone)
+        </li>
+        <li>
+          Tap Join the beta on this page
+        </li>
+      </ol>
     </div>
   );
 }

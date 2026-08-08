@@ -142,25 +142,25 @@ export const productApps: ProductApp[] = [
     statusLabel: "Open beta",
     tagline: "For the audiobooks you already own.",
     summary:
-      "ListenEasy turns your audiobook files into an organised, comfortable listening library on iPhone — with progress, chapters, notes, and the controls an audiobook player should have.",
+      "Stop managing folders of tracks. ListenEasy turns audiobooks you already own into a real library on iPhone · multi-file sets stay one book, and you never lose your place.",
     platform: "iPhone",
     contactEmail: site.email,
     appStoreUrl: null,
     features: [
       {
-        title: "Your audiobooks, your library",
+        title: "Stop living in folders of tracks",
         description:
-          "Import books you already have. No audiobook store, subscription, or account required.",
+          "Multi-file and CD/disc sets become one book · not dozens of separate files.",
       },
       {
-        title: "Multi-part books stay together",
+        title: "A library for books you already own",
         description:
-          "CD, disc and multi-file audiobooks can be grouped into a single book instead of dozens of tracks.",
+          "Import from Files. No audiobook store, subscription, or account.",
       },
       {
-        title: "Notes made for listening",
+        title: "Never lose your place",
         description:
-          "Timestamped notes and bookmarks while listening. Jump straight back to that exact moment later.",
+          "Position saved for every book. Resume exactly where you stopped.",
       },
     ],
     howItWorks: [],
@@ -172,7 +172,7 @@ export const productApps: ProductApp[] = [
       product: {
         title: "ListenEasy",
         description:
-          "For the audiobooks you already own. An organised listening library on iPhone — join the ListenEasy open beta on TestFlight.",
+          "For the audiobooks you already own. Multi-file books stay together, and you never lose your place. Join the ListenEasy open beta on TestFlight.",
       },
       support: {
         title: "ListenEasy Support",
