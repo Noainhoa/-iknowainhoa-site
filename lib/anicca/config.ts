@@ -22,13 +22,6 @@ export const ANICCA_CONTACT_EMAIL = "hola@iknowainhoa.com";
 
 export const ANICCA_SHIPPING_RETURNS_PATH = "/anicca/shipping-returns";
 
-export const ANICCA_SHIPPING_LINE = "Standard delivery in Spain included";
-
-export const ANICCA_SHIPPING_SUPPORT =
-  "Pouch + personal note included · Standard delivery in Spain included";
-
-export const ANICCA_SHIPPING_TRACKED = "Tracked delivery available at checkout";
-
 /**
  * Public dispatch wording. The same-day-before-12:00-CET rule is not published
  * until the owner confirms it.
@@ -182,8 +175,11 @@ export const ANICCA_LIFE_IMAGES = [
   },
 ] as const;
 
-export function formatAniccaPrice(amount = ANICCA_PRICE_EUR): string {
-  return new Intl.NumberFormat("en-GB", {
+export function formatAniccaPrice(
+  amount = ANICCA_PRICE_EUR,
+  locale: "en" | "es" = "en"
+): string {
+  return new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-GB", {
     style: "currency",
     currency: ANICCA_CURRENCY,
     maximumFractionDigits: 0,

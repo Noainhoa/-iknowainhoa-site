@@ -6,31 +6,40 @@ import {
   ANICCA_PATH,
   ANICCA_SHIPPING_RETURNS_PATH,
 } from "@/lib/anicca/config";
-import { ANICCA_SHIPPING_RETURNS as copy } from "@/lib/anicca/shipping";
+import { getAniccaShippingReturns } from "@/lib/anicca/shipping";
+import { getLocale } from "@/lib/i18n";
 import "../anicca.css";
 
 const canonical = `${ANICCA_ORIGIN}${ANICCA_SHIPPING_RETURNS_PATH}`;
 
-export const metadata: Metadata = {
-  title: { absolute: copy.meta.title },
-  description: copy.meta.description,
-  alternates: {
-    canonical,
-  },
-  openGraph: {
-    type: "website",
-    url: canonical,
-    title: copy.meta.title,
-    description: copy.meta.description,
-    siteName: "iknowainhoa",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const copy = getAniccaShippingReturns(locale);
 
-export default function AniccaShippingReturnsPage() {
+  return {
+    title: { absolute: copy.meta.title },
+    description: copy.meta.description,
+    alternates: {
+      canonical,
+    },
+    openGraph: {
+      type: "website",
+      url: canonical,
+      title: copy.meta.title,
+      description: copy.meta.description,
+      siteName: "iknowainhoa",
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+export default async function AniccaShippingReturnsPage() {
+  const locale = await getLocale();
+  const copy = getAniccaShippingReturns(locale);
+
   return (
     <div className="anicca">
       <article className="anicca-wrap anicca-legal">
@@ -38,7 +47,6 @@ export default function AniccaShippingReturnsPage() {
           <Link href={ANICCA_PATH}>Anicca</Link>
         </p>
         <h1>{copy.title}</h1>
-        <p className="anicca-lead">{copy.intro}</p>
 
         <section className="anicca-section" aria-labelledby="shipping-title">
           <h2 id="shipping-title">{copy.shipping.title}</h2>
@@ -74,7 +82,7 @@ export default function AniccaShippingReturnsPage() {
             <a href={`mailto:${ANICCA_CONTACT_EMAIL}`}>{ANICCA_CONTACT_EMAIL}</a>
           </p>
           <p>
-            <Link href={ANICCA_PATH}>Back to Anicca</Link>
+            <Link href={ANICCA_PATH}>{copy.backLabel}</Link>
           </p>
         </div>
       </article>

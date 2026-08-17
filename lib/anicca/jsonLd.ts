@@ -10,8 +10,8 @@ import {
 } from "@/lib/anicca/config";
 import { getAniccaCopy } from "@/lib/anicca/copy";
 
-export function buildAniccaJsonLd() {
-  const copy = getAniccaCopy("en");
+export function buildAniccaJsonLd(locale: "en" | "es" | "fr" = "en") {
+  const copy = getAniccaCopy(locale);
   const anyInStock = ANICCA_VARIANTS.some(isVariantPurchasable);
   const productImages = [
     `${ANICCA_ORIGIN}${ANICCA_IMAGES.hero}`,
@@ -42,7 +42,7 @@ export function buildAniccaJsonLd() {
         name: copy.meta.title,
         description: copy.meta.description,
         isPartOf: { "@id": `${ANICCA_ORIGIN}/#website` },
-        inLanguage: "en",
+        inLanguage: locale === "es" ? "es" : "en",
       },
       {
         "@type": "Product",

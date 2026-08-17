@@ -3,46 +3,51 @@ import AniccaLanding from "@/components/anicca/AniccaLanding";
 import { ANICCA_CANONICAL, ANICCA_IMAGES, ANICCA_ORIGIN } from "@/lib/anicca/config";
 import { getAniccaCopy } from "@/lib/anicca/copy";
 import { buildAniccaJsonLd } from "@/lib/anicca/jsonLd";
+import { getLocale } from "@/lib/i18n";
 import "./anicca.css";
 
-const copy = getAniccaCopy("en");
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const copy = getAniccaCopy(locale);
 
-export const metadata: Metadata = {
-  title: { absolute: copy.meta.title },
-  description: copy.meta.description,
-  alternates: {
-    canonical: ANICCA_CANONICAL,
-  },
-  openGraph: {
-    type: "website",
-    url: ANICCA_CANONICAL,
-    title: copy.meta.title,
+  return {
+    title: { absolute: copy.meta.title },
     description: copy.meta.description,
-    siteName: "iknowainhoa",
-    locale: "en_GB",
-    images: [
-      {
-        url: `${ANICCA_ORIGIN}${ANICCA_IMAGES.og}`,
-        width: 1024,
-        height: 1024,
-        alt: "Anicca reminder token, engraved Anicca · Impermanence",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: copy.meta.title,
-    description: copy.meta.description,
-    images: [`${ANICCA_ORIGIN}${ANICCA_IMAGES.og}`],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+    alternates: {
+      canonical: ANICCA_CANONICAL,
+    },
+    openGraph: {
+      type: "website",
+      url: ANICCA_CANONICAL,
+      title: copy.meta.title,
+      description: copy.meta.description,
+      siteName: "iknowainhoa",
+      locale: locale === "es" ? "es_ES" : "en_GB",
+      images: [
+        {
+          url: `${ANICCA_ORIGIN}${ANICCA_IMAGES.og}`,
+          width: 1024,
+          height: 1024,
+          alt: copy.a11y.heroFrontAlt("Anicca · Impermanence"),
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: copy.meta.title,
+      description: copy.meta.description,
+      images: [`${ANICCA_ORIGIN}${ANICCA_IMAGES.og}`],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
-export default function AniccaPage() {
-  const jsonLd = buildAniccaJsonLd();
+export default async function AniccaPage() {
+  const locale = await getLocale();
+  const jsonLd = buildAniccaJsonLd(locale);
 
   return (
     <>
@@ -50,7 +55,7 @@ export default function AniccaPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <AniccaLanding />
+      <AniccaLanding locale={locale} />
     </>
   );
 }

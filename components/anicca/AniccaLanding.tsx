@@ -17,7 +17,8 @@ import {
   type AniccaVariant,
   type AniccaVariantId,
 } from "@/lib/anicca/config";
-import { getAniccaCopy } from "@/lib/anicca/copy";
+import { getAniccaCopy, type AniccaCopy } from "@/lib/anicca/copy";
+import type { Locale } from "@/lib/i18n/shared";
 
 function Media({
   src,
@@ -51,11 +52,13 @@ function Media({
 function CheckoutAction({
   selected,
   label,
+  soldOut,
   noteId,
   onBlocked,
 }: {
   selected: AniccaVariant;
   label: string;
+  soldOut: string;
   noteId?: string;
   onBlocked: (variant: AniccaVariant, reason: "sold_out" | "no_payment_url") => void;
 }) {
@@ -85,13 +88,13 @@ function CheckoutAction({
       aria-describedby={noteId}
       onClick={() => onBlocked(selected, purchasable ? "no_payment_url" : "sold_out")}
     >
-      {purchasable ? label : getAniccaCopy("en").choice.soldOut}
+      {purchasable ? label : soldOut}
     </button>
   );
 }
 
-export default function AniccaLanding() {
-  const copy = getAniccaCopy("en");
+export default function AniccaLanding({ locale = "en" }: { locale?: Locale }) {
+  const copy: AniccaCopy = getAniccaCopy(locale);
   const noteId = useId();
   const [selectedId, setSelectedId] = useState<AniccaVariantId>(getDefaultAniccaVariant().id);
   const [checkoutNote, setCheckoutNote] = useState<string | null>(null);
@@ -100,7 +103,7 @@ export default function AniccaLanding() {
   const variant =
     ANICCA_VARIANTS.find((item) => item.id === selectedId) ?? getDefaultAniccaVariant();
   const meaning = copy.meaningByVariant[variant.id];
-  const price = formatAniccaPrice(variant.priceEur);
+  const price = formatAniccaPrice(variant.priceEur, locale === "es" ? "es" : "en");
   const ctaLabel = copy.choice.ctaBuy(price);
   const describedBy = checkoutNote ? noteId : undefined;
 
@@ -181,6 +184,7 @@ export default function AniccaLanding() {
                 <div id="hero-inscriptions">
                   <AniccaVariantPicker
                     selectedId={variant.id}
+                    locale={locale}
                     onSelect={(next) => selectVariant(next, true)}
                   />
                 </div>
@@ -188,6 +192,7 @@ export default function AniccaLanding() {
               <CheckoutAction
                 selected={variant}
                 label={ctaLabel}
+                soldOut={copy.choice.soldOut}
                 noteId={describedBy}
                 onBlocked={onBlocked}
               />
@@ -209,7 +214,7 @@ export default function AniccaLanding() {
                 <figure className="anicca-frame">
                   <Media
                     src={item.src}
-                    alt={item.alt}
+                    alt={copy.life.imageAlts[index] ?? item.alt}
                     sizes={
                       index === 0
                         ? "(max-width: 720px) 100vw, 720px"
@@ -240,6 +245,7 @@ export default function AniccaLanding() {
             <CheckoutAction
               selected={variant}
               label={ctaLabel}
+              soldOut={copy.choice.soldOut}
               noteId={describedBy}
               onBlocked={onBlocked}
             />
@@ -263,12 +269,14 @@ export default function AniccaLanding() {
           <div className="anicca-buy">
             <AniccaVariantPicker
               selectedId={variant.id}
+              locale={locale}
               onSelect={(next) => selectVariant(next)}
             />
             <p className="anicca-price anicca-price--compact">{price}</p>
             <CheckoutAction
               selected={variant}
               label={ctaLabel}
+              soldOut={copy.choice.soldOut}
               noteId={describedBy}
               onBlocked={onBlocked}
             />
@@ -304,7 +312,7 @@ export default function AniccaLanding() {
               {copy.trust.contact}:{" "}
               <a href={`mailto:${ANICCA_CONTACT_EMAIL}`}>{ANICCA_CONTACT_EMAIL}</a>
               {" · "}
-              <Link href="/contact">Contact</Link>
+              <Link href="/contact">{copy.trust.contactPage}</Link>
               {" · "}
               <Link href={ANICCA_SHIPPING_RETURNS_PATH}>{copy.trust.shippingLink}</Link>
             </p>

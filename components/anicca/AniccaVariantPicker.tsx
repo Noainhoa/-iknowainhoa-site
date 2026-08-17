@@ -8,17 +8,20 @@ import {
   type AniccaVariantId,
 } from "@/lib/anicca/config";
 import { getAniccaCopy } from "@/lib/anicca/copy";
+import type { Locale } from "@/lib/i18n/shared";
 
 export default function AniccaVariantPicker({
   selectedId,
   onSelect,
   labelledBy,
+  locale = "en",
 }: {
   selectedId: AniccaVariantId;
   onSelect: (variant: AniccaVariant) => void;
   labelledBy?: string;
+  locale?: Locale;
 }) {
-  const copy = getAniccaCopy("en");
+  const copy = getAniccaCopy(locale);
   const name = useId();
 
   return (
