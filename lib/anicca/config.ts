@@ -96,7 +96,7 @@ export const ANICCA_VARIANTS: AniccaVariant[] = [
     priceEur: ANICCA_PRICE_EUR,
     stock: 20,
     active: true,
-    stripePaymentUrl: "", // TODO: Stripe Payment Link
+    stripePaymentUrl: "https://buy.stripe.com/9B6fZh2J554s4Avdbq3F604",
     images: {
       front: "/anicca/yathabhutam-front.jpg",
       back: "/anicca/yathabhutam-back.jpg",
@@ -115,7 +115,7 @@ export const ANICCA_VARIANTS: AniccaVariant[] = [
     priceEur: ANICCA_PRICE_EUR,
     stock: 5,
     active: true,
-    stripePaymentUrl: "", // TODO: Stripe Payment Link
+    stripePaymentUrl: "https://buy.stripe.com/aFa3cv4Rd68w2sn8Va3F603",
     images: {
       front: "/anicca/spanish-front.jpg",
       back: "/anicca/spanish-back.jpg",
