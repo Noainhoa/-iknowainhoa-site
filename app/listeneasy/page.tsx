@@ -13,7 +13,7 @@ import { publicPages } from "@/lib/site";
 
 const SLUG = "listeneasy" as const;
 const TESTFLIGHT_URL = "https://testflight.apple.com/join/5uYmScxX";
-const LOGO_SRC = "/images/projects/listeneasy/logo.png";
+const LOGO_SRC = "/images/projects/listeneasy/app-icon.jpg";
 
 /** Three pain points · why bother with the beta. */
 const STANDOUTS = [

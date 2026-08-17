@@ -6,6 +6,7 @@ slug: "muebles-begui"
 draft: false
 tags: ["Web design", "website", "Client work"]
 coverImage: https://image.thum.io/get/width/1200/crop/800/https://mueblesbegui.es
+logo: "/images/projects/muebles-begui/logo.png"
 cta:
   text: "Visit website"
   link: "https://mueblesbegui.es/"

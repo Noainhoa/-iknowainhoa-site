@@ -22,11 +22,21 @@ type Dictionary = {
   footer: {
     support: string;
   };
+  home: {
+    lead: string;
+  };
   work: {
     title: string;
     subtitle: string;
     empty: string;
     more: string;
+    liveTitle: string;
+    sections: {
+      apps: string;
+      websites: string;
+      systems: string;
+      "product-design": string;
+    };
   };
   about: {
     title: string;
@@ -58,12 +68,22 @@ const dictionaries: Record<Locale, Dictionary> = {
   en: {
     header: { blog: "Blog", work: "Work", about: "About", contact: "Contact" },
     footer: { support: "Support this work" },
+    home: {
+      lead: "I design and build small, honest internet things.",
+    },
     work: {
       title: "Work",
       subtitle:
         "Apps, websites, systems, and product design — future-focused work for everyday use.",
       empty: "Nothing here yet.",
       more: "More work",
+      liveTitle: "Live",
+      sections: {
+        apps: "Apps",
+        websites: "Websites",
+        systems: "Systems",
+        "product-design": "Product design",
+      },
     },
     about: {
       title: "About Ainhoa",
@@ -97,12 +117,22 @@ const dictionaries: Record<Locale, Dictionary> = {
   es: {
     header: { blog: "Blog", work: "Trabajo", about: "Sobre mí", contact: "Contacto" },
     footer: { support: "Apoyar este trabajo" },
+    home: {
+      lead: "Diseño y construyo cosas pequeñas y honestas para internet.",
+    },
     work: {
       title: "Trabajo",
       subtitle:
         "Apps, webs, sistemas y diseño de producto — trabajo con foco en el uso diario.",
       empty: "Todavía no hay nada aquí.",
       more: "Más proyectos",
+      liveTitle: "En vivo",
+      sections: {
+        apps: "Apps",
+        websites: "Webs",
+        systems: "Sistemas",
+        "product-design": "Diseño de producto",
+      },
     },
     about: {
       title: "Sobre Ainhoa",
@@ -137,12 +167,22 @@ const dictionaries: Record<Locale, Dictionary> = {
   fr: {
     header: { blog: "Blog", work: "Work", about: "About", contact: "Contact" },
     footer: { support: "Support this work" },
+    home: {
+      lead: "I design and build small, honest internet things.",
+    },
     work: {
       title: "Work",
       subtitle:
         "Apps, websites, systems, and product design — future-focused work for everyday use.",
       empty: "Nothing here yet.",
       more: "More work",
+      liveTitle: "Live",
+      sections: {
+        apps: "Apps",
+        websites: "Websites",
+        systems: "Systems",
+        "product-design": "Product design",
+      },
     },
     about: {
       title: "About Ainhoa",

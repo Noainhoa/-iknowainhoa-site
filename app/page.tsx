@@ -1,76 +1,50 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/shared";
 import { externalAnchorProps } from "@/lib/links";
-import { siteWhatsAppEnquiryHref } from "@/lib/site";
+import { site, siteWhatsAppEnquiryHref } from "@/lib/site";
 
 const WA_ICON_PATH =
   "M12.04 2a9.9 9.9 0 0 0-9.9 9.9c0 1.75.46 3.45 1.33 4.95L2 22l5.3-1.39a9.87 9.87 0 0 0 4.74 1.21h.01a9.9 9.9 0 0 0 9.9-9.9 9.86 9.86 0 0 0-9.91-9.92Zm5.76 14.07c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.29.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.59.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.39-.43.52-.14.14-.29.3-.12.58.16.29.73 1.2 1.56 1.94 1.08.96 1.98 1.26 2.27 1.4.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.19-.29.38-.24.64-.14.26.1 1.66.78 1.95.92.28.15.47.21.54.33.07.12.07.68-.17 1.36Z";
 
-/** Home stays sparse — content is added piece by piece. */
-export default function Home() {
+/** Brand-first portal — projects live on /work. */
+export default async function Home() {
+  const locale = await getLocale();
+  const t = getDictionary(locale);
   const whatsappHref = siteWhatsAppEnquiryHref();
 
   return (
     <main className="home">
-      <ul className="home-logos">
-        <li>
-          <Link
-            href="/parking-guardamar-centro"
-            aria-label="Guardamar Parking"
-            className="home-logo"
-          >
-            <Image
-              src="/images/parking/guardamar-parking-badge.png"
-              alt="Guardamar Parking"
-              width={160}
-              height={160}
-              priority
-              className="home-logo-img home-logo-img--parking"
-            />
-          </Link>
-        </li>
-        <li>
-          <a
-            href="https://mueblesbegui.es/"
-            {...externalAnchorProps("https://mueblesbegui.es/")}
-            aria-label="Muebles Begui"
-            className="home-logo"
-          >
-            <Image
-              src="/images/projects/muebles-begui/logo.png"
-              alt="Muebles Begui"
-              width={220}
-              height={125}
-              priority
-              className="home-logo-img home-logo-img--begui"
-            />
-          </a>
-        </li>
-        <li>
-          <Link href="/anicca" aria-label="Anicca" className="home-logo">
-            <Image
-              src="/images/projects/anicca/logo.png"
-              alt="Anicca"
-              width={160}
-              height={156}
-              priority
-              className="home-logo-img home-logo-img--anicca"
-            />
-          </Link>
-        </li>
-        <li>
-          <Link href="/listeneasy" aria-label="ListenEasy" className="home-logo">
-            <Image
-              src="/images/projects/listeneasy/logo.png"
-              alt="ListenEasy"
-              width={160}
-              height={160}
-              priority
-              className="home-logo-img home-logo-img--listeneasy"
-            />
-          </Link>
-        </li>
-      </ul>
+      <section className="home-hero" aria-label={site.name}>
+        <div className="home-hero-media" aria-hidden>
+          <Image
+            src="/images/blog/avatar/03.png"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="home-hero-img"
+          />
+        </div>
+        <div className="home-hero-shade" aria-hidden />
+
+        <div className="home-hero-copy">
+          <h1 className="home-brand">{site.name}</h1>
+          <p className="home-lead">{t.home.lead}</p>
+          <nav className="home-ctas" aria-label={site.name}>
+            <Link href="/work" className="home-cta">
+              {t.header.work}
+            </Link>
+            <span className="home-cta-sep" aria-hidden>
+              ·
+            </span>
+            <Link href="/contact" className="home-cta">
+              {t.header.contact}
+            </Link>
+          </nav>
+        </div>
+      </section>
 
       <a
         className="home-wa-fab"
@@ -87,54 +61,110 @@ export default function Home() {
         .home {
           box-sizing: border-box;
           width: 100%;
-          min-height: calc(100vh - var(--accent-height) - var(--site-mobile-bar-height, 72px) - 180px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: clamp(40px, 8vh, 72px) clamp(20px, 6vw, 40px);
-          font-family: var(--font-geist-sans);
-        }
-        .home-logos {
-          list-style: none;
           margin: 0;
           padding: 0;
-          width: min(100%, 240px);
+          font-family: var(--font-geist-sans);
+        }
+        .home-hero {
+          position: relative;
+          isolation: isolate;
           display: flex;
           flex-direction: column;
+          justify-content: flex-end;
+          min-height: calc(
+            100svh - var(--accent-height) - var(--site-mobile-bar-height, 72px)
+          );
+          overflow: hidden;
+          color: #f7f4ef;
+        }
+        .home-hero-media {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+        }
+        .home-hero-img {
+          object-fit: cover;
+          object-position: center 8%;
+        }
+        .home-hero-shade {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(12, 10, 8, 0.12) 0%,
+              rgba(12, 10, 8, 0.08) 42%,
+              rgba(12, 10, 8, 0.62) 68%,
+              rgba(12, 10, 8, 0.9) 100%
+            ),
+            linear-gradient(
+              90deg,
+              rgba(12, 10, 8, 0.4) 0%,
+              rgba(12, 10, 8, 0.1) 52%,
+              rgba(12, 10, 8, 0.04) 100%
+            );
+          pointer-events: none;
+        }
+        .home-hero-copy {
+          position: relative;
+          z-index: 2;
+          width: min(100%, 720px);
+          padding: clamp(24px, 5vh, 48px) clamp(20px, 5vw, 40px)
+            clamp(48px, 9vh, 72px);
+        }
+        .home-brand {
+          margin: 0;
+          font-family: var(--font-blog-brand), "Bebas Neue", system-ui, sans-serif;
+          font-size: clamp(2.85rem, 12vw, 6.5rem);
+          font-weight: 400;
+          letter-spacing: 0.02em;
+          line-height: 0.92;
+          text-transform: uppercase;
+          color: #f7f4ef;
+          text-shadow: 0 1px 18px rgba(0, 0, 0, 0.28);
+        }
+        .home-lead {
+          margin: clamp(12px, 2vh, 20px) 0 0;
+          max-width: 28ch;
+          font-family: var(--font-serif);
+          font-size: clamp(1.02rem, 2.5vw, 1.35rem);
+          font-weight: 400;
+          line-height: 1.45;
+          color: rgba(247, 244, 239, 0.92);
+          text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+        }
+        .home-ctas {
+          display: flex;
+          flex-wrap: wrap;
           align-items: center;
-          gap: clamp(40px, 7vh, 64px);
+          gap: 10px 14px;
+          margin-top: clamp(18px, 3.2vh, 32px);
         }
-        .home-logo {
-          display: block;
-          line-height: 0;
-          width: 100%;
-          text-align: center;
-          background: transparent;
+        .home-cta {
+          font-size: 0.95rem;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          text-decoration: none !important;
+          color: #f7f4ef !important;
+          border-bottom: 2px solid transparent;
+          padding-bottom: 2px;
+          transition: border-color 0.2s ease, color 0.2s ease;
         }
-        .home-logo-img {
-          display: block;
-          margin: 0 auto;
-          width: auto;
-          height: auto;
-          max-width: 100%;
-          object-fit: contain;
+        .home-cta:hover {
+          color: var(--accent-yellow) !important;
+          border-bottom-color: var(--accent-yellow);
         }
-        .home-logo-img--parking {
-          width: min(112px, 46vw);
-          height: auto;
+        .home-cta:focus-visible {
+          outline: 2px solid var(--accent-yellow);
+          outline-offset: 4px;
         }
-        .home-logo-img--begui {
-          width: min(168px, 70vw);
-          height: auto;
-        }
-        .home-logo-img--anicca {
-          width: min(112px, 46vw);
-          height: auto;
-        }
-        .home-logo-img--listeneasy {
-          width: min(112px, 46vw);
-          height: auto;
-          border-radius: 22%;
+        .home-cta-sep {
+          color: rgba(247, 244, 239, 0.45);
+          font-size: 1.1rem;
+          line-height: 1;
+          user-select: none;
         }
         .home-wa-fab {
           position: fixed;
@@ -147,7 +177,7 @@ export default function Home() {
           height: 52px;
           background: transparent;
           text-decoration: none !important;
-          filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+          filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.28));
           -webkit-tap-highlight-color: transparent;
           touch-action: manipulation;
         }
@@ -158,26 +188,75 @@ export default function Home() {
           outline: 2px solid var(--accent-orange);
           outline-offset: 3px;
         }
+        @keyframes home-media-settle {
+          from {
+            transform: scale(1.08);
+          }
+          to {
+            transform: scale(1.04);
+          }
+        }
+        @keyframes home-rise {
+          from {
+            transform: translateY(14px);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+          .home-hero-img {
+            transform: scale(1.04);
+            animation: home-media-settle 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+          }
+          .home-brand {
+            animation: home-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+          }
+          .home-lead {
+            animation: home-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+          }
+          .home-ctas {
+            animation: home-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both;
+          }
+        }
         @media (min-width: 720px) {
-          .home-logos {
-            width: min(100%, 280px);
-            gap: clamp(48px, 8vh, 80px);
+          .home-hero {
+            justify-content: center;
           }
-          .home-logo-img--parking {
-            width: 120px;
+          .home-hero-img {
+            object-position: center 16%;
           }
-          .home-logo-img--begui {
-            width: 180px;
+          .home-hero-shade {
+            background:
+              linear-gradient(
+                100deg,
+                rgba(12, 10, 8, 0.78) 0%,
+                rgba(12, 10, 8, 0.42) 38%,
+                rgba(12, 10, 8, 0.12) 68%,
+                rgba(12, 10, 8, 0.2) 100%
+              ),
+              linear-gradient(
+                180deg,
+                rgba(12, 10, 8, 0.18) 0%,
+                rgba(12, 10, 8, 0.05) 45%,
+                rgba(12, 10, 8, 0.45) 100%
+              );
           }
-          .home-logo-img--anicca {
-            width: 120px;
+          .home-hero-copy {
+            padding: clamp(40px, 8vh, 80px) clamp(28px, 6vw, 56px);
           }
-          .home-logo-img--listeneasy {
-            width: 120px;
+          .home-lead {
+            max-width: 32ch;
           }
           .home-wa-fab {
             right: max(24px, env(safe-area-inset-right, 0px));
             bottom: max(24px, env(safe-area-inset-bottom, 0px));
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .home-hero-img {
+            transform: none;
+            opacity: 1;
           }
         }
       `}</style>

@@ -20,6 +20,7 @@ import { type WorkCategory, type WorkItem } from "@/lib/work-shared";
 export {
   WORK_FILTERS,
   categoryLabel,
+  groupWorkByCategory,
   type WorkCategory,
   type WorkFilterId,
   type WorkItem,
@@ -116,17 +117,24 @@ function toWorkItem(
 }
 
 function productAppWorkItems(): WorkItem[] {
-  return productApps.map((app) => ({
-    slug: app.slug,
-    title: app.name,
-    description: app.summary,
-    coverImage: undefined,
-    category: "apps" as const,
-    summary: app.tagline,
-    href: `/work/${app.slug}`,
-    source: "product-apps" as const,
-    tags: ["apps", app.status],
-  }));
+  return productApps.map((app) => {
+    const logo =
+      app.slug === "listeneasy"
+        ? "/images/projects/listeneasy/brand-mark.png"
+        : undefined;
+    return {
+      slug: app.slug,
+      title: app.name,
+      description: app.summary,
+      coverImage: logo,
+      logo,
+      category: "apps" as const,
+      summary: app.tagline,
+      href: app.slug === "listeneasy" ? "/listeneasy" : `/work/${app.slug}`,
+      source: "product-apps" as const,
+      tags: ["apps", app.status],
+    };
+  });
 }
 
 export async function getAllWork(locale: Locale = "en"): Promise<WorkItem[]> {

@@ -17,7 +17,7 @@ export default async function WorkPage() {
 
   const locale = await getLocale();
   const t = getDictionary(locale);
-  const work = await getAllWork();
+  const work = await getAllWork(locale);
 
   return (
     <WorkIndex
@@ -25,6 +25,9 @@ export default async function WorkPage() {
       title={t.work.title}
       subtitle={t.work.subtitle}
       empty={t.work.empty}
+      liveTitle={t.work.liveTitle}
+      sectionLabels={t.work.sections}
+      locale={locale}
     />
   );
 }

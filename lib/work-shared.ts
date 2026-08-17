@@ -27,6 +27,22 @@ export type WorkItem = {
   tags: string[];
 };
 
+export function groupWorkByCategory(
+  items: WorkItem[]
+): { category: WorkCategory; items: WorkItem[] }[] {
+  const order: WorkCategory[] = ["apps", "websites", "systems", "product-design"];
+  const buckets = new Map<WorkCategory, WorkItem[]>();
+  for (const category of order) buckets.set(category, []);
+  for (const item of items) {
+    const list = buckets.get(item.category) ?? [];
+    list.push(item);
+    buckets.set(item.category, list);
+  }
+  return order
+    .map((category) => ({ category, items: buckets.get(category) ?? [] }))
+    .filter((section) => section.items.length > 0);
+}
+
 export function categoryLabel(category: WorkCategory): string {
   return WORK_FILTERS.find((f) => f.id === category)?.label ?? category;
 }

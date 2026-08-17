@@ -2,19 +2,123 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { WorkItem } from "@/lib/work-shared";
+import type { ReactNode } from "react";
+import { externalAnchorProps, isExternalHref } from "@/lib/links";
+import type { Locale } from "@/lib/i18n/shared";
+import {
+  groupWorkByCategory,
+  type WorkCategory,
+  type WorkItem,
+} from "@/lib/work-shared";
+import { WORK_BRANDS, workBrandOmitSlugs } from "@/lib/workBrands";
+
+type SectionLabels = Record<WorkCategory, string>;
+
+function BrandLink({
+  href,
+  className,
+  children,
+  ariaLabel,
+}: {
+  href: string;
+  className: string;
+  children: ReactNode;
+  ariaLabel: string;
+}) {
+  if (isExternalHref(href)) {
+    return (
+      <a
+        href={href}
+        className={className}
+        aria-label={ariaLabel}
+        {...externalAnchorProps(href)}
+      >
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={className} aria-label={ariaLabel}>
+      {children}
+    </Link>
+  );
+}
+
+function ProjectCard({
+  item,
+  priority,
+}: {
+  item: WorkItem;
+  priority?: boolean;
+}) {
+  const isLogoTile = Boolean(item.logo && item.coverImage === item.logo);
+
+  return (
+    <Link href={item.href} className="project">
+      <div className="media">
+        {item.coverImage ? (
+          isLogoTile ? (
+            // Logos: skip Next optimizer — it was soft-resizing the badge.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={item.coverImage}
+              alt=""
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                objectPosition: "center",
+                padding: 10,
+                background: "#0b2a5b",
+              }}
+            />
+          ) : (
+            <Image
+              src={item.coverImage}
+              alt=""
+              fill
+              sizes="(max-width: 760px) 50vw, (max-width: 1100px) 33vw, 25vw"
+              quality={90}
+              priority={priority}
+              style={{
+                objectFit: "cover",
+                objectPosition: "center",
+              }}
+            />
+          )
+        ) : (
+          <div className="placeholder" aria-hidden />
+        )}
+      </div>
+      <h3>{item.title}</h3>
+      <p>{item.summary}</p>
+    </Link>
+  );
+}
 
 export default function WorkIndex({
   items,
   title,
   subtitle,
   empty,
+  liveTitle,
+  sectionLabels,
+  locale,
 }: {
   items: WorkItem[];
   title: string;
   subtitle: string;
   empty: string;
+  liveTitle: string;
+  sectionLabels: SectionLabels;
+  locale: Locale;
 }) {
+  const omit = workBrandOmitSlugs();
+  const portfolio = items.filter((item) => !omit.has(item.slug));
+  const sections = groupWorkByCategory(portfolio);
+
   return (
     <main className="work">
       <header className="work-hero">
@@ -22,55 +126,56 @@ export default function WorkIndex({
         <p>{subtitle}</p>
       </header>
 
-      {items.length === 0 ? (
-        <p className="empty">{empty}</p>
-      ) : (
-        <section className="grid" aria-label={title}>
-          {items.map((item, index) => (
-            <Link key={item.slug} href={item.href} className="project">
-              <div className="media">
-                {item.coverImage ? (
-                  item.logo && item.coverImage === item.logo ? (
-                    // Logos: skip Next optimizer — it was soft-resizing the badge.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={item.coverImage}
-                      alt=""
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "contain",
-                        objectPosition: "center",
-                        padding: 10,
-                        background: "#0b2a5b",
-                      }}
-                    />
-                  ) : (
-                    <Image
-                      src={item.coverImage}
-                      alt=""
-                      fill
-                      sizes="(max-width: 760px) 50vw, (max-width: 1100px) 33vw, 25vw"
-                      quality={90}
-                      priority={index < 2}
-                      style={{
-                        objectFit: "cover",
-                        objectPosition: "center",
-                      }}
-                    />
-                  )
-                ) : (
-                  <div className="placeholder" aria-hidden />
-                )}
-              </div>
-              <h2>{item.title}</h2>
-              <p>{item.summary}</p>
-            </Link>
+      <section className="work-section work-brands" aria-labelledby="work-live">
+        <h2 id="work-live">{liveTitle}</h2>
+        <ul className="brand-list">
+          {WORK_BRANDS.map((brand) => (
+            <li key={brand.id}>
+              <BrandLink
+                href={brand.href}
+                className={`brand-card${brand.wide ? " brand-card--wide" : ""}`}
+                ariaLabel={brand.name}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={brand.logo}
+                  alt=""
+                  className={`brand-logo brand-logo--${brand.id}`}
+                />
+                <span className="brand-copy">
+                  <span className="brand-name">{brand.name}</span>
+                  <span className="brand-summary">{brand.summary[locale]}</span>
+                </span>
+              </BrandLink>
+            </li>
           ))}
+        </ul>
+      </section>
+
+      {portfolio.length === 0 && sections.length === 0 ? (
+        <p className="empty">{empty}</p>
+      ) : null}
+
+      {sections.map((section) => (
+        <section
+          key={section.category}
+          className="work-section"
+          aria-labelledby={`work-${section.category}`}
+        >
+          <h2 id={`work-${section.category}`}>
+            {sectionLabels[section.category]}
+          </h2>
+          <div className="grid">
+            {section.items.map((item, index) => (
+              <ProjectCard
+                key={item.slug}
+                item={item}
+                priority={section.category === sections[0]?.category && index < 2}
+              />
+            ))}
+          </div>
         </section>
-      )}
+      ))}
 
       <style>{`
         .work {
@@ -82,7 +187,7 @@ export default function WorkIndex({
         }
         .work-hero {
           max-width: 34em;
-          margin-bottom: 64px;
+          margin-bottom: 56px;
         }
         .work-hero h1 {
           margin: 0;
@@ -100,9 +205,78 @@ export default function WorkIndex({
           font-weight: 450;
           max-width: 28em;
         }
+        .work-section {
+          margin-top: 64px;
+        }
+        .work-section:first-of-type {
+          margin-top: 0;
+        }
+        .work-section h2 {
+          margin: 0 0 28px;
+          font-size: 0.8rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #6a6a6a;
+        }
         .empty {
           opacity: 0.65;
           font-size: 1.05rem;
+        }
+        .brand-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 20px 16px;
+        }
+        .brand-card {
+          display: grid;
+          grid-template-rows: 120px auto;
+          gap: 14px;
+          text-decoration: none !important;
+          color: inherit !important;
+        }
+        .brand-card:hover .brand-name {
+          color: var(--link);
+        }
+        .brand-logo {
+          display: block;
+          width: auto;
+          height: auto;
+          max-width: 100%;
+          max-height: 88px;
+          margin: 0 auto;
+          object-fit: contain;
+        }
+        .brand-card--wide .brand-logo {
+          max-height: 64px;
+          max-width: 160px;
+        }
+        .brand-logo--parking,
+        .brand-logo--anicca,
+        .brand-logo--listeneasy {
+          max-height: 96px;
+        }
+        .brand-copy {
+          display: grid;
+          gap: 4px;
+          text-align: center;
+        }
+        .brand-name {
+          font-size: 1rem;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+          line-height: 1.2;
+          color: #2a2a2a;
+          transition: color 0.2s ease;
+        }
+        .brand-summary {
+          font-family: var(--font-serif);
+          font-size: 0.9rem;
+          line-height: 1.4;
+          color: #6a6a6a;
         }
         .grid {
           display: grid;
@@ -134,7 +308,7 @@ export default function WorkIndex({
           inset: 0;
           background: linear-gradient(145deg, #e8e4dc 0%, #f3efe6 55%, #ddd6c8 100%);
         }
-        .project h2 {
+        .project h3 {
           margin: 2px 0 0;
           font-size: 1.1rem;
           font-weight: 700;
@@ -153,6 +327,15 @@ export default function WorkIndex({
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
+        @media (min-width: 900px) {
+          .brand-list {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 28px 24px;
+          }
+          .brand-card {
+            grid-template-rows: 132px auto;
+          }
+        }
         @media (min-width: 1100px) {
           .grid {
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -170,7 +353,35 @@ export default function WorkIndex({
             padding: 28px 16px 72px;
           }
           .work-hero {
-            margin-bottom: 28px;
+            margin-bottom: 36px;
+          }
+          .work-section {
+            margin-top: 48px;
+          }
+          .work-section h2 {
+            margin-bottom: 18px;
+          }
+          .brand-list {
+            gap: 22px 12px;
+          }
+          .brand-card {
+            grid-template-rows: 100px auto;
+            gap: 10px;
+          }
+          .brand-logo--parking,
+          .brand-logo--anicca,
+          .brand-logo--listeneasy {
+            max-height: 80px;
+          }
+          .brand-card--wide .brand-logo {
+            max-height: 52px;
+            max-width: 130px;
+          }
+          .brand-name {
+            font-size: 0.92rem;
+          }
+          .brand-summary {
+            font-size: 0.8rem;
           }
           .grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -182,7 +393,7 @@ export default function WorkIndex({
           .project {
             gap: 8px;
           }
-          .project h2 {
+          .project h3 {
             font-size: 0.95rem;
           }
           .project p {
