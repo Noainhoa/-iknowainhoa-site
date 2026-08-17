@@ -13,20 +13,31 @@ export const ANICCA_ORIGIN = "https://iknowainhoa.com";
 export const ANICCA_PATH = "/anicca";
 export const ANICCA_CANONICAL = `${ANICCA_ORIGIN}${ANICCA_PATH}`;
 
-/** Single source of truth for unit price (EUR). Delivery is charged separately. */
+/** Single source of truth for unit price (EUR). Spain standard delivery is included. */
 export const ANICCA_PRICE_EUR = 14;
 
 export const ANICCA_CURRENCY = "EUR" as const;
 
 export const ANICCA_CONTACT_EMAIL = "hola@iknowainhoa.com";
 
-/** Owner-confirm before launch. */
-export const ANICCA_DISPATCH_ESTIMATE =
-  "If ordered before 12:00 CET Monday to Friday, posted the same day; otherwise the next working day.";
+export const ANICCA_SHIPPING_RETURNS_PATH = "/anicca/shipping-returns";
 
-/** Shown in FAQ. Live rates appear in Stripe checkout. */
-export const ANICCA_SHIPPING_MESSAGE =
-  "Delivery availability and cost are shown during Stripe checkout, before you pay. Shipping is charged separately from the token price.";
+export const ANICCA_SHIPPING_LINE = "Standard delivery in Spain included";
+
+export const ANICCA_SHIPPING_SUPPORT =
+  "Pouch + personal note included · Standard delivery in Spain included";
+
+export const ANICCA_SHIPPING_TRACKED = "Tracked delivery available at checkout";
+
+/**
+ * Public dispatch wording. The same-day-before-12:00-CET rule is not published
+ * until the owner confirms it.
+ */
+export const ANICCA_DISPATCH_PUBLIC = "Orders are posted from Spain on working days.";
+
+/** Owner-confirm before using on the public page. */
+export const ANICCA_DISPATCH_ESTIMATE_UNCONFIRMED =
+  "If ordered before 12:00 CET Monday to Friday, posted the same day; otherwise the next working day.";
 
 export const ANICCA_FIRST_EDITION_TOTAL = 44;
 
@@ -42,6 +53,8 @@ export type AniccaVariant = {
   selectorLabel: string;
   /** Compact selector subtitle (front / back sense) */
   selectorDetail: string;
+  /** One-line hero summary of the selected words */
+  compactDetail: string;
   name: string;
   language: "English" | "Español";
   languageCode: "en" | "es";
@@ -69,6 +82,7 @@ export const ANICCA_VARIANTS: AniccaVariant[] = [
     label: "Anicca — English",
     selectorLabel: "Anicca · English",
     selectorDetail: "Impermanence / This too shall pass · good or bad",
+    compactDetail: "Impermanence · This too shall pass, good or bad",
     name: "Anicca",
     language: "English",
     languageCode: "en",
@@ -88,6 +102,7 @@ export const ANICCA_VARIANTS: AniccaVariant[] = [
     label: "Yathābhūtaṃ — English",
     selectorLabel: "Yathābhūtaṃ · English",
     selectorDetail: "As it is / Not as you would like it to be",
+    compactDetail: "As it is · Not as you would like it to be",
     name: "Yathābhūtaṃ",
     language: "English",
     languageCode: "en",
@@ -106,7 +121,10 @@ export const ANICCA_VARIANTS: AniccaVariant[] = [
     id: "anicca-es",
     label: "Anicca — Español",
     selectorLabel: "Anicca · Español",
-    selectorDetail: "Esto también pasará, bueno o malo / Acéptalo así como es…",
+    selectorDetail:
+      "Esto también pasará, bueno o malo / Acéptalo así como es, no como te gustaría que fuese",
+    compactDetail:
+      "Esto también pasará, bueno o malo · Acéptalo así como es, no como te gustaría que fuese",
     name: "Anicca",
     language: "Español",
     languageCode: "es",

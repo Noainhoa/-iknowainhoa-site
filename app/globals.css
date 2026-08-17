@@ -225,6 +225,32 @@ a:hover {
   }
 }
 
+html.page-anicca {
+  --accent-height: 8px;
+}
+
+html.page-anicca .site-accent {
+  height: 4px;
+  border-bottom-width: 4px;
+}
+
+html.page-anicca .site-header-bar {
+  padding: 8px 16px;
+}
+
+html.page-anicca .site-brand {
+  font-size: 13px;
+}
+
+html.page-anicca .site-menu-btn {
+  width: 40px;
+  height: 40px;
+}
+
+html.page-anicca .site-header {
+  background: #f6f1ea;
+}
+
 /* ------------------------------------------------------------------ */
 /* Blog shell — Seth-inspired sidebar (https://seths.blog/)            */
 /* Joy-yellow accents instead of Seth orange; no subscribe blocks.     */

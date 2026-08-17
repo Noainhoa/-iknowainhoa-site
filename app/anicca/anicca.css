@@ -16,6 +16,29 @@
 
 body:has(.anicca) {
   background: #f6f1ea;
+  --accent-height: 8px;
+}
+
+body:has(.anicca) .site-accent {
+  height: 4px;
+  border-bottom-width: 4px;
+}
+
+body:has(.anicca) .site-header {
+  background: #f6f1ea;
+}
+
+body:has(.anicca) .site-header-bar {
+  padding: 8px 16px;
+}
+
+body:has(.anicca) .site-brand {
+  font-size: 13px;
+}
+
+body:has(.anicca) .site-menu-btn {
+  width: 40px;
+  height: 40px;
 }
 
 .anicca * {
@@ -35,8 +58,8 @@ body:has(.anicca) {
 
 .anicca-hero {
   display: grid;
-  gap: 28px;
-  padding: 20px 0 48px;
+  gap: 20px;
+  padding: 12px 0 40px;
 }
 
 @media (min-width: 880px) {
@@ -85,7 +108,7 @@ body:has(.anicca) {
 }
 
 .anicca-hero-copy h1 {
-  margin: 0 0 14px;
+  margin: 0 0 10px;
   font-family: var(--font-serif);
   font-weight: 500;
   font-size: clamp(1.7rem, 4.2vw, 2.55rem);
@@ -102,7 +125,7 @@ body:has(.anicca) {
 }
 
 .anicca-price {
-  margin: 22px 0 0;
+  margin: 16px 0 0;
   font-family: var(--font-serif);
   font-size: 1.85rem;
   font-weight: 500;
@@ -125,10 +148,10 @@ body:has(.anicca) {
 
 .anicca-buy {
   display: grid;
-  gap: 14px;
-  margin-top: 28px;
+  gap: 12px;
+  margin-top: 18px;
   max-width: 28rem;
-  scroll-margin-top: 96px;
+  scroll-margin-top: 88px;
 }
 
 .anicca-buy--inline {
@@ -183,6 +206,59 @@ body:has(.anicca) {
   font-size: 0.78rem;
   line-height: 1.5;
   color: var(--anicca-muted);
+}
+
+.anicca-meta--price {
+  margin-top: 6px;
+}
+
+.anicca-current {
+  display: grid;
+  gap: 4px;
+}
+
+.anicca-current-label {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.anicca-current-detail {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--anicca-muted);
+}
+
+.anicca-change {
+  margin: 4px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  justify-self: start;
+}
+
+.anicca-change:focus-visible {
+  outline: 2px solid var(--anicca-focus);
+  outline-offset: 3px;
+}
+
+.anicca-legal {
+  padding-top: 28px;
+}
+
+.anicca-legal h1 {
+  margin: 0 0 12px;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  line-height: 1.15;
 }
 
 .anicca-section {
@@ -477,25 +553,34 @@ body:has(.anicca) {
   }
 
   .anicca-hero {
-    padding-top: 16px;
-    gap: 20px;
+    padding-top: 10px;
+    gap: 14px;
   }
 
   .anicca-hero-copy h1 {
-    font-size: 1.62rem;
+    font-size: 1.5rem;
+  }
+
+  .anicca-lead {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .anicca-shot {
+    gap: 4px;
+  }
+
+  .anicca-shot figcaption {
+    display: none;
   }
 
   .anicca-buy {
-    margin-top: 20px;
-    gap: 12px;
+    margin-top: 14px;
+    gap: 10px;
   }
 
   .anicca-pick {
     padding: 9px 6px 9px 8px;
-  }
-
-  .anicca-shot figcaption {
-    font-size: 0.62rem;
   }
 
   .anicca-section {

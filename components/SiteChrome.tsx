@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import type { Locale } from "@/lib/i18n/shared";
@@ -27,8 +28,14 @@ export default function SiteChrome({
     pathname === "/parking" ||
     pathname.startsWith("/parking/");
   const isBlog = pathname === "/blog" || pathname.startsWith("/blog/");
+  const isAnicca = pathname === "/anicca" || pathname.startsWith("/anicca/");
   const showAccent = !isParking;
   const showHeaderFooter = !isParking && !isBlog;
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("page-anicca", isAnicca);
+    return () => document.documentElement.classList.remove("page-anicca");
+  }, [isAnicca]);
 
   return (
     <>

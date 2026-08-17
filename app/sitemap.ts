@@ -79,6 +79,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.95,
     },
+    {
+      url: `${baseUrl}/anicca/shipping-returns`,
+      lastModified: new Date(),
+      changeFrequency: "yearly" as const,
+      priority: 0.5,
+    },
     // Spanish = bare path; do not list ?lang=es (duplicate of canonical).
     {
       url: `${baseUrl}/parking-guardamar-centro`,

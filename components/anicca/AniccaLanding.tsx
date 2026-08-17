@@ -8,6 +8,7 @@ import { trackAniccaEvent } from "@/lib/anicca/analytics";
 import {
   ANICCA_CONTACT_EMAIL,
   ANICCA_LIFE_IMAGES,
+  ANICCA_SHIPPING_RETURNS_PATH,
   ANICCA_VARIANTS,
   formatAniccaPrice,
   getDefaultAniccaVariant,
@@ -94,9 +95,11 @@ export default function AniccaLanding() {
   const noteId = useId();
   const [selectedId, setSelectedId] = useState<AniccaVariantId>(getDefaultAniccaVariant().id);
   const [checkoutNote, setCheckoutNote] = useState<string | null>(null);
+  const [chooserOpen, setChooserOpen] = useState(false);
 
   const variant =
     ANICCA_VARIANTS.find((item) => item.id === selectedId) ?? getDefaultAniccaVariant();
+  const meaning = copy.meaningByVariant[variant.id];
   const price = formatAniccaPrice(variant.priceEur);
   const ctaLabel = copy.choice.ctaBuy(price);
   const describedBy = checkoutNote ? noteId : undefined;
@@ -105,9 +108,10 @@ export default function AniccaLanding() {
     trackAniccaEvent({ name: "anicca_view" });
   }, []);
 
-  function selectVariant(next: AniccaVariant) {
+  function selectVariant(next: AniccaVariant, collapseHero = false) {
     setSelectedId(next.id);
     setCheckoutNote(null);
+    if (collapseHero) setChooserOpen(false);
     trackAniccaEvent({ name: "anicca_variant_selected", variantId: next.id });
   }
 
@@ -157,16 +161,30 @@ export default function AniccaLanding() {
 
             <p className="anicca-price">{price}</p>
             <p className="anicca-edition">{copy.hero.edition}</p>
+            <p className="anicca-meta anicca-meta--price">{copy.hero.ctaMeta}</p>
 
             <div className="anicca-buy" id="choose">
-              <p className="anicca-choose-label" id="hero-choose-label">
-                {copy.choice.headline}
-              </p>
-              <AniccaVariantPicker
-                selectedId={variant.id}
-                onSelect={selectVariant}
-                labelledBy="hero-choose-label"
-              />
+              <div className="anicca-current">
+                <p className="anicca-current-label">{variant.selectorLabel}</p>
+                <p className="anicca-current-detail">{variant.compactDetail}</p>
+                <button
+                  type="button"
+                  className="anicca-change"
+                  aria-expanded={chooserOpen}
+                  aria-controls="hero-inscriptions"
+                  onClick={() => setChooserOpen((open) => !open)}
+                >
+                  {chooserOpen ? copy.hero.closeInscription : copy.hero.changeInscription}
+                </button>
+              </div>
+              {chooserOpen ? (
+                <div id="hero-inscriptions">
+                  <AniccaVariantPicker
+                    selectedId={variant.id}
+                    onSelect={(next) => selectVariant(next, true)}
+                  />
+                </div>
+              ) : null}
               <CheckoutAction
                 selected={variant}
                 label={ctaLabel}
@@ -178,7 +196,6 @@ export default function AniccaLanding() {
                   {checkoutNote}
                 </p>
               ) : null}
-              <p className="anicca-meta">{copy.hero.ctaMeta}</p>
             </div>
           </div>
         </header>
@@ -206,13 +223,9 @@ export default function AniccaLanding() {
         </section>
 
         <section className="anicca-section anicca-meaning" aria-labelledby="meaning-title">
-          <h2 id="meaning-title">{copy.meanings.headline}</h2>
-          <p className="anicca-gloss">{copy.meanings.gloss}</p>
-          <p className="anicca-prose">{copy.meanings.body}</p>
-          <div className="anicca-also">
-            <p className="anicca-also-label">{copy.meanings.yathaLabel}</p>
-            <p className="anicca-prose">{copy.meanings.yathaBody}</p>
-          </div>
+          <h2 id="meaning-title">{meaning.headline}</h2>
+          <p className="anicca-gloss">{meaning.gloss}</p>
+          <p className="anicca-prose">{meaning.body}</p>
         </section>
 
         <section className="anicca-section anicca-arrives" aria-labelledby="arrives-title">
@@ -224,18 +237,12 @@ export default function AniccaLanding() {
           </ul>
           <p className="anicca-material">{copy.arrives.material}</p>
           <div className="anicca-buy anicca-buy--inline">
-            <p className="anicca-price anicca-price--compact">{price}</p>
             <CheckoutAction
               selected={variant}
               label={ctaLabel}
               noteId={describedBy}
               onBlocked={onBlocked}
             />
-            {checkoutNote ? (
-              <p className="anicca-notice" role="status">
-                {checkoutNote}
-              </p>
-            ) : null}
           </div>
         </section>
 
@@ -254,7 +261,10 @@ export default function AniccaLanding() {
         <section className="anicca-section anicca-final" aria-labelledby="final-title">
           <h2 id="final-title">{copy.finalCta.headline}</h2>
           <div className="anicca-buy">
-            <AniccaVariantPicker selectedId={variant.id} onSelect={selectVariant} />
+            <AniccaVariantPicker
+              selectedId={variant.id}
+              onSelect={(next) => selectVariant(next)}
+            />
             <p className="anicca-price anicca-price--compact">{price}</p>
             <CheckoutAction
               selected={variant}
@@ -268,6 +278,7 @@ export default function AniccaLanding() {
               </p>
             ) : null}
             <p className="anicca-meta">{copy.finalCta.support}</p>
+            <p className="anicca-meta">{copy.finalCta.tracked}</p>
           </div>
         </section>
 
@@ -276,7 +287,15 @@ export default function AniccaLanding() {
           {copy.faq.items.map((item) => (
             <details key={item.q}>
               <summary>{item.q}</summary>
-              <p>{item.a}</p>
+              <p>
+                {item.a}
+                {item.href ? (
+                  <>
+                    {" "}
+                    <Link href={item.href}>{item.hrefLabel}</Link>
+                  </>
+                ) : null}
+              </p>
             </details>
           ))}
           <div className="anicca-trust">
@@ -286,6 +305,8 @@ export default function AniccaLanding() {
               <a href={`mailto:${ANICCA_CONTACT_EMAIL}`}>{ANICCA_CONTACT_EMAIL}</a>
               {" · "}
               <Link href="/contact">Contact</Link>
+              {" · "}
+              <Link href={ANICCA_SHIPPING_RETURNS_PATH}>{copy.trust.shippingLink}</Link>
             </p>
             <p>{copy.trust.privacyNote}</p>
           </div>

@@ -1,10 +1,24 @@
 /**
  * Page copy for /anicca.
- * English ships first. Spanish can be added as `es: { … }` mirroring this shape
- * and selected via the site locale / a future ?lang= helper without changing JSX.
+ * English ships first. Pali terms stay untranslated.
+ * Spanish strings for the Spanish variant use natural Spanish;
+ * engraved wording is stored on the variant in config.ts and must not be paraphrased.
  */
 
-import { ANICCA_CONTACT_EMAIL, ANICCA_DISPATCH_ESTIMATE, ANICCA_SHIPPING_MESSAGE } from "@/lib/anicca/config";
+import {
+  ANICCA_CONTACT_EMAIL,
+  ANICCA_SHIPPING_LINE,
+  ANICCA_SHIPPING_RETURNS_PATH,
+  ANICCA_SHIPPING_SUPPORT,
+  ANICCA_SHIPPING_TRACKED,
+  type AniccaVariantId,
+} from "@/lib/anicca/config";
+
+export type AniccaMeaning = {
+  headline: string;
+  gloss: string;
+  body: string;
+};
 
 export type AniccaCopy = {
   meta: { title: string; description: string };
@@ -14,6 +28,8 @@ export type AniccaCopy = {
     support: string;
     edition: string;
     ctaMeta: string;
+    changeInscription: string;
+    closeInscription: string;
   };
   choice: {
     headline: string;
@@ -25,25 +41,23 @@ export type AniccaCopy = {
     paymentMissing: string;
   };
   life: { headline: string; body: string };
-  meanings: {
-    headline: string;
-    gloss: string;
-    body: string;
-    yathaLabel: string;
-    yathaBody: string;
-  };
+  meaningByVariant: Record<AniccaVariantId, AniccaMeaning>;
   origin: { headline: string; paragraphs: string[]; pull: string };
   arrives: {
     headline: string;
     items: string[];
     material: string;
   };
-  finalCta: { headline: string; support: string };
-  faq: { headline: string; items: { q: string; a: string }[] };
+  finalCta: { headline: string; support: string; tracked: string };
+  faq: {
+    headline: string;
+    items: { q: string; a: string; href?: string; hrefLabel?: string }[];
+  };
   trust: {
     independent: string;
     contact: string;
     privacyNote: string;
+    shippingLink: string;
   };
   a11y: {
     selectVariant: string;
@@ -56,15 +70,16 @@ const en: AniccaCopy = {
   meta: {
     title: "Anicca — a reminder that this moment will pass",
     description:
-      "A small, double-sided engraved token to keep close. Anicca · Impermanence. Limited first edition, €14 plus delivery.",
+      "A small, double-sided engraved token to keep close. Anicca · Impermanence. €14, standard delivery in Spain included.",
   },
   hero: {
     eyebrow: "Anicca · Reminder token",
     headline: "A reminder that this moment will pass.",
-    support:
-      "A small, double-sided engraved token to keep close — in difficult moments, good ones, and everything between.",
+    support: "A small, double-sided engraved token to keep close.",
     edition: "Limited first edition",
-    ctaMeta: "Velvet pouch + personal note included · Delivery calculated at checkout",
+    ctaMeta: ANICCA_SHIPPING_LINE,
+    changeInscription: "Change inscription",
+    closeInscription: "Close",
   },
   choice: {
     headline: "Choose your words",
@@ -77,38 +92,46 @@ const en: AniccaCopy = {
   },
   life: {
     headline: "The first ones never stayed in the box.",
-    body: "The people who first received them each found their own way to keep the token close.",
+    body: "Everyone found their own way to keep one close.",
   },
-  meanings: {
-    headline: "Anicca",
-    gloss: "Impermanence.",
-    body: "Everything changes. The difficult passes, but so does the pleasant. The token is simply a physical reminder of that fact — something to see, touch or carry when perspective is harder to hold.",
-    yathaLabel: "Also available: Yathābhūtaṃ · As it is",
-    yathaBody:
-      "To meet what is present, not as you would like it to be. Acceptance here does not mean approval — only beginning with what is actually here.",
+  meaningByVariant: {
+    "anicca-en": {
+      headline: "Anicca",
+      gloss: "Impermanence.",
+      body: "Everything changes. The difficult passes; the pleasant does too. A small reminder to keep close.",
+    },
+    "yathabhutam-en": {
+      headline: "Yathābhūtaṃ",
+      gloss: "As it is.",
+      body: "To meet what is present as it is, not as we would like it to be.",
+    },
+    "anicca-es": {
+      headline: "Anicca",
+      gloss: "Impermanencia.",
+      body: "Todo cambia. Lo difícil pasa; lo agradable también. Un pequeño recordatorio para llevar contigo.",
+    },
   },
   origin: {
     headline: "Why I made it",
     paragraphs: [
-      "The words returned to me during a ten-day Vipassana retreat, after a period in which cancer had changed the shape of my life.",
-      "People around me sometimes minimised their own difficulties beside mine. I did not want that.",
-      "I first made these tokens for people who had supported me — a physical reminder that whatever they were experiencing was real, but changing.",
+      "These words stayed with me after a ten-day Vipassana retreat, during a period when cancer had changed the shape of my life.",
+      "I first made the tokens for people who had supported me — a small reminder that whatever they were going through mattered too, and that it was changing.",
     ],
-    pull: "This moment is real. It may be difficult. It is also changing.",
+    pull: "This moment is real. It is also changing.",
   },
   arrives: {
     headline: "What arrives",
     items: [
       "One 2.45 cm double-sided engraved token",
-      "Small velvet pouch",
-      "Printed personal note",
-      "Protective postal packaging",
+      "Velvet pouch",
+      "Personal note",
     ],
-    material: "Silver-plated metal · diamond engraved on both sides",
+    material: "Silver-plated metal · diamond engraved",
   },
   finalCta: {
     headline: "Choose the words you want to keep close.",
-    support: "Pouch + personal note included · Delivery calculated at checkout",
+    support: ANICCA_SHIPPING_SUPPORT,
+    tracked: ANICCA_SHIPPING_TRACKED,
   },
   faq: {
     headline: "Questions",
@@ -119,7 +142,7 @@ const en: AniccaCopy = {
       },
       {
         q: "Is a chain or cord included?",
-        a: "No. Cord, chain and keyring are not included. The token can be carried, placed on a desk, attached to keys, or worn with your own cord or chain.",
+        a: "No. Cord, chain and keyring are not included.",
       },
       {
         q: "How large is it?",
@@ -127,23 +150,29 @@ const en: AniccaCopy = {
       },
       {
         q: "Is this an official Vipassana product?",
-        a: "No. It is an independent object inspired by contemplative practice and lived experience. It is not affiliated with or endorsed by any Vipassana organisation, and it does not require religious belief.",
+        a: "No. It is an independent object, not affiliated with or endorsed by any Vipassana organisation, and it does not require religious belief.",
       },
       {
         q: "Can I give it to someone?",
-        a: "Yes — when you understand the words and believe they will mean something to the recipient. It is not meant as a lesson prescribed to someone else.",
+        a: "Yes, when the words already mean something to you and you believe they will to them.",
       },
       {
         q: "Where do you deliver?",
-        a: ANICCA_SHIPPING_MESSAGE,
+        a: `${ANICCA_SHIPPING_LINE}. ${ANICCA_SHIPPING_TRACKED}. Delivery outside Spain is not currently advertised.`,
+        href: ANICCA_SHIPPING_RETURNS_PATH,
+        hrefLabel: "Shipping and returns",
       },
       {
-        q: "How soon will it be posted?",
-        a: ANICCA_DISPATCH_ESTIMATE,
+        q: "How is it sent?",
+        a: "From Spain, by Correos. Standard delivery within Spain is included; tracked delivery can be selected at checkout.",
+        href: ANICCA_SHIPPING_RETURNS_PATH,
+        hrefLabel: "Shipping and returns",
       },
       {
         q: "Can it be returned?",
-        a: `Write to ${ANICCA_CONTACT_EMAIL} before ordering if you have a question about returns.`,
+        a: `EU consumers can withdraw from the purchase. Write to ${ANICCA_CONTACT_EMAIL}.`,
+        href: ANICCA_SHIPPING_RETURNS_PATH,
+        hrefLabel: "Shipping and returns",
       },
     ],
   },
@@ -153,6 +182,7 @@ const en: AniccaCopy = {
     contact: "Questions before you buy",
     privacyNote:
       "Payment and shipping details are processed by Stripe. For privacy questions, use the contact email.",
+    shippingLink: "Shipping and returns",
   },
   a11y: {
     selectVariant: "Choose inscription",
@@ -161,11 +191,9 @@ const en: AniccaCopy = {
   },
 };
 
-/** Locale map — add `es` when Spanish UI copy is ready. Pali terms stay untranslated. */
 export const aniccaCopyByLocale: Record<"en", AniccaCopy> = { en };
 
 export function getAniccaCopy(locale: "en" | "es" = "en"): AniccaCopy {
-  // Spanish UI copy can be added to aniccaCopyByLocale.es later.
   void locale;
   return aniccaCopyByLocale.en;
 }
