@@ -23,9 +23,9 @@ export const metadata: Metadata = {
     images: [
       {
         url: `${ANICCA_ORIGIN}${ANICCA_IMAGES.og}`,
-        width: 1200,
-        height: 630,
-        alt: "Anicca reminder token",
+        width: 1024,
+        height: 1024,
+        alt: "Anicca reminder token, engraved Anicca · Impermanence",
       },
     ],
   },

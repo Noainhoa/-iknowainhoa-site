@@ -1,24 +1,28 @@
-/* Anicca product landing — calm, tactile, independent of parking chrome */
+/* Anicca product landing — paper, metal, quiet */
 
 .anicca {
-  --anicca-bg: #f7f4ef;
-  --anicca-panel: #fffcf8;
-  --anicca-ink: #1c1917;
-  --anicca-muted: #5c564e;
-  --anicca-line: #ddd4c8;
-  --anicca-silver: #9a958c;
+  --anicca-bg: #f6f1ea;
+  --anicca-panel: #fbf7f1;
+  --anicca-ink: #1a1714;
+  --anicca-muted: #5e574e;
+  --anicca-line: #d8d0c6;
+  --anicca-silver: #8f8a82;
   --anicca-focus: #3f3a34;
   background: var(--anicca-bg);
   color: var(--anicca-ink);
   font-family: var(--font-geist-sans);
-  padding-bottom: 80px;
+  padding-bottom: 48px;
+}
+
+body:has(.anicca) {
+  background: #f6f1ea;
 }
 
 .anicca * {
   box-sizing: border-box;
 }
 
-.anicca a:not(.anicca-btn):not(.anicca-option) {
+.anicca a:not(.anicca-btn) {
   color: inherit;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
@@ -31,31 +35,49 @@
 
 .anicca-hero {
   display: grid;
-  gap: 36px;
-  padding: 36px 0 56px;
+  gap: 28px;
+  padding: 20px 0 48px;
 }
 
 @media (min-width: 880px) {
   .anicca-hero {
     grid-template-columns: 1.05fr 0.95fr;
-    align-items: center;
+    align-items: start;
     gap: 56px;
-    padding: 48px 0 72px;
+    padding: 40px 0 72px;
   }
 }
 
-.anicca-hero-media {
+.anicca-hero-photos {
+  display: grid;
+  grid-template-columns: 1.2fr 0.72fr;
+  gap: 10px;
+  align-items: end;
+}
+
+.anicca-shot {
   margin: 0;
-  border-radius: 4px;
+  display: grid;
+  gap: 8px;
+}
+
+.anicca-shot figcaption {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--anicca-muted);
+}
+
+.anicca-frame {
+  margin: 0;
   overflow: hidden;
   background: var(--anicca-panel);
   border: 1px solid var(--anicca-line);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1;
 }
 
-.anicca-hero-media img,
-.anicca-media img,
-.anicca-option-thumbs img {
+.anicca-frame img,
+.anicca-life-grid img {
   display: block;
   width: 100%;
   height: 100%;
@@ -63,45 +85,82 @@
 }
 
 .anicca-hero-copy h1 {
-  margin: 0 0 16px;
+  margin: 0 0 14px;
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: clamp(1.85rem, 4.5vw, 2.75rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.7rem, 4.2vw, 2.55rem);
+  line-height: 1.16;
+  letter-spacing: -0.025em;
 }
 
-.anicca-hero-copy .anicca-lead {
-  margin: 0 0 28px;
-  max-width: 36rem;
-  font-size: 1.0625rem;
-  line-height: 1.7;
+.anicca-lead {
+  margin: 0;
+  max-width: 34rem;
+  font-size: 1.02rem;
+  line-height: 1.65;
   color: var(--anicca-muted);
 }
 
-.anicca-cta-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px 20px;
+.anicca-price {
+  margin: 22px 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.85rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.anicca-price--compact {
+  margin: 0;
+  font-size: 1.45rem;
+}
+
+.anicca-edition {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--anicca-muted);
+}
+
+.anicca-buy {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+  max-width: 28rem;
+  scroll-margin-top: 96px;
+}
+
+.anicca-buy--inline {
+  margin-top: 32px;
+}
+
+.anicca-choose-label {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--anicca-muted);
 }
 
 .anicca-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  max-width: 22rem;
   min-height: 48px;
-  padding: 12px 22px;
-  border-radius: 999px;
+  padding: 12px 20px;
+  border-radius: 2px;
   border: 1px solid var(--anicca-ink);
   background: var(--anicca-ink);
   color: #f8f5f0 !important;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   text-decoration: none !important;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  transition: opacity 0.15s ease, background 0.15s ease;
 }
 
 .anicca-btn:hover:not(:disabled) {
@@ -109,31 +168,21 @@
 }
 
 .anicca-btn:focus-visible,
-.anicca-option:focus-visible {
+.anicca-pick:focus-within {
   outline: 2px solid var(--anicca-focus);
   outline-offset: 3px;
 }
 
-.anicca-btn:disabled,
-.anicca-btn[aria-disabled="true"] {
-  opacity: 0.45;
+.anicca-btn:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
-}
-
-.anicca-btn--ghost {
-  background: transparent;
-  color: var(--anicca-ink) !important;
-}
-
-.anicca-btn--ghost:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--anicca-ink) 6%, transparent);
 }
 
 .anicca-meta {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
   color: var(--anicca-muted);
-  letter-spacing: 0.02em;
 }
 
 .anicca-section {
@@ -142,16 +191,16 @@
 }
 
 .anicca-section h2 {
-  margin: 0 0 16px;
+  margin: 0 0 14px;
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  line-height: 1.2;
+  font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+  line-height: 1.25;
 }
 
 .anicca-eyebrow {
   margin: 0 0 10px;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--anicca-muted);
@@ -159,189 +208,165 @@
 
 .anicca-prose {
   margin: 0;
-  max-width: 40rem;
-  font-size: 1.05rem;
-  line-height: 1.75;
+  max-width: 38rem;
+  font-size: 1.02rem;
+  line-height: 1.7;
   color: var(--anicca-muted);
-  white-space: pre-line;
 }
 
 .anicca-prose + .anicca-prose {
   margin-top: 1em;
 }
 
-.anicca-choice-grid {
+.anicca-picker {
   display: grid;
-  gap: 14px;
-  margin: 28px 0 24px;
 }
 
-@media (min-width: 720px) {
-  .anicca-choice-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.anicca-option {
+.anicca-pick {
+  position: relative;
   display: grid;
+  grid-template-columns: auto 1fr;
   gap: 12px;
-  text-align: left;
-  padding: 16px;
-  border-radius: 10px;
-  border: 1px solid var(--anicca-line);
-  background: var(--anicca-panel);
-  color: inherit;
+  align-items: start;
+  padding: 12px 8px 12px 10px;
+  border-top: 1px solid var(--anicca-line);
+  border-left: 2px solid transparent;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.anicca-option:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--anicca-ink) 35%, var(--anicca-line));
+.anicca-pick.is-selected {
+  border-left-color: var(--anicca-ink);
 }
 
-.anicca-option.is-selected {
-  border-color: var(--anicca-ink);
-  box-shadow: inset 0 0 0 1px var(--anicca-ink);
+.anicca-pick:last-child {
+  border-bottom: 1px solid var(--anicca-line);
 }
 
-.anicca-option:disabled,
-.anicca-option.is-sold-out {
-  opacity: 0.72;
-  cursor: not-allowed;
+.anicca-pick input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.anicca-option-thumbs {
+.anicca-pick-mark {
+  width: 15px;
+  height: 15px;
+  margin-top: 3px;
+  border: 1px solid var(--anicca-ink);
+  border-radius: 50%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  place-items: center;
 }
 
-.anicca-option-thumbs figure {
-  margin: 0;
-  aspect-ratio: 1;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #ebe6df;
-  border: 1px solid var(--anicca-line);
+.anicca-pick.is-selected .anicca-pick-mark::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--anicca-ink);
 }
 
-.anicca-option-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 650;
+.anicca-pick-copy {
+  display: grid;
+  gap: 2px;
 }
 
-.anicca-option-inscribe {
-  margin: 0;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: var(--anicca-muted);
-}
-
-.anicca-option-meta {
+.anicca-pick-title {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 12px;
-  margin: 0;
-  font-size: 0.78rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.anicca-pick-detail {
+  font-size: 0.8rem;
+  line-height: 1.35;
   color: var(--anicca-muted);
 }
 
-.anicca-pill {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--anicca-line);
-  background: var(--anicca-bg);
+.anicca-pick-stock {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--anicca-silver);
 }
 
-.anicca-pill--sold {
-  border-color: color-mix(in srgb, #7f1d1d 30%, var(--anicca-line));
-  color: #7f1d1d;
-}
-
-.anicca-buy-panel {
-  display: grid;
-  gap: 12px;
-  max-width: 28rem;
+.anicca-pick.is-sold-out {
+  opacity: 0.55;
 }
 
 .anicca-notice {
   margin: 0;
-  padding: 12px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--anicca-line);
-  background: #f3eee6;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   line-height: 1.5;
   color: var(--anicca-muted);
 }
 
-.anicca-meanings {
+.anicca-life-grid {
   display: grid;
-  gap: 28px;
-}
-
-@media (min-width: 720px) {
-  .anicca-meanings {
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-  }
-}
-
-.anicca-meaning h3 {
-  margin: 0 0 4px;
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
-.anicca-gloss {
-  margin: 0 0 12px;
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--anicca-silver);
-}
-
-.anicca-uses {
-  display: grid;
-  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
   margin: 28px 0 0;
   padding: 0;
   list-style: none;
 }
 
+.anicca-life-grid li {
+  margin: 0;
+}
+
+.anicca-life-grid li:first-child {
+  grid-column: 1 / -1;
+}
+
+.anicca-life-grid .anicca-frame {
+  aspect-ratio: 4 / 3;
+}
+
+.anicca-life-grid li:first-child .anicca-frame {
+  aspect-ratio: 16 / 10;
+}
+
 @media (min-width: 720px) {
-  .anicca-uses {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+  .anicca-life-grid {
+    gap: 12px;
+  }
+
+  .anicca-life-grid li:first-child {
+    grid-column: auto;
+  }
+
+  .anicca-life-grid li:first-child .anicca-frame,
+  .anicca-life-grid .anicca-frame {
+    aspect-ratio: 4 / 3;
   }
 }
 
-.anicca-uses li {
-  display: grid;
-  gap: 10px;
-  margin: 0;
+.anicca-gloss {
+  margin: 0 0 14px;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 500;
 }
 
-.anicca-media {
-  margin: 0;
-  aspect-ratio: 4 / 3;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid var(--anicca-line);
-  background: var(--anicca-panel);
+.anicca-also {
+  margin-top: 36px;
+  max-width: 38rem;
 }
 
-.anicca-uses p {
-  margin: 0;
-  font-size: 0.95rem;
+.anicca-also-label {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
   color: var(--anicca-muted);
 }
 
 .anicca-list {
-  margin: 16px 0 0;
+  margin: 8px 0 0;
   padding: 0;
   list-style: none;
   display: grid;
@@ -350,7 +375,7 @@
 }
 
 .anicca-list li {
-  padding-left: 1.1rem;
+  padding-left: 1rem;
   position: relative;
   color: var(--anicca-muted);
   line-height: 1.55;
@@ -367,22 +392,30 @@
   background: var(--anicca-silver);
 }
 
-.anicca-stock-table {
-  width: min(100%, 420px);
-  margin-top: 20px;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+.anicca-material {
+  margin: 22px 0 0;
+  font-size: 0.88rem;
+  color: var(--anicca-muted);
+  letter-spacing: 0.01em;
 }
 
-.anicca-stock-table th,
-.anicca-stock-table td {
-  text-align: left;
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--anicca-line);
+.anicca-pull {
+  margin: 28px 0 0;
+  padding: 0;
+  max-width: 34rem;
+  border: 0;
 }
 
-.anicca-stock-table th {
-  font-weight: 600;
+.anicca-pull p {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.anicca-final .anicca-buy {
+  margin-top: 24px;
 }
 
 .anicca-faq details {
@@ -423,7 +456,7 @@
   gap: 12px;
   margin-top: 28px;
   max-width: 40rem;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--anicca-muted);
   line-height: 1.6;
 }
@@ -433,18 +466,45 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anicca-btn,
-  .anicca-option {
+  .anicca-btn {
     transition: none;
+  }
+}
+
+@media (max-width: 430px) {
+  .anicca-wrap {
+    width: calc(100% - 32px);
+  }
+
+  .anicca-hero {
+    padding-top: 16px;
+    gap: 20px;
+  }
+
+  .anicca-hero-copy h1 {
+    font-size: 1.62rem;
+  }
+
+  .anicca-buy {
+    margin-top: 20px;
+    gap: 12px;
+  }
+
+  .anicca-pick {
+    padding: 9px 6px 9px 8px;
+  }
+
+  .anicca-shot figcaption {
+    font-size: 0.62rem;
+  }
+
+  .anicca-section {
+    padding: 44px 0;
   }
 }
 
 @media (max-width: 360px) {
   .anicca-wrap {
-    width: calc(100% - 28px);
-  }
-
-  .anicca-hero-copy h1 {
-    font-size: 1.65rem;
+    width: calc(100% - 24px);
   }
 }

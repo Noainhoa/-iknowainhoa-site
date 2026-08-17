@@ -13,9 +13,15 @@ import { getAniccaCopy } from "@/lib/anicca/copy";
 export function buildAniccaJsonLd() {
   const copy = getAniccaCopy("en");
   const anyInStock = ANICCA_VARIANTS.some(isVariantPurchasable);
+  const productImages = [
+    `${ANICCA_ORIGIN}${ANICCA_IMAGES.hero}`,
+    `${ANICCA_ORIGIN}${ANICCA_IMAGES.og}`,
+    `${ANICCA_ORIGIN}${ANICCA_IMAGES.necklace}`,
+    `${ANICCA_ORIGIN}${ANICCA_IMAGES.desk}`,
+  ];
 
   const offers = ANICCA_VARIANTS.filter((v) => v.active).map((v) => ({
-    "@type": "Offer",
+    "@type": "Offer" as const,
     name: v.label,
     sku: v.id,
     price: ANICCA_PRICE_EUR,
@@ -24,18 +30,6 @@ export function buildAniccaJsonLd() {
       ? "https://schema.org/InStock"
       : "https://schema.org/SoldOut",
     url: ANICCA_CANONICAL,
-    shippingDetails: {
-      "@type": "OfferShippingDetails",
-      shippingRate: {
-        "@type": "MonetaryAmount",
-        currency: ANICCA_CURRENCY,
-        value: "0",
-      },
-      shippingDestination: {
-        "@type": "DefinedRegion",
-        addressCountry: "EU",
-      },
-    },
   }));
 
   return {
@@ -55,10 +49,7 @@ export function buildAniccaJsonLd() {
         "@id": `${ANICCA_CANONICAL}#product`,
         name: "Anicca Reminder Token",
         description: copy.meta.description,
-        image: [
-          `${ANICCA_ORIGIN}${ANICCA_IMAGES.hero}`,
-          `${ANICCA_ORIGIN}${ANICCA_IMAGES.og}`,
-        ],
+        image: productImages,
         brand: {
           "@type": "Brand",
           name: site.name,
@@ -86,18 +77,13 @@ export function buildAniccaJsonLd() {
         "@type": "FAQPage",
         "@id": `${ANICCA_CANONICAL}#faq`,
         mainEntity: copy.faq.items
-          .filter((item) => item.q)
+          .filter((item) => item.q && item.a)
           .map((item) => ({
             "@type": "Question",
             name: item.q,
             acceptedAnswer: {
               "@type": "Answer",
-              text:
-                item.q === "Where do you deliver?"
-                  ? "Delivery availability and cost are shown during checkout."
-                  : item.q === "How soon will it be posted?"
-                    ? "Usually dispatched within 2–3 working days."
-                    : item.a,
+              text: item.a,
             },
           })),
       },
