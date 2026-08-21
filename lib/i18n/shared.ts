@@ -30,7 +30,6 @@ type Dictionary = {
     subtitle: string;
     empty: string;
     more: string;
-    liveTitle: string;
     sections: {
       apps: string;
       websites: string;
@@ -77,7 +76,6 @@ const dictionaries: Record<Locale, Dictionary> = {
         "Apps, websites, systems, and product design — future-focused work for everyday use.",
       empty: "Nothing here yet.",
       more: "More work",
-      liveTitle: "Live",
       sections: {
         apps: "Apps",
         websites: "Websites",
@@ -123,10 +121,9 @@ const dictionaries: Record<Locale, Dictionary> = {
     work: {
       title: "Trabajo",
       subtitle:
-        "Apps, webs, sistemas y diseño de producto — trabajo con foco en el uso diario.",
+        "Apps, webs, sistemas y diseño de producto, para el uso diario.",
       empty: "Todavía no hay nada aquí.",
       more: "Más proyectos",
-      liveTitle: "En vivo",
       sections: {
         apps: "Apps",
         websites: "Webs",
@@ -176,7 +173,6 @@ const dictionaries: Record<Locale, Dictionary> = {
         "Apps, websites, systems, and product design — future-focused work for everyday use.",
       empty: "Nothing here yet.",
       more: "More work",
-      liveTitle: "Live",
       sections: {
         apps: "Apps",
         websites: "Websites",

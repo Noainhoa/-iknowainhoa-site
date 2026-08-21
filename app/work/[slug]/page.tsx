@@ -6,13 +6,13 @@ import BlankPage from "@/components/BlankPage";
 import { getLocale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n/shared";
 import {
-  getAllWork,
+  getListedWork,
   getAllWorkSlugs,
   getWorkBySlug,
 } from "@/lib/work";
 import { splitCaseBody } from "@/lib/workCaseBody";
 import { getProductApp } from "@/lib/productApps";
-import { externalAnchorProps } from "@/lib/links";
+import { externalAnchorProps, isExternalHref } from "@/lib/links";
 import { publicPages } from "@/lib/site";
 
 export async function generateStaticParams() {
@@ -55,7 +55,7 @@ export default async function WorkCaseStudyPage({
 
   const { item, bodyHtml } = entry;
   const productApp = getProductApp(slug);
-  const more = (await getAllWork(locale)).filter((w) => w.slug !== slug).slice(0, 6);
+  const more = (await getListedWork(locale)).filter((w) => w.slug !== slug).slice(0, 6);
   const blocks = bodyHtml ? splitCaseBody(bodyHtml) : [];
   const hasShots = blocks.some((b) => b.type === "shot");
   const showHeroCover = Boolean(item.coverImage) && !item.logo && !hasShots;
@@ -162,29 +162,58 @@ export default async function WorkCaseStudyPage({
         <section className="more" aria-labelledby="more-heading">
           <h2 id="more-heading">{t.work.more}</h2>
           <div className="more-grid">
-            {more.map((w) => (
-              <Link key={w.slug} href={w.href} className="more-card">
-                <div className="more-media">
-                  {w.coverImage ? (
-                    <Image
-                      src={w.coverImage}
-                      alt=""
-                      fill
-                      sizes="(max-width: 700px) 50vw, 220px"
-                      style={{
-                        objectFit: w.logo && w.coverImage === w.logo ? "contain" : "cover",
-                        objectPosition: "center",
-                        padding: w.logo && w.coverImage === w.logo ? 16 : 0,
-                      }}
-                    />
-                  ) : (
-                    <span className="more-ph" />
-                  )}
-                </div>
-                <h3>{w.title}</h3>
-                <p>{w.summary}</p>
-              </Link>
-            ))}
+            {more.map((w) => {
+              const card = (
+                <>
+                  <div
+                    className="more-media"
+                    style={
+                      w.logo && w.coverImage === w.logo
+                        ? { background: "#fff" }
+                        : undefined
+                    }
+                  >
+                    {w.coverImage ? (
+                      <Image
+                        src={w.coverImage}
+                        alt=""
+                        fill
+                        sizes="(max-width: 700px) 50vw, 220px"
+                        style={{
+                          objectFit:
+                            w.logo && w.coverImage === w.logo ? "contain" : "cover",
+                          objectPosition: "center",
+                          padding: w.logo && w.coverImage === w.logo ? 16 : 0,
+                        }}
+                      />
+                    ) : (
+                      <span className="more-ph" />
+                    )}
+                  </div>
+                  <h3>{w.title}</h3>
+                  <p>{w.summary}</p>
+                </>
+              );
+
+              if (isExternalHref(w.href)) {
+                return (
+                  <a
+                    key={w.slug}
+                    href={w.href}
+                    className="more-card"
+                    {...externalAnchorProps(w.href)}
+                  >
+                    {card}
+                  </a>
+                );
+              }
+
+              return (
+                <Link key={w.slug} href={w.href} className="more-card">
+                  {card}
+                </Link>
+              );
+            })}
           </div>
         </section>
       ) : null}

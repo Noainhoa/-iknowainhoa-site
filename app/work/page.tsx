@@ -4,7 +4,7 @@ import WorkIndex from "@/components/work/WorkIndex";
 import { getLocale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n/shared";
 import { publicPages } from "@/lib/site";
-import { getAllWork } from "@/lib/work";
+import { getListedWork } from "@/lib/work";
 
 export const metadata: Metadata = {
   title: "Work",
@@ -17,7 +17,7 @@ export default async function WorkPage() {
 
   const locale = await getLocale();
   const t = getDictionary(locale);
-  const work = await getAllWork(locale);
+  const work = await getListedWork(locale);
 
   return (
     <WorkIndex
@@ -25,9 +25,7 @@ export default async function WorkPage() {
       title={t.work.title}
       subtitle={t.work.subtitle}
       empty={t.work.empty}
-      liveTitle={t.work.liveTitle}
       sectionLabels={t.work.sections}
-      locale={locale}
     />
   );
 }

@@ -15,6 +15,7 @@ import {
 } from "@/lib/contentLocale";
 import type { Locale } from "@/lib/i18n/shared";
 import { productApps } from "@/lib/productApps";
+import { listedWorkItems } from "@/lib/workBrands";
 import { type WorkCategory, type WorkItem } from "@/lib/work-shared";
 
 export {
@@ -214,6 +215,10 @@ export async function getWorkBySlug(
     bodyHtml,
     body: localizedMarkdown || hit.content.body,
   };
+}
+
+export async function getListedWork(locale: Locale = "en"): Promise<WorkItem[]> {
+  return listedWorkItems(await getAllWork(locale), locale);
 }
 
 export async function getAllWorkSlugs(): Promise<string[]> {

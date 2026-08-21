@@ -1,3 +1,8 @@
+---
+title: "watnow.pwa-snippet"
+draft: true
+---
+
 ## Get the app on your iPhone (Safari)
 
 This is a web app. On iPhone, you “install” it by saving it to your **Home Screen**.
