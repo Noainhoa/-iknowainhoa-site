@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { externalAnchorProps } from "@/lib/links";
+import type { Locale } from "@/lib/i18n/shared";
+import { getListenEasyCopy } from "@/lib/listeneasy/copy";
 
 const TESTFLIGHT_APP_STORE =
   "https://apps.apple.com/app/testflight/id899247664";
@@ -9,18 +11,21 @@ const TESTFLIGHT_APP_STORE =
 type ListenEasyBetaActionsProps = {
   testFlightUrl: string;
   appName: string;
+  locale?: Locale;
 };
 
 export default function ListenEasyBetaActions({
   testFlightUrl,
   appName,
+  locale = "en",
 }: ListenEasyBetaActionsProps) {
-  const [shareLabel, setShareLabel] = useState("Share invite");
+  const copy = getListenEasyCopy(locale).actions;
+  const [shareLabel, setShareLabel] = useState(copy.share);
 
   async function handleShare() {
     const shareData: ShareData = {
-      title: `${appName} beta`,
-      text: `Join the ${appName} beta on TestFlight:`,
+      title: copy.shareTitle(appName),
+      text: copy.shareText(appName),
       url: testFlightUrl,
     };
 
@@ -35,17 +40,17 @@ export default function ListenEasyBetaActions({
       }
 
       await navigator.clipboard.writeText(testFlightUrl);
-      setShareLabel("Link copied");
-      window.setTimeout(() => setShareLabel("Share invite"), 1600);
+      setShareLabel(copy.copied);
+      window.setTimeout(() => setShareLabel(copy.share), 1600);
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
       try {
         await navigator.clipboard.writeText(testFlightUrl);
-        setShareLabel("Link copied");
-        window.setTimeout(() => setShareLabel("Share invite"), 1600);
+        setShareLabel(copy.copied);
+        window.setTimeout(() => setShareLabel(copy.share), 1600);
       } catch {
-        setShareLabel("Couldn’t copy");
-        window.setTimeout(() => setShareLabel("Share invite"), 1600);
+        setShareLabel(copy.copyFail);
+        window.setTimeout(() => setShareLabel(copy.share), 1600);
       }
     }
   }
@@ -57,24 +62,24 @@ export default function ListenEasyBetaActions({
         href={testFlightUrl}
         {...externalAnchorProps(testFlightUrl)}
       >
-        Join the beta
+        {copy.join}
       </a>
       <button type="button" className="le-share" onClick={handleShare}>
         {shareLabel}
       </button>
       <ol className="le-steps">
         <li>
-          Install{" "}
+          {copy.stepInstall}{" "}
           <a
             href={TESTFLIGHT_APP_STORE}
             {...externalAnchorProps(TESTFLIGHT_APP_STORE)}
           >
             TestFlight
           </a>{" "}
-          from the App Store (on your phone)
+          {copy.stepTestFlight}
         </li>
         <li>
-          Tap Join the beta on this page
+          {copy.stepJoin}
         </li>
       </ol>
     </div>

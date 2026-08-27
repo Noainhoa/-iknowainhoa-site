@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Heart } from "lucide-react";
+import type { Locale } from "@/lib/i18n/shared";
+import { getDictionary } from "@/lib/i18n/shared";
 
 const presetAmounts = [5, 10, 25];
 type Currency = "eur" | "usd" | "gbp";
@@ -12,6 +14,7 @@ const SYMBOLS: Record<Currency, string> = {
 };
 
 type Props = {
+  locale?: Locale;
   buttonText?: string;
   cancelUrl?: string;
   variant?: "default" | "compact";
@@ -19,10 +22,13 @@ type Props = {
 };
 
 export function SupportCard({
-  buttonText = "Contribute for",
+  locale = "en",
+  buttonText,
   cancelUrl,
   variant = "default",
 }: Props) {
+  const copy = getDictionary(locale).support;
+  const resolvedButtonText = buttonText ?? copy.contributeFor;
   const [currency, setCurrency] = useState<Currency>("eur");
   const [selectedAmount, setSelectedAmount] = useState<number | null>(10);
   const [customAmount, setCustomAmount] = useState("");
@@ -47,7 +53,7 @@ export function SupportCard({
   async function handleCheckout() {
     const numericAmount = Number(displayAmount);
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      alert("Please enter an amount greater than 0.");
+      alert(copy.enterAmount);
       return;
     }
     if (loading) return;
@@ -68,7 +74,7 @@ export function SupportCard({
       window.location.href = data.url;
     } catch (err) {
       console.error(err);
-      alert("Could not start checkout. Please try again.");
+      alert(copy.checkoutFail);
       setLoading(false);
     }
   }
@@ -89,10 +95,10 @@ export function SupportCard({
         />
         <div className="min-w-0">
           <p className="m-0 text-[0.95rem] font-bold leading-tight tracking-tight text-neutral-900 whitespace-nowrap">
-            Support my work
+            {copy.title}
           </p>
           <p className="mt-0.5 mb-0 hidden text-[0.75rem] leading-snug text-neutral-500 whitespace-nowrap sm:block">
-            Your support helps me create more content
+            {copy.subtitle}
           </p>
         </div>
       </div>
@@ -101,7 +107,7 @@ export function SupportCard({
         <div
           className="inline-flex items-center gap-0.5 rounded-full border border-neutral-200 bg-white p-1"
           role="group"
-          aria-label="Choose amount"
+          aria-label={copy.chooseAmount}
         >
           {presetAmounts.map((amount) => {
             const active = selectedAmount === amount && !isCustom;
@@ -152,13 +158,13 @@ export function SupportCard({
                   value={customAmount}
                   onChange={(e) => setCustomAmount(e.target.value)}
                   placeholder="…"
-                  aria-label="Custom amount"
+                  aria-label={copy.customAmount}
                   autoFocus
                   className="w-10 appearance-none border-0 bg-transparent p-0 text-sm font-medium text-inherit outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 />
               </span>
             ) : (
-              "Custom"
+              copy.custom
             )}
           </button>
         </div>
@@ -170,8 +176,8 @@ export function SupportCard({
           disabled={!displayAmount || loading}
         >
           {loading
-            ? "Processing…"
-            : `${buttonText} ${symbol}${displayAmount || "…"}`}
+            ? copy.processing
+            : `${resolvedButtonText} ${symbol}${displayAmount || "…"}`}
         </button>
       </div>
     </div>

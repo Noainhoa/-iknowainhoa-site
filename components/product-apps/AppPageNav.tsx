@@ -1,24 +1,27 @@
 import Link from "next/link";
 import type { ProductApp } from "@/lib/productApps";
 import { productAppPaths } from "@/lib/productApps";
+import type { Locale } from "@/lib/i18n/shared";
+import { getDictionary } from "@/lib/i18n/shared";
 
 type AppPageNavProps = {
   app: ProductApp;
   current: "product" | "support" | "privacy";
+  locale?: Locale;
 };
 
-const LABELS = {
-  product: "Product",
-  support: "Support",
-  privacy: "Privacy",
-} as const;
-
-export default function AppPageNav({ app, current }: AppPageNavProps) {
+export default function AppPageNav({ app, current, locale = "en" }: AppPageNavProps) {
+  const t = getDictionary(locale).apps;
   const paths = productAppPaths(app.slug);
+  const labels = {
+    product: app.name,
+    support: t.support,
+    privacy: t.privacy,
+  } as const;
   const items = (["product", "support", "privacy"] as const).map((key) => ({
     key,
     href: paths[key],
-    label: key === "product" ? app.name : LABELS[key],
+    label: labels[key],
   }));
 
   return (

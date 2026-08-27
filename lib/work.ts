@@ -16,6 +16,7 @@ import {
 import type { Locale } from "@/lib/i18n/shared";
 import { productApps } from "@/lib/productApps";
 import { listedWorkItems } from "@/lib/workBrands";
+import { getListenEasyCopy } from "@/lib/listeneasy/copy";
 import { type WorkCategory, type WorkItem } from "@/lib/work-shared";
 
 export {
@@ -117,20 +118,21 @@ function toWorkItem(
   };
 }
 
-function productAppWorkItems(): WorkItem[] {
+function productAppWorkItems(locale: Locale = "en"): WorkItem[] {
   return productApps.map((app) => {
     const logo =
       app.slug === "listeneasy"
         ? "/images/projects/listeneasy/brand-mark.png"
         : undefined;
+    const le = app.slug === "listeneasy" ? getListenEasyCopy(locale) : null;
     return {
       slug: app.slug,
       title: app.name,
-      description: app.summary,
+      description: le?.summary ?? app.summary,
       coverImage: logo,
       logo,
       category: "apps" as const,
-      summary: app.tagline,
+      summary: le?.tagline ?? app.tagline,
       href: app.slug === "listeneasy" ? "/listeneasy" : `/work/${app.slug}`,
       source: "product-apps" as const,
       tags: ["apps", app.status],
@@ -158,7 +160,7 @@ export async function getAllWork(locale: Locale = "en"): Promise<WorkItem[]> {
       ...toWorkItem(item, "projects", locale),
       _dateKey: item.date || "",
     })),
-    ...productAppWorkItems().map((item) => ({
+    ...productAppWorkItems(locale).map((item) => ({
       ...item,
       _dateKey: item.date || "2026-07-01",
     })),
@@ -185,7 +187,7 @@ export async function getWorkBySlug(
   bodyHtml?: string;
   body?: string;
 } | null> {
-  const curated = productAppWorkItems().find((w) => w.slug === slug);
+  const curated = productAppWorkItems(locale).find((w) => w.slug === slug);
   if (curated) {
     return { item: curated };
   }

@@ -6,11 +6,15 @@ import { getDictionary } from "@/lib/i18n/shared";
 import { publicPages } from "@/lib/site";
 import { getListedWork } from "@/lib/work";
 
-export const metadata: Metadata = {
-  title: "Work",
-  description: "Selected apps, websites, systems, and product design by iknowainhoa.",
-  alternates: { canonical: "/work" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+  return {
+    title: t.work.title,
+    description: t.work.subtitle,
+    alternates: { canonical: "/work" },
+  };
+}
 
 export default async function WorkPage() {
   if (!publicPages.work) return <BlankPage />;

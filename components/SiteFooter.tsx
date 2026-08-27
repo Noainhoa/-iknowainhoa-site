@@ -1,7 +1,10 @@
 import { site } from "@/lib/site";
 import SiteCopyright from "@/components/SiteCopyright";
+import type { Locale } from "@/lib/i18n/shared";
+import { getDictionary } from "@/lib/i18n/shared";
 
-export default function SiteFooter() {
+export default function SiteFooter({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale);
   return (
     <footer
       style={{
@@ -32,7 +35,7 @@ export default function SiteFooter() {
             lineHeight: 1.5,
           }}
         >
-          {site.description}
+          {t.footer.description}
         </p>
         <div style={{ marginTop: 12 }}>
           <SiteCopyright style={{ textAlign: "left" }} />

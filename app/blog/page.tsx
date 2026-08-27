@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getAllBlog } from "@/lib/content";
+import { getLocalizedBlogIndex } from "@/lib/blogLocale";
+import { getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/shared";
 
 type Props = {
   searchParams?: Promise<{ q?: string }> | { q?: string };
@@ -9,7 +11,9 @@ type Props = {
 export default async function BlogIndex({ searchParams }: Props) {
   const params = await searchParams;
   const q = (params?.q || "").trim().toLowerCase();
-  const posts = await getAllBlog();
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+  const posts = await getLocalizedBlogIndex(locale);
 
   const filtered = q
     ? posts.filter((post) => {
@@ -32,7 +36,7 @@ export default async function BlogIndex({ searchParams }: Props) {
           letterSpacing: "-0.03em",
         }}
       >
-        Blog
+        {t.blog.title}
       </h1>
       <p
         style={{
@@ -43,18 +47,18 @@ export default async function BlogIndex({ searchParams }: Props) {
           maxWidth: 540,
         }}
       >
-        Writing, notes, and longer stories.
+        {t.blog.subtitle}
       </p>
 
       {q ? (
         <p style={{ marginBottom: 20, fontSize: 14, opacity: 0.7 }}>
-          Showing {filtered.length} result{filtered.length === 1 ? "" : "s"} for “{params?.q}”.{" "}
-          <Link href="/blog">Clear</Link>
+          {t.blog.showing(filtered.length, params?.q || "")}{" "}
+          <Link href="/blog">{t.blog.clear}</Link>
         </p>
       ) : null}
 
       {filtered.length === 0 ? (
-        <p style={{ opacity: 0.7 }}>No posts matched.</p>
+        <p style={{ opacity: 0.7 }}>{t.blog.empty}</p>
       ) : (
         <div style={{ display: "grid", gap: 28 }}>
           {filtered.map((post) => (

@@ -2,10 +2,13 @@
 
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { Paperclip, X } from "lucide-react";
+import type { Locale } from "@/lib/i18n/shared";
+import { getDictionary } from "@/lib/i18n/shared";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
-export function ContactForm() {
+export function ContactForm({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale).contact.form;
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -40,20 +43,20 @@ export function ContactForm() {
     const totalBytes = combined.reduce((sum, f) => sum + f.size, 0);
 
     if (combined.length > maxFiles) {
-      setAttachmentsError("You can attach up to 3 files.");
+      setAttachmentsError(t.errFilesCount);
       event.target.value = "";
       return;
     }
 
     if (totalBytes > maxTotalBytes) {
-      setAttachmentsError("Attachments must be 4 MB or smaller in total.");
+      setAttachmentsError(t.errFilesSize);
       event.target.value = "";
       return;
     }
 
     const hasInvalid = combined.some((file) => !allowedTypes.has(file.type));
     if (hasInvalid) {
-      setAttachmentsError("Files must be PDF, JPG, PNG, or TXT.");
+      setAttachmentsError(t.errFilesType);
       event.target.value = "";
       return;
     }
@@ -77,25 +80,25 @@ export function ContactForm() {
     // Client-side validation mirrors server limits
     if (!formData.name.trim() || formData.name.length > 100) {
       setStatus("error");
-      setClientError("Name is required and must be under 100 characters.");
+      setClientError(t.errName);
       return;
     }
 
     if (!formData.email.trim() || formData.email.length > 200) {
       setStatus("error");
-      setClientError("Email is required and must be under 200 characters.");
+      setClientError(t.errEmail);
       return;
     }
 
     if (!formData.subject.trim() || formData.subject.length > 200) {
       setStatus("error");
-      setClientError("Subject is required and must be under 200 characters.");
+      setClientError(t.errSubject);
       return;
     }
 
     if (!formData.message.trim() || formData.message.length > 5000) {
       setStatus("error");
-      setClientError("Message is required and must be under 5000 characters.");
+      setClientError(t.errMessage);
       return;
     }
 
@@ -126,7 +129,7 @@ export function ContactForm() {
     }
 
     setStatus("error");
-    setError(data.error || data.message || "Something went wrong. Please try again.");
+    setError(data.error || data.message || t.errGeneric);
   };
 
   return (
@@ -143,7 +146,7 @@ export function ContactForm() {
       noValidate
     >
       <div style={{ position: "absolute", left: "-10000px", top: "auto", width: 1, height: 1, overflow: "hidden" }}>
-        <label htmlFor="company">Company</label>
+        <label htmlFor="company">{t.company}</label>
         <input
           type="text"
           id="company"
@@ -157,7 +160,7 @@ export function ContactForm() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <label htmlFor="name" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
-          Name
+          {t.name}
         </label>
         <input
           type="text"
@@ -181,7 +184,7 @@ export function ContactForm() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <label htmlFor="email" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
-          Email
+          {t.email}
         </label>
         <input
           type="email"
@@ -205,7 +208,7 @@ export function ContactForm() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <label htmlFor="subject" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
-          Subject
+          {t.subject}
         </label>
         <input
           type="text"
@@ -229,7 +232,7 @@ export function ContactForm() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <label htmlFor="message" style={{ fontWeight: 500, fontSize: "0.95rem" }}>
-          Message
+          {t.message}
         </label>
         <textarea
           id="message"
@@ -254,9 +257,9 @@ export function ContactForm() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <span style={{ fontWeight: 500, fontSize: "0.95rem" }}>Attachments (optional)</span>
+          <span style={{ fontWeight: 500, fontSize: "0.95rem" }}>{t.attachments}</span>
           <span style={{ fontSize: "0.9rem", color: "#4b5563" }}>
-            Up to 3 files (PDF, JPG, PNG, TXT). Max 4 MB total.
+            {t.attachmentsHint}
           </span>
         </div>
 
@@ -288,7 +291,7 @@ export function ContactForm() {
           }}
           className="hover:opacity-80"
         >
-          <Paperclip size={16} /> Add files
+          <Paperclip size={16} /> {t.addFiles}
         </button>
 
         {attachments.length > 0 && (
@@ -355,23 +358,23 @@ export function ContactForm() {
         }}
         className="hover:opacity-80"
       >
-        {status === "loading" ? "Sending..." : "Send Message"}
+        {status === "loading" ? t.sending : t.send}
       </button>
 
       {status === "success" && (
-        <p style={{ color: "var(--success, #16a34a)", margin: 0 }}>Message sent! I will get back to you soon.</p>
+        <p style={{ color: "var(--success, #16a34a)", margin: 0 }}>{t.sent}</p>
       )}
       {status === "error" && (
         <div style={{ color: "var(--error, #ef4444)", margin: 0, display: "grid", gap: 6 }}>
-          <p style={{ margin: 0 }}>{clientError || error || "Something went wrong. Please try again."}</p>
+          <p style={{ margin: 0 }}>{clientError || error || t.errGeneric}</p>
           {error === "SERVER_CONFIG_INCOMPLETE" && (
             <p style={{ margin: 0, color: "var(--error, #ef4444)", fontSize: "0.95rem", lineHeight: 1.5 }}>
-              Contact form is not configured yet. The site owner must set SMTP_* and CONTACT_TO in Vercel environment variables.
+              {t.errConfig}
             </p>
           )}
           {error === "RATE_LIMITED" && (
             <p style={{ margin: 0, color: "var(--error, #ef4444)", fontSize: "0.95rem", lineHeight: 1.5 }}>
-              You’re sending messages too quickly. Please wait a moment and try again.
+              {t.errRate}
             </p>
           )}
         </div>

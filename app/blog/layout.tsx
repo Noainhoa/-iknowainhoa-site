@@ -1,12 +1,18 @@
 import BlogShell from "@/components/blog/BlogShell";
 import { getBlogAvatarSources } from "@/lib/blogAvatar";
+import { getLocale } from "@/lib/i18n";
 
 export default async function BlogLayout({ children }: { children: React.ReactNode }) {
-  const avatarSources = await getBlogAvatarSources();
+  const [avatarSources, locale] = await Promise.all([
+    getBlogAvatarSources(),
+    getLocale(),
+  ]);
 
   return (
     <>
-      <BlogShell avatarSources={avatarSources}>{children}</BlogShell>
+      <BlogShell locale={locale} avatarSources={avatarSources}>
+        {children}
+      </BlogShell>
       <style>{`
         .blog-prose {
           font-family: var(--font-serif);

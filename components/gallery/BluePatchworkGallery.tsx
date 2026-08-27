@@ -7,8 +7,12 @@ import { groupBlueGalleryByYear } from "@/lib/galleries/blue";
 import InstagramEmbed from "@/components/gallery/InstagramEmbed";
 import MediaStamp from "@/components/gallery/MediaStamp";
 
+import { getDictionary } from "@/lib/i18n/shared";
+import type { Locale } from "@/lib/i18n/shared";
+
 type BluePatchworkGalleryProps = {
   items: GalleryItem[];
+  locale?: Locale;
 };
 
 function publicSrc(path: string) {
@@ -26,7 +30,11 @@ function aspectClass(item: GalleryItem) {
   return "tile-mid";
 }
 
-export default function BluePatchworkGallery({ items }: BluePatchworkGalleryProps) {
+export default function BluePatchworkGallery({
+  items,
+  locale = "en",
+}: BluePatchworkGalleryProps) {
+  const t = getDictionary(locale).gallery;
   const years = useMemo(() => groupBlueGalleryByYear(items), [items]);
   const localLightboxItems = useMemo(
     () => items.filter((i) => i.kind === "photo" || i.kind === "video"),
@@ -77,7 +85,7 @@ export default function BluePatchworkGallery({ items }: BluePatchworkGalleryProp
                   className={`tile ${isIgPost ? "tile-ig" : aspectClass(item)}`}
                 >
                   <div className="stamp-slot">
-                    <MediaStamp date={item.date} location={item.location} compact />
+                    <MediaStamp date={item.date} location={item.location} compact locale={locale} />
                   </div>
 
                   {isIgPost && item.instagramUrl ? (
@@ -90,7 +98,7 @@ export default function BluePatchworkGallery({ items }: BluePatchworkGalleryProp
                       href={item.instagramUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={`Open reel on Instagram: ${item.title}`}
+                      aria-label={t.openReel(item.title)}
                     >
                       <Image
                         src={item.coverSrc!}
@@ -113,7 +121,7 @@ export default function BluePatchworkGallery({ items }: BluePatchworkGalleryProp
                       type="button"
                       className="media-hit"
                       onClick={() => setActiveId(item.id)}
-                      aria-label={`Open ${item.title}`}
+                      aria-label={t.openPhoto(item.title)}
                     >
                       <Image
                         src={item.src}
@@ -131,7 +139,7 @@ export default function BluePatchworkGallery({ items }: BluePatchworkGalleryProp
                       type="button"
                       className="media-hit video-hit"
                       onClick={() => setActiveId(item.id)}
-                      aria-label={`Open video ${item.title}`}
+                      aria-label={t.openVideo(item.title)}
                     >
                       <video
                         className="video-thumb"
@@ -205,7 +213,7 @@ export default function BluePatchworkGallery({ items }: BluePatchworkGalleryProp
               />
             )}
             <div className="lb-stamp">
-              <MediaStamp date={active.date} location={active.location} />
+              <MediaStamp date={active.date} location={active.location} locale={locale} />
               <p className="lb-title">{active.title}</p>
             </div>
           </div>

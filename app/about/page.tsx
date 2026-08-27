@@ -1,8 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import BlankPage from "@/components/BlankPage";
 import { getLocale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n/shared";
 import { publicPages } from "@/lib/site";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+  return {
+    title: t.about.title,
+    description: t.about.intro1,
+    alternates: { canonical: "/about" },
+  };
+}
 
 export default async function AboutPage() {
   if (!publicPages.about) return <BlankPage />;
@@ -11,7 +22,7 @@ export default async function AboutPage() {
   const t = getDictionary(locale);
 
   return (
-    <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 720, margin: "0 auto" }}>
+    <main style={{ padding: 32, fontFamily: "var(--font-geist-sans)", maxWidth: 720, margin: "0 auto" }}>
       <header style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 32, fontWeight: 700, margin: 0 }}>{t.about.title}</h1>
       </header>

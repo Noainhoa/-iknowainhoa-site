@@ -13,7 +13,7 @@ export const site = {
 
 export function siteWhatsAppEnquiryHref(message?: string): string {
   const text = encodeURIComponent(
-    message?.trim() || "Hola — me gustaría hacer una consulta."
+    message?.trim() || "Hola, me gustaría hacer una consulta."
   );
   return `https://api.whatsapp.com/send/?phone=${site.whatsapp}&text=${text}&type=phone_number&app_absent=0`;
 }
@@ -28,7 +28,7 @@ export const publicPages = {
   contact: true,
   gallery: true,
   work: true,
-  about: false,
+  about: true,
   apps: false,
   offers: false,
   shop: false,

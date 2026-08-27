@@ -4,14 +4,24 @@ import Link from "next/link";
 import { FormEvent, useEffect, useId, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import BlogAvatarLoop from "@/components/blog/BlogAvatarLoop";
-import { blogNavSections } from "@/lib/blogNav";
+import LanguageToggle from "@/components/LanguageToggle";
+import { getBlogNavSections } from "@/lib/blogNav";
 import { activeBlogMoon, moonMaskDataUri } from "@/lib/blogMoon";
 import { externalAnchorProps, isExternalHref } from "@/lib/links";
+import type { Locale } from "@/lib/i18n/shared";
+import { getDictionary } from "@/lib/i18n/shared";
 
-function NavSections({ onNavigate }: { onNavigate?: () => void }) {
+function NavSections({
+  locale,
+  onNavigate,
+}: {
+  locale: Locale;
+  onNavigate?: () => void;
+}) {
+  const sections = getBlogNavSections(locale);
   return (
     <>
-      {blogNavSections.map((section) => (
+      {sections.map((section) => (
         <section key={section.id} className="blog-nav-block">
           <h2 className="blog-nav-heading">{section.title}</h2>
           <ul className="blog-nav-list">
@@ -52,10 +62,17 @@ function SearchIcon() {
   );
 }
 
-function SearchBox({ onNavigate }: { onNavigate?: () => void }) {
+function SearchBox({
+  locale,
+  onNavigate,
+}: {
+  locale: Locale;
+  onNavigate?: () => void;
+}) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const id = useId();
+  const t = getDictionary(locale).blog;
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -67,7 +84,7 @@ function SearchBox({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <form className="blog-search" onSubmit={onSubmit} role="search">
       <label className="blog-search-label" htmlFor={id}>
-        Search
+        {t.search}
       </label>
       <div className="blog-search-row">
         <input
@@ -78,7 +95,7 @@ function SearchBox({ onNavigate }: { onNavigate?: () => void }) {
           onChange={(e) => setQ(e.target.value)}
           autoComplete="off"
         />
-        <button className="blog-search-btn" type="submit" aria-label="Search">
+        <button className="blog-search-btn" type="submit" aria-label={t.search}>
           <SearchIcon />
         </button>
       </div>
@@ -86,8 +103,15 @@ function SearchBox({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-function Brand({ avatarSources }: { avatarSources: string[] }) {
+function Brand({
+  locale,
+  avatarSources,
+}: {
+  locale: Locale;
+  avatarSources: string[];
+}) {
   const moon = activeBlogMoon;
+  const t = getDictionary(locale).blog;
 
   return (
     <Link href="/" className="blog-brand">
@@ -112,8 +136,8 @@ function Brand({ avatarSources }: { avatarSources: string[] }) {
         </svg>
       </span>
       <span className="blog-brand-copy">
-        <span className="blog-brand-line">Ainhoa&apos;s</span>
-        <span className="blog-brand-line">Blog</span>
+        <span className="blog-brand-line">{t.brandLine1}</span>
+        <span className="blog-brand-line">{t.brandLine2}</span>
       </span>
     </Link>
   );
@@ -141,13 +165,16 @@ function MenuIcon({ open }: { open: boolean }) {
 export default function BlogShell({
   children,
   avatarSources = [],
+  locale,
 }: {
   children: React.ReactNode;
   avatarSources?: string[];
+  locale: Locale;
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const sidebarRef = useRef<HTMLElement>(null);
+  const t = getDictionary(locale).blog;
 
   useEffect(() => {
     setOpen(false);
@@ -186,14 +213,14 @@ export default function BlogShell({
         ref={sidebarRef}
         className="blog-sidebar"
         role={open ? "dialog" : undefined}
-        aria-label={open ? "Blog menu" : undefined}
+        aria-label={open ? t.menu : undefined}
       >
         <div className="blog-sidebar-header">
-          <Brand avatarSources={avatarSources} />
+          <Brand locale={locale} avatarSources={avatarSources} />
           <button
             type="button"
             className="blog-menu-btn"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? t.closeMenu : t.openMenu}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
           >
@@ -201,8 +228,11 @@ export default function BlogShell({
           </button>
         </div>
         <div className="blog-sidebar-body">
-          <SearchBox onNavigate={() => setOpen(false)} />
-          <NavSections onNavigate={() => setOpen(false)} />
+          <div style={{ marginBottom: 16 }}>
+            <LanguageToggle locale={locale} locales={["es", "en"]} />
+          </div>
+          <SearchBox locale={locale} onNavigate={() => setOpen(false)} />
+          <NavSections locale={locale} onNavigate={() => setOpen(false)} />
         </div>
       </aside>
 

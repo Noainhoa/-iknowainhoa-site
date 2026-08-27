@@ -5,10 +5,14 @@ import { site } from "@/lib/site";
 import { getLocale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n/shared";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: "Get in touch with Ainhoa. Questions, collaborations, or just to say hello.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+  return {
+    title: t.contact.title,
+    description: t.contact.intro,
+  };
+}
 
 export default async function ContactPage() {
   const locale = await getLocale();
@@ -123,7 +127,7 @@ export default async function ContactPage() {
           <h2 style={{ fontSize: "1.5rem", fontWeight: 600, margin: "0 0 24px 0" }}>
             {t.contact.formTitle}
           </h2>
-          <ContactForm />
+          <ContactForm locale={locale} />
         </section>
 
         {/* Response Time */}

@@ -1,12 +1,16 @@
 ---
 title: "Jar of Awesome"
+title_es: "Bote de lo bueno"
 date: "2026-04-21"
 description: ""
+description_es: ""
 slug: "jar-of-awesome"
 draft: false
 tags:
   - daily
 ---
+
+<!-- lang:en -->
 Short opening paragraph. Say what happened, what you learned, or why this matters.
 
 ## Quick take
@@ -77,3 +81,67 @@ Use one or two tags only. Suggested structure:
 ## Close
 
 Finish with one useful takeaway, one feeling, or one next step.
+
+<!-- lang:es -->
+
+Párrafo corto de apertura. Qué pasó, qué aprendí, o por qué importa.
+
+## En pocas líneas
+
+- De qué va esta entrada
+- A quién ayuda
+- Qué cambió para mí
+
+## Cuando te falta perspectiva
+
+Dicen que con la distancia se ve claro, y que se ven los árboles en el bosque. Cuando estoy en el agujero no veo la luz al final del túnel ni la salida: solo estoy ahí, entumecida.
+
+Al final salgo, pero me cuesta todo. Dos veces en la vida he estado en ese agujero entumecido y he sentido que no me importaba nada. Todo era difícil, y me daba igual.
+
+Y las dos veces, con años de por medio, 2014 y 2023, hice lo mismo: busqué pequeñas victorias, cualquier cosa que me hiciera sentir que no estaba todo perdido. Pequeño como lavarme la cara, vestirme, llamar a una amiga, hablar, dar de comer a los perros. Cosas que no podía hacer, y cuesta creerlo porque normalmente ni te ofrecería un café de la energía que siempre he mostrado.
+
+Pero varios factores me llevaron ahí y no salía; pasaban las semanas y se hacía más pesado, todo amontonado. Mi pareja de entonces tenía sus propias luchas, yo no tenía trabajo y no estaba acostumbrada a no poder trabajar. Siempre había trabajado desde los 16 y tener un empleo no solo era fácil: me gustaba. Era la primera vez en un país extranjero. Irlanda, y el CV no encajaba; estaba aprendiendo inglés siendo au pair a los 27 y, aunque tenía 10 años de experiencia ya en puestos de gestión, no me estaba presentando bien, supongo: ni siquiera me llamaban a entrevistas. (Después de unos pasos más todo fue más fácil, pero entonces se sentía enorme.)
+Lo que importa es que una noche, harta de mí, cogí papel kraft, de ese marrón, y colgué un trozo grande en la pared del dormitorio para verlo al dormir. Y cada día intentaba añadir algo positivo; después de unas 10 o 15, la siguiente fue que me llamaron a una entrevista, y luego el trabajo.
+
+<div style="margin:24px 0;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;">
+  <iframe
+    src="https://www.youtube.com/embed/LWCv0zAnqW0?start=35"
+    title="Vídeo Jar of Awesome"
+    width="100%"
+    height="420"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+  ></iframe>
+</div>
+
+## Enlaces de producto o referencia
+
+Usa enlaces markdown normales cuando menciones herramientas, libros, productos o referencias.
+
+- [Soporte para el portátil](https://example.com)
+- [Cámara que uso](https://example.com)
+- [Artículo que me ayudó](https://example.com)
+
+Si alguno es de afiliado, dilo claro:
+
+> Algunos enlaces pueden ser de afiliado. Solo enlazo lo que uso o valoro de verdad.
+
+## Bloque de galería
+
+Puedes poner una galería en cualquier parte de la entrada con HTML sencillo.
+
+## Tipos de entrada (opcional)
+
+Usa una o dos etiquetas. Estructura sugerida:
+
+- `daily`: actualización rápida, dónde estás, qué estás construyendo
+- `solution`: problema, arreglo, resultado
+- `ideas`: pensamiento en bruto, experimentos, preguntas
+- `life-in-uk`: ciudadanía, papeles, notas culturales, vida vivida
+
+## Cierre
+
+Termina con una idea útil, una sensación o un siguiente paso.
+

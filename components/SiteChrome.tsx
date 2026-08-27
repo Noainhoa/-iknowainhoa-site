@@ -9,8 +9,9 @@ import SiteFooter from "@/components/SiteFooter";
 import SiteCopyright from "@/components/SiteCopyright";
 
 /**
- * Site chrome: joy-yellow accent + header/footer.
- * Blog uses its own Seth-style shell (no global header/footer).
+ * Site chrome: header/footer on most pages.
+ * Orange/yellow accent strip is blog-only (including nested blog routes).
+ * Home overlays the header on the portrait.
  * Parking is a standalone mini-app (no chrome at all).
  * Copyright appears on every page.
  */
@@ -29,7 +30,7 @@ export default function SiteChrome({
     pathname.startsWith("/parking/");
   const isBlog = pathname === "/blog" || pathname.startsWith("/blog/");
   const isAnicca = pathname === "/anicca" || pathname.startsWith("/anicca/");
-  const showAccent = !isParking;
+  const showAccent = isBlog;
   const showHeaderFooter = !isParking && !isBlog;
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function SiteChrome({
       {showHeaderFooter ? <SiteHeader locale={locale} /> : null}
       {children}
       {showHeaderFooter ? (
-        <SiteFooter />
+        <SiteFooter locale={locale} />
       ) : (
         <div
           style={{

@@ -9,80 +9,45 @@ import {
   getProductApp,
   productAppPaths,
 } from "@/lib/productApps";
+import { getListenEasyCopy } from "@/lib/listeneasy/copy";
+import { getLocale } from "@/lib/i18n";
 import { publicPages } from "@/lib/site";
 
 const SLUG = "listeneasy" as const;
 const TESTFLIGHT_URL = "https://testflight.apple.com/join/5uYmScxX";
 const LOGO_SRC = "/images/projects/listeneasy/app-icon.jpg";
 
-/** Three pain points · why bother with the beta. */
-const STANDOUTS = [
-  {
-    title: "Stop living in folders of tracks",
-    line: "Multi-file and CD/disc sets become one book · not dozens of separate files.",
-  },
-  {
-    title: "A library for books you already own",
-    line: "Import from Files. No audiobook store, subscription, or account.",
-  },
-  {
-    title: "Never lose your place",
-    line: "Position saved for every book. Resume exactly where you stopped.",
-  },
-] as const;
-
-/** The rest · scannable, not essay-length. */
-const MORE = [
-  { title: "Easy importing", line: "Files, folders, Share, or AirDrop." },
-  {
-    title: "Notes made for listening",
-    line: "Timestamped notes and bookmarks. Jump back to the exact moment.",
-  },
-  {
-    title: "Library that shows where you are",
-    line: "Not Started, Continuing, Finished · plus search, sort, favourites, progress.",
-  },
-  { title: "Chapters & parts", line: "Browse and jump to the section you want." },
-  { title: "Flexible playback", line: "0.5×–3× speed, seek, custom skip intervals." },
-  { title: "Sleep timer", line: "Stop automatically after 5–60 minutes." },
-  {
-    title: "Background & lock screen",
-    line: "Listen locked; control from Lock Screen, Control Centre, or Bluetooth.",
-  },
-  {
-    title: "Covers & metadata",
-    line: "Use embedded info, or fill in artwork when you want.",
-  },
-  {
-    title: "Companion PDFs",
-    line: "Keep a book’s PDF with it and open from details.",
-  },
-  {
-    title: "Offline by design",
-    line: "Books live on device. No connection needed to listen.",
-  },
-  {
-    title: "Private & account-free",
-    line: "No login. Online metadata lookup is optional and off by default.",
-  },
-  {
-    title: "Broad formats",
-    line: "M4B, MP3, M4A, FLAC, WAV, AIFF/AIF, and other iOS media.",
-  },
-] as const;
-
-export function generateMetadata(): Metadata {
+export async function generateMetadata(): Promise<Metadata> {
   const app = getProductApp(SLUG);
   if (!app) return { title: "Not Found" };
-  return buildProductAppMetadata(app, "product");
+  const locale = await getLocale();
+  const copy = getListenEasyCopy(locale);
+  const base = buildProductAppMetadata(app, "product");
+  return {
+    ...base,
+    title: copy.meta.title,
+    description: copy.meta.description,
+    openGraph: {
+      ...base.openGraph,
+      title: copy.meta.title,
+      description: copy.meta.description,
+    },
+    twitter: {
+      ...base.twitter,
+      title: copy.meta.title,
+      description: copy.meta.description,
+    },
+  };
 }
 
-export default function ListenEasyProductPage() {
+export default async function ListenEasyProductPage() {
   if (!publicPages.listeneasy) return <BlankPage />;
 
   const app = getProductApp(SLUG);
   if (!app) return notFound();
 
+  const locale = await getLocale();
+  const copy = getListenEasyCopy(locale);
   const paths = productAppPaths(SLUG);
 
   return (
@@ -98,10 +63,10 @@ export default function ListenEasyProductPage() {
         />
 
         <h1 className="le-name">{app.name}</h1>
-        <p className="le-prop">For the audiobooks you already own.</p>
+        <p className="le-prop">{copy.tagline}</p>
 
-        <ol className="le-pains" aria-label="Why ListenEasy">
-          {STANDOUTS.map((item) => (
+        <ol className="le-pains" aria-label={copy.whyLabel}>
+          {copy.standouts.map((item) => (
             <li key={item.title}>
               <strong>{item.title}</strong>
               <span>{item.line}</span>
@@ -109,15 +74,19 @@ export default function ListenEasyProductPage() {
           ))}
         </ol>
 
-        <ListenEasyBetaActions testFlightUrl={TESTFLIGHT_URL} appName={app.name} />
+        <ListenEasyBetaActions
+          testFlightUrl={TESTFLIGHT_URL}
+          appName={app.name}
+          locale={locale}
+        />
       </header>
 
       <section className="le-more" aria-labelledby="le-more-heading">
         <h2 id="le-more-heading" className="le-section-label">
-          Also in the beta
+          {copy.alsoHeading}
         </h2>
         <ul className="le-more-grid">
-          {MORE.map((item, i) => (
+          {copy.more.map((item, i) => (
             <li
               key={item.title}
               className="le-more-item"
@@ -131,9 +100,9 @@ export default function ListenEasyProductPage() {
       </section>
 
       <footer className="le-foot">
-        <Link href={paths.support}>Support</Link>
+        <Link href={paths.support}>{copy.support}</Link>
         <span aria-hidden="true">·</span>
-        <Link href={paths.privacy}>Privacy</Link>
+        <Link href={paths.privacy}>{copy.privacy}</Link>
       </footer>
 
       <style>{`

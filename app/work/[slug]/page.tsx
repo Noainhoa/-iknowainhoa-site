@@ -100,11 +100,11 @@ export default async function WorkCaseStudyPage({
           <p className="actions">
             {item.externalHref ? (
               <a href={item.externalHref} {...externalAnchorProps(item.externalHref)}>
-                {item.externalCtaText || "Visit live site"}
+                {item.externalCtaText || t.work.visitLive}
               </a>
             ) : null}
             {productApp ? (
-              <Link href={`/${productApp.slug}`}>Product page</Link>
+              <Link href={`/${productApp.slug}`}>{t.work.productPage}</Link>
             ) : null}
           </p>
         )}
@@ -150,10 +150,9 @@ export default async function WorkCaseStudyPage({
         </div>
       ) : productApp ? (
         <div className="prose-block">
-          <p>{productApp.summary}</p>
+          <p>{item.description || item.summary}</p>
           <p>
-            <Link href={`/${productApp.slug}`}>Open the {productApp.name} page</Link>{" "}
-            for features, support, and privacy.
+            <Link href={`/${productApp.slug}`}>{t.work.openProduct(productApp.name)}</Link>
           </p>
         </div>
       ) : null}

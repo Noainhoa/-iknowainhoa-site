@@ -1,9 +1,14 @@
 import Image from "next/image";
-import Link from "next/link";
+import HomeFeatureCarousel from "@/components/home/HomeFeatureCarousel";
+import { getLocalizedBlogIndex } from "@/lib/blogLocale";
 import { getLocale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n/shared";
 import { externalAnchorProps } from "@/lib/links";
 import { site, siteWhatsAppEnquiryHref } from "@/lib/site";
+import { getListedWork } from "@/lib/work";
+
+/** Prefer these writing slides when they are in the public blog index. */
+const HOME_FEATURED_BLOG_SLUGS = ["blue", "piano-joy", "exactness"];
 
 const WA_ICON_PATH =
   "M12.04 2a9.9 9.9 0 0 0-9.9 9.9c0 1.75.46 3.45 1.33 4.95L2 22l5.3-1.39a9.87 9.87 0 0 0 4.74 1.21h.01a9.9 9.9 0 0 0 9.9-9.9 9.86 9.86 0 0 0-9.91-9.92Zm5.76 14.07c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.29.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.59.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.39-.43.52-.14.14-.29.3-.12.58.16.29.73 1.2 1.56 1.94 1.08.96 1.98 1.26 2.27 1.4.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.19-.29.38-.24.64-.14.26.1 1.66.78 1.95.92.28.15.47.21.54.33.07.12.07.68-.17 1.36Z";
@@ -13,6 +18,39 @@ export default async function Home() {
   const locale = await getLocale();
   const t = getDictionary(locale);
   const whatsappHref = siteWhatsAppEnquiryHref();
+  const [work, posts] = await Promise.all([
+    getListedWork(locale),
+    getLocalizedBlogIndex(locale),
+  ]);
+  const workSlides = work.map((item) => ({
+    id: item.slug,
+    kicker: t.work.sections[item.category],
+    title: item.title,
+    summary: item.summary,
+    href: item.href,
+    image: item.coverImage,
+    imageContain: Boolean(item.logo && item.coverImage === item.logo),
+  }));
+  const bySlug = new Map(posts.map((post) => [post.slug, post]));
+  const featuredPost = HOME_FEATURED_BLOG_SLUGS.map((slug) => bySlug.get(slug)).find(
+    (post) => post && (post.description || post.title)
+  );
+  const slides = [
+    ...(featuredPost
+      ? [
+          {
+            id: featuredPost.slug,
+            kicker: t.header.blog,
+            title: featuredPost.title,
+            summary: featuredPost.description?.trim() || featuredPost.title,
+            href: `/blog/${featuredPost.slug}`,
+            image: featuredPost.coverImage,
+            imageContain: false,
+          },
+        ]
+      : []),
+    ...workSlides,
+  ];
 
   return (
     <main className="home">
@@ -23,26 +61,21 @@ export default async function Home() {
             alt=""
             fill
             priority
-            sizes="100vw"
+            sizes="(min-width: 860px) 58vw, 100vw"
             className="home-hero-img"
           />
         </div>
         <div className="home-hero-shade" aria-hidden />
 
         <div className="home-hero-copy">
-          <h1 className="home-brand">{site.name}</h1>
           <p className="home-lead">{t.home.lead}</p>
-          <nav className="home-ctas" aria-label={site.name}>
-            <Link href="/work" className="home-cta">
-              {t.header.work}
-            </Link>
-            <span className="home-cta-sep" aria-hidden>
-              ·
-            </span>
-            <Link href="/contact" className="home-cta">
-              {t.header.contact}
-            </Link>
-          </nav>
+          <HomeFeatureCarousel
+            slides={slides}
+            previousLabel={t.home.previous}
+            nextLabel={t.home.next}
+            openLabel={t.home.open}
+            regionLabel={t.home.featuresLabel}
+          />
         </div>
       </section>
 
@@ -50,7 +83,7 @@ export default async function Home() {
         className="home-wa-fab"
         href={whatsappHref}
         {...externalAnchorProps(whatsappHref)}
-        aria-label="WhatsApp enquiry"
+        aria-label={t.header.whatsAppAria}
       >
         <svg viewBox="0 0 24 24" width="52" height="52" aria-hidden="true" focusable="false">
           <path fill="var(--accent-yellow)" d={WA_ICON_PATH} />
@@ -64,6 +97,7 @@ export default async function Home() {
           margin: 0;
           padding: 0;
           font-family: var(--font-geist-sans);
+          background: #08080a;
         }
         .home-hero {
           position: relative;
@@ -71,9 +105,7 @@ export default async function Home() {
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
-          min-height: calc(
-            100svh - var(--accent-height) - var(--site-mobile-bar-height, 72px)
-          );
+          min-height: 100svh;
           overflow: hidden;
           color: #f7f4ef;
         }
@@ -84,7 +116,7 @@ export default async function Home() {
         }
         .home-hero-img {
           object-fit: cover;
-          object-position: center 8%;
+          object-position: center 12%;
         }
         .home-hero-shade {
           position: absolute;
@@ -93,78 +125,29 @@ export default async function Home() {
           background:
             linear-gradient(
               180deg,
-              rgba(12, 10, 8, 0.12) 0%,
-              rgba(12, 10, 8, 0.08) 42%,
-              rgba(12, 10, 8, 0.62) 68%,
-              rgba(12, 10, 8, 0.9) 100%
-            ),
-            linear-gradient(
-              90deg,
-              rgba(12, 10, 8, 0.4) 0%,
-              rgba(12, 10, 8, 0.1) 52%,
-              rgba(12, 10, 8, 0.04) 100%
+              rgba(8, 8, 10, 0.42) 0%,
+              rgba(8, 8, 10, 0.08) 22%,
+              rgba(8, 8, 10, 0.2) 48%,
+              rgba(8, 8, 10, 0.82) 100%
             );
           pointer-events: none;
         }
         .home-hero-copy {
           position: relative;
           z-index: 2;
-          width: min(100%, 720px);
-          padding: clamp(24px, 5vh, 48px) clamp(20px, 5vw, 40px)
-            clamp(48px, 9vh, 72px);
-        }
-        .home-brand {
-          margin: 0;
-          font-family: var(--font-blog-brand), "Bebas Neue", system-ui, sans-serif;
-          font-size: clamp(2.85rem, 12vw, 6.5rem);
-          font-weight: 400;
-          letter-spacing: 0.02em;
-          line-height: 0.92;
-          text-transform: uppercase;
-          color: #f7f4ef;
-          text-shadow: 0 1px 18px rgba(0, 0, 0, 0.28);
+          width: min(100%, 560px);
+          padding: clamp(88px, 14vh, 120px) clamp(20px, 5vw, 40px)
+            clamp(36px, 7vh, 56px);
         }
         .home-lead {
-          margin: clamp(12px, 2vh, 20px) 0 0;
-          max-width: 28ch;
+          margin: 0 0 clamp(22px, 4vh, 36px);
+          max-width: 22ch;
           font-family: var(--font-serif);
-          font-size: clamp(1.02rem, 2.5vw, 1.35rem);
+          font-size: clamp(1.05rem, 2.6vw, 1.4rem);
           font-weight: 400;
-          line-height: 1.45;
+          line-height: 1.4;
           color: rgba(247, 244, 239, 0.92);
           text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
-        }
-        .home-ctas {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 10px 14px;
-          margin-top: clamp(18px, 3.2vh, 32px);
-        }
-        .home-cta {
-          font-size: 0.95rem;
-          font-weight: 700;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          text-decoration: none !important;
-          color: #f7f4ef !important;
-          border-bottom: 2px solid transparent;
-          padding-bottom: 2px;
-          transition: border-color 0.2s ease, color 0.2s ease;
-        }
-        .home-cta:hover {
-          color: var(--accent-yellow) !important;
-          border-bottom-color: var(--accent-yellow);
-        }
-        .home-cta:focus-visible {
-          outline: 2px solid var(--accent-yellow);
-          outline-offset: 4px;
-        }
-        .home-cta-sep {
-          color: rgba(247, 244, 239, 0.45);
-          font-size: 1.1rem;
-          line-height: 1;
-          user-select: none;
         }
         .home-wa-fab {
           position: fixed;
@@ -209,19 +192,17 @@ export default async function Home() {
             transform: scale(1.04);
             animation: home-media-settle 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
           }
-          .home-brand {
-            animation: home-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
-          }
-          .home-lead {
-            animation: home-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
-          }
-          .home-ctas {
-            animation: home-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both;
+          .home-hero-copy {
+            animation: home-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
           }
         }
-        @media (min-width: 720px) {
+        @media (min-width: 860px) {
           .home-hero {
             justify-content: center;
+          }
+          .home-hero-media {
+            right: auto;
+            width: 58%;
           }
           .home-hero-img {
             object-position: center 16%;
@@ -229,24 +210,27 @@ export default async function Home() {
           .home-hero-shade {
             background:
               linear-gradient(
-                100deg,
-                rgba(12, 10, 8, 0.78) 0%,
-                rgba(12, 10, 8, 0.42) 38%,
-                rgba(12, 10, 8, 0.12) 68%,
-                rgba(12, 10, 8, 0.2) 100%
+                90deg,
+                rgba(8, 8, 10, 0.08) 0%,
+                rgba(8, 8, 10, 0.12) 38%,
+                rgba(8, 8, 10, 0.72) 58%,
+                #08080a 78%
               ),
               linear-gradient(
                 180deg,
-                rgba(12, 10, 8, 0.18) 0%,
-                rgba(12, 10, 8, 0.05) 45%,
-                rgba(12, 10, 8, 0.45) 100%
+                rgba(8, 8, 10, 0.38) 0%,
+                transparent 24%,
+                transparent 100%
               );
           }
           .home-hero-copy {
-            padding: clamp(40px, 8vh, 80px) clamp(28px, 6vw, 56px);
+            margin-left: auto;
+            width: min(46%, 540px);
+            padding: clamp(96px, 12vh, 120px) clamp(36px, 5vw, 64px)
+              clamp(48px, 8vh, 72px);
           }
           .home-lead {
-            max-width: 32ch;
+            max-width: 24ch;
           }
           .home-wa-fab {
             right: max(24px, env(safe-area-inset-right, 0px));

@@ -1,17 +1,27 @@
 import type { Metadata } from "next";
 import BluePatchworkGallery from "@/components/gallery/BluePatchworkGallery";
-import { blueGalleryItems } from "@/lib/galleries/blue";
+import { blueGalleryItems, localizeGalleryItems } from "@/lib/galleries/blue";
 import { publicPages, site } from "@/lib/site";
 import BlankPage from "@/components/BlankPage";
+import { getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/shared";
 
-export const metadata: Metadata = {
-  title: "Blue — Gallery",
-  description: "A timeline patchwork of Blue: local photos, videos, and Instagram moments with place and date.",
-  alternates: { canonical: `${site.url}/gallery/blue` },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+  return {
+    title: `${t.gallery.title} — ${t.gallery.kicker}`,
+    description: t.gallery.intro,
+    alternates: { canonical: `${site.url}/gallery/blue` },
+  };
+}
 
-export default function BlueGalleryPage() {
+export default async function BlueGalleryPage() {
   if (!publicPages.gallery) return <BlankPage />;
+
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+  const items = localizeGalleryItems(blueGalleryItems, locale);
 
   return (
     <main
@@ -32,16 +42,17 @@ export default function BlueGalleryPage() {
             opacity: 0.55,
           }}
         >
-          Gallery
+          {t.gallery.kicker}
         </p>
-        <h1 style={{ margin: 0, fontSize: 40, fontWeight: 750, lineHeight: 1.1 }}>Blue</h1>
+        <h1 style={{ margin: 0, fontSize: 40, fontWeight: 750, lineHeight: 1.1 }}>
+          {t.gallery.title}
+        </h1>
         <p style={{ margin: "14px 0 0", fontSize: 17, lineHeight: 1.65, opacity: 0.8 }}>
-          A patchwork timeline — not an equal grid. Local photos and clips sit beside public Instagram
-          posts and reels. Each piece is stamped with when it happened; places open in Google Maps.
+          {t.gallery.intro}
         </p>
       </header>
 
-      <BluePatchworkGallery items={blueGalleryItems} />
+      <BluePatchworkGallery items={items} locale={locale} />
     </main>
   );
 }

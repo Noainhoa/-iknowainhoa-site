@@ -1,9 +1,14 @@
 import Link from "next/link";
 import BlankPage from "@/components/BlankPage";
+import { getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/shared";
 import { publicPages } from "@/lib/site";
 
-export default function ThankYouPage() {
+export default async function ThankYouPage() {
   if (!publicPages.thanks) return <BlankPage />;
+
+  const locale = await getLocale();
+  const t = getDictionary(locale);
 
   return (
     <main
@@ -24,7 +29,7 @@ export default function ThankYouPage() {
           color: "var(--foreground-muted)",
         }}
       >
-        Thank you
+        {t.thanks.kicker}
       </p>
       <h1
         style={{
@@ -35,11 +40,10 @@ export default function ThankYouPage() {
           lineHeight: 1.15,
         }}
       >
-        Your order is confirmed.
+        {t.thanks.title}
       </h1>
       <p style={{ margin: 0, fontSize: 17, lineHeight: 1.7, color: "var(--foreground-muted)", maxWidth: "36rem" }}>
-        Payment went through successfully. You will receive a confirmation from Stripe, and the token will be
-        prepared for dispatch.
+        {t.thanks.body}
       </p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 32 }}>
         <Link
@@ -56,10 +60,10 @@ export default function ThankYouPage() {
             fontSize: 14,
           }}
         >
-          Back to Anicca
+          {t.thanks.backAnicca}
         </Link>
         <Link href="/" style={{ alignSelf: "center", fontSize: 14, color: "var(--foreground-muted)" }}>
-          Home
+          {t.thanks.home}
         </Link>
       </div>
     </main>

@@ -16,7 +16,7 @@
 
 body:has(.anicca) {
   background: #f6f1ea;
-  --accent-height: 8px;
+  --accent-height: 0px;
 }
 
 body:has(.anicca) .site-accent {

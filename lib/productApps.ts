@@ -2,10 +2,13 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 import type { Metadata } from "next";
-import { remark } from "remark";
-import remarkGfm from "remark-gfm";
-import html from "remark-html";
 import { site } from "@/lib/site";
+import {
+  markdownToHtml,
+  pickLocalizedField,
+  pickLocalizedMarkdown,
+} from "@/lib/contentLocale";
+import type { Locale } from "@/lib/i18n/shared";
 
 export type ProductAppStatus = "available" | "in-development";
 
@@ -233,16 +236,25 @@ export function buildProductAppMetadata(
 
 async function loadMarkdown(
   slug: ProductApp["slug"],
-  fileName: "support.md" | "privacy.md"
+  fileName: "support.md" | "privacy.md",
+  locale: Locale = "en"
 ): Promise<ProductAppMarkdownPage | null> {
   const filePath = path.join(CONTENT_DIR, slug, fileName);
   try {
     const raw = await fs.readFile(filePath, "utf8");
     const { data, content } = matter(raw);
-    const rendered = await remark().use(remarkGfm).use(html).process(content);
+    const title =
+      pickLocalizedField(data as Record<string, unknown>, "title", locale) || slug;
+    const description = pickLocalizedField(
+      data as Record<string, unknown>,
+      "description",
+      locale
+    );
+    const markdown = pickLocalizedMarkdown(content, locale);
+    const rendered = await markdownToHtml(markdown);
     return {
-      title: typeof data.title === "string" ? data.title : slug,
-      description: typeof data.description === "string" ? data.description : undefined,
+      title,
+      description,
       date: typeof data.date === "string" ? data.date : undefined,
       html: String(rendered),
     };
@@ -251,10 +263,16 @@ async function loadMarkdown(
   }
 }
 
-export async function getProductAppSupportPage(slug: ProductApp["slug"]) {
-  return loadMarkdown(slug, "support.md");
+export async function getProductAppSupportPage(
+  slug: ProductApp["slug"],
+  locale: Locale = "en"
+) {
+  return loadMarkdown(slug, "support.md", locale);
 }
 
-export async function getProductAppPrivacyPage(slug: ProductApp["slug"]) {
-  return loadMarkdown(slug, "privacy.md");
+export async function getProductAppPrivacyPage(
+  slug: ProductApp["slug"],
+  locale: Locale = "en"
+) {
+  return loadMarkdown(slug, "privacy.md", locale);
 }

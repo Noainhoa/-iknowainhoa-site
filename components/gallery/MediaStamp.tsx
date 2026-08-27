@@ -1,14 +1,21 @@
 import type { GalleryLocation } from "@/lib/galleries/blue";
 import { formatGalleryDate } from "@/lib/galleries/blue";
+import type { Locale } from "@/lib/i18n/shared";
 
 type MediaStampProps = {
   date: string;
   location?: GalleryLocation;
   compact?: boolean;
+  locale?: Locale;
 };
 
 /** Visual date + place stamp (place links to Google Maps). */
-export default function MediaStamp({ date, location, compact }: MediaStampProps) {
+export default function MediaStamp({
+  date,
+  location,
+  compact,
+  locale = "en",
+}: MediaStampProps) {
   return (
     <div
       className="media-stamp"
@@ -29,7 +36,7 @@ export default function MediaStamp({ date, location, compact }: MediaStampProps)
       }}
     >
       <time dateTime={date} style={{ opacity: 0.95 }}>
-        {formatGalleryDate(date)}
+        {formatGalleryDate(date, locale)}
       </time>
       {location ? (
         <a

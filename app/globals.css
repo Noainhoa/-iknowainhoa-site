@@ -15,8 +15,8 @@
     var(--monk-orange) 45%,
     var(--monk-orange-soft) 100%
   );
-  /* Seth uses ~15px: orange bar + yellow bottom edge */
-  --accent-height: 15px;
+  /* Orange/yellow strip is blog-only; height is applied when .site-accent is present */
+  --accent-height: 0px;
   --accent-orange: #ff8c00;
   --accent-yellow: #ffb900;
 
@@ -66,7 +66,7 @@ body {
   font-family: var(--font-geist-sans);
 }
 
-/* Site-wide accent strip — Seth-style: orange over yellow (2 bands) */
+/* Blog-only accent strip — Seth-style: orange over yellow (2 bands) */
 .site-accent {
   height: 8px;
   box-sizing: content-box;
@@ -75,6 +75,10 @@ body {
   position: sticky;
   top: 0;
   z-index: 50;
+}
+
+html:has(.site-accent) {
+  --accent-height: 15px;
 }
 
 a {
@@ -128,6 +132,7 @@ a:hover {
 
 .site-nav--desktop {
   display: flex;
+  align-items: center;
   gap: 24px;
 }
 
@@ -140,6 +145,78 @@ a:hover {
 
 .site-nav-link:hover {
   color: var(--foreground) !important;
+}
+
+.site-nav-item {
+  position: relative;
+}
+
+.site-nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.site-nav-caret {
+  width: 11px;
+  height: 11px;
+  display: block;
+}
+
+.site-nav-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 210px;
+  padding-top: 12px;
+  z-index: 80;
+}
+
+.site-nav-item.is-open .site-nav-dropdown,
+.site-nav-item:hover .site-nav-dropdown {
+  display: block;
+}
+
+.site-nav-dropdown-panel {
+  padding: 8px 0;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+}
+
+.site-nav-dropdown-link {
+  display: block;
+  padding: 10px 18px;
+  color: #141414 !important;
+  font-size: 14px;
+  text-decoration: none !important;
+  white-space: nowrap;
+}
+
+.site-nav-dropdown-link:hover {
+  background: #f5f5f5;
+  color: #141414 !important;
+}
+
+.site-mobile-heading {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.45;
+}
+
+.site-mobile-link.is-nested {
+  padding-left: 12px;
 }
 
 .site-menu-btn {
@@ -226,7 +303,7 @@ a:hover {
 }
 
 html.page-anicca {
-  --accent-height: 8px;
+  --accent-height: 0px;
 }
 
 html.page-anicca .site-accent {
@@ -249,6 +326,105 @@ html.page-anicca .site-menu-btn {
 
 html.page-anicca .site-header {
   background: #f6f1ea;
+}
+
+/* Home: transparent header over the portrait, no orange/yellow strip */
+html:has(.site-header--overlay) {
+  --accent-height: 0px;
+}
+
+.site-header--overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+  border-bottom: none;
+  color: #f7f4ef;
+}
+
+.site-header--overlay .site-header-bar {
+  padding: 18px 22px;
+}
+
+.site-header--overlay .site-header-inner {
+  max-width: none;
+  width: 100%;
+}
+
+.site-header--overlay .site-brand,
+.site-header--overlay .site-brand-title {
+  font-family: var(--font-blog-brand), "Bebas Neue", system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: #f7f4ef !important;
+}
+
+.site-header--overlay .site-brand-title {
+  margin: 0;
+  line-height: 1;
+}
+
+.site-header--overlay .site-nav-link {
+  color: rgba(247, 244, 239, 0.82) !important;
+}
+
+.site-header--overlay .site-nav-link:hover {
+  color: #f7f4ef !important;
+}
+
+.site-header--overlay .site-menu-btn {
+  color: #f7f4ef;
+}
+
+.site-header--overlay .site-lang--desktop {
+  color: #f7f4ef;
+}
+
+@media (min-width: 769px) {
+  .site-header--overlay .site-header-bar {
+    padding: 22px 36px;
+  }
+
+  .site-header--overlay .site-nav--desktop {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  html:has(.site-header--overlay) .site-header-spacer {
+    display: none;
+  }
+
+  .site-header--overlay {
+    position: absolute;
+    z-index: 60;
+  }
+
+  .site-header--overlay.is-menu-open {
+    position: fixed;
+    inset: 0;
+    height: 100vh;
+    max-height: 100vh;
+    background: #0c0a08;
+    color: #f7f4ef;
+  }
+
+  .site-header--overlay .site-mobile-link {
+    color: #f7f4ef !important;
+    border-bottom-color: rgba(247, 244, 239, 0.16);
+  }
+
+  .site-header--overlay .site-mobile-heading {
+    color: rgba(247, 244, 239, 0.55);
+  }
+
+  .site-header--overlay .site-mobile-lang {
+    color: #f7f4ef;
+  }
 }
 
 /* ------------------------------------------------------------------ */

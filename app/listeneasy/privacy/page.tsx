@@ -6,21 +6,33 @@ import {
   getProductApp,
   getProductAppPrivacyPage,
 } from "@/lib/productApps";
+import { getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/shared";
 
 const SLUG = "listeneasy" as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const app = getProductApp(SLUG);
   if (!app) return { title: "Not Found" };
-  return buildProductAppMetadata(app, "privacy");
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+  const base = buildProductAppMetadata(app, "privacy");
+  const title = t.apps.privacyPolicy(app.name);
+  return {
+    ...base,
+    title,
+    openGraph: { ...base.openGraph, title },
+    twitter: { ...base.twitter, title },
+  };
 }
 
 export default async function ListenEasyPrivacyPage() {
   const app = getProductApp(SLUG);
   if (!app) return notFound();
 
-  const page = await getProductAppPrivacyPage(SLUG);
+  const locale = await getLocale();
+  const page = await getProductAppPrivacyPage(SLUG, locale);
   if (!page) return notFound();
 
-  return <AppMarkdownDocument app={app} page={page} current="privacy" />;
+  return <AppMarkdownDocument app={app} page={page} current="privacy" locale={locale} />;
 }

@@ -27,11 +27,14 @@ export default function LanguageToggle({
   locale,
   label,
   locales = ["es", "en", "fr"],
+  tone = "default",
 }: {
   locale: Locale;
   label?: string;
   /** Languages to show (parking shows all three; main site can pass fewer). */
   locales?: Locale[];
+  /** Light text for dark overlay headers (home hero). */
+  tone?: "default" | "onDark";
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -78,11 +81,18 @@ export default function LanguageToggle({
               }}
               style={{
                 textDecoration: "none",
-                color: locale === code ? "#005288" : "inherit",
+                color:
+                  locale === code
+                    ? tone === "onDark"
+                      ? "#ffffff"
+                      : "#005288"
+                    : "inherit",
                 opacity: locale === code ? 1 : 0.7,
                 fontWeight: locale === code ? 700 : 500,
                 borderBottom:
-                  locale === code ? "2px solid #005288" : "2px solid transparent",
+                  locale === code
+                    ? `2px solid ${tone === "onDark" ? "#ffffff" : "#005288"}`
+                    : "2px solid transparent",
                 paddingBottom: 1,
               }}
             >

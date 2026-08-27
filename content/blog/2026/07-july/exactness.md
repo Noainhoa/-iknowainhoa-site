@@ -1,13 +1,17 @@
 ---
 title: "Exactness"
+title_es: "Exactitud"
 date: "2026-07-26"
 description: "On pausing for the right word, Spanish that travels, and patience with how people correct you."
+description_es: "Sobre parar a buscar la palabra justa, el español que viaja, y la paciencia con quien te corrige."
 slug: "exactness"
 draft: false
 tags:
   - daily
   - book
 ---
+
+<!-- lang:en -->
 
 Every day, when I speak, I pause — (if you have ever crossed paths with me, pause is not something you would quickly associate with how I talk) — but I do pause to think. Sometimes, when the conversation matters more, I even close my eyes for several seconds, right in front of you, to sort through the thoughts and choose my words wisely. Each time I am more careful with the words I use, as I have noticed how carelessly language gets used.
 
@@ -53,3 +57,51 @@ This post is a wink to a close friend (in case she wanders over here one day, I 
 - Building: [ListenEasy](https://appstoreconnect.apple.com/apps/6780047059/distribution/ios/version/inflight)
 - Book I am reading: [Clear Thinking](https://share.google/3V4Irz1w27PvNxunx) by [Shane Parrish](https://share.google/FIEvxJ1sl1XrT5hIJ)
 - Looking at: [acceptation](https://www.merriam-webster.com/dictionary/acceptation), [patience](https://www.merriam-webster.com/dictionary/patience)
+
+<!-- lang:es -->
+
+Cada día, cuando hablo, hago una pausa — (si alguna vez te has cruzado conmigo, “pausa” no es lo primero que asociarías con cómo hablo) — pero sí paro a pensar. A veces, cuando la conversación importa más, hasta cierro los ojos varios segundos, delante de ti, para ordenar las ideas y elegir las palabras con cuidado. Cada vez soy más cuidadosa con las que uso, porque he visto lo a la ligera que se usa el lenguaje.
+
+Algunas palabras que me gustan son exactas a su manera desordenada.
+
+**“Tito”** es una de las habituales de mi madre — acuñada por ella, me atrevería a decir. Puede ser casi cualquier cosa útil, aunque se puede vivir sin ella: desde un recipiente con forma de limón para guardar limones usados en la nevera, hasta un cepillo extra largo para esa parte del coche a la que no llega nada más.
+
+**“Pollo”** — no el de comer. En España, desde hace unos años, se refiere a una “persona”. Puede llevar ternura en casa, con los tuyos, pero también me gusta el tono un poco irrespetuoso, como ese “fella”.
+
+**“Chisme”** — una palabra cajón de sastre maravillosa, de mi vecina del balcón, a la que no voy a nombrar aquí. Para ella casi todo puede ser un “chisme”, mientras la palabra buscada se queda en la punta de la lengua y se puede ayudar con las manos y señalando.
+
+A menudo discrepo sobre la precisión cuando hablo español con alguien que no habla inglés. Uso muchas palabras que viajan del inglés al español y que, de hecho, son correctas — a menudo más exactas — pero menos habituales en España que en Inglaterra. (Una consecuencia directa de casi quince años viviendo en el Reino Unido, y ahora tener que volver a ser española.)
+
+Así que quien no habla inglés puede no reconocer ese significado, solo los usos que ya conoce — que también son válidos — y eso le lleva a cuestionarme, y a menudo a corregirme.
+
+Solo he aprendido a decir, con educación, que creo que eso es correcto — pero oye, la ignorancia puede ser atrevida. Diccionario en mano, sale solo para descubrir que no estaba equivocada: acaban de encontrar otro uso de su propia palabra, o al menos otra [acepción](https://www.merriam-webster.com/dictionary/acceptation).
+
+Me tomo un segundo para reconocer que, por una vez, no soy la oveja negra. De hecho sé cosas, y la falta de reconocimiento de los demás es su falta, no la mía.
+
+Así que que te corrijan. Han arrastrado una vida de correcciones, y no me toca a mí dejar a nadie menos en lo cierto. Pero si insisten, que usen un diccionario a gusto: no seré yo quien intente tener razón a toda costa.
+
+Con esta nota, volvamos a la [paciencia](https://www.merriam-webster.com/dictionary/patience), y a unas preguntas que puedes hacerte sobre lo paciente que eres con los demás — y, sobre todo, contigo.
+
+<aside class="blog-pull">
+  <p class="blog-pull-term">patience</p>
+  <p class="blog-pull-def">the capacity, habit, or fact of being patient · the ability to give attention to something for a long time without becoming bored or losing interest.</p>
+  <p class="blog-pull-source"><a href="https://www.merriam-webster.com/dictionary/patience">Merriam-Webster</a></p>
+</aside>
+
+Esta entrada es un guiño a una amiga cercana (por si un día pasa por aquí, seguro que lo reconoce).
+
+**¿Eres una persona paciente?**
+
+- **¿Cómo actúo cuando tengo que esperar?**  
+  ¿Me quedo en calma, me impaciento, me quejo o intento acelerarlo todo?
+- **¿Cómo reacciono cuando me molesto?**  
+  ¿Paro y elijo qué decir, o reacciono al momento?
+- **¿Puedo seguir cuando las cosas van lentas o son difíciles?**  
+  ¿Me quedo, cambio de enfoque o lo dejo pronto?
+
+## Notas
+
+- Construyendo: [ListenEasy](https://appstoreconnect.apple.com/apps/6780047059/distribution/ios/version/inflight)
+- Libro que leo: [Clear Thinking](https://share.google/3V4Irz1w27PvNxunx) de [Shane Parrish](https://share.google/FIEvxJ1sl1XrT5hIJ)
+- Mirando: [acceptation](https://www.merriam-webster.com/dictionary/acceptation), [patience](https://www.merriam-webster.com/dictionary/patience)
+

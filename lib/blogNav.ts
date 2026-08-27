@@ -1,4 +1,6 @@
 import { site } from "@/lib/site";
+import type { Locale } from "@/lib/i18n/shared";
+import { getDictionary } from "@/lib/i18n/shared";
 
 export type BlogNavLink = {
   href: string;
@@ -13,46 +15,52 @@ export type BlogNavSection = {
 };
 
 /** Seth-style sidebar sections (no subscribe / digest). */
-export const blogNavSections: BlogNavSection[] = [
-  {
-    id: "learn",
-    title: "Learn",
-    links: [
-      { href: "/blog", label: "All posts" },
-      { href: "/gallery/blue", label: "Blue gallery" },
-      { href: "/blog/blue", label: "Blue — the story" },
-    ],
-  },
-  {
-    id: "connect",
-    title: "Connect",
-    links: [
-      { href: "/contact", label: "Contact" },
-      {
-        href: site.socials.instagram,
-        label: "Instagram",
-        external: true,
-      },
-      { href: `mailto:${site.email}`, label: "Email" },
-    ],
-  },
-  {
-    id: "best",
-    title: "Best of",
-    links: [
-      { href: "/blog/blue", label: "Blue" },
-      { href: "/blog/i-start-here", label: "I start here" },
-      { href: "/blog/jar-of-awesome", label: "Jar of awesome" },
-      { href: "/blog/i-get-to-keep-them", label: "I get to keep them" },
-    ],
-  },
-  {
-    id: "more",
-    title: "More",
-    links: [
-      { href: "/gallery/blue", label: "Gallery" },
-      { href: "/contact", label: "Say hello" },
-      { href: "/", label: "Home" },
-    ],
-  },
-];
+export function getBlogNavSections(locale: Locale): BlogNavSection[] {
+  const t = getDictionary(locale).blog;
+  return [
+    {
+      id: "learn",
+      title: t.navLearn,
+      links: [
+        { href: "/blog", label: t.allPosts },
+        { href: "/gallery/blue", label: t.blueGallery },
+        { href: "/blog/blue", label: t.blueStory },
+      ],
+    },
+    {
+      id: "connect",
+      title: t.navConnect,
+      links: [
+        { href: "/contact", label: getDictionary(locale).header.contact },
+        {
+          href: site.socials.instagram,
+          label: "Instagram",
+          external: true,
+        },
+        { href: `mailto:${site.email}`, label: "Email" },
+      ],
+    },
+    {
+      id: "best",
+      title: t.navBest,
+      links: [
+        { href: "/blog/blue", label: t.bestBlue },
+        { href: "/blog/i-start-here", label: t.bestStart },
+        { href: "/blog/jar-of-awesome", label: t.bestJar },
+        { href: "/blog/i-get-to-keep-them", label: t.bestKeep },
+      ],
+    },
+    {
+      id: "more",
+      title: t.navMore,
+      links: [
+        { href: "/gallery/blue", label: t.blueGallery },
+        { href: "/contact", label: t.sayHello },
+        { href: "/", label: t.home },
+      ],
+    },
+  ];
+}
+
+/** @deprecated Use getBlogNavSections(locale) */
+export const blogNavSections: BlogNavSection[] = getBlogNavSections("en");

@@ -1,3 +1,6 @@
+import type { Locale } from "@/lib/i18n/shared";
+import { localeTag } from "@/lib/i18n/shared";
+
 export type GalleryLocation = {
   label: string;
   mapsUrl: string;
@@ -348,13 +351,66 @@ export function groupBlueGalleryByYear(items: GalleryItem[] = blueGalleryItems) 
   return [...groups.entries()].map(([year, yearItems]) => ({ year, items: yearItems }));
 }
 
-export function formatGalleryDate(iso: string) {
+export function formatGalleryDate(iso: string, locale: Locale = "en") {
   const d = new Date(`${iso}T12:00:00`);
-  return d.toLocaleDateString("en-GB", {
+  return d.toLocaleDateString(localeTag(locale), {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+}
+
+const galleryTitleEs: Record<string, string> = {
+  "ig-9VdMA0ifuj": "Blue llega a Kildangan",
+  "ig-9VeLtzCfvl": "Nos tiene cogidos",
+  "local-blue-bowl-2015": "Cuenco de cachorro",
+  "ig-reel-9VvuiUifnH": "Reel de los primeros días",
+  "ig-9kxzguCfks": "Se queda con la cama",
+  "ig-9y5hOoifrs": "Retrato de familia",
+  "ig-_w03nUCfpq": "Navidad — con apenas 8 meses",
+  "local-2016-04-18-a": "Luz de abril",
+  "local-2016-04-18-b": "Luz de abril",
+  "local-2016-04-18-c": "Luz de abril",
+  "ig-BH4UwHsjgP8": "Llega Gringo a la familia",
+  "local-campo-2016": "Blue y Gringo en el campo",
+  "local-2016-12-02": "Retrato de invierno",
+  "ig-BMPN_kfgWID": "Llegada a Henley-on-Thames",
+  "ig-reel-BRN7U0xA5Eu": "Reel",
+  "ig-BanJtt3n9zH": "Casa nueva, Roselea",
+  "ig-reel-BanKxCjHUoq": "Reel de Roselea",
+  "ig-BanLr7GH7tf": "Tomando el sol detrás",
+  "local-2018-02-24": "Tarde de febrero",
+  "ig-Bbm2zVZnids": "Blue durmiendo",
+  "ig-Bbm3eecHbxj": "Gringo durmiendo",
+  "ig-Bbm4QN8Hi6h": "Blue, gripe de hombre",
+  "ig-Bbm5QfMHAJU": "Gripe de hombre para todos",
+  "local-2018-06-16": "Tarde de junio",
+  "ig-Bn8iEjEFTpL": "Simplemente en casa",
+  "ig-BoE3V1LFeej": "Gringo, simplemente en casa",
+  "local-IMG_2409": "Noviembre",
+  "ig-reel-BrKowCGhRt-": "Reel",
+  "ig-reel-BsU6nvwhaRd": "Reel",
+  "ig-reel-BsVpv6dBV8r": "Reel",
+  "local-IMG_4247": "Blue",
+};
+
+const galleryCaptionEs: Record<string, string> = {
+  "ig-9VdMA0ifuj": "Blue llega a Kildangan, Kildare, Irlanda",
+  "ig-BMPN_kfgWID": "Llegada a Henley-on-Thames, Reino Unido",
+  "local-IMG_4247": "Fecha aproximada: este archivo no tiene EXIF",
+};
+
+export function localizeGalleryItem(item: GalleryItem, locale: Locale): GalleryItem {
+  if (locale !== "es") return item;
+  return {
+    ...item,
+    title: galleryTitleEs[item.id] || item.title,
+    caption: galleryCaptionEs[item.id] || item.caption,
+  };
+}
+
+export function localizeGalleryItems(items: GalleryItem[], locale: Locale): GalleryItem[] {
+  return items.map((item) => localizeGalleryItem(item, locale));
 }
 
 /** Curated local photos for the blog post side strip (not the full timeline). */
@@ -367,7 +423,10 @@ const blueAsideIds = [
   "local-2016-04-18-b",
 ] as const;
 
-export function getAsideGallery(id: string): {
+export function getAsideGallery(
+  id: string,
+  locale: Locale = "en"
+): {
   title: string;
   href: string;
   items: GalleryItem[];
@@ -377,7 +436,11 @@ export function getAsideGallery(id: string): {
     const items = blueAsideIds
       .map((itemId) => byId.get(itemId))
       .filter((item): item is GalleryItem => Boolean(item?.src));
-    return { title: "Blue", href: "/gallery/blue", items };
+    return {
+      title: locale === "es" ? "Blue" : "Blue",
+      href: "/gallery/blue",
+      items: localizeGalleryItems(items, locale),
+    };
   }
   return null;
 }

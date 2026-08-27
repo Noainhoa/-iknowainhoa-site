@@ -1,11 +1,14 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
-import { getBlogPost, getAllBlogSlugs } from "@/lib/content";
+import { getAllBlogSlugs } from "@/lib/content";
+import { getLocalizedBlogPost } from "@/lib/blogLocale";
 import { SupportCard } from "@/components/SupportCard";
 import BlogAsideGallery from "@/components/gallery/BlogAsideGallery";
 import { getAsideGallery } from "@/lib/galleries/blue";
 import { site } from "@/lib/site";
+import { getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/shared";
 
 export async function generateStaticParams() {
   const slugs = await getAllBlogSlugs();
@@ -18,7 +21,8 @@ export async function generateMetadata({
   params: { slug: string } | Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const locale = await getLocale();
+  const post = await getLocalizedBlogPost(slug, locale);
 
   if (!post) {
     return { title: "Not Found" };
@@ -54,12 +58,14 @@ export default async function BlogPostPage({
   params: { slug: string } | Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const locale = await getLocale();
+  const t = getDictionary(locale);
+  const post = await getLocalizedBlogPost(slug, locale);
   if (!post) return notFound();
 
   const asideId =
     typeof post.metadata?.asideGallery === "string" ? post.metadata.asideGallery : null;
-  const aside = asideId ? getAsideGallery(asideId) : null;
+  const aside = asideId ? getAsideGallery(asideId, locale) : null;
   const hasAside = Boolean(aside?.items.length);
 
   return (
@@ -75,7 +81,7 @@ export default async function BlogPostPage({
             fontFamily: "var(--blog-sans)",
           }}
         >
-          Draft — visible locally, hidden in production
+          {t.blog.draftBadge}
         </p>
       ) : null}
 
@@ -181,7 +187,7 @@ export default async function BlogPostPage({
       </div>
 
       <div style={{ marginTop: 56 }}>
-        <SupportCard variant="compact" />
+        <SupportCard locale={locale} variant="compact" />
       </div>
 
       <style>{`

@@ -1,12 +1,16 @@
 ---
 coverImage: "/images/blog/2026/February/piano_mini.png"
 title: "I Got Myself Some Piano Joy!"
+title_es: "Me traje un poco de alegría de piano"
 date: "2026-02-19"
 description: "A free upright piano, a wet English evening..."
+description_es: "Un piano de pared gratis, una tarde húmeda en Inglaterra..."
 slug: "piano-joy"
 draft: false
 tags: [piano, music, personal, joy, England]
 ---
+
+<!-- lang:en -->
 
 I always had it in the back of my mind — a piano...
 
@@ -175,4 +179,143 @@ Don't ask for a divine intervention, intervene with divinity!
 Sixx King https://www.instagram.com/sixxking/?utm_source=ig_web_button_share_sheet
 
 <!-- Final CTA : > If you want more stories like this (and the practical bits I learn along the way), you can subscribe here: **[Subscribe](/subscribe/)**. -->
+
+<!-- lang:es -->
+
+Siempre lo tuve en un rincón de la cabeza: un piano...
+
+Y entonces, una tarde húmeda, gris y ventosa en Inglaterra, encontré uno gratis.
+
+# Me traje un poco de alegría de piano
+
+Siempre lo tuve en un rincón de la cabeza: un piano.
+
+Nunca lo llamé “sueño”… pero quizá lo era, porque durante años creí de verdad que los pianos eran para gente rica.
+
+Y entonces, una tarde húmeda, gris y ventosa en Inglaterra, encontré uno gratis.
+
+## Hero
+<div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;max-width:1100px;align-items:stretch;">
+  <img src="/images/blog/2026/February/71911067_985542415157016_3382565736960319165_n.jpg" alt="Gringo junto al piano" style="width:100%;height:420px;object-fit:cover;border-radius:14px;" />
+  <div style="display:grid;grid-template-rows:1fr 1fr;gap:12px;">
+    <img src="/images/blog/2026/February/73055592_819893655126490_7740360516362284211_n.jpg" alt="Piano en la habitación con silla amarilla" style="width:100%;height:204px;object-fit:cover;border-radius:14px;" />
+    <video autoplay muted loop playsinline preload="metadata" poster="/images/blog/2026/February/piano_mini.png" style="width:100%;height:204px;object-fit:cover;border-radius:14px;background:#000;">
+      <source src="/images/blog/2026/February/piano_gringo_video.mp4" type="video/mp4" />
+      Tu navegador no admite el vídeo.
+    </video>
+  </div>
+</div>
+
+## En resumen
+
+- Creía que los pianos eran “para otra gente”, sobre todo para gente rica.
+- Nextdoor y una tarde de lluvia en Inglaterra lo cambiaron.
+- Un piano de pared gratis llegó a casa con la ayuda de Jay, mi amigo del recado.
+- Se mudó conmigo a través de distintos capítulos.
+- Sentarme a él me ha salvado más veces de las que puedo contar.
+
+---
+
+## La creencia que arrastré años
+
+Siempre tuve esa idea callada de que un piano no era para alguien como yo.
+No un “sueño”, ni siquiera un plan: más bien una puerta cerrada en la cabeza.
+
+## El escenario: Leighton Buzzard + Nextdoor
+
+En 2019 alquilé un adosado en Leighton Buzzard.
+Era de esos sitios que todavía se sentían como un barrio de verdad.
+
+Nextdoor estaba fuerte entonces: podías escribir a gente de cerca sin el momento raro de llamar a la puerta.
+
+Y tenía un mercadillo.
+
+## El momento: “artículos GRATIS” y un anuncio de piano
+
+Una tarde de otoño cualquiera —húmeda, gris, ventosa, miserable— estaba mirando la sección de “artículos GRATIS”.
+
+Y ahí estaba:
+un piano de pared entero… gratis.
+
+Me acababa de mudar. Cajas por todas partes.
+Pero de algún modo había sitio para un piano.
+
+## Llevarlo a casa: mi amigo Jay (DPD)
+
+Escribí a Jay, el chico de DPD.
+
+Esa es otra historia —cómo nos hicimos amigos—, pero dijo que sí.
+Por una cantidad pequeña, me ayudaba a recogerlo.
+
+Así que fuimos.
+
+## La casa: como una película británica antigua
+
+La casa parecía la Inglaterra de las películas viejas:
+un estanque, patos, esa quietud de campo.
+
+El señor tenía ese aire de “chaqueta de caza”.
+Las botas de agua.
+Toda la escena era exactamente el mundo al que yo creía que pertenecía un piano.
+
+Y entonces la mujer se preocupó de que yo quisiera venderlo.
+
+Le dije: “No. De verdad quiero aprender. Gracias.”
+
+## La primera noche: yo, Gringo y el piano
+
+Una hora después estaba en el salón.
+
+Y ahí estaba yo:
+el piano, mi perro y yo.
+
+## Los años desde entonces (y por qué importa)
+
+Desde aquel día he conseguido seguir tocando.
+
+No perfecto.
+No constante.
+Hubo temporadas largas en las que el piano desaparecía de la vista.
+
+Pasaron muchas cosas.
+Me mudé más de una vez.
+Y cada vez, el piano se mudó conmigo.
+
+Puedo llorar de alegría de verdad al pensarlo:
+cuántas veces sentarme con él me salvó de mí misma… y de todo lo demás.
+
+## Qué estoy aprendiendo ahora
+
+- Qué puedo tocar hoy:
+- Con qué me cuesta:
+- La rutina pequeña que me funciona:
+- Una cosa que ojalá hubiera sabido antes:
+
+## Una invitación pequeña
+
+Si alguna vez has querido aprender un instrumento, esta es tu señal:
+empieza chapucero, empieza pequeño, empieza con 10 minutos.
+
+---
+
+## Cierre
+
+No “cumplí un sueño”.
+Me traje a casa un trozo de alegría que no creía merecer.
+
+Y de algún modo se quedó conmigo: entre cajas, mudanzas, silencios y tormentas.
+
+**Pregunta:** ¿Has querido alguna vez algo que creías que no era para ti por cuestión de clase?
+
+Cito aquí las palabras de mi abuela: “Cuando naces te pareces a tus padres, pero cuando mueres te pareces a tus decisiones.” Cada decisión que tomas tiene un efecto dominó en tu vida.
+No confundas “asistencia” con “alianza”. No todo el que está contigo está para ti.
+Las águilas no vuelan con palomas.
+
+No pidas una intervención divina: interviene con la divinidad.
+
+**Pregunta:** ¿Qué has querido —y te has hablado en contra— por de dónde vienes?
+**Pregunta:** ¿Has querido alguna vez algo (como un piano) y has dado por hecho que era “demasiado” para alguien como tú?
+
+Sixx King https://www.instagram.com/sixxking/?utm_source=ig_web_button_share_sheet
+
 

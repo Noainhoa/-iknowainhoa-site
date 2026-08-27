@@ -27,7 +27,7 @@ Here is the [live example](https://iknowainhoa.com/parking-guardamar-centro).
 
 <!-- lang:es -->
 
-Yo mismo alquilo una plaza de aparcamiento privada y he creado una herramienta sencilla que muestra la disponibilidad, calcula el precio y recoge las solicitudes de reserva a través de un solo enlace.
+Yo misma alquilo una plaza de aparcamiento privada y he creado una herramienta sencilla que muestra la disponibilidad, calcula el precio y recoge las solicitudes de reserva a través de un solo enlace.
 
 La estoy abriendo a un número reducido de otros propietarios.
 
