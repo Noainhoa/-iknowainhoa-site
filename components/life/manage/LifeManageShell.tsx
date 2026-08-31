@@ -1,14 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import EntryDetail from "@/components/life/detail/EntryDetail";
 import LifeDetailPanel, { LifeDetailEmpty } from "@/components/life/detail/LifeDetailPanel";
 import EntryForm, { type EntryFormPayload } from "@/components/life/EntryForm";
 import GroupForm from "@/components/life/GroupForm";
 import LifeLoginForm from "@/components/life/LifeLoginForm";
 import LifeNavigator from "@/components/life/navigator/LifeNavigator";
+import BulkSkeletonImporter from "@/components/life/manage/BulkSkeletonImporter";
 import TrackForm from "@/components/life/TrackForm";
+import { useLifeSession } from "@/components/life/useLifeSession";
 import {
   createLifeEntry,
   createLifeGroup,
@@ -21,10 +24,7 @@ import {
   updateLifeGroup,
   updateLifeTrack,
 } from "@/lib/life/db";
-import { formatLifeErrorForPanel } from "@/lib/life/errors";
 import { resolveLifeLocationId } from "@/lib/life/locations";
-import { bootstrapLifeData, getLifeClientDebugInfo } from "@/lib/life/startup";
-import { getLifeSupabase, lifeSupabaseConfigured } from "@/lib/life/supabase";
 import type { LifeEntry, LifeGroup } from "@/lib/life/types";
 
 type Workspace =
@@ -35,29 +35,6 @@ type Workspace =
   | { kind: "edit-track"; groupId: string; trackId: string }
   | { kind: "new-entry"; trackId: string; trackName: string }
   | { kind: "edit-entry"; entryId: string };
-
-const SCHEMA_HINT =
-  "If this is a schema/RLS issue, confirm supabase/life.sql was run in the ainhoa-life project.";
-
-function formatLoadError(error: unknown, userId: string | null): string {
-  const client = getLifeClientDebugInfo();
-  return formatLifeErrorForPanel(error, {
-    lifeSupabaseHost: client.supabaseHost,
-    lifeSupabaseConfigured: String(client.configured),
-    authUserId: userId ?? "(none)",
-    parkingSupabaseHost: process.env.NEXT_PUBLIC_SUPABASE_URL
-      ? safeHost(process.env.NEXT_PUBLIC_SUPABASE_URL)
-      : "(not in client bundle for comparison)",
-  });
-}
-
-function safeHost(url: string): string {
-  try {
-    return new URL(url).host;
-  } catch {
-    return url;
-  }
-}
 
 function findEntryInGroups(groups: LifeGroup[], entryId: string): LifeEntry | undefined {
   for (const group of groups) {
@@ -77,77 +54,48 @@ function findTrackMeta(groups: LifeGroup[], trackId: string) {
   return undefined;
 }
 
-export default function LifeShell() {
-  const configured = lifeSupabaseConfigured();
-  const supabase = getLifeSupabase();
+export default function LifeManageShell() {
+  const searchParams = useSearchParams();
+  const {
+    configured,
+    supabase,
+    sessionEmail,
+    userId,
+    authBusy,
+    authError,
+    groups,
+    loading,
+    loadError,
+    setLoadError,
+    reload,
+    handleLogin,
+    handleSignOut,
+    formatLoadError,
+    schemaHint,
+  } = useLifeSession();
 
-  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [authBusy, setAuthBusy] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
-
-  const [groups, setGroups] = useState<LifeGroup[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [workspace, setWorkspace] = useState<Workspace>({ kind: "idle" });
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const [collapsedGroupIds, setCollapsedGroupIds] = useState<Set<string>>(() => new Set());
+  const [entryDeepLinkHandled, setEntryDeepLinkHandled] = useState(false);
 
-  const reload = useCallback(async (): Promise<LifeGroup[]> => {
-    if (!supabase || !userId) return [];
-    setLoading(true);
-    setLoadError(null);
-    try {
-      const tree = await bootstrapLifeData(supabase, userId);
-      setGroups(tree);
-      return tree;
-    } catch (error) {
-      console.error("[life] reload failed", error);
-      setLoadError(`${formatLoadError(error, userId)}\n\n${SCHEMA_HINT}`);
-      return [];
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (entryDeepLinkHandled || groups.length === 0) return;
+    const entryId = searchParams.get("entry");
+    if (!entryId) {
+      setEntryDeepLinkHandled(true);
+      return;
     }
-  }, [supabase, userId]);
-
-  useEffect(() => {
-    if (!supabase) return;
-    void supabase.auth.getSession().then(({ data }) => {
-      setSessionEmail(data.session?.user.email ?? null);
-      setUserId(data.session?.user.id ?? null);
-    });
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event: AuthChangeEvent, session: Session | null) => {
-        setSessionEmail(session?.user.email ?? null);
-        setUserId(session?.user.id ?? null);
-      }
-    );
-    return () => subscription.subscription.unsubscribe();
-  }, [supabase]);
-
-  useEffect(() => {
-    if (userId) void reload();
-  }, [userId, reload]);
-
-  async function handleLogin(email: string, password: string) {
-    if (!supabase) return;
-    setAuthBusy(true);
-    setAuthError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setAuthBusy(false);
-    if (error) setAuthError(error.message);
-  }
-
-  async function handleSignOut() {
-    if (!supabase) return;
-    await supabase.auth.signOut();
-    setGroups([]);
-    setWorkspace({ kind: "idle" });
-    setSelectedEntryId(null);
-  }
+    if (findEntryInGroups(groups, entryId)) {
+      setSelectedEntryId(entryId);
+      setWorkspace({ kind: "idle" });
+    }
+    setEntryDeepLinkHandled(true);
+  }, [entryDeepLinkHandled, groups, searchParams]);
 
   async function runMutation(task: () => Promise<void>): Promise<boolean> {
+    if (!supabase) return false;
     setBusy(true);
     setLoadError(null);
     try {
@@ -156,7 +104,7 @@ export default function LifeShell() {
       return true;
     } catch (error) {
       console.error("[life] mutation failed", error);
-      setLoadError(`${formatLoadError(error, userId)}\n\n${SCHEMA_HINT}`);
+      setLoadError(`${formatLoadError(error)}\n\n${schemaHint}`);
       return false;
     } finally {
       setBusy(false);
@@ -198,6 +146,7 @@ export default function LifeShell() {
         endPrecision: payload.endPrecision,
         isOngoing: payload.isOngoing,
         notes: payload.notes,
+        entryStatus: payload.entryStatus,
       };
 
       let nextEntryId = existingEntryId ?? null;
@@ -215,7 +164,7 @@ export default function LifeShell() {
       setWorkspace({ kind: "idle" });
     } catch (error) {
       console.error("[life] mutation failed", error);
-      setLoadError(`${formatLoadError(error, userId)}\n\n${SCHEMA_HINT}`);
+      setLoadError(`${formatLoadError(error)}\n\n${schemaHint}`);
     } finally {
       setBusy(false);
     }
@@ -247,7 +196,12 @@ export default function LifeShell() {
       <header className="flex flex-col gap-2">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Life</h1>
+            <p className="mb-1">
+              <Link href="/life" className="text-sm text-gray-600 hover:text-gray-900">
+                ← Back to timeline
+              </Link>
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Life · Manage</h1>
             <p className="text-gray-600">Signed in as {sessionEmail}</p>
           </div>
           <button
@@ -264,6 +218,17 @@ export default function LifeShell() {
         <p className="whitespace-pre-wrap rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           {loadError}
         </p>
+      ) : null}
+
+      {userId && supabase ? (
+        <BulkSkeletonImporter
+          supabase={supabase}
+          userId={userId}
+          groups={groups}
+          onImported={async () => {
+            await reload();
+          }}
+        />
       ) : null}
 
       {loading && groups.length === 0 ? (

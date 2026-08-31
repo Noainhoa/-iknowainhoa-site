@@ -6,7 +6,8 @@ import { normalizeLifeDate, LIFE_PRECISION_LABELS, lifeDateToFormValue } from "@
 import { lifeLocationToSelection } from "@/lib/life/location-types";
 import type { LifeLocationSelection } from "@/lib/life/location-types";
 import { validateLifeEntryInput } from "@/lib/life/validation";
-import type { LifeDatePrecision, LifeEntry, LifeEntryType } from "@/lib/life/types";
+import type { LifeDatePrecision, LifeEntry, LifeEntryStatus, LifeEntryType } from "@/lib/life/types";
+import { LIFE_ENTRY_STATUS_LABELS } from "@/lib/life/entry-status";
 
 export type EntryFormPayload = {
   title: string;
@@ -18,6 +19,7 @@ export type EntryFormPayload = {
   isOngoing: boolean;
   notes: string | null;
   location: LifeLocationSelection | null;
+  entryStatus: LifeEntryStatus;
 };
 
 type EntryFormProps = {
@@ -38,6 +40,8 @@ function emptyStartRaw(precision: LifeDatePrecision): string {
   }
   return new Date().toISOString().slice(0, 10);
 }
+
+const STATUSES: LifeEntryStatus[] = ["complete", "skeleton"];
 
 export default function EntryForm({
   trackName,
@@ -64,6 +68,9 @@ export default function EntryForm({
   );
   const [isOngoing, setIsOngoing] = useState(initial?.isOngoing ?? false);
   const [notes, setNotes] = useState(initial?.notes ?? "");
+  const [entryStatus, setEntryStatus] = useState<LifeEntryStatus>(
+    initial?.entryStatus ?? "complete"
+  );
   const [location, setLocation] = useState<LifeLocationSelection | null>(
     initial?.location ? lifeLocationToSelection(initial.location) : null
   );
@@ -123,6 +130,7 @@ export default function EntryForm({
       isOngoing: entryType === "period" ? isOngoing : false,
       notes: notes.trim() || null,
       location,
+      entryStatus,
     };
 
     const validationError = validateLifeEntryInput({
@@ -136,6 +144,7 @@ export default function EntryForm({
       endPrecision: payload.endPrecision,
       isOngoing: payload.isOngoing,
       notes: payload.notes,
+      entryStatus: payload.entryStatus,
     });
     if (validationError) {
       setError(validationError);
@@ -175,6 +184,21 @@ export default function EntryForm({
         >
           <option value="event">Event</option>
           <option value="period">Period</option>
+        </select>
+      </label>
+
+      <label className="flex flex-col gap-1 text-sm text-gray-700">
+        Record status
+        <select
+          value={entryStatus}
+          onChange={(event) => setEntryStatus(event.target.value as LifeEntryStatus)}
+          className="rounded-md border border-gray-300 px-3 py-2"
+        >
+          {STATUSES.map((status) => (
+            <option key={status} value={status}>
+              {LIFE_ENTRY_STATUS_LABELS[status]}
+            </option>
+          ))}
         </select>
       </label>
 

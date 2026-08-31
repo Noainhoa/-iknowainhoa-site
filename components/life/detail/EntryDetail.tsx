@@ -1,4 +1,5 @@
 import { formatLifeEntrySummary, LIFE_PRECISION_LABELS } from "@/lib/life/format";
+import { isSkeletonEntry, LIFE_ENTRY_STATUS_LABELS } from "@/lib/life/entry-status";
 import { googleMapsHref } from "@/lib/life/google-maps";
 import { externalAnchorProps } from "@/lib/links";
 import type { LifeEntry } from "@/lib/life/types";
@@ -19,16 +20,24 @@ export default function EntryDetail({
   onDelete,
 }: EntryDetailProps) {
   const mapsHref = entry.location ? googleMapsHref(entry.location) : null;
+  const skeleton = isSkeletonEntry(entry);
 
   return (
     <article className="flex flex-col gap-5">
+      {skeleton ? (
+        <p className="text-sm italic text-gray-500">{LIFE_ENTRY_STATUS_LABELS.skeleton}</p>
+      ) : null}
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-wide text-gray-500">
             {groupName ? `${groupName} · ` : ""}
             {trackName}
           </p>
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-gray-900">
+          <h2
+            className={`mt-1 text-2xl font-semibold tracking-tight ${
+              skeleton ? "italic text-gray-600" : "text-gray-900"
+            }`}
+          >
             {entry.title}
           </h2>
         </div>

@@ -4,6 +4,8 @@ export type LifeDatePrecision = "exact" | "month" | "year" | "approximate";
 
 export type LifeEntryType = "event" | "period";
 
+export type LifeEntryStatus = "skeleton" | "complete";
+
 export type LifeRelationType = "related" | (string & {});
 
 /** Database row shapes (snake_case). */
@@ -41,6 +43,7 @@ export type DbLifeEntry = {
   end_precision: LifeDatePrecision | null;
   is_ongoing: boolean;
   notes: string | null;
+  entry_status: LifeEntryStatus;
   created_at: string;
   updated_at: string;
 };
@@ -68,6 +71,7 @@ export type LifeEntry = {
   endPrecision: LifeDatePrecision | null;
   isOngoing: boolean;
   notes: string | null;
+  entryStatus: LifeEntryStatus;
 };
 
 export type LifeTrack = {
@@ -107,6 +111,7 @@ export type LifeEntryInput = {
   endPrecision: LifeDatePrecision | null;
   isOngoing: boolean;
   notes: string | null;
+  entryStatus?: LifeEntryStatus;
 };
 
 export type LifeGroupInput = {

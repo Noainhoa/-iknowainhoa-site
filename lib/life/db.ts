@@ -6,6 +6,7 @@ import type {
   DbLifeGroup,
   DbLifeTrack,
   LifeEntry,
+  LifeEntryStatus,
   LifeGroup,
   LifeTrack,
 } from "@/lib/life/types";
@@ -36,6 +37,7 @@ function mapEntry(row: DbLifeEntry, location: LifeLocation | null): LifeEntry {
     endPrecision: row.end_precision,
     isOngoing: row.is_ongoing,
     notes: row.notes,
+    entryStatus: row.entry_status ?? "complete",
   };
 }
 
@@ -224,6 +226,7 @@ export async function createLifeEntry(
     endPrecision: DbLifeEntry["end_precision"];
     isOngoing: boolean;
     notes: string | null;
+    entryStatus?: LifeEntryStatus;
   }
 ): Promise<DbLifeEntry> {
   const { data, error } = await supabase
@@ -240,6 +243,7 @@ export async function createLifeEntry(
       end_precision: input.endPrecision,
       is_ongoing: input.isOngoing,
       notes: input.notes?.trim() || null,
+      entry_status: input.entryStatus ?? "complete",
     })
     .select("*")
     .single();
@@ -262,6 +266,7 @@ export async function updateLifeEntry(
     endPrecision: DbLifeEntry["end_precision"];
     isOngoing: boolean;
     notes: string | null;
+    entryStatus?: LifeEntryStatus;
   }
 ): Promise<void> {
   const { error } = await supabase
@@ -277,6 +282,7 @@ export async function updateLifeEntry(
       end_precision: input.endPrecision,
       is_ongoing: input.isOngoing,
       notes: input.notes?.trim() || null,
+      entry_status: input.entryStatus ?? "complete",
     })
     .eq("id", entryId);
 

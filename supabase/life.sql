@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS life_entries (
   ),
   is_ongoing BOOLEAN NOT NULL DEFAULT FALSE,
   notes TEXT NULL,
+  entry_status TEXT NOT NULL DEFAULT 'complete' CHECK (entry_status IN ('skeleton', 'complete')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

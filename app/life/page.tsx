@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import LifeShell from "@/components/life/LifeShell";
+import LifeTimelineShell from "@/components/life/timeline/LifeTimelineShell";
 
 export const metadata: Metadata = {
   title: "Life",
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 export default function LifePage() {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-12">
-      <LifeShell />
+    <main className="mx-auto w-full max-w-[1600px] px-4 py-12">
+      <LifeTimelineShell />
     </main>
   );
 }
