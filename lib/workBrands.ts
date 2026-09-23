@@ -108,6 +108,7 @@ export function listedWorkItems(items: WorkItem[], locale: Locale): WorkItem[] {
         ...existing,
         category: brand.category,
         summary: brand.summary[locale],
+        href: brand.href,
       });
       continue;
     }

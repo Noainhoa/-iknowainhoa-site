@@ -34,6 +34,16 @@ const nextConfig: NextConfig = {
         destination: "/parking-guardamar-centro/admin/",
         permanent: true,
       },
+      {
+        source: "/work/muebles-begui",
+        destination: "https://mueblesbegui.es/",
+        permanent: true,
+      },
+      {
+        source: "/work/muebles-begui/",
+        destination: "https://mueblesbegui.es/",
+        permanent: true,
+      },
     ];
   },
 };
