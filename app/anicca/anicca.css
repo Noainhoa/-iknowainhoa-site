@@ -58,8 +58,8 @@ body:has(.anicca) .site-menu-btn {
 
 .anicca-hero {
   display: grid;
-  gap: 20px;
-  padding: 12px 0 40px;
+  gap: 16px;
+  padding: 10px 0 36px;
 }
 
 @media (min-width: 880px) {
@@ -81,13 +81,24 @@ body:has(.anicca) .site-menu-btn {
 .anicca-shot {
   margin: 0;
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .anicca-shot figcaption {
-  font-size: 0.68rem;
+  display: grid;
+  gap: 2px;
+}
+
+.anicca-shot-side {
+  font-size: 0.62rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  color: var(--anicca-silver);
+}
+
+.anicca-shot-text {
+  font-size: 0.72rem;
+  line-height: 1.3;
   color: var(--anicca-muted);
 }
 
@@ -108,7 +119,7 @@ body:has(.anicca) .site-menu-btn {
 }
 
 .anicca-hero-copy h1 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-family: var(--font-serif);
   font-weight: 500;
   font-size: clamp(1.7rem, 4.2vw, 2.55rem);
@@ -120,8 +131,17 @@ body:has(.anicca) .site-menu-btn {
   margin: 0;
   max-width: 34rem;
   font-size: 1.02rem;
-  line-height: 1.65;
+  line-height: 1.55;
   color: var(--anicca-muted);
+}
+
+.anicca-commercial {
+  margin: 14px 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
 }
 
 .anicca-price {
@@ -139,17 +159,17 @@ body:has(.anicca) .site-menu-btn {
 }
 
 .anicca-edition {
-  margin: 8px 0 0;
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
+  margin: 2px 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--anicca-muted);
+  color: var(--anicca-silver);
 }
 
 .anicca-buy {
   display: grid;
   gap: 12px;
-  margin-top: 18px;
+  margin-top: 14px;
   max-width: 28rem;
   scroll-margin-top: 88px;
 }
@@ -275,7 +295,7 @@ body:has(.anicca) .site-menu-btn {
 }
 
 .anicca-eyebrow {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 0.68rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -553,30 +573,51 @@ body:has(.anicca) .site-menu-btn {
   }
 
   .anicca-hero {
-    padding-top: 10px;
-    gap: 14px;
+    padding-top: 8px;
+    padding-bottom: 28px;
+    gap: 12px;
+  }
+
+  .anicca-hero-photos {
+    gap: 8px;
   }
 
   .anicca-hero-copy h1 {
-    font-size: 1.5rem;
+    font-size: 1.45rem;
   }
 
   .anicca-lead {
-    font-size: 0.95rem;
-    line-height: 1.5;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .anicca-commercial {
+    margin-top: 10px;
+    font-size: 1.05rem;
   }
 
   .anicca-shot {
     gap: 4px;
   }
 
-  .anicca-shot figcaption {
-    display: none;
+  .anicca-shot-side {
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+  }
+
+  .anicca-shot-text {
+    font-size: 0.68rem;
+    line-height: 1.25;
   }
 
   .anicca-buy {
-    margin-top: 14px;
+    margin-top: 12px;
     gap: 10px;
+  }
+
+  .anicca-btn {
+    min-height: 50px;
+    font-size: 0.95rem;
   }
 
   .anicca-pick {

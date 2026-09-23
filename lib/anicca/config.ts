@@ -51,8 +51,14 @@ export type AniccaVariant = {
   name: string;
   language: "English" | "Español";
   languageCode: "en" | "es";
+  /** Full engraved front text */
   front: string;
+  /** Full engraved back text */
   back: string;
+  /** Short front caption under hero photo */
+  frontCaption: string;
+  /** Short back caption under hero photo */
+  backCaption: string;
   priceEur: number;
   stock: number;
   active: boolean;
@@ -67,7 +73,7 @@ export type AniccaVariant = {
 /**
  * Variants — update `stock` as pieces sell; set `active: false` to hide.
  * When stock is 0 the UI marks Sold out regardless of `active`.
- * Default / hero product is Anicca — English (`ANICCA_DEFAULT_VARIANT_ID`).
+ * Default product: English pages → Anicca English; Spanish pages → Anicca Español.
  */
 export const ANICCA_VARIANTS: AniccaVariant[] = [
   {
@@ -81,6 +87,8 @@ export const ANICCA_VARIANTS: AniccaVariant[] = [
     languageCode: "en",
     front: "Anicca · Impermanence",
     back: "This too shall pass · good or bad",
+    frontCaption: "Anicca · Impermanence",
+    backCaption: "This too shall pass",
     priceEur: ANICCA_PRICE_EUR,
     stock: 19,
     active: true,
@@ -101,6 +109,8 @@ export const ANICCA_VARIANTS: AniccaVariant[] = [
     languageCode: "en",
     front: "Yathābhūtaṃ · As it is",
     back: "Not as you would like it to be",
+    frontCaption: "Yathābhūtaṃ · As it is",
+    backCaption: "Not as you would like it to be",
     priceEur: ANICCA_PRICE_EUR,
     stock: 20,
     active: true,
@@ -116,13 +126,14 @@ export const ANICCA_VARIANTS: AniccaVariant[] = [
     selectorLabel: "Anicca · Español",
     selectorDetail:
       "Esto también pasará, bueno o malo / Acéptalo así como es, no como te gustaría que fuese",
-    compactDetail:
-      "Esto también pasará, bueno o malo · Acéptalo así como es, no como te gustaría que fuese",
+    compactDetail: "Impermanencia · Esto también pasará, sea bueno o malo",
     name: "Anicca",
     language: "Español",
     languageCode: "es",
     front: "Anicca · Esto también pasará, bueno o malo",
     back: "Acéptalo así como es, no como te gustaría que fuese",
+    frontCaption: "Anicca · Esto también pasará",
+    backCaption: "Acéptalo así como es",
     priceEur: ANICCA_PRICE_EUR,
     stock: 5,
     active: true,
@@ -191,8 +202,10 @@ export function getAniccaVariant(id: AniccaVariantId | null): AniccaVariant | un
   return ANICCA_VARIANTS.find((v) => v.id === id);
 }
 
-export function getDefaultAniccaVariant(): AniccaVariant {
-  return getAniccaVariant(ANICCA_DEFAULT_VARIANT_ID) ?? ANICCA_VARIANTS[0];
+export function getDefaultAniccaVariant(locale: "en" | "es" = "en"): AniccaVariant {
+  const preferredId: AniccaVariantId =
+    locale === "es" ? "anicca-es" : ANICCA_DEFAULT_VARIANT_ID;
+  return getAniccaVariant(preferredId) ?? ANICCA_VARIANTS[0];
 }
 
 export function isVariantPurchasable(variant: AniccaVariant): boolean {

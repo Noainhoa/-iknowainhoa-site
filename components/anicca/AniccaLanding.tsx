@@ -96,14 +96,19 @@ function CheckoutAction({
 export default function AniccaLanding({ locale = "en" }: { locale?: Locale }) {
   const copy: AniccaCopy = getAniccaCopy(locale);
   const noteId = useId();
-  const [selectedId, setSelectedId] = useState<AniccaVariantId>(getDefaultAniccaVariant().id);
+  const pageLocale = locale === "es" ? "es" : "en";
+  const [selectedId, setSelectedId] = useState<AniccaVariantId>(
+    () => getDefaultAniccaVariant(pageLocale).id
+  );
   const [checkoutNote, setCheckoutNote] = useState<string | null>(null);
   const [chooserOpen, setChooserOpen] = useState(false);
 
   const variant =
-    ANICCA_VARIANTS.find((item) => item.id === selectedId) ?? getDefaultAniccaVariant();
+    ANICCA_VARIANTS.find((item) => item.id === selectedId) ??
+    getDefaultAniccaVariant(pageLocale);
   const meaning = copy.meaningByVariant[variant.id];
-  const price = formatAniccaPrice(variant.priceEur, locale === "es" ? "es" : "en");
+  const price = formatAniccaPrice(variant.priceEur, pageLocale);
+  const commercialLine = `${price} · ${copy.hero.ctaMeta}`;
   const ctaLabel = copy.choice.ctaBuy(price);
   const describedBy = checkoutNote ? noteId : undefined;
 
@@ -143,7 +148,10 @@ export default function AniccaLanding({ locale = "en" }: { locale?: Locale }) {
                   sizes="(max-width: 880px) 70vw, 480px"
                 />
               </div>
-              <figcaption>{copy.choice.frontLabel}</figcaption>
+              <figcaption>
+                <span className="anicca-shot-side">{copy.choice.frontLabel}</span>
+                <span className="anicca-shot-text">{variant.frontCaption}</span>
+              </figcaption>
             </figure>
             <figure className="anicca-shot anicca-shot--back">
               <div className="anicca-frame">
@@ -153,7 +161,10 @@ export default function AniccaLanding({ locale = "en" }: { locale?: Locale }) {
                   sizes="(max-width: 880px) 40vw, 280px"
                 />
               </div>
-              <figcaption>{copy.choice.backLabel}</figcaption>
+              <figcaption>
+                <span className="anicca-shot-side">{copy.choice.backLabel}</span>
+                <span className="anicca-shot-text">{variant.backCaption}</span>
+              </figcaption>
             </figure>
           </div>
 
@@ -162,14 +173,13 @@ export default function AniccaLanding({ locale = "en" }: { locale?: Locale }) {
             <h1>{copy.hero.headline}</h1>
             <p className="anicca-lead">{copy.hero.support}</p>
 
-            <p className="anicca-price">{price}</p>
-            <p className="anicca-edition">{copy.hero.edition}</p>
-            <p className="anicca-meta anicca-meta--price">{copy.hero.ctaMeta}</p>
+            <p className="anicca-commercial">{commercialLine}</p>
 
             <div className="anicca-buy" id="choose">
               <div className="anicca-current">
                 <p className="anicca-current-label">{variant.selectorLabel}</p>
                 <p className="anicca-current-detail">{variant.compactDetail}</p>
+                <p className="anicca-edition">{copy.hero.edition}</p>
                 <button
                   type="button"
                   className="anicca-change"

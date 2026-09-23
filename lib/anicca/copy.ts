@@ -73,7 +73,8 @@ const en: AniccaCopy = {
   hero: {
     eyebrow: "Anicca · Reminder token",
     headline: "A reminder that this moment will pass.",
-    support: "A small, double-sided engraved token to keep close.",
+    support:
+      "A small token to keep close when life feels difficult — and when it feels beautiful. A physical reminder that everything changes.",
     edition: "Limited first edition",
     ctaMeta: "Standard delivery in Spain included",
     changeInscription: "Change inscription",
@@ -193,9 +194,10 @@ const es: AniccaCopy = {
       "Una pequeña ficha grabada por ambas caras para llevar contigo. Anicca · Impermanencia. 14 €, envío estándar en España incluido.",
   },
   hero: {
-    eyebrow: "Anicca · Recordatorio",
-    headline: "Un pequeño recordatorio de que este momento también pasará.",
-    support: "Una pequeña ficha grabada por ambas caras para llevar contigo.",
+    eyebrow: "Anicca · Token recordatorio",
+    headline: "Un recordatorio de que este momento también pasará.",
+    support:
+      "Un pequeño token para tener cerca cuando la vida se hace difícil — y también cuando es hermosa. Un recordatorio físico de que todo cambia.",
     edition: "Primera edición limitada",
     ctaMeta: "Envío estándar en España incluido",
     changeInscription: "Cambiar inscripción",
@@ -203,7 +205,7 @@ const es: AniccaCopy = {
   },
   choice: {
     headline: "Elige tus palabras",
-    ctaBuy: (price) => `Comprar esta ficha — ${price}`,
+    ctaBuy: (price) => `Quiero este token — ${price}`,
     soldOut: "Agotada",
     remaining: (n) => (n === 1 ? "1 restante" : `${n} restantes`),
     frontLabel: "Anverso",
