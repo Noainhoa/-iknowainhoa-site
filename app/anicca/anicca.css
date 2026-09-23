@@ -11,7 +11,7 @@
   background: var(--anicca-bg);
   color: var(--anicca-ink);
   font-family: var(--font-geist-sans);
-  padding-bottom: 48px;
+  padding-bottom: 32px;
 }
 
 body:has(.anicca) {
@@ -58,16 +58,16 @@ body:has(.anicca) .site-menu-btn {
 
 .anicca-hero {
   display: grid;
-  gap: 16px;
-  padding: 10px 0 36px;
+  gap: 14px;
+  padding: 8px 0 28px;
 }
 
 @media (min-width: 880px) {
   .anicca-hero {
     grid-template-columns: 1.05fr 0.95fr;
     align-items: start;
-    gap: 56px;
-    padding: 40px 0 72px;
+    gap: 48px;
+    padding: 32px 0 48px;
   }
 }
 
@@ -110,8 +110,7 @@ body:has(.anicca) .site-menu-btn {
   aspect-ratio: 1;
 }
 
-.anicca-frame img,
-.anicca-life-grid img {
+.anicca-frame img {
   display: block;
   width: 100%;
   height: 100%;
@@ -130,52 +129,39 @@ body:has(.anicca) .site-menu-btn {
 .anicca-lead {
   margin: 0;
   max-width: 34rem;
-  font-size: 1.02rem;
-  line-height: 1.55;
+  display: grid;
+  gap: 0.35em;
+  font-size: 0.98rem;
+  line-height: 1.45;
   color: var(--anicca-muted);
 }
 
+.anicca-lead p {
+  margin: 0;
+}
+
 .anicca-commercial {
-  margin: 14px 0 0;
+  margin: 12px 0 0;
   font-family: var(--font-serif);
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 500;
   letter-spacing: -0.015em;
   line-height: 1.35;
 }
 
-.anicca-price {
-  margin: 16px 0 0;
-  font-family: var(--font-serif);
-  font-size: 1.85rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-
-.anicca-price--compact {
+.anicca-contents {
   margin: 0;
-  font-size: 1.45rem;
-}
-
-.anicca-edition {
-  margin: 2px 0 0;
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--anicca-silver);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--anicca-muted);
 }
 
 .anicca-buy {
   display: grid;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 12px;
   max-width: 28rem;
   scroll-margin-top: 88px;
-}
-
-.anicca-buy--inline {
-  margin-top: 32px;
 }
 
 .anicca-choose-label {
@@ -281,17 +267,17 @@ body:has(.anicca) .site-menu-btn {
   line-height: 1.15;
 }
 
-.anicca-section {
-  padding: 56px 0;
+.anicca-life {
+  padding: 28px 0 32px;
   border-top: 1px solid var(--anicca-line);
 }
 
-.anicca-section h2 {
+.anicca-life h2 {
   margin: 0 0 14px;
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: clamp(1.4rem, 2.8vw, 1.9rem);
-  line-height: 1.25;
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  line-height: 1.3;
 }
 
 .anicca-eyebrow {
@@ -402,162 +388,122 @@ body:has(.anicca) .site-menu-btn {
   color: var(--anicca-muted);
 }
 
-.anicca-life-grid {
+.anicca-life-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(118px, 1fr);
   gap: 8px;
-  margin: 28px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.anicca-life-grid li {
   margin: 0;
+  padding: 0 0 4px;
+  list-style: none;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 
-.anicca-life-grid li:first-child {
-  grid-column: 1 / -1;
+.anicca-life-row li {
+  margin: 0;
+  min-width: 0;
 }
 
-.anicca-life-grid .anicca-frame {
-  aspect-ratio: 4 / 3;
+.anicca-life-row .anicca-frame {
+  aspect-ratio: 1;
 }
 
-.anicca-life-grid li:first-child .anicca-frame {
-  aspect-ratio: 16 / 10;
-}
-
-@media (min-width: 720px) {
-  .anicca-life-grid {
-    gap: 12px;
-  }
-
-  .anicca-life-grid li:first-child {
-    grid-column: auto;
-  }
-
-  .anicca-life-grid li:first-child .anicca-frame,
-  .anicca-life-grid .anicca-frame {
-    aspect-ratio: 4 / 3;
-  }
+.anicca-frame img,
+.anicca-life-row img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .anicca-gloss {
-  margin: 0 0 14px;
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
-  font-weight: 500;
-}
-
-.anicca-also {
-  margin-top: 36px;
-  max-width: 38rem;
-}
-
-.anicca-also-label {
   margin: 0 0 8px;
-  font-size: 0.82rem;
-  letter-spacing: 0.04em;
-  color: var(--anicca-muted);
-}
-
-.anicca-list {
-  margin: 8px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 10px;
-  max-width: 36rem;
-}
-
-.anicca-list li {
-  padding-left: 1rem;
-  position: relative;
-  color: var(--anicca-muted);
-  line-height: 1.55;
-}
-
-.anicca-list li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.65em;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--anicca-silver);
-}
-
-.anicca-material {
-  margin: 22px 0 0;
-  font-size: 0.88rem;
-  color: var(--anicca-muted);
-  letter-spacing: 0.01em;
-}
-
-.anicca-pull {
-  margin: 28px 0 0;
-  padding: 0;
-  max-width: 34rem;
-  border: 0;
-}
-
-.anicca-pull p {
-  margin: 0;
   font-family: var(--font-serif);
-  font-size: 1.25rem;
-  line-height: 1.45;
+  font-size: 1.05rem;
   font-weight: 500;
 }
 
-.anicca-final .anicca-buy {
-  margin-top: 24px;
+.anicca-secondary {
+  padding: 20px 0 8px;
+  border-top: 1px solid var(--anicca-line);
+  max-width: 40rem;
 }
 
-.anicca-faq details {
+.anicca-secondary > details,
+.anicca-secondary-link {
   border-bottom: 1px solid var(--anicca-line);
-  padding: 14px 0;
+  padding: 12px 0;
+  margin: 0;
+  font-size: 0.88rem;
 }
 
-.anicca-faq summary {
+.anicca-secondary > details > summary {
   cursor: pointer;
   font-weight: 600;
   list-style: none;
 }
 
-.anicca-faq summary::-webkit-details-marker {
+.anicca-secondary > details > summary::-webkit-details-marker {
   display: none;
 }
 
-.anicca-faq summary::after {
+.anicca-secondary > details > summary::after {
   content: "+";
   float: right;
   color: var(--anicca-muted);
   font-weight: 400;
 }
 
-.anicca-faq details[open] summary::after {
+.anicca-secondary > details[open] > summary::after {
   content: "–";
 }
 
-.anicca-faq p {
-  margin: 10px 0 0;
-  color: var(--anicca-muted);
-  line-height: 1.65;
-  max-width: 40rem;
-}
-
-.anicca-trust {
-  display: grid;
-  gap: 12px;
-  margin-top: 28px;
-  max-width: 40rem;
-  font-size: 0.88rem;
+.anicca-secondary-body {
+  margin-top: 10px;
   color: var(--anicca-muted);
   line-height: 1.6;
 }
 
-.anicca-trust a {
+.anicca-secondary-body p {
+  margin: 0;
+}
+
+.anicca-secondary-body p + p {
+  margin-top: 0.85em;
+}
+
+.anicca-secondary-faq {
+  display: grid;
+  gap: 0;
+}
+
+.anicca-secondary-faq > details {
+  border-top: 1px solid var(--anicca-line);
+  padding: 10px 0;
+}
+
+.anicca-secondary-faq > details:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.anicca-secondary-faq summary {
+  cursor: pointer;
+  font-weight: 500;
+  list-style: none;
+}
+
+.anicca-secondary-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.anicca-secondary-faq p {
+  margin: 8px 0 0;
+}
+
+.anicca-secondary-link a {
   text-decoration: underline;
 }
 
@@ -587,13 +533,13 @@ body:has(.anicca) .site-menu-btn {
   }
 
   .anicca-lead {
-    font-size: 0.9rem;
-    line-height: 1.45;
+    font-size: 0.88rem;
+    line-height: 1.4;
   }
 
   .anicca-commercial {
     margin-top: 10px;
-    font-size: 1.05rem;
+    font-size: 1.02rem;
   }
 
   .anicca-shot {
@@ -611,8 +557,8 @@ body:has(.anicca) .site-menu-btn {
   }
 
   .anicca-buy {
-    margin-top: 12px;
-    gap: 10px;
+    margin-top: 10px;
+    gap: 8px;
   }
 
   .anicca-btn {
@@ -624,8 +570,12 @@ body:has(.anicca) .site-menu-btn {
     padding: 9px 6px 9px 8px;
   }
 
-  .anicca-section {
-    padding: 44px 0;
+  .anicca-life {
+    padding: 22px 0 26px;
+  }
+
+  .anicca-life-row {
+    grid-auto-columns: minmax(104px, 38vw);
   }
 }
 
