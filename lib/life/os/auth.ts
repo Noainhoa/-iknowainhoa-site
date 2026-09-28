@@ -34,7 +34,7 @@ export async function getLifeAuthedContext(
     },
   });
 
-  const { data, error } = await supabase.auth.getUser(accessToken);
+  const { data, error } = await supabase.auth.getUser(accessToken).catch(() => ({ data: { user: null }, error: true }));
   if (error || !data.user) return null;
 
   return { supabase, user: data.user, accessToken };

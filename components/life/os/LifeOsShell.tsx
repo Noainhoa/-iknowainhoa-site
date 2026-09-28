@@ -45,7 +45,12 @@ function bodyLines(entry: OsEntry): Array<{ label: string; value: string }> {
     lines.push({ label, value: String(value) });
   };
 
-  if (entry.type === "constitution") {
+  if (body.source_inbox_id) {
+    push("Observation", body.observation);
+    push("Hypothesis", body.hypothesis);
+    push("Unknowns", body.unknowns);
+    push("Question", body.question_to_investigate);
+  } else if (entry.type === "constitution") {
     push("Principle", body.principle);
     push("Meaning", body.meaning);
   } else if (entry.type === "belief") {
@@ -120,6 +125,11 @@ function emptyAiDraft(): OsInboxAiOutput {
 }
 
 export default function LifeOsShell() {
+  const auth = useLifeAuth();
+  return <LifeOsSession key={auth.userId ?? "signed-out"} auth={auth} />;
+}
+
+function LifeOsSession({ auth }: { auth: ReturnType<typeof useLifeAuth> }) {
   const {
     configured,
     supabase,
@@ -129,7 +139,7 @@ export default function LifeOsShell() {
     authError,
     handleLogin,
     handleSignOut,
-  } = useLifeAuth();
+  } = auth;
 
   const [entries, setEntries] = useState<OsEntry[]>([]);
   const [inbox, setInbox] = useState<OsInboxItem[]>([]);
@@ -360,7 +370,7 @@ export default function LifeOsShell() {
           </label>
           <button
             type="submit"
-            disabled={busyId === "capture" || !rawText.trim()}
+            disabled={busyId !== null || !rawText.trim()}
             className="border border-gray-900 bg-gray-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
           >
             {busyId === "capture" ? "Saving…" : "Add to Inbox"}
@@ -389,7 +399,7 @@ export default function LifeOsShell() {
                     <button
                       type="button"
                       onClick={() => void handleProcess(item)}
-                      disabled={busyId === item.id}
+                      disabled={busyId !== null}
                       className="mt-3 border border-gray-300 px-3 py-2 text-sm text-gray-800 disabled:opacity-60"
                     >
                       {busyId === item.id ? "Processing…" : "Process"}
@@ -488,7 +498,7 @@ export default function LifeOsShell() {
                         <button
                           type="button"
                           onClick={() => void handleApprove(item)}
-                          disabled={busyId === `approve-${item.id}`}
+                          disabled={busyId !== null}
                           className="border border-gray-900 bg-gray-900 px-3 py-2 text-sm text-white disabled:opacity-60"
                         >
                           {busyId === `approve-${item.id}` ? "Approving…" : "Approve into OS"}
@@ -496,7 +506,7 @@ export default function LifeOsShell() {
                         <button
                           type="button"
                           onClick={() => void handleReject(item)}
-                          disabled={busyId === `reject-${item.id}`}
+                          disabled={busyId !== null}
                           className="border border-gray-300 px-3 py-2 text-sm text-gray-800 disabled:opacity-60"
                         >
                           Reject
@@ -505,7 +515,7 @@ export default function LifeOsShell() {
                           <button
                             type="button"
                             onClick={() => void handleProcess(item)}
-                            disabled={busyId === item.id}
+                            disabled={busyId !== null}
                             className="border border-gray-300 px-3 py-2 text-sm text-gray-800 disabled:opacity-60"
                           >
                             Re-process

@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test:parking": "npx tsx --tsconfig tsconfig.json --test lib/parking/parking.test.ts",
     "test:links": "npx tsx --tsconfig tsconfig.json --test lib/links.test.ts",
-    "test:life-os": "npx tsx --tsconfig tsconfig.json --test lib/life/os/retrieve.test.ts",
+    "test:life-os": "NODE_OPTIONS=--conditions=react-server npx tsx --tsconfig tsconfig.json --test lib/life/os/*.test.ts",
     "icons:parking": "node scripts/generate-parking-icons.cjs",
     "post:new": "node scripts/new-blog-post.mjs",
     "post:publish": "node scripts/publish-blog-post.mjs"
@@ -28,6 +28,7 @@
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",
     "remark-html": "^16.0.1",
+    "server-only": "0.0.1",
     "stripe": "^20.2.0",
     "tesseract.js": "^7.0.0"
   },

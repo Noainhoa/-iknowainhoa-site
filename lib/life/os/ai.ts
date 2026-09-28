@@ -1,5 +1,6 @@
+import "server-only";
 import type { NoaAnswer, OsEntry, OsInboxAiOutput } from "@/lib/life/os/types";
-import { isOsEntryType } from "@/lib/life/os/types";
+import { OS_ENTRY_TYPES, isOsEntryType } from "@/lib/life/os/types";
 
 export type { NoaAnswer };
 
@@ -15,7 +16,10 @@ export function isOsAiConfigured(): boolean {
   return Boolean(getOpenAiKey());
 }
 
-async function chatJson<T>(system: string, user: string): Promise<T> {
+const inboxFields = ["observation", "possible_type", "candidate_title", "hypothesis", "question_to_investigate", "confidence"];
+const answerFields = ["answer", "fact", "interpretation", "feeling_state", "relevant_principle", "suggested_next_step", "uncertainty"];
+
+async function chatJson(system: string, user: string, fields: string[]): Promise<Record<string, unknown>> {
   const apiKey = getOpenAiKey();
   if (!apiKey) {
     throw new Error("OPENAI_API_KEY is not configured.");
@@ -23,6 +27,7 @@ async function chatJson<T>(system: string, user: string): Promise<T> {
 
   const response = await fetch(OPENAI_URL, {
     method: "POST",
+    signal: AbortSignal.timeout(25_000),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
@@ -30,7 +35,25 @@ async function chatJson<T>(system: string, user: string): Promise<T> {
     body: JSON.stringify({
       model: process.env.OPENAI_MODEL?.trim() || DEFAULT_MODEL,
       temperature: 0.2,
-      response_format: { type: "json_object" },
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "os_response",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              ...Object.fromEntries(fields.map((field) => [field, {
+                type: "string",
+                ...(field === "possible_type" ? { enum: OS_ENTRY_TYPES } : {}),
+              }])),
+              unknowns: { type: "array", items: { type: "string" } },
+            },
+            required: [...fields, "unknowns"],
+            additionalProperties: false,
+          },
+        },
+      },
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -39,10 +62,8 @@ async function chatJson<T>(system: string, user: string): Promise<T> {
   });
 
   if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(
-      `OpenAI request failed (${response.status})${detail ? `: ${detail.slice(0, 200)}` : ""}`
-    );
+    // Provider errors can echo credentials or private input. Never propagate their body.
+    throw new Error(`OpenAI request failed (${response.status}).`);
   }
 
   const payload = (await response.json()) as {
@@ -51,25 +72,36 @@ async function chatJson<T>(system: string, user: string): Promise<T> {
   const content = payload.choices?.[0]?.message?.content;
   if (!content) throw new Error("OpenAI returned an empty response.");
 
-  return JSON.parse(content) as T;
+  const raw: unknown = JSON.parse(content);
+  validateOutput(raw, fields);
+  return raw;
 }
 
-function asStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  return value.map((item) => String(item)).filter(Boolean);
+function validateOutput(raw: unknown, fields: string[]): asserts raw is Record<string, unknown> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new Error("Invalid AI output.");
+  }
+  const value = raw as Record<string, unknown>;
+  if (fields.some((field) => typeof value[field] !== "string") ||
+      !Array.isArray(value.unknowns) || value.unknowns.some((item) => typeof item !== "string")) {
+    throw new Error("Invalid AI output.");
+  }
 }
 
-export function normalizeInboxAiOutput(raw: Record<string, unknown>): OsInboxAiOutput {
-  const possibleType = String(raw.possible_type || "pattern").toLowerCase();
+export function normalizeInboxAiOutput(raw: unknown): OsInboxAiOutput {
+  validateOutput(raw, inboxFields);
+  const possibleType = String(raw.possible_type);
+  if (!isOsEntryType(possibleType) || !String(raw.observation).trim() || !String(raw.candidate_title).trim()) {
+    throw new Error("Invalid AI candidate.");
+  }
   return {
-    observation: String(raw.observation || "").trim(),
-    possible_type: isOsEntryType(possibleType) ? possibleType : "pattern",
-    candidate_title: String(raw.candidate_title || "").trim(),
-    hypothesis: String(raw.hypothesis || "").trim(),
-    unknowns: asStringArray(raw.unknowns),
-    question_to_investigate: String(raw.question_to_investigate || "").trim(),
-    confidence: String(raw.confidence || "medium").trim() || "medium",
-    summary: raw.summary ? String(raw.summary).trim() : undefined,
+    observation: String(raw.observation).trim(),
+    possible_type: possibleType,
+    candidate_title: String(raw.candidate_title).trim(),
+    hypothesis: String(raw.hypothesis).trim(),
+    unknowns: raw.unknowns as string[],
+    question_to_investigate: String(raw.question_to_investigate).trim(),
+    confidence: String(raw.confidence).trim(),
   };
 }
 
@@ -80,18 +112,15 @@ export async function processInboxRawText(rawText: string): Promise<OsInboxAiOut
     "This output is an AI interpretation, not approved truth.",
     "Do not diagnose. Do not invent certainty. Prefer modest hypotheses.",
     "possible_type must be one of: constitution, belief, pattern, goal, training, selection, regulation, precedent.",
-    "Fields: observation, possible_type, candidate_title, hypothesis, unknowns (string[]), question_to_investigate, confidence, summary.",
+    "Fields: observation, possible_type, candidate_title, hypothesis, unknowns (string[]), question_to_investigate, confidence.",
   ].join(" ");
 
-  const raw = await chatJson<Record<string, unknown>>(
+  const raw = await chatJson(
     system,
-    `Raw observation:\n${rawText}`
+    `Raw observation:\n${rawText}`,
+    inboxFields
   );
-  const normalized = normalizeInboxAiOutput(raw);
-  if (!normalized.observation || !normalized.candidate_title) {
-    throw new Error("AI output missing required fields.");
-  }
-  return normalized;
+  return normalizeInboxAiOutput(raw);
 }
 
 export async function askNoa(params: {
@@ -139,7 +168,8 @@ export async function askNoa(params: {
     2
   );
 
-  const raw = await chatJson<Record<string, unknown>>(system, user);
+  const raw = await chatJson(system, user, answerFields);
+  if (!String(raw.answer).trim()) throw new Error("AI returned an empty answer.");
   return {
     answer: String(raw.answer || "").trim(),
     fact: String(raw.fact || "").trim(),
@@ -147,7 +177,7 @@ export async function askNoa(params: {
     feeling_state: String(raw.feeling_state || "").trim(),
     relevant_principle: String(raw.relevant_principle || "").trim(),
     suggested_next_step: String(raw.suggested_next_step || "").trim(),
-    unknowns: asStringArray(raw.unknowns),
+    unknowns: raw.unknowns as string[],
     uncertainty: String(raw.uncertainty || "").trim(),
   };
 }

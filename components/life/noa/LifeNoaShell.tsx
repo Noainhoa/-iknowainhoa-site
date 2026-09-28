@@ -17,6 +17,11 @@ type UsedEntry = {
 };
 
 export default function LifeNoaShell() {
+  const auth = useLifeAuth();
+  return <LifeNoaSession key={auth.userId ?? "signed-out"} auth={auth} />;
+}
+
+function LifeNoaSession({ auth }: { auth: ReturnType<typeof useLifeAuth> }) {
   const {
     configured,
     supabase,
@@ -25,7 +30,7 @@ export default function LifeNoaShell() {
     authError,
     handleLogin,
     handleSignOut,
-  } = useLifeAuth();
+  } = auth;
 
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);

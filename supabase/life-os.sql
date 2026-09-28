@@ -1,5 +1,5 @@
 -- Ainhoa OS / NOA MVP tables for the ainhoa-life Supabase project.
--- Run in SQL Editor (or apply via migration). Independent from Life timeline tables.
+-- Run in SQL Editor, then run life-os-review-fixes.sql. Independent from timeline tables.
 
 -- ---------------------------------------------------------------------------
 -- Tables
@@ -240,8 +240,7 @@ BEGIN
       'active', 'approved',
       'Confusion in another person does not create an obligation for disclosure in me.',
       jsonb_build_object(
-        'principle', 'Confusion in another person does not create an obligation for disclosure in me.',
-        'meaning', 'Another person''s confusion is information about them, not an automatic duty for me to explain.'
+        'principle', 'Confusion in another person does not create an obligation for disclosure in me.'
       ),
       now()
     ),
@@ -250,8 +249,7 @@ BEGIN
       'active', 'approved',
       'Select based on observed behaviour, not explained potential.',
       jsonb_build_object(
-        'principle', 'Select based on observed behaviour, not explained potential.',
-        'meaning', 'What someone repeatedly does is more informative than what they say they could become.'
+        'principle', 'Select based on observed behaviour, not explained potential.'
       ),
       now()
     ),
@@ -260,8 +258,7 @@ BEGIN
       'active', 'approved',
       'I do not have to be an expert to accurately name what I am doing.',
       jsonb_build_object(
-        'principle', 'I do not have to be an expert to accurately name what I am doing.',
-        'meaning', 'Naming my own pattern does not require professional certainty.'
+        'principle', 'I do not have to be an expert to accurately name what I am doing.'
       ),
       now()
     ),
@@ -270,8 +267,7 @@ BEGIN
       'active', 'approved',
       'Other people''s urgency does not automatically become mine.',
       jsonb_build_object(
-        'principle', 'Other people''s urgency does not automatically become mine.',
-        'meaning', 'I can notice urgency without adopting it as my operating tempo.'
+        'principle', 'Other people''s urgency does not automatically become mine.'
       ),
       now()
     );
@@ -283,16 +279,9 @@ BEGIN
     'Confusion in another person does not create an obligation for disclosure in me.',
     jsonb_build_object(
       'old_rule', 'If my choice is not understandable to someone, I need to explain enough that they can see why it is reasonable.',
-      'what_it_protected', 'Belonging, reduced conflict, and the sense of being seen as reasonable.',
-      'what_i_keep', 'Clarity when freely chosen and useful.',
-      'current_cost', 'Over-explaining and losing contact with my own simple wanting.',
       'chosen_belief', 'Confusion in another person does not create an obligation for disclosure in me.',
       'behavioural_evidence', 'I answer the question that was actually asked, once, without automatically explaining the explanation.',
-      'bedtime_rehearsal', 'Imagine someone questioning an unconventional choice. Give one short truthful answer. Notice the urge to add justification. Let the silence remain.',
-      'integration_criteria', jsonb_build_array(
-        'I can leave one short answer without adding justification.',
-        'I notice the urge to explain without obeying it by default.'
-      )
+      'bedtime_rehearsal', 'Imagine someone questioning an unconventional choice. Give one short truthful answer. Notice the urge to add justification. Let the silence remain.'
     ),
     now()
   )

@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json().catch(() => null)) as { inboxId?: string } | null;
-  const inboxId = body?.inboxId?.trim();
+  const inboxId = typeof body?.inboxId === "string" ? body.inboxId.trim() : "";
   if (!inboxId) {
     return NextResponse.json({ error: "inboxId is required." }, { status: 400 });
   }
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ error: "Could not load inbox item." }, { status: 400 });
   }
   if (!data) {
     return NextResponse.json({ error: "Inbox item not found." }, { status: 404 });
@@ -50,8 +50,8 @@ export async function POST(request: Request) {
     const aiOutput = await processInboxRawText(inbox.rawText);
     const updated = await updateOsInboxAiOutput(auth.supabase, inbox.id, aiOutput);
     return NextResponse.json({ item: updated });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Processing failed.";
+  } catch {
+    const message = "Processing failed. Please try again.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

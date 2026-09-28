@@ -122,8 +122,8 @@ test("openInboxItems hides decided items", () => {
   );
 });
 
-test("normalizeInboxAiOutput coerces invalid possible_type to pattern", () => {
-  const normalized = normalizeInboxAiOutput({
+test("normalizeInboxAiOutput rejects invalid candidate types", () => {
+  assert.throws(() => normalizeInboxAiOutput({
     observation: "obs",
     possible_type: "habit",
     candidate_title: "Title",
@@ -131,15 +131,5 @@ test("normalizeInboxAiOutput coerces invalid possible_type to pattern", () => {
     unknowns: ["a"],
     question_to_investigate: "q",
     confidence: "low",
-  });
-  assert.equal(normalized.possible_type, "pattern");
-});
-
-test("NOA ranking input must already be approved-only (contract)", () => {
-  // fetchApprovedOsEntries filters review_state=approved server-side.
-  // This test locks the client-side contract: callers must not pass drafts into ranker for NOA.
-  const approvedOnly = [
-    entry({ id: "ok", type: "pattern", title: "Approved pattern", reviewState: "approved" }),
-  ];
-  assert.ok(approvedOnly.every((item) => item.reviewState === "approved"));
+  }), /Invalid AI candidate/);
 });

@@ -1,12 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
-  isOsEntryType,
   mapOsEntry,
   mapOsInbox,
   type DbOsEntry,
   type DbOsInbox,
   type OsEntry,
-  type OsEntryType,
   type OsInboxAiOutput,
   type OsInboxItem,
 } from "@/lib/life/os/types";
@@ -78,6 +76,7 @@ export async function updateOsInboxAiOutput(
       decision: "pending",
     })
     .eq("id", inboxId)
+    .or("decision.is.null,decision.eq.pending")
     .select("*")
     .single();
   if (error) fail("updateOsInboxAiOutput", error);
@@ -92,6 +91,7 @@ export async function rejectOsInboxItem(
     .from("os_inbox")
     .update({ decision: "rejected" })
     .eq("id", inboxId)
+    .or("decision.is.null,decision.eq.pending")
     .select("*")
     .single();
   if (error) fail("rejectOsInboxItem", error);
@@ -104,51 +104,13 @@ export async function approveOsInboxItem(
   inbox: OsInboxItem,
   edits: OsInboxAiOutput
 ): Promise<{ entry: OsEntry; inbox: OsInboxItem }> {
-  const possibleType = String(edits.possible_type || "pattern").toLowerCase();
-  const type: OsEntryType = isOsEntryType(possibleType) ? possibleType : "pattern";
-
-  const body: Record<string, unknown> = {
-    observation: edits.observation,
-    hypothesis: edits.hypothesis,
-    unknowns: edits.unknowns,
-    question_to_investigate: edits.question_to_investigate,
-    confidence: edits.confidence,
-    source_inbox_id: inbox.id,
-    source_raw_text: inbox.rawText,
-  };
-
-  const { data: entryRow, error: entryError } = await supabase
-    .from("os_entries")
-    .insert({
-      user_id: userId,
-      type,
-      title: edits.candidate_title.trim() || "Untitled",
-      status: "active",
-      review_state: "approved",
-      summary: edits.summary?.trim() || edits.observation.slice(0, 240),
-      body,
-      identified_at: new Date().toISOString(),
-    })
-    .select("*")
-    .single();
-  if (entryError) fail("approveOsInboxItem:entry", entryError);
-
-  const entry = mapOsEntry(entryRow as DbOsEntry);
-
-  const { data: inboxRow, error: inboxError } = await supabase
-    .from("os_inbox")
-    .update({
-      decision: "approved",
-      processed: true,
-      ai_output: edits,
-      entry_id: entry.id,
-    })
-    .eq("id", inbox.id)
-    .select("*")
-    .single();
-  if (inboxError) fail("approveOsInboxItem:inbox", inboxError);
-
-  return { entry, inbox: mapOsInbox(inboxRow as DbOsInbox) };
+  if (inbox.userId !== userId) throw new Error("Inbox owner mismatch.");
+  const { data, error } = await supabase.rpc("approve_os_inbox", {
+    p_inbox_id: inbox.id,
+    p_edits: edits,
+  });
+  if (error) fail("approveOsInboxItem", error);
+  return { entry: mapOsEntry(data.entry as DbOsEntry), inbox: mapOsInbox(data.inbox as DbOsInbox) };
 }
 
 export function getActiveTraining(entries: OsEntry[]): OsEntry | null {
