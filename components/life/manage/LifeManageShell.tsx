@@ -196,9 +196,15 @@ export default function LifeManageShell() {
       <header className="flex flex-col gap-2">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="mb-1">
+            <p className="mb-1 flex flex-wrap gap-3">
               <Link href="/life" className="text-sm text-gray-600 hover:text-gray-900">
-                ← Back to timeline
+                ← Timeline
+              </Link>
+              <Link href="/life/os" className="text-sm text-gray-600 hover:text-gray-900">
+                OS
+              </Link>
+              <Link href="/life/noa" className="text-sm text-gray-600 hover:text-gray-900">
+                NOA
               </Link>
             </p>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">Life · Manage</h1>

@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test:parking": "npx tsx --tsconfig tsconfig.json --test lib/parking/parking.test.ts",
     "test:links": "npx tsx --tsconfig tsconfig.json --test lib/links.test.ts",
+    "test:life-os": "npx tsx --tsconfig tsconfig.json --test lib/life/os/retrieve.test.ts",
     "icons:parking": "node scripts/generate-parking-icons.cjs",
     "post:new": "node scripts/new-blog-post.mjs",
     "post:publish": "node scripts/publish-blog-post.mjs"

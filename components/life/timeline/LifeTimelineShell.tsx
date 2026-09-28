@@ -35,12 +35,17 @@ export default function LifeTimelineShell() {
     <div className="flex flex-col gap-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Life</h1>
-        <Link
-          href="/life/manage"
-          className="text-sm text-gray-600 hover:text-gray-900"
-        >
-          Manage
-        </Link>
+        <nav className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+          <Link href="/life/os" className="hover:text-gray-900">
+            OS
+          </Link>
+          <Link href="/life/noa" className="hover:text-gray-900">
+            NOA
+          </Link>
+          <Link href="/life/manage" className="hover:text-gray-900">
+            Manage
+          </Link>
+        </nav>
       </header>
 
       {loadError ? (

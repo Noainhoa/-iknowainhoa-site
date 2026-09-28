@@ -9,6 +9,8 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
         "/_next",
         "/api",
+        "/life",
+        "/life/",
         "/parking-guardamar-centro/admin",
         "/parking-guardamar-centro/admin/",
         "/parking/admin",
