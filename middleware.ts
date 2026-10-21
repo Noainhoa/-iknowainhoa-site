@@ -7,6 +7,11 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const pathname = url.pathname.toLowerCase();
 
+  // Personal Almanac PWA is proxied via next.config rewrites — do not rewrite cookies/locale.
+  if (pathname === "/almanac" || pathname.startsWith("/almanac/")) {
+    return NextResponse.next();
+  }
+
   // Persist language from ?lang= without stripping it, so URL and UI stay aligned.
   const langParam = url.searchParams.get("lang");
   const applyLocaleCookie = (response: NextResponse) => {

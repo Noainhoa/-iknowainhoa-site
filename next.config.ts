@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+/** Separate Vite PWA project; proxied under /almanac/ without owning that app’s deploy. */
+const ALMANAC_ORIGIN =
+  process.env.ALMANAC_ORIGIN ?? "https://iknowainhoa-almanac.vercel.app";
+
 const nextConfig: NextConfig = {
   // Allow LAN access during local development (phone / other devices).
   allowedDevOrigins: ["192.168.1.51", "127.0.0.1", "localhost"],
@@ -11,6 +15,18 @@ const nextConfig: NextConfig = {
         pathname: "/get/**",
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/almanac",
+        destination: `${ALMANAC_ORIGIN}/almanac`,
+      },
+      {
+        source: "/almanac/:path*",
+        destination: `${ALMANAC_ORIGIN}/almanac/:path*`,
+      },
+    ];
   },
   async redirects() {
     return [
