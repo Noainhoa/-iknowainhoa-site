@@ -1,18 +1,18 @@
 ---
 title: "PhotoArc Support"
 description: "Help, FAQ, and contact for the PhotoArc iOS app."
-date: "2026-07-21"
+date: "2026-10-24"
 ---
 
 # PhotoArc Support
 
-PhotoArc is a native iOS utility that turns the photos you deliberately select into a silent progression video you can preview, share, or save. Selected media is processed on-device. PhotoArc uses Apple’s PhotosPicker and only receives the photos you choose—it does not scan or import your entire photo library.
+PhotoArc is a native iOS utility that turns the photos (and optional short clips) you deliberately select into a silent progression video you can preview, share, or save. Selected media is processed on-device. Default selection uses **Choose** (Apple’s PhotosPicker). **Collections** is an optional way to add an entire album. **Composition Lab** holds Before / After and saved projects. PhotoArc does not automatically scan or import your whole library.
 
 **Compatibility:** iPhone, iOS 17 and later.
 
 **Current version:** 1.0
 
-**Last updated:** July 2026
+**Last updated:** October 2026
 
 ## Contact
 
@@ -22,27 +22,27 @@ Email: [hola@iknowainhoa.com](mailto:hola@iknowainhoa.com)
 
 ### Do my photos leave the device?
 
-No. PhotoArc processes selected photos on your device to create the video. The developer does not receive your photos or videos.
+No. PhotoArc processes selected photos and clips on your device to create the video. The developer does not receive your photos or videos.
 
 ### Why is Photos permission requested?
 
-PhotoArc uses Apple’s system photo picker (PhotosPicker) to choose images. That does not require full photo-library access.
+It depends on what you tap:
 
-PhotoArc only receives the photos explicitly selected through Apple’s PhotosPicker. It does not require unrestricted access to the full photo library.
-
-Photos permission is requested only when you tap **Save to Photos**, and only with add-only access so PhotoArc can save the video you created—not browse your library.
+- **Choose** uses Apple’s system photo picker. That does not require broad library access.
+- **Collections** optionally requests Photos library access so PhotoArc can list albums and add every item from the album you choose. Media stays on this iPhone.
+- **Save to Photos** requests **add-only** access so PhotoArc can save the video (or issue-report screenshot) you created—not browse your library for that save.
 
 ### How do I save videos?
 
-After Create finishes, open the result screen, use the **⋯** menu, and choose **Save**. Grant add-only Photos access if prompted. You can also **Share** the video to Messages, Mail, Files, and other apps.
+After Create finishes, open the result screen and choose **Save**. Grant add-only Photos access if prompted. You can also **Share** the video to Messages, Mail, Files, and other apps.
 
 ### How do the three free progressions work?
 
-PhotoArc includes three free progressions so you can try the full create → preview → share or save flow. After those free progressions are used, unlock unlimited progressions with a one-time PhotoArc Pro purchase.
+PhotoArc includes three free personal Creates so you can try the full create → preview → share or save flow. One of those three may include a short video clip (up to five seconds). After the free Creates are used—or after a second clip Create—unlock unlimited Creates with a one-time **PhotoArc Pro Lifetime** purchase. **Demo** (bundled sample photos) does not spend those free Creates. Demo appears on empty Home for the first few visits, then stays available in Settings.
 
 ### How do I restore PhotoArc Pro?
 
-If you previously purchased PhotoArc Pro on the same Apple ID, open PhotoArc and use the restore-purchase option in the app. Purchases are tied to your Apple ID through the App Store. If restore does not work, email [hola@iknowainhoa.com](mailto:hola@iknowainhoa.com) with your Apple ID email (do not share passwords) and a short description of what you see.
+If you previously purchased PhotoArc Pro on the same Apple ID, open the paywall or Settings and use **Restore Purchases**. You can also use **Redeem Offer Code** when you have an Apple offer code. Purchases are tied to your Apple ID through the App Store. If restore does not work, email [hola@iknowainhoa.com](mailto:hola@iknowainhoa.com) with your Apple ID email (do not share passwords) and a short description of what you see.
 
 ### How do I report a problem?
 
@@ -65,7 +65,7 @@ Finish creating the progression first. Share and Save are available from the res
 
 ### Photos permission was denied
 
-PhotoArc only needs add-only Photos access to save a video. Open **Settings → PhotoArc → Photos** and allow adding photos, then try **Save** again. Selecting photos still uses PhotosPicker and does not require full library access.
+For **Save**, allow adding photos in **Settings → PhotoArc → Photos**, then try **Save** again. For **Collections**, allow Photos access in the same place, then try Collections again. Choosing individual photos with **Choose** does not require library access.
 
 ### Restore purchase did not unlock Pro
 
@@ -73,7 +73,7 @@ Confirm you are signed into the App Store with the Apple ID used for the origina
 
 ## Privacy
 
-PhotoArc only receives the photos explicitly selected through Apple’s PhotosPicker. It does not require unrestricted access to the full photo library.
+Default selection uses Choose. Collections is optional and stays on device. Save uses add-only access.
 
 Read the [PhotoArc Privacy Policy](/photoarc/privacy).
 

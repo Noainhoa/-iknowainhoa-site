@@ -75,17 +75,17 @@ export const productApps: ProductApp[] = [
     tagline:
       "Turn selected photos into a clean progression video and watch change unfold over time.",
     summary:
-      "PhotoArc is a native iOS utility that turns photos you deliberately choose into a silent progression video you can preview, share, or save. You pick the frames—PhotoArc does not scan or import your entire photo library.",
+      "PhotoArc is a native iOS utility that turns photos (and optional short clips) you deliberately choose into a silent progression video you can preview, share, or save. You pick the frames—PhotoArc does not automatically import your entire photo library.",
     platform: "iPhone, iOS 17 and later",
     version: "1.0",
-    lastUpdated: "July 2026",
+    lastUpdated: "October 2026",
     contactEmail: site.email,
     appStoreUrl: null,
     features: [
       {
         title: "Select what matters",
         description:
-          "Choose photos deliberately with Apple’s PhotosPicker. PhotoArc only receives the images you pick—not your full library.",
+          "Choose photos with Apple’s PhotosPicker, or optionally add an entire album with Collections. Composition Lab holds Before / After and projects.",
       },
       {
         title: "On-device processing",
@@ -100,7 +100,7 @@ export const productApps: ProductApp[] = [
       {
         title: "Three free progressions",
         description:
-          "Create up to three progression videos for free, then unlock PhotoArc Pro for unlimited use with a one-time purchase.",
+          "Create up to three progression videos for free (one may include a short clip), then unlock PhotoArc Pro Lifetime for unlimited use. Demo samples do not spend free Creates.",
       },
     ],
     howItWorks: [
@@ -109,8 +109,8 @@ export const productApps: ProductApp[] = [
       "Preview the result, then share it or save it to Photos.",
     ],
     pricing: {
-      free: "Three free progressions to try the full create → preview → share or save flow.",
-      pro: "One-time PhotoArc Pro purchase for unlimited progressions.",
+      free: "Three free progressions to try the full create → preview → share or save flow. One may include a short clip.",
+      pro: "One-time PhotoArc Pro Lifetime purchase (Spain €14.99 regular; StoreKit shows your local price) for unlimited progressions and clips.",
     },
     screenshots: [
       { alt: "PhotoArc screenshot placeholder: selecting photos", label: "Select photos" },

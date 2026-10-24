@@ -1,12 +1,12 @@
 ---
 title: "PhotoArc Privacy Policy"
 description: "How PhotoArc handles photos and data on your device."
-date: "2026-07-21"
+date: "2026-10-24"
 ---
 
 # PhotoArc Privacy Policy
 
-**Last updated:** 21 July 2026
+**Last updated:** 24 October 2026
 
 This policy describes how the PhotoArc iOS app (“PhotoArc”) handles information. It reflects the behaviour of the shipping app.
 
@@ -16,27 +16,35 @@ PhotoArc processes media **entirely on your device**. There is no PhotoArc accou
 
 ## What PhotoArc does
 
-You select photos with Apple’s system photo picker, create a silent progression video on device, preview it, and optionally share it or save it to Photos.
+You select photos (and optionally short library video clips) with Apple’s system photo picker (**Choose**), or add an entire album with **Collections**. Side tools such as Before / After and saved projects live in **Composition Lab**. PhotoArc creates a silent progression video on device, lets you preview it, and optionally share it or save it to Photos.
 
 ## Photos and videos
 
-- Selected photos are loaded on device to create the export.
+- Selected photos and short clips are loaded on device to create the export.
 - Temporary export files are stored in the app’s local Caches directory and cleaned automatically (including removal of stale exports older than about 24 hours, while keeping the active export).
+- Editable projects you choose to save stay in the app’s local storage on this iPhone.
 - The developer does not collect, upload, or store your photos or videos on a PhotoArc server.
 
 ## Photos permission
 
-PhotoArc requests Photos access only when you tap **Save to Photos**. The request is **add-only** (`PHAccessLevel.addOnly`): permission to save the video you created, not to read your full library for browsing.
+PhotoArc uses two separate Photos permissions, each only when you choose that action:
 
-Selecting photos uses the system PhotosPicker and does not require broad photo-library read access.
+1. **Choose (default)** — Apple’s system PhotosPicker. This does not require broad photo-library access. PhotoArc only receives the items you pick.
+2. **Collections** — If you use Collections to add an entire album, PhotoArc requests Photos library access so it can list albums and add those items. Photos stay on this iPhone. PhotoArc does not upload them.
+3. **Save to Photos** — When you save a progression video or an issue-report screenshot, PhotoArc requests **add-only** access (`PHAccessLevel.addOnly`): permission to save the file you created, not to browse your library for that save.
+
+You can change Photos access later in **Settings → PhotoArc → Photos**.
 
 ## Data PhotoArc stores on device
 
 PhotoArc may store on device:
 
-- App preferences (for example default speed/quality, selection-order preference, max file-size preference)
-- First-run welcome completion state
+- App preferences (for example default pace/quality, selection-order preference, max file-size preference)
+- Free-progression and free-clip Create counters (local only)
+- How many times Demo has been shown on empty Home (local only)
+- Saved projects you choose to keep
 - Temporary video exports in the app container (Caches), cleaned as described above
+- PhotoArc Pro unlock status cached from Apple’s StoreKit for offline relaunch
 
 These stay on your device. They are not sent to the developer.
 
@@ -48,12 +56,12 @@ These stay on your device. They are not sent to the developer.
 - No cloud sync of your media by PhotoArc
 - No developer-operated collection of personal content from the app
 
-System features you choose to use (for example Share Sheet destinations, opening Settings, opening App Store or mailto links) are handled by Apple or the destination you select. Those services have their own privacy practices.
+System features you choose to use (for example Share Sheet destinations, opening Settings, opening App Store or mailto links, redeeming an App Store offer code) are handled by Apple or the destination you select. Those services have their own privacy practices.
 
 ## Purchases and support
 
-- PhotoArc Pro purchases are processed by Apple through StoreKit. The developer does not receive or store payment-card details.
-- If the user voluntarily contacts support by email, the email address, message, and any information the user chooses to include are handled through the user’s mail provider and received only for the purpose of responding to that support request.
+- PhotoArc Pro purchases and offer-code redemptions are processed by Apple through StoreKit. The developer does not receive or store payment-card details.
+- If you voluntarily contact support by email, the email address, message, and any information you choose to include are handled through your mail provider and received only for the purpose of responding to that support request.
 - PhotoArc does not automatically transmit photos, videos, diagnostics, or device information to the developer.
 
 ## Contact
