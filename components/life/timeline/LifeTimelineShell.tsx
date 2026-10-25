@@ -36,6 +36,9 @@ export default function LifeTimelineShell() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Life</h1>
         <nav className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+          <Link href="/life/canvas" className="hover:text-gray-900">
+            Canvas
+          </Link>
           <Link href="/life/os" className="hover:text-gray-900">
             OS
           </Link>
