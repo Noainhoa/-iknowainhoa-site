@@ -28,10 +28,12 @@ export default function SiteChrome({
     pathname.startsWith("/parking-guardamar-centro/") ||
     pathname === "/parking" ||
     pathname.startsWith("/parking/");
+  const isTech =
+    pathname === "/tech-made-easy" || pathname.startsWith("/tech-made-easy/");
   const isBlog = pathname === "/blog" || pathname.startsWith("/blog/");
   const isAnicca = pathname === "/anicca" || pathname.startsWith("/anicca/");
   const showAccent = isBlog;
-  const showHeaderFooter = !isParking && !isBlog;
+  const showHeaderFooter = !isParking && !isTech && !isBlog;
 
   useEffect(() => {
     document.documentElement.classList.toggle("page-anicca", isAnicca);

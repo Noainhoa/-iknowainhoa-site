@@ -1,0 +1,177 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { describe, it } from "node:test";
+import { buildIcs } from "./ics";
+import { getTechCopy } from "./i18n";
+import { resolveTechLocale } from "./locale";
+import { ownerBookingEmail } from "./messages";
+import { normalizePhone } from "./phone";
+import { shouldStripTechLangParam } from "./seo";
+import { hashToken, isReference, newCancelToken, newReference } from "./tokens";
+import {
+  approvalBlocked,
+  canCancelFree,
+  intervalsOverlap,
+  madridLocalToUtc,
+  requestTimeAllowed,
+  seatAvailable,
+} from "./time";
+import { notificationOutcome, readSource, validateBooking } from "./validate";
+
+const sql = readFileSync(new URL("../../supabase/tech-sessions.sql", import.meta.url), "utf8");
+
+const validInput = {
+  contactName: "María",
+  attendeeName: "",
+  bookingForOther: false,
+  phone: "+34 636 67 01 03",
+  email: "",
+  question: "El móvil no abre el correo",
+  acceptAttendance: true,
+  acceptCancellation: true,
+  acceptPrivacy: true,
+  company: "",
+  source: "flyer",
+  locale: "es" as const,
+};
+
+describe("tech booking rules", () => {
+  it("keeps a group open until the fifth confirmed place", () => {
+    assert.equal(seatAvailable(4, 5), true);
+    assert.equal(seatAvailable(5, 5), false);
+    assert.equal(seatAvailable(0, 1), true);
+    assert.equal(seatAvailable(1, 1), false);
+  });
+
+  it("treats touching session times as free", () => {
+    const group = { startMs: 0, endMs: 75 * 60 * 1000 };
+    const next = { startMs: 75 * 60 * 1000, endMs: 150 * 60 * 1000 };
+    assert.equal(intervalsOverlap(group, next), false);
+    assert.equal(intervalsOverlap(group, { startMs: 60 * 60 * 1000, endMs: 120 * 60 * 1000 }), true);
+  });
+
+  it("blocks approval when a confirmed session already occupies the hour", () => {
+    const existing = [{ startMs: Date.parse("2026-07-07T08:00:00Z"), endMs: Date.parse("2026-07-07T09:15:00Z") }];
+    const clash = { startMs: Date.parse("2026-07-07T08:30:00Z"), endMs: Date.parse("2026-07-07T09:30:00Z") };
+    const later = { startMs: Date.parse("2026-07-07T09:15:00Z"), endMs: Date.parse("2026-07-07T10:15:00Z") };
+    assert.equal(approvalBlocked(existing, clash), true);
+    assert.equal(approvalBlocked(existing, later), false);
+  });
+
+  it("allows free cancellation until exactly 24 hours before, including across the spring clock change", () => {
+    const starts = madridLocalToUtc("2026-03-29", "10:00");
+    assert.equal(starts.toISOString(), "2026-03-29T08:00:00.000Z");
+    const exactly = new Date(starts.getTime() - 24 * 60 * 60 * 1000);
+    assert.equal(canCancelFree(starts, exactly), true);
+    assert.equal(canCancelFree(starts, new Date(exactly.getTime() + 1000)), false);
+    assert.equal(exactly.toISOString(), "2026-03-28T08:00:00.000Z");
+  });
+
+  it("converts Madrid winter and summer times to the right UTC instant", () => {
+    assert.equal(madridLocalToUtc("2026-01-15", "10:00").toISOString(), "2026-01-15T09:00:00.000Z");
+    assert.equal(madridLocalToUtc("2026-07-15", "10:00").toISOString(), "2026-07-15T08:00:00.000Z");
+    assert.equal(madridLocalToUtc("2026-10-25", "10:00").toISOString(), "2026-10-25T09:00:00.000Z");
+  });
+
+  it("rejects alternative times that are too soon or overnight", () => {
+    const now = madridLocalToUtc("2026-06-02", "09:00");
+    assert.equal(requestTimeAllowed(madridLocalToUtc("2026-06-02", "09:30"), now), false);
+    assert.equal(requestTimeAllowed(madridLocalToUtc("2026-06-02", "11:00"), now), true);
+    assert.equal(requestTimeAllowed(madridLocalToUtc("2026-06-03", "03:00"), now), false);
+  });
+
+  it("normalises phones and rejects secrets, missing consent, and unknown sources", () => {
+    assert.equal(normalizePhone("+44 7700 900123"), "447700900123");
+    const ok = validateBooking(validInput);
+    assert.equal(ok.ok, true);
+    if (ok.ok) assert.equal(ok.value.phoneKey, "34636670103");
+    const secret = validateBooking({ ...validInput, question: "password: 1234" });
+    assert.equal(secret.ok, false);
+    const consent = validateBooking({ ...validInput, acceptPrivacy: false });
+    assert.equal(consent.ok, false);
+    assert.equal(readSource("Instagram"), "instagram");
+    assert.equal(readSource("newsletter"), null);
+  });
+
+  it("keeps the booking when the email notification fails", () => {
+    const result = notificationOutcome(false);
+    assert.equal(result.bookingKept, true);
+    assert.equal(result.notification, "failed");
+  });
+
+  it("stores only a hash of the cancellation token and keeps it out of the owner email", () => {
+    const token = newCancelToken();
+    const hash = hashToken(token);
+    assert.equal(hash.length, 64);
+    assert.equal(hash.includes(token), false);
+    assert.equal(isReference(newReference()), true);
+    const mail = ownerBookingEmail({
+      reference: "AB23CD45",
+      kind: "group",
+      startsAt: madridLocalToUtc("2026-06-02", "10:00"),
+      contactName: "María",
+      attendeeName: "María",
+      phone: "636670103",
+      email: null,
+      question: null,
+      venue: "Biblioteca",
+    });
+    assert.match(mail.body, /AB23CD45/);
+    assert.equal(mail.body.includes(token), false);
+    assert.match(mail.subject, /Nueva reserva/);
+  });
+
+  it("builds a calendar file in UTC", () => {
+    const ics = buildIcs({
+      reference: "AB23CD45",
+      title: "Tech Made Easy",
+      startsAt: new Date("2026-06-02T08:00:00.000Z"),
+      endsAt: new Date("2026-06-02T09:15:00.000Z"),
+      location: "Biblioteca, Guardamar",
+      description: "Plaza AB23CD45",
+    });
+    assert.match(ics, /DTSTART:20260602T080000Z/);
+    assert.match(ics, /LOCATION:Biblioteca\\, Guardamar/);
+  });
+
+  it("uses Spanish and English only for this service", () => {
+    assert.equal(resolveTechLocale(undefined, undefined), "es");
+    assert.equal(resolveTechLocale(undefined, "en"), "en");
+    assert.equal(resolveTechLocale(undefined, "fr"), "es");
+    assert.equal(resolveTechLocale("en", "es"), "en");
+    assert.equal(getTechCopy("es").headlineEm, "sin miedo");
+    assert.equal(getTechCopy("en").headlineEm, "without fear");
+    assert.equal(shouldStripTechLangParam("/tech-made-easy", "es"), true);
+    assert.equal(shouldStripTechLangParam("/tech-made-easy", "en"), false);
+    assert.equal(shouldStripTechLangParam("/tech-made-easy", "fr"), true);
+    assert.equal(shouldStripTechLangParam("/tech-made-easy", "de"), true);
+    assert.equal(shouldStripTechLangParam("/tech-made-easy/admin", "es"), false);
+  });
+});
+
+describe("tech database migration", () => {
+  it("locks the session row, caps the group at five, and blocks overlapping confirmed time", () => {
+    assert.match(sql, /FOR UPDATE/);
+    assert.match(sql, /taken >= sess\.capacity/);
+    assert.match(sql, /tech_sessions_no_overlap/);
+    assert.match(sql, /capacity BETWEEN 1 AND 5/);
+    assert.match(sql, /kind = 'individual'[\s\S]*capacity = 1/);
+  });
+
+  it("keeps customer rows and booking functions away from the public", () => {
+    assert.match(sql, /ENABLE ROW LEVEL SECURITY/);
+    assert.match(sql, /REVOKE ALL ON tech_bookings FROM PUBLIC, anon/);
+    assert.match(sql, /cancel_token_hash/);
+    assert.equal(/cancel_token text/i.test(sql), false);
+    assert.match(sql, /GRANT EXECUTE ON FUNCTION public\.tech_place_booking\(JSONB\) TO service_role/);
+    assert.match(sql, /REVOKE ALL ON FUNCTION public\.tech_place_booking\(JSONB\) FROM PUBLIC, anon, authenticated/);
+    assert.match(sql, /is_tech_admin/);
+    assert.match(sql, /tech_bump_rate/);
+  });
+
+  it("does not reserve a pending request", () => {
+    const requestFn = sql.slice(sql.indexOf("FUNCTION public.tech_place_request"), sql.indexOf("FUNCTION public.tech_access_by_token"));
+    assert.equal(/INSERT INTO tech_sessions/.test(requestFn), false);
+    assert.match(requestFn, /INSERT INTO tech_requests/);
+  });
+});

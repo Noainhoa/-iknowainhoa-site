@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isLocale } from "@/lib/i18n/shared";
 import { shouldStripParkingLangParam } from "@/lib/parking/seo";
+import { shouldStripTechLangParam } from "@/lib/tech/seo";
 import { updateSession } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
@@ -20,8 +21,8 @@ export async function middleware(request: NextRequest) {
     return response;
   };
 
-  // Spanish parking URLs are bare (no ?lang=es). Invalid lang → bare Spanish.
-  if (shouldStripParkingLangParam(pathname, langParam)) {
+  // Spanish parking and tech-help URLs are bare (no ?lang=es).
+  if (shouldStripParkingLangParam(pathname, langParam) || shouldStripTechLangParam(pathname, langParam)) {
     const cleaned = request.nextUrl.clone();
     cleaned.searchParams.delete("lang");
     const redirect = NextResponse.redirect(cleaned, 302);
