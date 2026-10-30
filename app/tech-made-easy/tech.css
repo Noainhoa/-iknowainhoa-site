@@ -894,6 +894,12 @@
   margin: 0 0 16px;
 }
 
+.tme-card-focus {
+  outline: 3px solid var(--tme-sun);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--tme-sun) 28%, transparent);
+}
+
 .tme-card {
   background: var(--tme-card);
   border: 1.5px solid var(--tme-line);

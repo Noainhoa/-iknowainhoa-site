@@ -4,9 +4,9 @@ import { describe, it } from "node:test";
 import { buildIcs } from "./ics";
 import { getTechCopy } from "./i18n";
 import { resolveTechLocale } from "./locale";
-import { ownerBookingEmail } from "./messages";
+import { customerBookingEmail, ownerBookingEmail, ownerRequestEmail } from "./messages";
 import { normalizePhone } from "./phone";
-import { shouldStripTechLangParam } from "./seo";
+import { parseAdminFocus, shouldStripTechLangParam, techAdminFocusUrl, techBookingManageUrl } from "./seo";
 import { hashToken, isReference, newCancelToken, newReference } from "./tokens";
 import {
   approvalBlocked,
@@ -118,7 +118,64 @@ describe("tech booking rules", () => {
     });
     assert.match(mail.body, /AB23CD45/);
     assert.equal(mail.body.includes(token), false);
+    assert.equal(mail.body.includes("/reserva/"), false);
+    assert.match(mail.body, /https:\/\/iknowainhoa\.com\/tech-made-easy\/admin\?focus=booking&ref=AB23CD45/);
     assert.match(mail.subject, /Nueva reserva/);
+  });
+
+  it("adds an admin deep link to owner request emails without manage tokens", () => {
+    const token = newCancelToken();
+    const mail = ownerRequestEmail({
+      reference: "XY89KLMN",
+      startsAt: madridLocalToUtc("2026-06-03", "11:00"),
+      contactName: "Pepe",
+      attendeeName: "Pepe",
+      phone: "636670103",
+      email: "pepe@example.com",
+      question: null,
+    });
+    assert.match(mail.body, /focus=request&ref=XY89KLMN/);
+    assert.equal(mail.body.includes(token), false);
+    assert.equal(mail.body.includes("/reserva/"), false);
+  });
+
+  it("builds ES and EN customer confirmation emails with the private manage link", () => {
+    const token = newCancelToken();
+    const manageUrl = techBookingManageUrl(token);
+    const es = customerBookingEmail({
+      locale: "es",
+      reference: "AB23CD45",
+      kind: "group",
+      startsAt: madridLocalToUtc("2026-06-02", "10:00"),
+      durationMinutes: 75,
+      priceCents: 1000,
+      venue: "Biblioteca",
+      manageToken: token,
+    });
+    const en = customerBookingEmail({
+      locale: "en",
+      reference: "AB23CD45",
+      kind: "individual",
+      startsAt: madridLocalToUtc("2026-06-02", "10:00"),
+      durationMinutes: 60,
+      priceCents: 2500,
+      venue: "Biblioteca",
+      manageToken: token,
+    });
+    assert.match(es.subject, /AB23CD45/);
+    assert.match(es.body, /no lo compartas/i);
+    assert.match(es.body, /636 67 01 03/);
+    assert.equal(es.body.includes(manageUrl), true);
+    assert.match(en.body, /do not share/i);
+    assert.equal(en.body.includes(manageUrl), true);
+    assert.match(en.body, /Individual/);
+  });
+
+  it("parses admin focus query params and rejects invalid references", () => {
+    assert.deepEqual(parseAdminFocus("booking", "ab23cd45"), { focus: "booking", ref: "AB23CD45" });
+    assert.equal(parseAdminFocus("request", "bad"), null);
+    assert.equal(parseAdminFocus("session", "AB23CD45"), null);
+    assert.match(techAdminFocusUrl("booking", "AB23CD45"), /^https:\/\/iknowainhoa\.com\/tech-made-easy\/admin\?/);
   });
 
   it("builds a calendar file in UTC", () => {

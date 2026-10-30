@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react
 import { isTechSupabaseConfigured } from "@/lib/tech/env";
 import { createTechBrowserClient } from "@/lib/tech/supabase-browser";
 import { GROUP_CAPACITY } from "@/lib/tech/constants";
+import { parseAdminFocus } from "@/lib/tech/seo";
 import { approvalBlocked, formatMadrid, intervalsOverlap, madridLocalToUtc, wholeMadridDay, type Interval } from "@/lib/tech/time";
 
 type SessionRow = {
@@ -92,6 +93,7 @@ export default function TechAdminApp() {
   const [blockReason, setBlockReason] = useState("");
   const [venues, setVenues] = useState<Record<string, string>>({});
   const [loadedAt, setLoadedAt] = useState<number | null>(null);
+  const [focusKey, setFocusKey] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!supabase) return;
@@ -135,6 +137,43 @@ export default function TechAdminApp() {
       cancelled = true;
     };
   }, [supabase, load]);
+
+  useEffect(() => {
+    if (!isAdmin || loadedAt == null) return;
+    const params = new URLSearchParams(window.location.search);
+    const target = parseAdminFocus(params.get("focus"), params.get("ref"));
+    if (!target) return;
+
+    const key = `${target.focus}-${target.ref}`;
+    let nextKey: string | null = key;
+    let nextMessage: string | null = null;
+
+    if (target.focus === "booking") {
+      const booking = bookings.find((row) => row.public_reference === target.ref);
+      if (!booking) {
+        nextKey = null;
+        nextMessage = `No hay ninguna reserva con la referencia ${target.ref}.`;
+      }
+    } else {
+      const request = requests.find((row) => row.public_reference === target.ref);
+      if (!request) {
+        nextKey = null;
+        nextMessage = `No hay ninguna solicitud con la referencia ${target.ref}.`;
+      } else if (request.status !== "pending") {
+        nextKey = null;
+        nextMessage = `La solicitud ${target.ref} ya no está pendiente (estado: ${request.status}).`;
+      }
+    }
+
+    const timer = window.setTimeout(() => {
+      setFocusKey(nextKey);
+      if (nextMessage) setMessage(nextMessage);
+      if (nextKey) {
+        document.getElementById(nextKey)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [isAdmin, loadedAt, bookings, requests]);
 
   async function onLogin(event: FormEvent) {
     event.preventDefault();
@@ -395,8 +434,13 @@ export default function TechAdminApp() {
         {pending.length === 0 ? <p>No hay solicitudes pendientes.</p> : null}
         {pending.map((request) => {
           const clash = approvalBlocked(occupied, span(request.requested_start, 60));
+          const requestFocus = `request-${request.public_reference}`;
           return (
-            <article key={request.id} className="tme-card">
+            <article
+              key={request.id}
+              id={requestFocus}
+              className={focusKey === requestFocus ? "tme-card tme-card-focus" : "tme-card"}
+            >
               <strong>{request.public_reference}</strong>
               <p>{formatMadrid(new Date(request.requested_start), "es")}</p>
               <p>{request.contact_name} · asiste {request.attendee_name}</p>
@@ -472,8 +516,14 @@ export default function TechAdminApp() {
 
       <section>
         <h2>Reservas</h2>
-        {bookings.map((booking) => (
-          <article key={booking.id} className="tme-card">
+        {bookings.map((booking) => {
+          const bookingFocus = `booking-${booking.public_reference}`;
+          return (
+          <article
+            key={booking.id}
+            id={bookingFocus}
+            className={focusKey === bookingFocus ? "tme-card tme-card-focus" : "tme-card"}
+          >
             <strong>{booking.public_reference}</strong> · {booking.status}
             <p>{booking.contact_name} · asiste {booking.attendee_name}</p>
             <p>{booking.phone}{booking.email ? ` · ${booking.email}` : ""}</p>
@@ -493,7 +543,8 @@ export default function TechAdminApp() {
               Borrar datos de esta persona
             </button>
           </article>
-        ))}
+          );
+        })}
       </section>
     </div>
   );

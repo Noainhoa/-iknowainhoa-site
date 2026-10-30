@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { GROUP_MINUTES, GROUP_PRICE_CENTS, INDIVIDUAL_MINUTES, INDIVIDUAL_PRICE_CENTS } from "@/lib/tech/constants";
 import { deliverNotification } from "@/lib/tech/deliver";
 import { allowPublicWrite } from "@/lib/tech/guard";
-import { ownerBookingEmail } from "@/lib/tech/messages";
+import { sendCustomerMail } from "@/lib/tech/mail";
+import { customerBookingEmail, ownerBookingEmail } from "@/lib/tech/messages";
 import { getTechServiceClient } from "@/lib/tech/server";
 import { hashToken, isReference, newCancelToken, newReference } from "@/lib/tech/tokens";
 import { localeFromBody } from "@/lib/tech/locale";
@@ -140,17 +142,59 @@ export async function POST(request: Request) {
     bodyText
   );
 
+  const kind = (data.kind ?? sessionRow.kind) as "group" | "individual";
+  const durationMinutes =
+    typeof data.duration_minutes === "number"
+      ? data.duration_minutes
+      : kind === "group"
+        ? GROUP_MINUTES
+        : INDIVIDUAL_MINUTES;
+  const priceCents =
+    typeof data.price_cents === "number"
+      ? data.price_cents
+      : kind === "group"
+        ? GROUP_PRICE_CENTS
+        : INDIVIDUAL_PRICE_CENTS;
+  const startsAt = data.starts_at ?? sessionRow.starts_at;
+  const venueLabel = data.venue_label ?? sessionRow.venue_label;
+
+  /**
+   * Customer confirmation runs only on the first successful create (when the raw token
+   * exists in memory). Idempotent replays and owner-notification retries never re-send
+   * a manage link — the raw token is not stored.
+   */
+  let customerNotification: "sent" | "failed" | "skipped" = "skipped";
+  if (!replayed && validated.value.email) {
+    try {
+      const customerMail = customerBookingEmail({
+        locale: validated.value.locale,
+        reference: String(data.reference ?? reference),
+        kind,
+        startsAt: new Date(startsAt),
+        durationMinutes,
+        priceCents,
+        venue: venueLabel,
+        manageToken: token,
+      });
+      await sendCustomerMail(validated.value.email, customerMail.subject, customerMail.body);
+      customerNotification = "sent";
+    } catch {
+      customerNotification = "failed";
+    }
+  }
+
   return NextResponse.json({
     ok: true,
     replayed,
     reference: data.reference,
     token: replayed ? null : token,
     confirmationPath: replayed ? null : `/tech-made-easy/reserva/${token}`,
-    startsAt: data.starts_at ?? sessionRow.starts_at,
-    durationMinutes: data.duration_minutes ?? (sessionRow.kind === "group" ? 75 : 60),
-    priceCents: data.price_cents ?? (sessionRow.kind === "group" ? 1000 : 2500),
-    venueLabel: data.venue_label ?? sessionRow.venue_label,
-    kind: data.kind ?? sessionRow.kind,
+    startsAt,
+    durationMinutes,
+    priceCents,
+    venueLabel,
+    kind,
     notification,
+    customerNotification,
   });
 }
