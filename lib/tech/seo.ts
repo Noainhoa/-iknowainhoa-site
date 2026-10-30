@@ -1,9 +1,16 @@
 import { TECH_PATH } from "@/lib/tech/constants";
 import type { TechLocale } from "@/lib/tech/locale";
-import { isReference } from "@/lib/tech/tokens";
 
 export const TECH_ORIGIN = "https://iknowainhoa.com";
 export const TECH_ADMIN_PATH = `${TECH_PATH}/admin`;
+
+/**
+ * Keep this module free of node:crypto — middleware imports shouldStripTechLangParam
+ * and must remain Edge-compatible.
+ */
+function isAdminReference(value: string): boolean {
+  return /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(value);
+}
 
 export function techCanonicalUrl(locale: TechLocale): string {
   if (locale === "es") return `${TECH_ORIGIN}${TECH_PATH}`;
@@ -28,7 +35,7 @@ export function parseAdminFocus(
 ): { focus: "booking" | "request"; ref: string } | null {
   if ((focus !== "booking" && focus !== "request") || !ref) return null;
   const normalized = ref.trim().toUpperCase();
-  if (!isReference(normalized)) return null;
+  if (!isAdminReference(normalized)) return null;
   return { focus, ref: normalized };
 }
 
