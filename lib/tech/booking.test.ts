@@ -231,4 +231,21 @@ describe("tech database migration", () => {
     assert.equal(/INSERT INTO tech_sessions/.test(requestFn), false);
     assert.match(requestFn, /INSERT INTO tech_requests/);
   });
+
+  it("cancels a session and its confirmed bookings in one admin RPC", () => {
+    const cancelFn = sql.slice(sql.indexOf("FUNCTION public.tech_cancel_session"), sql.indexOf("ALTER TABLE tech_sessions ENABLE ROW LEVEL SECURITY"));
+    assert.match(cancelFn, /SECURITY DEFINER/);
+    assert.match(cancelFn, /SET search_path = public/);
+    assert.match(cancelFn, /is_tech_admin/);
+    assert.match(cancelFn, /FOR UPDATE/);
+    assert.match(cancelFn, /status = 'cancelled'/);
+    assert.match(cancelFn, /cancelled_at/);
+    assert.match(cancelFn, /cancelled_bookings/);
+    assert.match(cancelFn, /already_cancelled/);
+    assert.match(cancelFn, /tech_forbidden/);
+    assert.match(cancelFn, /REVOKE ALL ON FUNCTION public\.tech_cancel_session\(JSONB\) FROM PUBLIC, anon/);
+    assert.match(cancelFn, /GRANT EXECUTE ON FUNCTION public\.tech_cancel_session\(JSONB\) TO authenticated/);
+    assert.equal(/\bCOMMIT\b/i.test(cancelFn), false);
+    assert.equal(/autonomous/i.test(cancelFn), false);
+  });
 });
