@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TechBrandLink } from "@/components/tech/TechBrandLink";
 import TechContactLinks from "@/components/tech/TechContactLinks";
 import {
   IconCalendar,
   IconClock,
   IconPhone,
   IconWhatsAppBubble,
-  TechBrandMark,
   TechHeroCoast,
   TechPortrait,
   TechWave,
@@ -192,7 +192,7 @@ export default function TechPublicApp({
     const endsAt = new Date(startsAt.getTime() + item.durationMinutes * 60 * 1000);
     const ics = buildIcs({
       reference: item.reference,
-      title: "Tech Made Easy · Guardamar",
+      title: copy.brandName,
       startsAt,
       endsAt,
       location: item.where,
@@ -202,7 +202,7 @@ export default function TechPublicApp({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `tech-made-easy-${item.reference}.ics`;
+    link.download = `guardamar-click-${item.reference}.ics`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -292,13 +292,7 @@ export default function TechPublicApp({
 
   const header = (
     <header className="tme-top">
-      <a className="tme-brand" href="/tech-made-easy">
-        <TechBrandMark />
-        <span>
-          {copy.brandName}
-          <small>{copy.brandPlace}</small>
-        </span>
-      </a>
+      <TechBrandLink href="/tech-made-easy" name={copy.brandName} />
       <nav className="tme-nav" aria-label={locale === "en" ? "Primary" : "Principal"}>
         <a href="#ayuda">{copy.navHelp}</a>
         <a href="#ainhoa">{copy.navAbout}</a>

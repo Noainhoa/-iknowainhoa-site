@@ -15,7 +15,7 @@ import { publicPages } from "@/lib/site";
 
 const SLUG = "listeneasy" as const;
 const TESTFLIGHT_URL = "https://testflight.apple.com/join/5uYmScxX";
-const LOGO_SRC = "/images/projects/listeneasy/app-icon.jpg";
+const LOGO_SRC = "/images/projects/listeneasy/app-icon.png";
 
 export async function generateMetadata(): Promise<Metadata> {
   const app = getProductApp(SLUG);

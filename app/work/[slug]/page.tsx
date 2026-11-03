@@ -168,7 +168,7 @@ export default async function WorkCaseStudyPage({
                     className="more-media"
                     style={
                       w.logo && w.coverImage === w.logo
-                        ? { background: "#fff" }
+                        ? { background: "transparent" }
                         : undefined
                     }
                   >

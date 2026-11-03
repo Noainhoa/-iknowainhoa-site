@@ -290,7 +290,7 @@ export default function TechAdminApp() {
       setIsAdmin(allowed === true && !error);
       setReady(true);
       if (allowed === true) await load();
-      else if (error) setMessage("La migración de Tech Made Easy todavía no está aplicada en la base de datos.");
+      else if (error) setMessage("La migración de Guardamar Click todavía no está aplicada en la base de datos.");
     });
     return () => {
       cancelled = true;
@@ -683,7 +683,7 @@ export default function TechAdminApp() {
       <div className="tme-admin">
         <div className="tme-admin-shell">
           <p>
-            Tech Made Easy no está conectado: faltan variables <code>NEXT_PUBLIC_TECH_SUPABASE_*</code> o coinciden con el
+            Guardamar Click no está conectado: faltan variables <code>NEXT_PUBLIC_TECH_SUPABASE_*</code> o coinciden con el
             proyecto de parking. Configura un proyecto Supabase aislado.
           </p>
         </div>
@@ -704,8 +704,16 @@ export default function TechAdminApp() {
     return (
       <div className="tme-admin">
         <div className="tme-admin-shell tme-admin-login">
+          <img
+            className="tme-admin-logo"
+            src="/images/tech/guardamar-click-badge.png"
+            alt=""
+            width={72}
+            height={72}
+            decoding="async"
+          />
           <p className="tme-admin-kicker">Administración</p>
-          <h1>Tech Made Easy</h1>
+          <h1>Guardamar Click</h1>
           <p className="tme-admin-lead">Entra para gestionar sesiones, reservas y solicitudes.</p>
           <form className="tme-admin-form" onSubmit={onLogin}>
             <label htmlFor="admin-email">Email</label>
@@ -747,9 +755,19 @@ export default function TechAdminApp() {
     <div className="tme-admin">
       <header className="tme-admin-top">
         <div className="tme-admin-top-inner">
-          <div>
-            <p className="tme-admin-kicker">Administración</p>
-            <h1>Tech Made Easy</h1>
+          <div className="tme-admin-brand">
+            <img
+              className="tme-admin-logo"
+              src="/images/tech/guardamar-click-badge.png"
+              alt=""
+              width={56}
+              height={56}
+              decoding="async"
+            />
+            <div>
+              <p className="tme-admin-kicker">Administración</p>
+              <h1>Guardamar Click</h1>
+            </div>
           </div>
           <div className="tme-admin-top-actions">
             <button

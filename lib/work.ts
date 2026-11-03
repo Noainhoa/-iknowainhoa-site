@@ -122,8 +122,10 @@ function productAppWorkItems(locale: Locale = "en"): WorkItem[] {
   return productApps.map((app) => {
     const logo =
       app.slug === "listeneasy"
-        ? "/images/projects/listeneasy/brand-mark.png"
-        : undefined;
+        ? "/images/projects/listeneasy/app-icon.png"
+        : app.slug === "photoarc"
+          ? "/images/projects/photoarc/app-icon.png"
+          : undefined;
     const le = app.slug === "listeneasy" ? getListenEasyCopy(locale) : null;
     return {
       slug: app.slug,

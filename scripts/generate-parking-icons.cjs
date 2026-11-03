@@ -1,139 +1,114 @@
 /**
- * Generate parking Home Screen / PWA icons from the Guardamar logo.
+ * Home Screen icons for Guardamar Parking and Guardamar Click.
  *
- * Source: public/images/parking/guardamar-parking-logo.png
- * (circular badge; transparent corners currently render black on iOS)
+ * Sources are the transparent circular badges. iOS paints transparent
+ * corners black, so each square continues the badge rim out to the edges.
  *
- * Fills a square canvas with the logo's outer blue and centres the badge
- * with ~7.5% safe padding so iOS can apply its own rounded mask.
- *
- * Usage: node scripts/generate-parking-icons.mjs
+ * Usage: npm run icons:parking
  */
 const fs = require("fs");
 const path = require("path");
-const sharp = require("sharp");
 
 const ROOT = path.join(__dirname, "..");
-const SOURCE = path.join(
-  ROOT,
-  "public/images/parking/guardamar-parking-logo.png"
-);
-const OUT_DIR = path.join(ROOT, "public/parking-icons/v2");
-const MASTER_DIR = path.join(ROOT, "scripts/parking-icons");
-
-/** Sampled from the outer blue ring / Untitled corner average. */
-const BLUE = { r: 4, g: 92, b: 146 }; // #045C92
-/** Fraction of canvas edge kept as safe padding around the badge. */
-const PAD = 0.075;
+const sharp = require(path.join(ROOT, "node_modules/next/node_modules/sharp"));
 
 const SIZES = [
-  { name: "apple-touch-icon.png", size: 180 },
-  { name: "icon-192.png", size: 192 },
-  { name: "icon-512.png", size: 512 },
-  { name: "icon-1024.png", size: 1024 },
+  ["apple-touch-icon.png", 180],
+  ["icon-192.png", 192],
+  ["icon-512.png", 512],
+  ["icon-1024.png", 1024],
 ];
 
-async function sampleOuterBlue(sourcePath) {
+const JOBS = [
+  {
+    source: "public/images/parking/guardamar-parking-badge.png",
+    outDir: "public/parking-icons/v2",
+    copies: [
+      ["apple-touch-icon.png", "app/parking-guardamar-centro/apple-icon.png"],
+      ["icon-512.png", "app/parking-guardamar-centro/icon.png"],
+      ["apple-touch-icon.png", "app/parking-guardamar-centro/admin/apple-icon.png"],
+      ["icon-512.png", "app/parking-guardamar-centro/admin/icon.png"],
+    ],
+  },
+  {
+    source: "public/images/tech/guardamar-click-badge.png",
+    outDir: "public/tech-icons/v1",
+    copies: [
+      ["apple-touch-icon.png", "app/tech-made-easy/apple-icon.png"],
+      ["icon-512.png", "app/tech-made-easy/icon.png"],
+    ],
+  },
+];
+
+async function extendRim(sourcePath, size) {
   const { data, info } = await sharp(sourcePath)
+    .resize(size, size, { fit: "fill" })
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
   const w = info.width;
   const h = info.height;
   const ch = info.channels;
-  const cy = Math.floor(h / 2);
-  // Walk inward from the left edge to the first opaque blue-ish pixel on the ring.
-  for (let x = 0; x < Math.floor(w * 0.2); x++) {
-    const i = (cy * w + x) * ch;
-    const a = data[i + 3];
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
-    if (a > 200 && b > r + 40 && g > 40) {
-      return { r, g, b };
+  const cx = (w - 1) / 2;
+  const cy = (h - 1) / 2;
+  let radius = 0;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (data[(y * w + x) * ch + 3] > 200) {
+        radius = Math.max(radius, Math.hypot(x - cx, y - cy));
+      }
     }
   }
-  return BLUE;
-}
-
-async function makeIcon(sourcePath, size, blue) {
-  const badgeSize = Math.round(size * (1 - 2 * PAD));
-  const left = Math.round((size - badgeSize) / 2);
-  const top = Math.round((size - badgeSize) / 2);
-
-  const badge = await sharp(sourcePath)
-    .resize(badgeSize, badgeSize, {
-      fit: "contain",
-      background: { r: blue.r, g: blue.g, b: blue.b, alpha: 1 },
-    })
-    .ensureAlpha()
-    .toBuffer();
-
-  return sharp({
-    create: {
-      width: size,
-      height: size,
-      channels: 3,
-      background: blue,
-    },
-  })
-    .composite([{ input: badge, left, top }])
-    .flatten({ background: blue })
-    .removeAlpha()
-    .png({ compressionLevel: 9, adaptiveFiltering: true })
+  const out = Buffer.alloc(w * h * 3);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * ch;
+      const o = (y * w + x) * 3;
+      if (data[i + 3] > 240) {
+        out[o] = data[i];
+        out[o + 1] = data[i + 1];
+        out[o + 2] = data[i + 2];
+        continue;
+      }
+      const dx = x - cx;
+      const dy = y - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      let si = i;
+      for (let step = 0.9; step >= 0.72; step -= 0.03) {
+        const sx = Math.max(0, Math.min(w - 1, Math.round(cx + (dx / len) * radius * step)));
+        const sy = Math.max(0, Math.min(h - 1, Math.round(cy + (dy / len) * radius * step)));
+        si = (sy * w + sx) * ch;
+        if (data[si + 3] > 250) break;
+      }
+      out[o] = data[si];
+      out[o + 1] = data[si + 1];
+      out[o + 2] = data[si + 2];
+    }
+  }
+  return sharp(out, { raw: { width: w, height: h, channels: 3 } })
+    .png({ compressionLevel: 9 })
     .toBuffer();
 }
 
 async function main() {
-  if (!fs.existsSync(SOURCE)) {
-    throw new Error(`Missing source logo: ${SOURCE}`);
-  }
-
-  fs.mkdirSync(OUT_DIR, { recursive: true });
-  fs.mkdirSync(MASTER_DIR, { recursive: true });
-
-  const blue = await sampleOuterBlue(SOURCE);
-  console.log(
-    `Blue background: rgb(${blue.r}, ${blue.g}, ${blue.b}) / #${[blue.r, blue.g, blue.b]
-      .map((n) => n.toString(16).padStart(2, "0"))
-      .join("")}`
-  );
-  console.log(`Padding: ${(PAD * 100).toFixed(1)}%`);
-  console.log(`Source: ${SOURCE}`);
-
-  const master = await makeIcon(SOURCE, 1024, blue);
-  const masterPath = path.join(MASTER_DIR, "icon-master-1024.png");
-  fs.writeFileSync(masterPath, master);
-
-  for (const { name, size } of SIZES) {
-    const buf = await makeIcon(SOURCE, size, blue);
-    const out = path.join(OUT_DIR, name);
-    fs.writeFileSync(out, buf);
-    const meta = await sharp(buf).metadata();
-    const { data, info } = await sharp(buf)
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-    const corner = [data[0], data[1], data[2]];
-    const hasAlpha = meta.hasAlpha === true;
-    console.log(
-      `Wrote ${name} ${meta.width}x${meta.height} channels=${info.channels} alpha=${hasAlpha} corner=${corner.join(",")}`
-    );
-  }
-
-  // Keep App Router file conventions in sync (same art, cache-bust via /parking-icons/v2 in metadata).
-  const copies = [
-    ["apple-touch-icon.png", "app/parking-guardamar-centro/apple-icon.png"],
-    ["icon-512.png", "app/parking-guardamar-centro/icon.png"],
-    ["apple-touch-icon.png", "app/parking-guardamar-centro/admin/apple-icon.png"],
-    ["icon-512.png", "app/parking-guardamar-centro/admin/icon.png"],
-  ];
-  for (const [from, to] of copies) {
-    fs.copyFileSync(path.join(OUT_DIR, from), path.join(ROOT, to));
-    console.log(`Synced ${to}`);
+  for (const job of JOBS) {
+    const source = path.join(ROOT, job.source);
+    const outDir = path.join(ROOT, job.outDir);
+    if (!fs.existsSync(source)) throw new Error(`Missing source logo: ${source}`);
+    fs.mkdirSync(outDir, { recursive: true });
+    for (const [name, size] of SIZES) {
+      const buf = await extendRim(source, size);
+      fs.writeFileSync(path.join(outDir, name), buf);
+      console.log(`Wrote ${job.outDir}/${name}`);
+    }
+    for (const [from, to] of job.copies) {
+      fs.copyFileSync(path.join(outDir, from), path.join(ROOT, to));
+      console.log(`Synced ${to}`);
+    }
   }
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

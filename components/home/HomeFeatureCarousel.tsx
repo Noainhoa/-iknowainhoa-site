@@ -213,8 +213,8 @@ export default function HomeFeatureCarousel({
           place-items: center;
           width: 92px;
           height: 92px;
-          border-radius: 12px;
-          background: #fff;
+          border-radius: 22%;
+          background: transparent;
           overflow: hidden;
           text-decoration: none !important;
         }
@@ -225,7 +225,7 @@ export default function HomeFeatureCarousel({
         }
         .home-carousel-img.is-contain {
           object-fit: contain;
-          padding: 12px;
+          padding: 0;
         }
         .home-carousel-meta {
           display: flex;

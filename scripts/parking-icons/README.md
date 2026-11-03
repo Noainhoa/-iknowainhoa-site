@@ -1,13 +1,13 @@
-# Parking icons
+# Parking and Click icons
 
 ## Source
 
-- Primary logo in repo: `public/images/parking/guardamar-parking-logo.png`
-  (circular badge; corners were transparent, which iOS shows as black)
-- Visual reference with continuous blue corners: `scripts/parking-icons/source-untitled-original.jpg`
-  (owner-supplied Untitled export; used to confirm blue `#045C92`)
+- Parking: `public/images/parking/guardamar-parking-badge.png`
+- Click: `public/images/tech/guardamar-click-badge.png`
 
-Do not use alternate regenerated logos as the source.
+Both are circular badges with transparent corners. iOS shows transparent
+corners as black, so the generator continues each badge's rim colour out to
+the square edges.
 
 ## Regenerate
 
@@ -15,10 +15,10 @@ Do not use alternate regenerated logos as the source.
 npm run icons:parking
 ```
 
-Writes versioned assets to `public/parking-icons/v2/` and syncs App Router
-`icon.png` / `apple-icon.png` under the parking routes.
+Writes `public/parking-icons/v2/` and `public/tech-icons/v1/`, and syncs the
+App Router `icon.png` / `apple-icon.png` files on those routes.
 
 ## iOS testing
 
 Delete any existing Home Screen shortcut before re-adding the page, so Safari
-does not keep a cached black-corner icon.
+does not keep a cached icon.

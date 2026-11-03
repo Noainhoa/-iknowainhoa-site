@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { TechBrandLink } from "@/components/tech/TechBrandLink";
 import TechContactLinks from "@/components/tech/TechContactLinks";
-import { TechBrandMark } from "@/components/tech/TechIllustrations";
 import { buildIcs } from "@/lib/tech/ics";
 import { getTechCopy } from "@/lib/tech/i18n";
 import type { TechLocale } from "@/lib/tech/locale";
@@ -82,7 +82,7 @@ export default function TechConfirmation({
     const startsAt = new Date(view.startsAt);
     const ics = buildIcs({
       reference: view.reference,
-      title: "Tech Made Easy · Guardamar",
+      title: copy.brandName,
       startsAt,
       endsAt: new Date(startsAt.getTime() + view.durationMinutes * 60 * 1000),
       location: view.venueLabel || copy.pendingPlace,
@@ -92,7 +92,7 @@ export default function TechConfirmation({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `tech-made-easy-${view.reference}.ics`;
+    link.download = `guardamar-click-${view.reference}.ics`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -111,13 +111,10 @@ export default function TechConfirmation({
     <main className="tme" lang={locale}>
       <div className="tme-wrap">
         <header className="tme-top">
-          <a className="tme-brand" href={locale === "en" ? "/tech-made-easy?lang=en" : "/tech-made-easy"}>
-            <TechBrandMark />
-            <span>
-              {copy.brandName}
-              <small>{copy.brandPlace}</small>
-            </span>
-          </a>
+          <TechBrandLink
+            href={locale === "en" ? "/tech-made-easy?lang=en" : "/tech-made-easy"}
+            name={copy.brandName}
+          />
         </header>
         <section className="tme-section" style={{ paddingTop: 12 }}>
           <h1>{copy.cancelTitle}</h1>
