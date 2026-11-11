@@ -33,9 +33,9 @@ import { formatMadrid, madridLocalToUtc } from "@/lib/tech/time";
 import { newIdempotencyKey } from "@/lib/tech/idempotency";
 
 const HERO_FAQ_ART: Record<TechLocale, string> = {
-  es: "/images/tech/everyday-faqs-es.jpg",
-  en: "/images/tech/everyday-faqs-en.jpg",
-  nl: "/images/tech/everyday-faqs-nl.jpg",
+  es: "/images/tech/everyday-faqs-es.png",
+  en: "/images/tech/everyday-faqs-en.png",
+  nl: "/images/tech/everyday-faqs-nl.png",
 };
 
 type Kind = "group" | "individual" | "request";
