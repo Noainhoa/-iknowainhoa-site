@@ -85,6 +85,7 @@ describe("tech hour calendar", () => {
           seatsLeft: 1,
           priceCents: 2500,
           venueLabel: "X",
+          sessionLanguage: "es",
         },
         {
           id: "b",
@@ -95,6 +96,7 @@ describe("tech hour calendar", () => {
           seatsLeft: 3,
           priceCents: 1000,
           venueLabel: "X",
+          sessionLanguage: "es",
         },
       ],
       madridLocalToUtc("2026-11-01", "09:00")
@@ -112,6 +114,7 @@ describe("tech hour calendar", () => {
             seatsLeft: 0,
             priceCents: 1000,
             venueLabel: "X",
+            sessionLanguage: "es",
           },
         ],
         madridLocalToUtc("2026-11-01", "09:00")
