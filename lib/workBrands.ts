@@ -3,10 +3,12 @@ import type { WorkCategory, WorkItem } from "@/lib/work-shared";
 
 /** Live destinations shown as cards inside Work categories. */
 export type WorkBrand = {
-  id: "parking" | "begui" | "anicca" | "listeneasy";
+  id: "parking" | "begui" | "anicca" | "listeneasy" | "guardamar-click";
   name: string;
   href: string;
   logo: string;
+  /** 3D badge revealed on hover. Flat `logo` stays at rest. */
+  logoHover?: string;
   category: WorkCategory;
   /** Existing work slug to merge with instead of adding a second card. */
   omitWorkSlug?: string;
@@ -18,7 +20,7 @@ export const WORK_BRANDS: WorkBrand[] = [
     id: "listeneasy",
     name: "ListenEasy",
     href: "/listeneasy",
-    logo: "/images/projects/listeneasy/brand-mark.png",
+    logo: "/images/projects/listeneasy/app-icon.png",
     category: "apps",
     omitWorkSlug: "listeneasy",
     summary: {
@@ -45,11 +47,25 @@ export const WORK_BRANDS: WorkBrand[] = [
     name: "Guardamar Parking",
     href: "/parking-guardamar-centro",
     logo: "/images/parking/guardamar-parking-badge.png",
+    logoHover: "/images/parking/guardamar-parking-badge-3d.png",
     category: "systems",
     summary: {
       en: "Private parking bookings in central Guardamar.",
       es: "Reservas de parking privado en el centro de Guardamar.",
       fr: "Private parking bookings in central Guardamar.",
+    },
+  },
+  {
+    id: "guardamar-click",
+    name: "Guardamar Click",
+    href: "/guardamar-click",
+    logo: "/images/tech/guardamar-click-badge-v2.png",
+    logoHover: "/images/tech/guardamar-click-badge-3d.png",
+    category: "systems",
+    summary: {
+      en: "Technology help in Guardamar, in a small group or one to one.",
+      es: "Ayuda tecnológica en Guardamar, en grupo o individual.",
+      fr: "Technology help in Guardamar, in a small group or one to one.",
     },
   },
   {
@@ -88,6 +104,7 @@ function brandToWorkItem(brand: WorkBrand, locale: Locale): WorkItem {
     description: brand.summary[locale],
     coverImage: brand.logo,
     logo: brand.logo,
+    logoHover: brand.logoHover,
     category: brand.category,
     summary: brand.summary[locale],
     href: brand.href,
@@ -109,6 +126,9 @@ export function listedWorkItems(items: WorkItem[], locale: Locale): WorkItem[] {
         category: brand.category,
         summary: brand.summary[locale],
         href: brand.href,
+        logo: brand.logo,
+        coverImage: brand.logo,
+        logoHover: brand.logoHover,
       });
       continue;
     }

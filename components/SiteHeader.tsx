@@ -122,6 +122,7 @@ export default function SiteHeader({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   const isHome = pathname === "/";
   const navLinks = [
+    { href: "/guardamar-click", label: t.header.techHelp },
     { href: "/work", label: t.header.work },
     { href: "/blog", label: t.header.blog },
     { href: "/gallery/blue", label: t.header.gallery },

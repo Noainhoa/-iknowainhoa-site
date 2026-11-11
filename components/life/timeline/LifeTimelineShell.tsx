@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import LifeLoginForm from "@/components/life/LifeLoginForm";
+import LifeSetPasswordForm from "@/components/life/LifeSetPasswordForm";
 import LifeTimeline from "@/components/life/timeline/LifeTimeline";
 import { useLifeSession } from "@/components/life/useLifeSession";
 
@@ -11,6 +12,8 @@ export default function LifeTimelineShell() {
     sessionEmail,
     authBusy,
     authError,
+    recoveryMode,
+    finishRecovery,
     groups,
     loading,
     loadError,
@@ -25,6 +28,10 @@ export default function LifeTimelineShell() {
         <code className="text-xs">supabase/life.sql</code> in the ainhoa-life project.
       </p>
     );
+  }
+
+  if (recoveryMode) {
+    return <LifeSetPasswordForm onDone={finishRecovery} />;
   }
 
   if (!sessionEmail) {

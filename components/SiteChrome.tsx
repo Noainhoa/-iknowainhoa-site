@@ -13,7 +13,7 @@ import SiteCopyright from "@/components/SiteCopyright";
  * Orange/yellow accent strip is blog-only (including nested blog routes).
  * Home overlays the header on the portrait.
  * Parking is a standalone mini-app (no chrome at all).
- * Copyright appears on every page.
+ * Copyright appears on every page except the Tech Made Easy admin workspace.
  */
 export default function SiteChrome({
   locale,
@@ -28,10 +28,15 @@ export default function SiteChrome({
     pathname.startsWith("/parking-guardamar-centro/") ||
     pathname === "/parking" ||
     pathname.startsWith("/parking/");
+  const isTech =
+    pathname === "/guardamar-click" || pathname.startsWith("/guardamar-click/");
+  const isTechAdmin =
+    pathname === "/guardamar-click/admin" || pathname.startsWith("/guardamar-click/admin/");
   const isBlog = pathname === "/blog" || pathname.startsWith("/blog/");
   const isAnicca = pathname === "/anicca" || pathname.startsWith("/anicca/");
   const showAccent = isBlog;
-  const showHeaderFooter = !isParking && !isBlog;
+  const showHeaderFooter = !isParking && !isTech && !isBlog;
+  const showCopyright = !showHeaderFooter && !isTechAdmin;
 
   useEffect(() => {
     document.documentElement.classList.toggle("page-anicca", isAnicca);
@@ -45,7 +50,7 @@ export default function SiteChrome({
       {children}
       {showHeaderFooter ? (
         <SiteFooter locale={locale} />
-      ) : (
+      ) : showCopyright ? (
         <div
           style={{
             padding: "20px 16px 28px",
@@ -54,7 +59,7 @@ export default function SiteChrome({
         >
           <SiteCopyright />
         </div>
-      )}
+      ) : null}
     </>
   );
 }

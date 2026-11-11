@@ -17,6 +17,8 @@ export type WorkItem = {
   coverImage?: string;
   /** Compact brand mark on the case page (not a full-bleed hero). */
   logo?: string;
+  /** Shown in place of `logo` while the work card is hovered. */
+  logoHover?: string;
   category: WorkCategory;
   /** Short one-liner under the title on index cards (Frank-style). */
   summary: string;

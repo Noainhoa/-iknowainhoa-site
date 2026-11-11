@@ -48,3 +48,5 @@ skills-lock.json
 
 # local archives
 *.zip
+tmp/
+.tmp/

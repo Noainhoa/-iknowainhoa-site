@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import LifeLoginForm from "@/components/life/LifeLoginForm";
+import LifeSetPasswordForm from "@/components/life/LifeSetPasswordForm";
 import { useLifeAuth } from "@/components/life/useLifeAuth";
 import { getLifeAccessToken } from "@/lib/life/os/auth";
 import {
@@ -137,6 +138,8 @@ function LifeOsSession({ auth }: { auth: ReturnType<typeof useLifeAuth> }) {
     userId,
     authBusy,
     authError,
+    recoveryMode,
+    finishRecovery,
     handleLogin,
     handleSignOut,
   } = auth;
@@ -274,6 +277,10 @@ function LifeOsSession({ auth }: { auth: ReturnType<typeof useLifeAuth> }) {
         Configure Life Supabase env vars, then run <code className="text-xs">supabase/life-os.sql</code>.
       </p>
     );
+  }
+
+  if (recoveryMode) {
+    return <LifeSetPasswordForm onDone={finishRecovery} />;
   }
 
   if (!sessionEmail) {

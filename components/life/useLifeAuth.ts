@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import { useLifeRecovery } from "@/components/life/useLifeRecovery";
 import { getLifeSupabase, lifeSupabaseConfigured } from "@/lib/life/supabase";
 
 /** Auth-only Life session for OS/NOA — no timeline bootstrap. */
@@ -13,6 +14,7 @@ export function useLifeAuth() {
   const [userId, setUserId] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const { recoveryMode, finishRecovery } = useLifeRecovery(supabase);
 
   useEffect(() => {
     if (!supabase) return;
@@ -50,6 +52,8 @@ export function useLifeAuth() {
     userId,
     authBusy,
     authError,
+    recoveryMode,
+    finishRecovery,
     handleLogin,
     handleSignOut,
   };

@@ -24,6 +24,7 @@ type Dictionary = {
     closeMenu: string;
     siteMenu: string;
     whatsAppAria: string;
+    techHelp: string;
   };
   footer: {
     support: string;
@@ -173,6 +174,7 @@ const en: Dictionary = {
     closeMenu: "Close menu",
     siteMenu: "Site menu",
     whatsAppAria: "WhatsApp enquiry",
+    techHelp: "Tech help",
   },
   footer: {
     support: "Support this work",
@@ -332,6 +334,7 @@ const es: Dictionary = {
     closeMenu: "Cerrar menú",
     siteMenu: "Menú del sitio",
     whatsAppAria: "Consulta por WhatsApp",
+    techHelp: "Ayuda tecnológica",
   },
   footer: {
     support: "Apoyar este trabajo",

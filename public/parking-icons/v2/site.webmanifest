@@ -4,8 +4,8 @@
   "description": "Consulta la disponibilidad de una plaza de garaje privada en el centro de Guardamar del Segura.",
   "start_url": "/parking-guardamar-centro?lang=es",
   "display": "standalone",
-  "background_color": "#045C92",
-  "theme_color": "#045C92",
+  "background_color": "#d81b29",
+  "theme_color": "#d81b29",
   "lang": "es",
   "icons": [
     {
