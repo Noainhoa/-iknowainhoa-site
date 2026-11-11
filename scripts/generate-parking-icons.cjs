@@ -1,8 +1,9 @@
 /**
- * Home Screen icons for Guardamar Parking and Guardamar Click.
+ * Home Screen / tab icons for Guardamar Parking and Guardamar Click.
  *
- * Sources are the transparent circular badges. iOS paints transparent
- * corners black, so each square continues the badge rim out to the edges.
+ * Parking: transparent circular badge, with rim colour extended to the
+ * square edges (iOS paints transparent corners black).
+ * Click: keep the circular badge with transparent corners for the browser tab.
  *
  * Usage: npm run icons:parking
  */
@@ -23,6 +24,7 @@ const JOBS = [
   {
     source: "public/images/parking/guardamar-parking-badge.png",
     outDir: "public/parking-icons/v2",
+    mode: "rim",
     copies: [
       ["apple-touch-icon.png", "app/parking-guardamar-centro/apple-icon.png"],
       ["icon-512.png", "app/parking-guardamar-centro/icon.png"],
@@ -32,7 +34,8 @@ const JOBS = [
   },
   {
     source: "public/images/tech/guardamar-click-badge-v2.png",
-    outDir: "public/tech-icons/v1",
+    outDir: "public/tech-icons/v2",
+    mode: "circle",
     copies: [
       ["apple-touch-icon.png", "app/guardamar-click/apple-icon.png"],
       ["icon-512.png", "app/guardamar-click/icon.png"],
@@ -90,6 +93,23 @@ async function extendRim(sourcePath, size) {
     .toBuffer();
 }
 
+async function circularTransparent(sourcePath, size) {
+  const inset = Math.max(1, Math.round(size * 0.02));
+  const inner = size - inset * 2;
+  return sharp(sourcePath)
+    .resize(inner, inner, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .ensureAlpha()
+    .extend({
+      top: inset,
+      bottom: inset,
+      left: inset,
+      right: inset,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .png({ compressionLevel: 9 })
+    .toBuffer();
+}
+
 async function main() {
   for (const job of JOBS) {
     const source = path.join(ROOT, job.source);
@@ -97,7 +117,8 @@ async function main() {
     if (!fs.existsSync(source)) throw new Error(`Missing source logo: ${source}`);
     fs.mkdirSync(outDir, { recursive: true });
     for (const [name, size] of SIZES) {
-      const buf = await extendRim(source, size);
+      const buf =
+        job.mode === "circle" ? await circularTransparent(source, size) : await extendRim(source, size);
       fs.writeFileSync(path.join(outDir, name), buf);
       console.log(`Wrote ${job.outDir}/${name}`);
     }

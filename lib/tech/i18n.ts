@@ -166,7 +166,7 @@ export type TechCopy = {
 };
 
 const es: TechCopy = {
-  metaTitle: `${TECH_BRAND} · Guardamar`,
+  metaTitle: TECH_BRAND,
   metaDescription:
     "Ayuda digital cercana en Guardamar del Segura: móvil, tablet y ordenador (Windows o Mac). Grupos pequeños desde 10 € o cita individual. Sesiones en español e inglés.",
   brandName: TECH_BRAND,
@@ -401,7 +401,7 @@ const es: TechCopy = {
 };
 
 const en: TechCopy = {
-  metaTitle: `${TECH_BRAND} · Guardamar`,
+  metaTitle: TECH_BRAND,
   metaDescription:
     "Friendly digital help in Guardamar del Segura: phone, tablet and computer (Windows or Mac). Small groups from €10, or one-to-one. Sessions in Spanish and English.",
   brandName: TECH_BRAND,
@@ -636,7 +636,7 @@ const en: TechCopy = {
 };
 
 const nl: TechCopy = {
-  metaTitle: `${TECH_BRAND} · Guardamar`,
+  metaTitle: TECH_BRAND,
   metaDescription:
     "Vriendelijke digitale hulp in Guardamar del Segura: telefoon, tablet en computer (Windows of Mac). Kleine groepen vanaf €10, of een-op-een. Sessies in het Spaans en Engels.",
   brandName: TECH_BRAND,

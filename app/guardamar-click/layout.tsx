@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-const ICON_192 = "/tech-icons/v1/icon-192.png";
-const ICON_512 = "/tech-icons/v1/icon-512.png";
-const APPLE_TOUCH = "/tech-icons/v1/apple-touch-icon.png";
+const ICON_192 = "/tech-icons/v2/icon-192.png";
+const ICON_512 = "/tech-icons/v2/icon-512.png";
+const APPLE_TOUCH = "/tech-icons/v2/apple-touch-icon.png";
 
 export const metadata: Metadata = {
   icons: {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     apple: [{ url: APPLE_TOUCH, type: "image/png", sizes: "180x180" }],
     shortcut: ICON_192,
   },
-  manifest: "/tech-icons/v1/site.webmanifest",
+  manifest: "/tech-icons/v2/site.webmanifest",
 };
 
 export default function TechLayout({ children }: { children: ReactNode }) {
