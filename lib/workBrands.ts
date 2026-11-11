@@ -58,8 +58,8 @@ export const WORK_BRANDS: WorkBrand[] = [
   {
     id: "guardamar-click",
     name: "Guardamar Click",
-    href: "/tech-made-easy",
-    logo: "/images/tech/guardamar-click-badge.png",
+    href: "/guardamar-click",
+    logo: "/images/tech/guardamar-click-badge-v2.png",
     logoHover: "/images/tech/guardamar-click-badge-3d.png",
     category: "systems",
     summary: {

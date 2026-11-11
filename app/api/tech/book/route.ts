@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
-import { GROUP_MINUTES, GROUP_PRICE_CENTS, INDIVIDUAL_MINUTES, INDIVIDUAL_PRICE_CENTS } from "@/lib/tech/constants";
+import {
+  GROUP_MINUTES,
+  GROUP_PRICE_CENTS,
+  INDIVIDUAL_MINUTES,
+  INDIVIDUAL_PRICE_CENTS,
+} from "@/lib/tech/constants";
 import { deliverNotification } from "@/lib/tech/deliver";
 import { allowPublicWrite } from "@/lib/tech/guard";
 import { sendCustomerMail } from "@/lib/tech/mail";
 import { customerBookingEmail, ownerBookingEmail } from "@/lib/tech/messages";
 import { getTechServiceClient } from "@/lib/tech/server";
+import { techBookingManagePath } from "@/lib/tech/seo";
 import { hashToken, isReference, newCancelToken, newReference } from "@/lib/tech/tokens";
 import { localeFromBody } from "@/lib/tech/locale";
 import { validateBooking } from "@/lib/tech/validate";
@@ -46,15 +52,36 @@ export async function POST(request: Request) {
     company: "",
     source: text(body.source) || null,
     locale,
+    sessionLanguage: text(body.sessionLanguage),
   });
   if (!validated.ok) {
     return NextResponse.json({ ok: false, error: validated.errors[0] }, { status: 400 });
   }
 
   const sessionId = text(body.sessionId);
+  const startsAtRaw = text(body.startsAt);
+  const createKind = text(body.kind);
   const idempotencyKey = text(body.idempotencyKey);
-  if (!UUID.test(sessionId) || !UUID.test(idempotencyKey)) {
+  const isCreate = !sessionId && Boolean(startsAtRaw);
+  const isJoin = Boolean(sessionId);
+
+  if (!UUID.test(idempotencyKey)) {
     return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+  }
+  if (isJoin && !UUID.test(sessionId)) {
+    return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+  }
+  if (isCreate && createKind !== "group" && createKind !== "individual") {
+    return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+  }
+  if (!isJoin && !isCreate) {
+    return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+  }
+  if (isCreate) {
+    const starts = new Date(startsAtRaw);
+    if (Number.isNaN(starts.getTime())) {
+      return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+    }
   }
 
   const client = getTechServiceClient();
@@ -73,50 +100,103 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 500 });
   }
 
-  const { data: sessionRow, error: sessionError } = await client
-    .from("tech_sessions")
-    .select("kind, starts_at, venue_label")
-    .eq("id", sessionId)
-    .maybeSingle();
-  if (sessionError || !sessionRow) {
-    return NextResponse.json({ ok: false, error: "tech_not_bookable" }, { status: 400 });
+  let kindForMail: "group" | "individual" = "group";
+  let startsForMail = new Date();
+  let venueForMail = "";
+
+  if (isJoin) {
+    const { data: sessionRow, error: sessionError } = await client
+      .from("tech_sessions")
+      .select("kind, starts_at, venue_label, session_language")
+      .eq("id", sessionId)
+      .maybeSingle();
+    if (sessionError || !sessionRow) {
+      return NextResponse.json({ ok: false, error: "tech_not_bookable" }, { status: 400 });
+    }
+    if (sessionRow.session_language !== validated.value.sessionLanguage) {
+      return NextResponse.json({ ok: false, error: "tech_language_mismatch" }, { status: 409 });
+    }
+    kindForMail = sessionRow.kind as "group" | "individual";
+    startsForMail = new Date(sessionRow.starts_at);
+    venueForMail = sessionRow.venue_label;
+  } else {
+    kindForMail = createKind as "group" | "individual";
+    startsForMail = new Date(startsAtRaw);
+    const { data: settings } = await client
+      .from("tech_calendar_settings")
+      .select("default_venue_label")
+      .eq("id", 1)
+      .maybeSingle();
+    venueForMail = settings?.default_venue_label || "Guardamar del Segura";
   }
 
   const mail = ownerBookingEmail({
     reference,
-    kind: sessionRow.kind,
-    startsAt: new Date(sessionRow.starts_at),
+    kind: kindForMail,
+    startsAt: startsForMail,
     contactName: validated.value.contactName,
     attendeeName: validated.value.attendeeName,
     phone: validated.value.phone,
     email: validated.value.email,
     question: validated.value.question,
-    venue: sessionRow.venue_label,
+    venue: venueForMail,
+    sessionLanguage: validated.value.sessionLanguage,
   });
 
-  const { data, error } = await client.rpc("tech_place_booking", {
-    payload: {
-      session_id: sessionId,
-      idempotency_key: idempotencyKey,
-      reference,
-      token_hash: hashToken(token),
-      contact_name: validated.value.contactName,
-      attendee_name: validated.value.attendeeName,
-      booking_for_other: validated.value.bookingForOther,
-      phone: validated.value.phone,
-      phone_key: validated.value.phoneKey,
-      email: validated.value.email,
-      question: validated.value.question,
-      locale: validated.value.locale,
-      source: validated.value.source,
-      subject: mail.subject,
-      body: mail.body,
-    },
-  });
+  const { data, error } = isJoin
+    ? await client.rpc("tech_place_booking", {
+        payload: {
+          session_id: sessionId,
+          idempotency_key: idempotencyKey,
+          reference,
+          token_hash: hashToken(token),
+          contact_name: validated.value.contactName,
+          attendee_name: validated.value.attendeeName,
+          booking_for_other: validated.value.bookingForOther,
+          phone: validated.value.phone,
+          phone_key: validated.value.phoneKey,
+          email: validated.value.email,
+          question: validated.value.question,
+          locale: validated.value.locale,
+          session_language: validated.value.sessionLanguage,
+          source: validated.value.source,
+          subject: mail.subject,
+          body: mail.body,
+        },
+      })
+    : await client.rpc("tech_create_and_book", {
+        payload: {
+          kind: createKind,
+          starts_at: new Date(startsAtRaw).toISOString(),
+          idempotency_key: idempotencyKey,
+          reference,
+          token_hash: hashToken(token),
+          contact_name: validated.value.contactName,
+          attendee_name: validated.value.attendeeName,
+          booking_for_other: validated.value.bookingForOther,
+          phone: validated.value.phone,
+          phone_key: validated.value.phoneKey,
+          email: validated.value.email,
+          question: validated.value.question,
+          locale: validated.value.locale,
+          session_language: validated.value.sessionLanguage,
+          source: validated.value.source,
+          venue_label: venueForMail,
+          subject: mail.subject,
+          body: mail.body,
+        },
+      });
 
   if (error || !data || data.ok !== true) {
     const code = typeof data?.error === "string" ? data.error : "tech_failed";
-    const status = code === "tech_full" || code === "tech_duplicate" ? 409 : 400;
+    const status =
+      code === "tech_full" ||
+      code === "tech_duplicate" ||
+      code === "tech_week_full" ||
+      code === "tech_overlap" ||
+      code === "tech_language_mismatch"
+        ? 409
+        : 400;
     return NextResponse.json({ ok: false, error: code }, { status });
   }
 
@@ -142,7 +222,7 @@ export async function POST(request: Request) {
     bodyText
   );
 
-  const kind = (data.kind ?? sessionRow.kind) as "group" | "individual";
+  const kind = (data.kind ?? kindForMail) as "group" | "individual";
   const durationMinutes =
     typeof data.duration_minutes === "number"
       ? data.duration_minutes
@@ -155,14 +235,9 @@ export async function POST(request: Request) {
       : kind === "group"
         ? GROUP_PRICE_CENTS
         : INDIVIDUAL_PRICE_CENTS;
-  const startsAt = data.starts_at ?? sessionRow.starts_at;
-  const venueLabel = data.venue_label ?? sessionRow.venue_label;
+  const startsAt = data.starts_at ?? startsForMail.toISOString();
+  const venueLabel = data.venue_label ?? venueForMail;
 
-  /**
-   * Customer confirmation runs only on the first successful create (when the raw token
-   * exists in memory). Idempotent replays and owner-notification retries never re-send
-   * a manage link — the raw token is not stored.
-   */
   let customerNotification: "sent" | "failed" | "skipped" = "skipped";
   if (!replayed && validated.value.email) {
     try {
@@ -186,9 +261,10 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     replayed,
+    joined: data.joined === true,
     reference: data.reference,
     token: replayed ? null : token,
-    confirmationPath: replayed ? null : `/tech-made-easy/reserva/${token}`,
+    confirmationPath: replayed ? null : techBookingManagePath(token, locale),
     startsAt,
     durationMinutes,
     priceCents,

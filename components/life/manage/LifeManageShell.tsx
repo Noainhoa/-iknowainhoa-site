@@ -8,6 +8,7 @@ import LifeDetailPanel, { LifeDetailEmpty } from "@/components/life/detail/LifeD
 import EntryForm, { type EntryFormPayload } from "@/components/life/EntryForm";
 import GroupForm from "@/components/life/GroupForm";
 import LifeLoginForm from "@/components/life/LifeLoginForm";
+import LifeSetPasswordForm from "@/components/life/LifeSetPasswordForm";
 import LifeNavigator from "@/components/life/navigator/LifeNavigator";
 import BulkSkeletonImporter from "@/components/life/manage/BulkSkeletonImporter";
 import TrackForm from "@/components/life/TrackForm";
@@ -63,6 +64,8 @@ export default function LifeManageShell() {
     userId,
     authBusy,
     authError,
+    recoveryMode,
+    finishRecovery,
     groups,
     loading,
     loadError,
@@ -178,6 +181,10 @@ export default function LifeManageShell() {
         <code className="text-xs">supabase/life.sql</code> in the ainhoa-life project.
       </p>
     );
+  }
+
+  if (recoveryMode) {
+    return <LifeSetPasswordForm onDone={finishRecovery} />;
   }
 
   if (!sessionEmail) {

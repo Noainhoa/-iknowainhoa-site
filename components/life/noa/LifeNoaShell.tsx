@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import LifeLoginForm from "@/components/life/LifeLoginForm";
+import LifeSetPasswordForm from "@/components/life/LifeSetPasswordForm";
 import { useLifeAuth } from "@/components/life/useLifeAuth";
 import { getLifeAccessToken } from "@/lib/life/os/auth";
 import type { NoaAnswer } from "@/lib/life/os/types";
@@ -28,6 +29,8 @@ function LifeNoaSession({ auth }: { auth: ReturnType<typeof useLifeAuth> }) {
     sessionEmail,
     authBusy,
     authError,
+    recoveryMode,
+    finishRecovery,
     handleLogin,
     handleSignOut,
   } = auth;
@@ -79,6 +82,10 @@ function LifeNoaSession({ auth }: { auth: ReturnType<typeof useLifeAuth> }) {
         Configure Life Supabase env vars to use NOA.
       </p>
     );
+  }
+
+  if (recoveryMode) {
+    return <LifeSetPasswordForm onDone={finishRecovery} />;
   }
 
   if (!sessionEmail) {

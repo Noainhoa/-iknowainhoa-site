@@ -1,44 +1,44 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TechBrandLink } from "@/components/tech/TechBrandLink";
+import TechBookingCalendar, {
+  type CalendarSelection,
+  type CalendarSession,
+} from "@/components/tech/TechBookingCalendar";
+import type { SessionLanguage } from "@/lib/tech/calendar";
 import TechContactLinks from "@/components/tech/TechContactLinks";
+import TechTestimonials from "@/components/tech/TechTestimonials";
 import {
   IconCalendar,
   IconClock,
   IconPhone,
-  IconWhatsAppBubble,
-  TechHeroCoast,
-  TechPortrait,
-  TechWave,
   TopicIcon,
 } from "@/components/tech/TechIllustrations";
 import WhatsAppMark from "@/components/tech/WhatsAppMark";
 import { externalAnchorProps } from "@/lib/links";
+import { GROUP_PRICE_CENTS, INDIVIDUAL_PRICE_CENTS, TECH_PATH } from "@/lib/tech/constants";
 import { site, siteWhatsAppEnquiryHref } from "@/lib/site";
 import { formatNationalPhone, telHref } from "@/lib/tech/phone";
 import type { TechCopy } from "@/lib/tech/i18n";
 import type { TechLocale } from "@/lib/tech/locale";
 import { buildIcs } from "@/lib/tech/ics";
 import { customerWhatsAppText, euros } from "@/lib/tech/messages";
+import { techPageHref } from "@/lib/tech/seo";
 import { readSource } from "@/lib/tech/validate";
-import { formatMadrid, madridDayKey, madridLocalToUtc } from "@/lib/tech/time";
+import { formatMadrid, madridLocalToUtc } from "@/lib/tech/time";
 import { newIdempotencyKey } from "@/lib/tech/idempotency";
 
-type Kind = "group" | "individual" | "request";
-
-type Session = {
-  id: string;
-  kind: "group" | "individual";
-  startsAt: string;
-  durationMinutes: number;
-  capacity: number;
-  seatsLeft: number;
-  priceCents: number;
-  venueLabel: string;
+const HERO_FAQ_ART: Record<TechLocale, string> = {
+  es: "/images/tech/everyday-faqs-es.jpg",
+  en: "/images/tech/everyday-faqs-en.jpg",
+  nl: "/images/tech/everyday-faqs-nl.jpg",
 };
+
+type Kind = "group" | "individual" | "request";
 
 type Success = {
   title: string;
@@ -80,12 +80,18 @@ export default function TechPublicApp({
   function langHref(next: TechLocale) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("lang", next);
-    return `/tech-made-easy?${params.toString()}`;
+    return `${TECH_PATH}?${params.toString()}`;
   }
   const [kind, setKind] = useState<Kind>("group");
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<CalendarSession[]>([]);
+  const [templateReady, setTemplateReady] = useState(false);
+  const [bookableStarts, setBookableStarts] = useState<string[]>([]);
+  const [nextJoinableGroup, setNextJoinableGroup] = useState<CalendarSession | null>(null);
+  const [weekSlotCounts, setWeekSlotCounts] = useState<Record<string, number>>({});
+  const [dayOpenMinute, setDayOpenMinute] = useState(540);
+  const [dayCloseMinute, setDayCloseMinute] = useState(1080);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error" | "off">("loading");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selection, setSelection] = useState<CalendarSelection | null>(null);
   const [date, setDate] = useState(todayMadrid);
   const [time, setTime] = useState("10:00");
   const [contactName, setContactName] = useState("");
@@ -94,6 +100,7 @@ export default function TechPublicApp({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [question, setQuestion] = useState("");
+  const [sessionLanguage, setSessionLanguage] = useState<SessionLanguage>(locale === "en" ? "en" : "es");
   const [attendance, setAttendance] = useState(false);
   const [cancellation, setCancellation] = useState(false);
   const [privacy, setPrivacy] = useState(false);
@@ -106,20 +113,34 @@ export default function TechPublicApp({
   const successRef = useRef<HTMLHeadingElement>(null);
   const bookingRef = useRef<HTMLDivElement>(null);
   const [barHidden, setBarHidden] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const phoneDisplay = formatNationalPhone();
+
+  function closeNav() {
+    setNavOpen(false);
+  }
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setSource(readSource(params.get("src")));
     let cancelled = false;
-    fetch("/api/tech/sessions")
+    fetch("/api/tech/availability")
       .then(async (response) => {
         // 503 = booking backend not configured in this environment (not “no sessions”).
         if (response.status === 503) {
           if (!cancelled) setLoadState("off");
           return;
         }
-        let payload: { ok?: boolean; sessions?: Session[]; error?: string } | null = null;
+        let payload: {
+          ok?: boolean;
+          templateReady?: boolean;
+          settings?: { dayOpenMinute?: number; dayCloseMinute?: number; bufferMinutes?: number };
+          sessions?: CalendarSession[];
+          bookableStarts?: string[];
+          nextJoinableGroup?: CalendarSession | null;
+          weekSlotCounts?: Record<string, number>;
+          error?: string;
+        } | null = null;
         try {
           payload = await response.json();
         } catch {
@@ -130,7 +151,13 @@ export default function TechPublicApp({
           throw new Error(payload?.error || "tech_failed");
         }
         if (!cancelled) {
+          setTemplateReady(payload.templateReady === true);
           setSessions(payload.sessions ?? []);
+          setBookableStarts(payload.bookableStarts ?? []);
+          setNextJoinableGroup(payload.nextJoinableGroup ?? null);
+          setWeekSlotCounts(payload.weekSlotCounts ?? {});
+          setDayOpenMinute(payload.settings?.dayOpenMinute ?? 540);
+          setDayCloseMinute(payload.settings?.dayCloseMinute ?? 1080);
           setLoadState("ready");
         }
       })
@@ -144,7 +171,7 @@ export default function TechPublicApp({
 
   useEffect(() => {
     idempotency.current = newIdempotencyKey();
-  }, [kind, selectedId, date, time]);
+  }, [kind, selection, date, time]);
 
   useEffect(() => {
     successRef.current?.focus();
@@ -161,30 +188,14 @@ export default function TechPublicApp({
   }, [success]);
 
   function openBooking(next: "group" | "individual") {
-    const published = sessions.some((session) => session.kind === next);
-    setKind(next === "individual" && !published ? "request" : next);
-    setSelectedId(null);
+    setKind(next);
+    setSelection(null);
     window.setTimeout(() => {
       bookingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
   }
 
-  const visible = useMemo(
-    () => sessions.filter((session) => (kind === "request" ? false : session.kind === kind)),
-    [sessions, kind]
-  );
-  const selected = sessions.find((session) => session.id === selectedId) ?? null;
-
-  const grouped = useMemo(() => {
-    const groups = new Map<string, Session[]>();
-    for (const session of visible) {
-      const key = madridDayKey(new Date(session.startsAt));
-      const list = groups.get(key) ?? [];
-      list.push(session);
-      groups.set(key, list);
-    }
-    return [...groups.entries()];
-  }, [visible]);
+  const bookingKind = kind === "request" ? null : kind;
 
   function downloadCalendar(item: Success) {
     if (item.kind === "request") return;
@@ -224,12 +235,24 @@ export default function TechPublicApp({
       }
     }
     try {
+      const bookPayload =
+        kind === "request"
+          ? { requestedStart }
+          : selection?.mode === "join"
+            ? { sessionId: selection.session.id }
+            : selection?.mode === "create"
+              ? { startsAt: selection.startsAt, kind: selection.kind }
+              : null;
+      if (kind !== "request" && !bookPayload) {
+        setSaving(false);
+        setError("tech_failed");
+        return;
+      }
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sessionId: selected?.id,
-          requestedStart,
+          ...bookPayload,
           idempotencyKey: idempotency.current,
           contactName,
           attendeeName,
@@ -243,6 +266,7 @@ export default function TechPublicApp({
           company,
           source,
           locale,
+          sessionLanguage,
         }),
       });
       const payload = await response.json().catch(() => null);
@@ -286,21 +310,39 @@ export default function TechPublicApp({
       })
     : locale === "en"
       ? "Hello Ainhoa, I would like technology help in Guardamar."
-      : "Hola Ainhoa, me gustaría una sesión de ayuda tecnológica en Guardamar.";
+      : locale === "nl"
+        ? "Hallo Ainhoa, ik zou graag technische hulp in Guardamar willen."
+        : "Hola Ainhoa, me gustaría una sesión de ayuda tecnológica en Guardamar.";
 
   const enquiryHref = siteWhatsAppEnquiryHref(whatsappMessage);
+  const successMailHref = success
+    ? `mailto:${site.email}?subject=${encodeURIComponent(`${copy.reference} ${success.reference}`)}&body=${encodeURIComponent(
+        `${copy.reference} ${success.reference}\n${copy.when}: ${success.when}\n\n${whatsappMessage}`
+      )}`
+    : "";
+  const navAria =
+    locale === "en" ? "Primary" : locale === "nl" ? "Hoofdmenu" : "Principal";
 
-  const header = (
-    <header className="tme-top">
-      <TechBrandLink href="/tech-made-easy" name={copy.brandName} />
-      <nav className="tme-nav" aria-label={locale === "en" ? "Primary" : "Principal"}>
-        <a href="#ayuda">{copy.navHelp}</a>
-        <a href="#ainhoa">{copy.navAbout}</a>
-        <a href="#precios">{copy.navPrices}</a>
+  const utilities = (
+    <>
+      <nav id="tme-primary-nav" className="tme-nav" aria-label={navAria}>
+        <a href="#ayuda" onClick={closeNav}>
+          {copy.navHelp}
+        </a>
+        <a href="#ainhoa" onClick={closeNav}>
+          {copy.navAbout}
+        </a>
+        <a href="#precios" onClick={closeNav}>
+          {copy.navPrices}
+        </a>
+        <a href="#opiniones" onClick={closeNav}>
+          {copy.navStories}
+        </a>
         <a
           href="#reservar"
           onClick={(event) => {
             event.preventDefault();
+            closeNav();
             openBooking("group");
           }}
         >
@@ -313,22 +355,91 @@ export default function TechPublicApp({
           {phoneDisplay}
         </a>
         <nav className="tme-lang" aria-label={copy.langLabel}>
-          <Link href={langHref("es")} aria-current={locale === "es" ? "page" : undefined} prefetch={false}>
+          <Link
+            href={langHref("es")}
+            hrefLang="es"
+            lang="es"
+            aria-current={locale === "es" ? "page" : undefined}
+            prefetch={false}
+          >
             ES
           </Link>
-          <Link href={langHref("en")} aria-current={locale === "en" ? "page" : undefined} prefetch={false}>
+          <span className="tme-lang-sep" aria-hidden="true">
+            /
+          </span>
+          <Link
+            href={langHref("en")}
+            hrefLang="en"
+            lang="en"
+            aria-current={locale === "en" ? "page" : undefined}
+            prefetch={false}
+          >
             EN
           </Link>
+          <span className="tme-lang-sep" aria-hidden="true">
+            /
+          </span>
+          <Link
+            href={langHref("nl")}
+            hrefLang="nl"
+            lang="nl"
+            aria-current={locale === "nl" ? "page" : undefined}
+            prefetch={false}
+          >
+            NL
+          </Link>
         </nav>
+        <button
+          type="button"
+          className="tme-menu-btn"
+          aria-expanded={navOpen}
+          aria-controls="tme-primary-nav"
+          aria-label={navOpen ? copy.navMenuClose : copy.navMenuOpen}
+          onClick={() => setNavOpen((open) => !open)}
+        >
+          <svg className="tme-menu-icon" viewBox="0 0 28 28" aria-hidden="true" fill="none">
+            {navOpen ? (
+              <>
+                <rect x="0" y="12.5" width="28" height="3" fill="currentColor" transform="rotate(45 14 14)" />
+                <rect x="0" y="12.5" width="28" height="3" fill="currentColor" transform="rotate(-45 14 14)" />
+              </>
+            ) : (
+              <>
+                <rect x="0" y="5" width="28" height="3" fill="currentColor" />
+                <rect x="0" y="12.5" width="28" height="3" fill="currentColor" />
+                <rect x="0" y="20" width="28" height="3" fill="currentColor" />
+              </>
+            )}
+          </svg>
+        </button>
       </div>
-    </header>
+    </>
+  );
+
+  const brandUnit = (
+    <div className="tme-brand-block">
+      <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
+      <div className="tme-brand-text">
+        <p className="tme-eyebrow">{copy.kicker}</p>
+        <h1>
+          {copy.headlineBefore} <em>{copy.headlineEm}</em> {copy.headlineAfter}
+        </h1>
+        <div className="tme-meta">
+          {copy.metaChips.map((chip) => (
+            <span key={chip}>{chip}</span>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 
   if (success) {
     return (
       <div className="tme">
         <div className="tme-wrap">
-          {header}
+          <header className="tme-top tme-top-success">
+            <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
+          </header>
           <section className="tme-section">
             <h1 ref={successRef} tabIndex={-1}>
               {success.title}
@@ -361,7 +472,23 @@ export default function TechPublicApp({
                   {copy.calendar}
                 </button>
               ) : null}
-              <TechContactLinks copy={copy} message={whatsappMessage} />
+              <button
+                type="button"
+                className="tme-secondary"
+                onClick={() => {
+                  void navigator.clipboard.writeText(whatsappMessage).catch(() => undefined);
+                }}
+              >
+                {copy.copyWhatsApp}
+              </button>
+              <a className="tme-secondary" href={successMailHref}>
+                {copy.copyEmail}
+              </a>
+              <a className="tme-btn tme-btn-wa" href={enquiryHref} {...externalAnchorProps(enquiryHref)}>
+                <WhatsAppMark />
+                {copy.writeWhatsApp}
+              </a>
+              <TechContactLinks copy={copy} message={whatsappMessage} showWhatsApp={false} />
               <button
                 type="button"
                 className="tme-secondary"
@@ -382,14 +509,11 @@ export default function TechPublicApp({
   return (
     <div className="tme">
       <div className="tme-wrap">
-        {header}
+        <header className={`tme-top${navOpen ? " is-nav-open" : ""}`}>{utilities}</header>
 
         <div className="tme-hero">
-          <div>
-            <div className="tme-eyebrow">{copy.kicker}</div>
-            <h1>
-              {copy.headlineBefore} <em>{copy.headlineEm}</em> {copy.headlineAfter}
-            </h1>
+          <div className="tme-hero-copy">
+            {brandUnit}
             <p className="tme-lead">{copy.lede}</p>
             <div className="tme-ctas">
               <a
@@ -408,24 +532,17 @@ export default function TechPublicApp({
                 {copy.callCta}
               </a>
             </div>
-            <div className="tme-meta">
-              {copy.metaChips.map((chip) => (
-                <span key={chip}>{chip}</span>
-              ))}
-            </div>
           </div>
           <div className="tme-art">
-            <div className="tme-arch">
-              <TechHeroCoast />
-            </div>
-            <div className="tme-msg">
-              <div className="tme-msg-who">
-                <span className="tme-msg-av">A</span>
-                {copy.msgWho}
-              </div>
-              {copy.msgHello}
-              <div className="tme-msg-re">{copy.msgReply}</div>
-            </div>
+            <Image
+              src={HERO_FAQ_ART[locale]}
+              alt={copy.heroArtAlt}
+              width={841}
+              height={1024}
+              sizes="(max-width: 720px) 90vw, 420px"
+              className="tme-art-img"
+              priority
+            />
           </div>
         </div>
       </div>
@@ -452,12 +569,18 @@ export default function TechPublicApp({
         </div>
       </section>
 
-      <TechWave />
-
       <section className="tme-about" id="ainhoa">
         <div className="tme-wrap tme-about-grid">
-          <div className="tme-por" role="img" aria-label={copy.portraitLabel}>
-            <TechPortrait />
+          <div className="tme-por">
+            <Image
+              src="/images/tech/ainhoa-portrait-v3.jpg"
+              alt={copy.portraitLabel}
+              width={960}
+              height={960}
+              sizes="300px"
+              className="tme-por-img"
+              priority
+            />
           </div>
           <div>
             <div className="tme-eyebrow">{copy.aboutKicker}</div>
@@ -482,7 +605,8 @@ export default function TechPublicApp({
               <span className="tme-plan-k">{copy.groupKicker}</span>
               <h3>{copy.groupTitle}</h3>
               <div className="tme-amt">
-                10 €<small>{copy.groupAmtNote}</small>
+                {euros(GROUP_PRICE_CENTS, locale)}
+                <small>{copy.groupAmtNote}</small>
               </div>
               <div className="tme-dur">
                 <IconClock />
@@ -508,7 +632,8 @@ export default function TechPublicApp({
               <span className="tme-plan-k">{copy.individualKicker}</span>
               <h3>{copy.individualTitle}</h3>
               <div className="tme-amt">
-                25 €<small>{copy.individualAmtNote}</small>
+                {euros(INDIVIDUAL_PRICE_CENTS, locale)}
+                <small>{copy.individualAmtNote}</small>
               </div>
               <div className="tme-dur">
                 <IconClock />
@@ -529,6 +654,8 @@ export default function TechPublicApp({
           </div>
         </div>
       </section>
+
+      <TechTestimonials copy={copy} locale={locale} />
 
       <section className="tme-section" id="reservar" ref={bookingRef} style={{ paddingTop: 0 }}>
         <div className="tme-wrap tme-book">
@@ -568,7 +695,7 @@ export default function TechPublicApp({
                 aria-pressed={kind === "group"}
                 onClick={() => {
                   setKind("group");
-                  setSelectedId(null);
+                  setSelection(null);
                 }}
               >
                 {copy.groupOption}
@@ -578,7 +705,7 @@ export default function TechPublicApp({
                 aria-pressed={kind === "individual"}
                 onClick={() => {
                   setKind("individual");
-                  setSelectedId(null);
+                  setSelection(null);
                 }}
               >
                 {copy.individualOption}
@@ -588,18 +715,44 @@ export default function TechPublicApp({
                 aria-pressed={kind === "request"}
                 onClick={() => {
                   setKind("request");
-                  setSelectedId(null);
+                  setSelection(null);
                 }}
               >
                 {copy.otherTime}
               </button>
             </div>
 
+            <fieldset className="tme-session-lang">
+              <legend>{copy.sessionLanguageLabel}</legend>
+              <p className="tme-hint">{copy.sessionLanguageHelp}</p>
+              <div className="tme-choice" role="group" aria-label={copy.sessionLanguageLabel}>
+                <button
+                  type="button"
+                  aria-pressed={sessionLanguage === "es"}
+                  onClick={() => {
+                    setSessionLanguage("es");
+                    setSelection(null);
+                  }}
+                >
+                  {copy.sessionLanguageEs}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={sessionLanguage === "en"}
+                  onClick={() => {
+                    setSessionLanguage("en");
+                    setSelection(null);
+                  }}
+                >
+                  {copy.sessionLanguageEn}
+                </button>
+              </div>
+            </fieldset>
+
             {kind === "request" ? <p className="tme-note">{copy.otherTimeHelp}</p> : null}
 
             {kind !== "request" ? (
               <div aria-busy={loadState === "loading"}>
-                <h3 style={{ fontSize: 22, marginBottom: 8 }}>{copy.choose}</h3>
                 {loadState === "loading" ? <p>{copy.loading}</p> : null}
                 {loadState === "error" ? (
                   <p className="tme-alert" role="alert">
@@ -611,54 +764,58 @@ export default function TechPublicApp({
                     {copy.notConfigured}
                   </p>
                 ) : null}
-                {loadState === "ready" && grouped.length === 0 ? (
-                  <p role="status">{copy.empty}</p>
+                {loadState === "ready" && bookingKind ? (
+                  <TechBookingCalendar
+                    copy={copy}
+                    locale={locale}
+                    templateReady={templateReady}
+                    sessions={sessions.filter(
+                      (session) => !session.sessionLanguage || session.sessionLanguage === sessionLanguage
+                    )}
+                    bookableStarts={bookableStarts}
+                    nextJoinableGroup={
+                      nextJoinableGroup &&
+                      (!nextJoinableGroup.sessionLanguage ||
+                        nextJoinableGroup.sessionLanguage === sessionLanguage)
+                        ? nextJoinableGroup
+                        : null
+                    }
+                    weekSlotCounts={weekSlotCounts}
+                    dayOpenMinute={dayOpenMinute}
+                    dayCloseMinute={dayCloseMinute}
+                    selection={selection}
+                    onSelect={setSelection}
+                    preferredKind={bookingKind}
+                    onPreferredKind={(next) => {
+                      setKind(next);
+                    }}
+                  />
                 ) : null}
-                {grouped.map(([day, items]) => (
-                  <div key={day}>
-                    <h3 style={{ fontSize: 18, margin: "14px 0 6px" }}>
-                      {formatMadrid(new Date(items[0].startsAt), locale).replace(/,.*/, "")}
-                    </h3>
-                    {items.map((session) => {
-                      const open = session.seatsLeft > 0;
-                      return (
-                        <button
-                          key={session.id}
-                          type="button"
-                          className={`tme-session${selectedId === session.id ? " is-selected" : ""}`}
-                          disabled={!open}
-                          onClick={() => setSelectedId(session.id)}
-                        >
-                          <strong>{formatMadrid(new Date(session.startsAt), locale)}</strong>
-                          <span>{session.venueLabel}</span>
-                          <span>
-                            {euros(session.priceCents, locale)} · {session.durationMinutes} min
-                          </span>
-                          <span>
-                            {open
-                              ? session.seatsLeft === 1
-                                ? copy.seatsOne
-                                : copy.seatsMany.replace("{n}", String(session.seatsLeft))
-                              : copy.full}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ))}
               </div>
             ) : null}
 
-            {kind === "request" || selected ? (
+            {kind === "request" || selection ? (
               <form onSubmit={onSubmit} noValidate>
                 <h3 style={{ fontSize: 22 }}>{kind === "request" ? copy.requestTitle : copy.formTitle}</h3>
-                {selected ? (
+                {selection?.mode === "join" ? (
                   <p className="tme-card">
-                    <strong>{formatMadrid(new Date(selected.startsAt), locale)}</strong>
+                    <strong>{formatMadrid(new Date(selection.session.startsAt), locale)}</strong>
                     <br />
-                    {selected.venueLabel}
+                    {selection.session.venueLabel}
                     <br />
-                    {euros(selected.priceCents, locale)}
+                    {euros(selection.session.priceCents, locale)}
+                  </p>
+                ) : null}
+                {selection?.mode === "create" ? (
+                  <p className="tme-card">
+                    <strong>{formatMadrid(new Date(selection.startsAt), locale)}</strong>
+                    <br />
+                    {selection.kind === "group" ? copy.groupOption : copy.individualOption}
+                    <br />
+                    {euros(
+                      selection.kind === "group" ? GROUP_PRICE_CENTS : INDIVIDUAL_PRICE_CENTS,
+                      locale
+                    )}
                   </p>
                 ) : null}
                 {kind === "request" ? (
@@ -829,7 +986,7 @@ export default function TechPublicApp({
           {copy.barCall}
         </a>
         <a className="tme-dock-w" href={enquiryHref} {...externalAnchorProps(enquiryHref)} aria-label={copy.whatsapp}>
-          <IconWhatsAppBubble />
+          <WhatsAppMark />
           {copy.whatsapp}
         </a>
         <a

@@ -29,9 +29,9 @@ export default function SiteChrome({
     pathname === "/parking" ||
     pathname.startsWith("/parking/");
   const isTech =
-    pathname === "/tech-made-easy" || pathname.startsWith("/tech-made-easy/");
+    pathname === "/guardamar-click" || pathname.startsWith("/guardamar-click/");
   const isTechAdmin =
-    pathname === "/tech-made-easy/admin" || pathname.startsWith("/tech-made-easy/admin/");
+    pathname === "/guardamar-click/admin" || pathname.startsWith("/guardamar-click/admin/");
   const isBlog = pathname === "/blog" || pathname.startsWith("/blog/");
   const isAnicca = pathname === "/anicca" || pathname.startsWith("/anicca/");
   const showAccent = isBlog;

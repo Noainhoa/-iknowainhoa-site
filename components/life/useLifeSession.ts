@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { formatLifeErrorForPanel } from "@/lib/life/errors";
 import { bootstrapLifeData, getLifeClientDebugInfo } from "@/lib/life/startup";
+import { useLifeRecovery } from "@/components/life/useLifeRecovery";
 import { getLifeSupabase, lifeSupabaseConfigured } from "@/lib/life/supabase";
 import type { LifeGroup } from "@/lib/life/types";
 
@@ -38,6 +39,7 @@ export function useLifeSession() {
   const [userId, setUserId] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const { recoveryMode, finishRecovery } = useLifeRecovery(supabase);
 
   const [groups, setGroups] = useState<LifeGroup[]>([]);
   const [loading, setLoading] = useState(false);
@@ -101,6 +103,8 @@ export function useLifeSession() {
     userId,
     authBusy,
     authError,
+    recoveryMode,
+    finishRecovery,
     groups,
     loading,
     loadError,

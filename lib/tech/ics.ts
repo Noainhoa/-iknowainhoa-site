@@ -1,3 +1,5 @@
+import { TECH_BRAND } from "@/lib/tech/constants";
+
 function escapeIcs(value: string): string {
   return value.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
 }
@@ -17,7 +19,7 @@ export function buildIcs(input: {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//iknowainhoa//Tech Made Easy//ES",
+    `PRODID:-//iknowainhoa//${TECH_BRAND}//ES`,
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",

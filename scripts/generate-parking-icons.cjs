@@ -31,11 +31,11 @@ const JOBS = [
     ],
   },
   {
-    source: "public/images/tech/guardamar-click-badge.png",
+    source: "public/images/tech/guardamar-click-badge-v2.png",
     outDir: "public/tech-icons/v1",
     copies: [
-      ["apple-touch-icon.png", "app/tech-made-easy/apple-icon.png"],
-      ["icon-512.png", "app/tech-made-easy/icon.png"],
+      ["apple-touch-icon.png", "app/guardamar-click/apple-icon.png"],
+      ["icon-512.png", "app/guardamar-click/icon.png"],
     ],
   },
 ];

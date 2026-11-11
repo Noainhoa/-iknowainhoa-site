@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { getLifeSupabase } from "@/lib/life/supabase";
 
 type LifeLoginFormProps = {
   onSubmit: (email: string, password: string) => Promise<void>;
@@ -11,11 +12,43 @@ type LifeLoginFormProps = {
 export default function LifeLoginForm({ onSubmit, busy, error }: LifeLoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [resetSent, setResetSent] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [resetBusy, setResetBusy] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    setResetSent(false);
     await onSubmit(email, password);
   }
+
+  async function handleForgotPassword() {
+    setResetError(null);
+    setResetSent(false);
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setResetError("Enter your email, then choose Forgot password.");
+      return;
+    }
+    const supabase = getLifeSupabase();
+    if (!supabase) {
+      setResetError("Life is not configured.");
+      return;
+    }
+    setResetBusy(true);
+    const redirectTo = `${window.location.origin}/life`;
+    const { error: resetFailure } = await supabase.auth.resetPasswordForEmail(trimmed, {
+      redirectTo,
+    });
+    setResetBusy(false);
+    if (resetFailure) {
+      setResetError(resetFailure.message);
+      return;
+    }
+    setResetSent(true);
+  }
+
+  const shownError = resetError ?? error;
 
   return (
     <div className="mx-auto max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -44,13 +77,26 @@ export default function LifeLoginForm({ onSubmit, busy, error }: LifeLoginFormPr
             className="rounded-md border border-gray-300 px-3 py-2"
           />
         </label>
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+        {shownError ? <p className="text-sm text-red-600">{shownError}</p> : null}
+        {resetSent ? (
+          <p className="text-sm text-green-700">
+            Reset email sent. Open the link in this browser, then choose a new password.
+          </p>
+        ) : null}
         <button
           type="submit"
-          disabled={busy}
+          disabled={busy || resetBusy}
           className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-60"
         >
           {busy ? "Signing in…" : "Sign in"}
+        </button>
+        <button
+          type="button"
+          disabled={busy || resetBusy}
+          onClick={() => void handleForgotPassword()}
+          className="text-sm text-gray-600 underline-offset-2 hover:text-gray-900 hover:underline disabled:opacity-60"
+        >
+          {resetBusy ? "Sending reset email…" : "Forgot password?"}
         </button>
       </form>
     </div>

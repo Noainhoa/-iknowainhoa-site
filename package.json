@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:parking": "npx tsx --tsconfig tsconfig.json --test lib/parking/parking.test.ts",
-    "test:tech": "npx tsx --tsconfig tsconfig.json --test lib/tech/booking.test.ts lib/tech/admin-focus.test.ts lib/tech/env.test.ts",
+    "test:tech": "npx tsx --tsconfig tsconfig.json --test lib/tech/booking.test.ts lib/tech/calendar.test.ts lib/tech/admin-focus.test.ts lib/tech/env.test.ts",
     "test:links": "npx tsx --tsconfig tsconfig.json --test lib/links.test.ts",
     "test:life-os": "NODE_OPTIONS=--conditions=react-server npx tsx --tsconfig tsconfig.json --test lib/life/os/*.test.ts",
     "icons:parking": "node scripts/generate-parking-icons.cjs",

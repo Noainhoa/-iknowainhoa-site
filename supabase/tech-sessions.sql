@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS tech_sessions (
   CONSTRAINT tech_sessions_shape CHECK (
     (
       kind = 'group'
-      AND duration_minutes = 75
-      AND capacity BETWEEN 1 AND 5
+      AND duration_minutes = 60
+      AND capacity BETWEEN 1 AND 7
       AND price_cents = 1000
     )
     OR (
@@ -60,6 +60,8 @@ CREATE TABLE IF NOT EXISTS tech_sessions (
       AND price_cents = 2500
     )
   ),
+  -- Note: hour-calendar template, ±15 life buffer, weekly slot cap (3), and
+  -- tech_create_and_book live in supabase/tech-calendar.sql.
   CONSTRAINT tech_sessions_venue_len CHECK (char_length(venue_label) <= 160)
 );
 

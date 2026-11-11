@@ -1,11 +1,11 @@
-import { GROUP_MINUTES, INDIVIDUAL_MINUTES } from "@/lib/tech/constants";
+import { GROUP_MINUTES, INDIVIDUAL_MINUTES, TECH_BRAND } from "@/lib/tech/constants";
 import type { TechLocale } from "@/lib/tech/locale";
 import { formatNationalPhone } from "@/lib/tech/phone";
 import { techAdminFocusUrl, techBookingManageUrl } from "@/lib/tech/seo";
 import { formatMadrid } from "@/lib/tech/time";
 
-export function euros(cents: number, locale: "es" | "en"): string {
-  const tag = locale === "en" ? "en-GB" : "es-ES";
+export function euros(cents: number, locale: "es" | "en" | "nl"): string {
+  const tag = locale === "en" ? "en-GB" : locale === "nl" ? "nl-NL" : "es-ES";
   return new Intl.NumberFormat(tag, {
     style: "currency",
     currency: "EUR",
@@ -22,13 +22,16 @@ export function ownerBookingEmail(input: {
   email: string | null;
   question: string | null;
   venue: string;
+  sessionLanguage?: "es" | "en";
 }): { subject: string; body: string } {
   const when = formatMadrid(input.startsAt, "es");
   const kind = input.kind === "group" ? "Grupo" : "Individual";
+  const language = input.sessionLanguage === "en" ? "Inglés" : "Español";
   const adminUrl = techAdminFocusUrl("booking", input.reference);
   const lines = [
     `Nueva reserva confirmada ${input.reference}.`,
     `Tipo: ${kind}`,
+    `Idioma de la sesión: ${language}`,
     `Cuándo: ${when}`,
     `Lugar: ${input.venue}`,
     `Contacto: ${input.contactName}`,
@@ -36,13 +39,13 @@ export function ownerBookingEmail(input: {
     `Teléfono: ${input.phone}`,
     input.email ? `Email: ${input.email}` : "Email: no dejado",
     input.question ? `Pregunta: ${input.question}` : "Pregunta: ninguna",
-    "Pago en la sesión, en efectivo o Bizum.",
+    "Pago en la sesión como prefiera la persona (efectivo, transferencia, tarjeta o Bizum).",
     "",
     "Abrir esta reserva en el administrador:",
     adminUrl,
   ];
   return {
-    subject: `Nueva reserva Tech Made Easy · ${input.reference}`,
+    subject: `Nueva reserva ${TECH_BRAND} · ${input.reference}`,
     body: lines.join("\n"),
   };
 }
@@ -55,11 +58,14 @@ export function ownerRequestEmail(input: {
   phone: string;
   email: string | null;
   question: string | null;
+  sessionLanguage?: "es" | "en";
 }): { subject: string; body: string } {
   const when = formatMadrid(input.startsAt, "es");
+  const language = input.sessionLanguage === "en" ? "Inglés" : "Español";
   const adminUrl = techAdminFocusUrl("request", input.reference);
   const lines = [
     `Nueva solicitud pendiente ${input.reference}. Esta hora NO está reservada.`,
+    `Idioma preferido: ${language}`,
     `Cuándo pide: ${when}`,
     `Duración si la aceptas: ${INDIVIDUAL_MINUTES} minutos`,
     `Contacto: ${input.contactName}`,
@@ -73,7 +79,7 @@ export function ownerRequestEmail(input: {
     adminUrl,
   ];
   return {
-    subject: `Solicitud pendiente Tech Made Easy · ${input.reference}`,
+    subject: `Solicitud pendiente ${TECH_BRAND} · ${input.reference}`,
     body: lines.join("\n"),
   };
 }
@@ -90,17 +96,18 @@ export function customerBookingEmail(input: {
   manageToken: string;
 }): { subject: string; body: string } {
   const when = formatMadrid(input.startsAt, input.locale);
-  const manageUrl = techBookingManageUrl(input.manageToken);
+  const manageUrl = techBookingManageUrl(input.manageToken, input.locale);
   const phone = formatNationalPhone();
   const price = euros(input.priceCents, input.locale);
   const kindEs = input.kind === "group" ? "Grupo" : "Individual";
   const kindEn = input.kind === "group" ? "Group" : "Individual";
+  const kindNl = input.kind === "group" ? "Groep" : "Individueel";
 
   if (input.locale === "en") {
     return {
-      subject: `Tech Made Easy booking ${input.reference}`,
+      subject: `${TECH_BRAND} booking ${input.reference}`,
       body: [
-        `Your Tech Made Easy booking is confirmed (${input.reference}).`,
+        `Your ${TECH_BRAND} booking is confirmed (${input.reference}).`,
         `Type: ${kindEn}`,
         `When: ${when}`,
         `Duration: ${input.durationMinutes} minutes`,
@@ -117,10 +124,31 @@ export function customerBookingEmail(input: {
     };
   }
 
+  if (input.locale === "nl") {
+    return {
+      subject: `${TECH_BRAND} reservering ${input.reference}`,
+      body: [
+        `Je ${TECH_BRAND}-reservering is bevestigd (${input.reference}).`,
+        `Soort: ${kindNl}`,
+        `Wanneer: ${when}`,
+        `Duur: ${input.durationMinutes} minuten`,
+        `Prijs: ${price} (betalen tijdens de sessie, contant of Bizum)`,
+        `Plaats: ${input.venue}`,
+        `Telefoon van Ainhoa: ${phone}`,
+        "",
+        "Privélink om je reservering te bekijken of te annuleren (deel hem niet):",
+        manageUrl,
+        "",
+        "Je kunt gratis annuleren tot 24 uur voor de sessie via die link.",
+        "Als jij deze reservering niet hebt gemaakt, negeer deze e-mail of bel Ainhoa.",
+      ].join("\n"),
+    };
+  }
+
   return {
-    subject: `Reserva Tech Made Easy · ${input.reference}`,
+    subject: `Reserva ${TECH_BRAND} · ${input.reference}`,
     body: [
-      `Tu reserva de Tech Made Easy está confirmada (${input.reference}).`,
+      `Tu reserva de ${TECH_BRAND} está confirmada (${input.reference}).`,
       `Tipo: ${kindEs}`,
       `Cuándo: ${when}`,
       `Duración: ${input.durationMinutes} minutos`,
@@ -138,7 +166,7 @@ export function customerBookingEmail(input: {
 }
 
 export function customerWhatsAppText(input: {
-  locale: "es" | "en";
+  locale: TechLocale;
   reference: string;
   when: string;
   kind: "group" | "individual" | "request";
@@ -146,11 +174,16 @@ export function customerWhatsAppText(input: {
   if (input.locale === "en") {
     const kind =
       input.kind === "group" ? "group" : input.kind === "individual" ? "individual appointment" : "request for another time";
-    return `Hello Ainhoa, this is my Tech Made Easy booking ${input.reference}. ${kind}. ${input.when}.`;
+    return `Hello Ainhoa, this is my ${TECH_BRAND} booking ${input.reference}. ${kind}. ${input.when}.`;
+  }
+  if (input.locale === "nl") {
+    const kind =
+      input.kind === "group" ? "groep" : input.kind === "individual" ? "individuele afspraak" : "verzoek om een ander tijdstip";
+    return `Hallo Ainhoa, dit is mijn ${TECH_BRAND}-reservering ${input.reference}. ${kind}. ${input.when}.`;
   }
   const kind =
     input.kind === "group" ? "grupo" : input.kind === "individual" ? "cita individual" : "solicitud de otra hora";
-  return `Hola Ainhoa, esta es mi reserva de Tech Made Easy ${input.reference}. ${kind}. ${input.when}.`;
+  return `Hola Ainhoa, esta es mi reserva de ${TECH_BRAND} ${input.reference}. ${kind}. ${input.when}.`;
 }
 
 export function sessionLength(kind: "group" | "individual"): number {

@@ -1,12 +1,33 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { adminCopy, adminLocaleFromSearch, type AdminLocale } from "@/lib/tech/admin-copy";
 import { isTechSupabaseConfigured } from "@/lib/tech/env";
 import { createTechBrowserClient } from "@/lib/tech/supabase-browser";
-import { GROUP_CAPACITY } from "@/lib/tech/constants";
+import {
+  applyBusyHourToggleLocal,
+  buildMonthCells,
+  hourIsWeeklyBusy,
+  isClosedDay,
+  minuteToHhMm,
+  planBusyHourToggle,
+  templateHourStarts,
+  TEMPLATE_DAY_CLOSE_MINUTE,
+  TEMPLATE_DAY_OPEN_MINUTE,
+  type WeeklyBusyRowLike,
+} from "@/lib/tech/calendar";
+import { GROUP_CAPACITY, SESSION_MINUTES } from "@/lib/tech/constants";
 import { parseAdminFocus } from "@/lib/tech/seo";
-import { approvalBlocked, formatMadrid, intervalsOverlap, madridLocalToUtc, wholeMadridDay, type Interval } from "@/lib/tech/time";
+import {
+  approvalBlocked,
+  formatMadrid,
+  intervalsOverlap,
+  madridDayKey,
+  madridLocalToUtc,
+  wholeMadridDay,
+  type Interval,
+} from "@/lib/tech/time";
 
 type SessionRow = {
   id: string;
@@ -29,6 +50,7 @@ type BookingRow = {
   phone: string;
   email: string | null;
   question: string | null;
+  session_language: "es" | "en" | null;
   status: string;
   attendance: string;
   payment_status: string;
@@ -46,6 +68,7 @@ type RequestRow = {
   phone: string;
   email: string | null;
   question: string | null;
+  session_language: "es" | "en" | null;
   status: string;
   source: string | null;
   created_at: string;
@@ -60,6 +83,16 @@ type NoteRow = {
   created_at: string;
 };
 
+type TestimonialRow = {
+  id: string;
+  display_name: string;
+  body: string;
+  place: string | null;
+  locale: string;
+  status: "pending" | "published" | "hidden";
+  created_at: string;
+};
+
 type BlockRow = {
   id: string;
   starts_at: string;
@@ -67,13 +100,73 @@ type BlockRow = {
   reason: string | null;
 };
 
-type AdminSection = "resumen" | "sesiones" | "reservas" | "solicitudes" | "mas";
+type CalendarSettingsRow = {
+  enabled: boolean;
+  day_open_minute: number;
+  day_close_minute: number;
+  buffer_minutes: number;
+  default_venue_label: string;
+};
+
+type WeeklyBusyRow = {
+  id: string;
+  weekday: number;
+  start_minute: number;
+  end_minute: number;
+  label: string | null;
+};
+
+type AdminSection = "resumen" | "sesiones" | "reservas" | "solicitudes" | "opiniones" | "mas";
+
+const WEEKDAY_SHORT = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"] as const;
+const TEMPLATE_HOURS = templateHourStarts();
+
+function defaultCalendarSettings(): CalendarSettingsRow {
+  return {
+    enabled: false,
+    day_open_minute: TEMPLATE_DAY_OPEN_MINUTE,
+    day_close_minute: TEMPLATE_DAY_CLOSE_MINUTE,
+    buffer_minutes: 15,
+    default_venue_label: "Guardamar del Segura",
+  };
+}
+
+function toBusyLike(row: WeeklyBusyRow): WeeklyBusyRowLike {
+  return {
+    id: row.id,
+    weekday: row.weekday,
+    startMinute: row.start_minute,
+    endMinute: row.end_minute,
+    label: row.label,
+  };
+}
+
+function fromBusyLike(row: WeeklyBusyRowLike): WeeklyBusyRow {
+  return {
+    id: row.id,
+    weekday: row.weekday,
+    start_minute: row.startMinute,
+    end_minute: row.endMinute,
+    label: row.label ?? null,
+  };
+}
+
+function monthTitle(year: number, month: number): string {
+  return new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric", timeZone: "UTC" }).format(
+    new Date(Date.UTC(year, month - 1, 1))
+  );
+}
+
+function todayMadridIso(): string {
+  return madridDayKey(new Date());
+}
 
 const SECTIONS: { id: AdminSection; label: string; short: string }[] = [
   { id: "resumen", label: "Resumen", short: "Inicio" },
   { id: "sesiones", label: "Sesiones", short: "Sesiones" },
   { id: "reservas", label: "Reservas", short: "Reservas" },
   { id: "solicitudes", label: "Solicitudes", short: "Pedidos" },
+  { id: "opiniones", label: "Opiniones", short: "Opiniones" },
   { id: "mas", label: "Más", short: "Más" },
 ];
 
@@ -150,8 +243,8 @@ function seedPreviewData() {
       id: sessionId,
       kind: "group",
       starts_at: inTwoDays.toISOString(),
-      duration_minutes: 75,
-      capacity: 5,
+      duration_minutes: 60,
+      capacity: 7,
       price_cents: 1000,
       venue_label: "Biblioteca municipal",
       venue_public: true,
@@ -220,7 +313,17 @@ function seedPreviewData() {
       reason: "Viaje",
     },
   ];
-  return { sessions, bookings, requests, notes, blocks };
+  const calendarSettings = defaultCalendarSettings();
+  const weeklyBusy: WeeklyBusyRow[] = [
+    {
+      id: "77777777-7777-4777-8777-777777777777",
+      weekday: 3,
+      start_minute: 780,
+      end_minute: 900,
+      label: "Clase de yoga",
+    },
+  ];
+  return { sessions, bookings, requests, notes, blocks, calendarSettings, weeklyBusy };
 }
 
 export default function TechAdminApp() {
@@ -229,6 +332,7 @@ export default function TechAdminApp() {
   const previewSeed = useMemo(() => (previewMode ? seedPreviewData() : null), [previewMode]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [ready, setReady] = useState(() => previewMode || !isTechSupabaseConfigured());
   const [isAdmin, setIsAdmin] = useState(previewMode);
   const [message, setMessage] = useState<string | null>(() => (previewMode ? "Vista previa local (datos de ejemplo)." : null));
@@ -238,14 +342,25 @@ export default function TechAdminApp() {
   const [requests, setRequests] = useState<RequestRow[]>(() => previewSeed?.requests ?? []);
   const [notes, setNotes] = useState<NoteRow[]>(() => previewSeed?.notes ?? []);
   const [blocks, setBlocks] = useState<BlockRow[]>(() => previewSeed?.blocks ?? []);
+  const [testimonials, setTestimonials] = useState<TestimonialRow[]>([]);
+  const [storyName, setStoryName] = useState("");
+  const [storyBody, setStoryBody] = useState("");
+  const [storyPlace, setStoryPlace] = useState("");
   const [kind, setKind] = useState<"group" | "individual">("group");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("10:00");
   const [capacity, setCapacity] = useState(GROUP_CAPACITY);
   const [venue, setVenue] = useState("");
   const [publish, setPublish] = useState(false);
-  const [blockDate, setBlockDate] = useState("");
-  const [blockReason, setBlockReason] = useState("");
+  const [calendarSettings, setCalendarSettings] = useState<CalendarSettingsRow>(() =>
+    previewSeed?.calendarSettings ?? defaultCalendarSettings()
+  );
+  const [weeklyBusy, setWeeklyBusy] = useState<WeeklyBusyRow[]>(() => previewSeed?.weeklyBusy ?? []);
+  const [closedView, setClosedView] = useState(() => {
+    const [year, month] = todayMadridIso().split("-").map(Number);
+    return { year, month };
+  });
+  const [scheduleBusy, setScheduleBusy] = useState(false);
   const [venues, setVenues] = useState<Record<string, string>>({});
   const [loadedAt, setLoadedAt] = useState<number | null>(() => (previewMode ? Date.now() : null));
   const [focusKey, setFocusKey] = useState<string | null>(null);
@@ -253,18 +368,31 @@ export default function TechAdminApp() {
     typeof window === "undefined" ? "es" : adminLocaleFromSearch(window.location.search)
   );
   const copy = adminCopy[locale];
+  const closedMonthCells = useMemo(() => buildMonthCells(closedView), [closedView]);
+  const closedRanges = useMemo(
+    () => blocks.map((block) => ({ startsAt: block.starts_at, endsAt: block.ends_at })),
+    [blocks]
+  );
+  const busyLikes = useMemo(() => weeklyBusy.map(toBusyLike), [weeklyBusy]);
 
   const load = useCallback(async () => {
     if (previewMode || !supabase) return;
-    const [sessionRes, bookingRes, requestRes, noteRes, blockRes] = await Promise.all([
+    const [sessionRes, bookingRes, requestRes, noteRes, blockRes, settingsRes, busyRes, storyRes] = await Promise.all([
       supabase.from("tech_sessions").select("id, kind, starts_at, duration_minutes, capacity, price_cents, venue_label, venue_public, status").order("starts_at"),
-      supabase.from("tech_bookings").select("id, session_id, public_reference, contact_name, attendee_name, phone, email, question, status, attendance, payment_status, source, created_at, price_cents").order("created_at", { ascending: false }),
-      supabase.from("tech_requests").select("id, public_reference, requested_start, contact_name, attendee_name, phone, email, question, status, source, created_at").order("created_at", { ascending: false }),
+      supabase.from("tech_bookings").select("id, session_id, public_reference, contact_name, attendee_name, phone, email, question, session_language, status, attendance, payment_status, source, created_at, price_cents").order("created_at", { ascending: false }),
+      supabase.from("tech_requests").select("id, public_reference, requested_start, contact_name, attendee_name, phone, email, question, session_language, status, source, created_at").order("created_at", { ascending: false }),
       supabase.from("tech_notifications").select("id, subject, status, attempts, last_error, created_at").order("created_at", { ascending: false }).limit(30),
       supabase.from("tech_blocks").select("id, starts_at, ends_at, reason").order("starts_at"),
+      supabase.from("tech_calendar_settings").select("enabled, day_open_minute, day_close_minute, buffer_minutes, default_venue_label").eq("id", 1).maybeSingle(),
+      supabase.from("tech_weekly_busy").select("id, weekday, start_minute, end_minute, label").order("weekday").order("start_minute"),
+      supabase.from("tech_testimonials").select("id, display_name, body, place, locale, status, created_at").order("created_at", { ascending: false }),
     ]);
     if (sessionRes.error || bookingRes.error || requestRes.error) {
       setMessage(sessionRes.error?.message || bookingRes.error?.message || requestRes.error?.message || "No se han podido leer los datos. ¿Está aplicada la migración?");
+      return;
+    }
+    if (settingsRes.error) {
+      setMessage(settingsRes.error.message);
       return;
     }
     setSessions((sessionRes.data ?? []) as SessionRow[]);
@@ -272,6 +400,41 @@ export default function TechAdminApp() {
     setRequests((requestRes.data ?? []) as RequestRow[]);
     setNotes((noteRes.data ?? []) as NoteRow[]);
     setBlocks((blockRes.data ?? []) as BlockRow[]);
+    if (settingsRes.data) {
+      const loaded = settingsRes.data as CalendarSettingsRow;
+      const aligned: CalendarSettingsRow = {
+        ...loaded,
+        day_open_minute: TEMPLATE_DAY_OPEN_MINUTE,
+        day_close_minute: TEMPLATE_DAY_CLOSE_MINUTE,
+      };
+      setCalendarSettings(aligned);
+      if (
+        loaded.day_open_minute !== TEMPLATE_DAY_OPEN_MINUTE ||
+        loaded.day_close_minute !== TEMPLATE_DAY_CLOSE_MINUTE
+      ) {
+        await supabase.from("tech_calendar_settings").upsert({
+          id: 1,
+          enabled: aligned.enabled,
+          day_open_minute: TEMPLATE_DAY_OPEN_MINUTE,
+          day_close_minute: TEMPLATE_DAY_CLOSE_MINUTE,
+          buffer_minutes: aligned.buffer_minutes,
+          default_venue_label: aligned.default_venue_label,
+        });
+      }
+    } else {
+      setCalendarSettings(defaultCalendarSettings());
+    }
+    if (busyRes.error) {
+      setMessage(busyRes.error.message);
+    } else {
+      setWeeklyBusy((busyRes.data ?? []) as WeeklyBusyRow[]);
+    }
+    if (storyRes.error) {
+      setTestimonials([]);
+      setMessage(storyRes.error.message);
+    } else {
+      setTestimonials((storyRes.data ?? []) as TestimonialRow[]);
+    }
     setLoadedAt(Date.now());
   }, [previewMode, supabase]);
 
@@ -380,7 +543,7 @@ export default function TechAdminApp() {
       return;
     }
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/tech-made-easy/admin`,
+      redirectTo: `${window.location.origin}/guardamar-click/admin`,
     });
     setMessage(error ? error.message : "Si la cuenta existe, llegará un email para cambiar la contraseña.");
   }
@@ -432,7 +595,7 @@ export default function TechAdminApp() {
       setMessage("Revisa el día y la hora.");
       return;
     }
-    const candidate = span(starts.toISOString(), kind === "group" ? 75 : 60);
+    const candidate = span(starts.toISOString(), SESSION_MINUTES);
     if (publish && approvalBlocked(occupied, candidate)) {
       setMessage("Esa hora se solapa con otra sesión confirmada.");
       return;
@@ -440,7 +603,7 @@ export default function TechAdminApp() {
     const { error } = await supabase.from("tech_sessions").insert({
       kind,
       starts_at: starts.toISOString(),
-      duration_minutes: kind === "group" ? 75 : 60,
+      duration_minutes: SESSION_MINUTES,
       capacity: kind === "group" ? capacity : 1,
       price_cents: kind === "group" ? 1000 : 2500,
       venue_label: venue.trim(),
@@ -462,24 +625,170 @@ export default function TechAdminApp() {
     await load();
   }
 
-  async function addBlock(event: FormEvent) {
+  async function saveCalendarSettings(event: FormEvent) {
     event.preventDefault();
-    if (previewMode || !supabase) {
-      if (previewMode) setMessage("Vista previa: no se guarda nada.");
+    const default_venue_label = calendarSettings.default_venue_label;
+    if (default_venue_label.trim().length < 3) {
+      setMessage("El lugar por defecto debe tener al menos 3 caracteres.");
       return;
     }
-    const range = wholeMadridDay(blockDate);
-    const { error } = await supabase.from("tech_blocks").insert({
-      starts_at: range.startsAt.toISOString(),
-      ends_at: range.endsAt.toISOString(),
-      reason: blockReason.trim() || null,
-    });
-    setMessage(error ? error.message : "Día bloqueado. Las sesiones ya publicadas hay que cancelarlas aparte.");
-    if (!error) {
-      setBlockDate("");
-      setBlockReason("");
-      await load();
+    const nextSettings: CalendarSettingsRow = {
+      ...calendarSettings,
+      day_open_minute: TEMPLATE_DAY_OPEN_MINUTE,
+      day_close_minute: TEMPLATE_DAY_CLOSE_MINUTE,
+      default_venue_label: default_venue_label.trim(),
+    };
+    setCalendarSettings(nextSettings);
+    if (previewMode) {
+      setMessage("Vista previa: horario actualizado solo en esta pestaña (08:00–20:00).");
+      return;
     }
+    if (!supabase) return;
+    const { error } = await supabase.from("tech_calendar_settings").upsert({
+      id: 1,
+      enabled: nextSettings.enabled,
+      day_open_minute: TEMPLATE_DAY_OPEN_MINUTE,
+      day_close_minute: TEMPLATE_DAY_CLOSE_MINUTE,
+      buffer_minutes: nextSettings.buffer_minutes,
+      default_venue_label: nextSettings.default_venue_label,
+    });
+    setMessage(
+      error
+        ? error.message
+        : nextSettings.enabled
+          ? "Horario guardado (08:00–20:00). El calendario público está activo."
+          : "Horario guardado (08:00–20:00). El calendario público sigue desactivado."
+    );
+    if (!error) await load();
+  }
+
+  async function toggleWeeklyBusyHour(weekday: number, hourStart: number) {
+    if (scheduleBusy) return;
+    if (previewMode) {
+      setWeeklyBusy((current) =>
+        applyBusyHourToggleLocal(current.map(toBusyLike), weekday, hourStart).map(fromBusyLike)
+      );
+      setMessage("Vista previa: plantilla semanal actualizada en local.");
+      return;
+    }
+    if (!supabase) return;
+    const plan = planBusyHourToggle(busyLikes, weekday, hourStart);
+    setScheduleBusy(true);
+    try {
+      for (const id of plan.deleteIds) {
+        const { error } = await supabase.from("tech_weekly_busy").delete().eq("id", id);
+        if (error) {
+          setMessage(error.message);
+          return;
+        }
+      }
+      for (const update of plan.updates) {
+        const { error } = await supabase
+          .from("tech_weekly_busy")
+          .update({ start_minute: update.startMinute, end_minute: update.endMinute })
+          .eq("id", update.id);
+        if (error) {
+          setMessage(error.message);
+          return;
+        }
+      }
+      if (plan.inserts.length > 0) {
+        const { error } = await supabase.from("tech_weekly_busy").insert(
+          plan.inserts.map((row) => ({
+            weekday: row.weekday,
+            start_minute: row.startMinute,
+            end_minute: row.endMinute,
+            label: row.label,
+          }))
+        );
+        if (error) {
+          setMessage(error.message);
+          return;
+        }
+      }
+      setMessage(
+        hourIsWeeklyBusy(busyLikes, weekday, hourStart)
+          ? "Hora liberada en la plantilla semanal."
+          : "Hora marcada como ocupada en la plantilla semanal."
+      );
+      await load();
+    } finally {
+      setScheduleBusy(false);
+    }
+  }
+
+  async function toggleClosedDay(dayKey: string) {
+    if (scheduleBusy) return;
+    const currentlyClosed = isClosedDay(dayKey, closedRanges);
+    if (previewMode) {
+      if (currentlyClosed) {
+        const range = wholeMadridDay(dayKey);
+        setBlocks((current) =>
+          current.filter(
+            (block) =>
+              !intervalsOverlap(
+                { startMs: new Date(block.starts_at).getTime(), endMs: new Date(block.ends_at).getTime() },
+                { startMs: range.startsAt.getTime(), endMs: range.endsAt.getTime() }
+              )
+          )
+        );
+        setMessage("Vista previa: día abierto en local.");
+      } else {
+        const range = wholeMadridDay(dayKey);
+        setBlocks((current) => [
+          ...current,
+          {
+            id: crypto.randomUUID(),
+            starts_at: range.startsAt.toISOString(),
+            ends_at: range.endsAt.toISOString(),
+            reason: null,
+          },
+        ]);
+        setMessage("Vista previa: día cerrado en local.");
+      }
+      return;
+    }
+    if (!supabase) return;
+    setScheduleBusy(true);
+    try {
+      if (currentlyClosed) {
+        const range = wholeMadridDay(dayKey);
+        const covering = blocks.filter((block) =>
+          intervalsOverlap(
+            { startMs: new Date(block.starts_at).getTime(), endMs: new Date(block.ends_at).getTime() },
+            { startMs: range.startsAt.getTime(), endMs: range.endsAt.getTime() }
+          )
+        );
+        for (const block of covering) {
+          const { error } = await supabase.from("tech_blocks").delete().eq("id", block.id);
+          if (error) {
+            setMessage(error.message);
+            return;
+          }
+        }
+        setMessage("Día abierto. Se pueden ofrecer citas ese día (según la plantilla).");
+      } else {
+        const range = wholeMadridDay(dayKey);
+        const { error } = await supabase.from("tech_blocks").insert({
+          starts_at: range.startsAt.toISOString(),
+          ends_at: range.endsAt.toISOString(),
+          reason: null,
+        });
+        if (error) {
+          setMessage(error.message);
+          return;
+        }
+        setMessage("Día cerrado. Las sesiones ya publicadas hay que cancelarlas aparte.");
+      }
+      await load();
+    } finally {
+      setScheduleBusy(false);
+    }
+  }
+
+  function shiftClosedMonth(delta: number) {
+    const base = new Date(Date.UTC(closedView.year, closedView.month - 1 + delta, 1));
+    setClosedView({ year: base.getUTCFullYear(), month: base.getUTCMonth() + 1 });
   }
 
   async function approve(request: RequestRow) {
@@ -631,6 +940,58 @@ export default function TechAdminApp() {
     if (!error) await load();
   }
 
+  async function addTestimonial(event: FormEvent) {
+    event.preventDefault();
+    const displayName = storyName.trim().replace(/\s+/g, " ");
+    const body = storyBody.trim().replace(/\s+/g, " ");
+    const place = storyPlace.trim().replace(/\s+/g, " ");
+    if (displayName.length < 1 || displayName.length > 60 || body.length < 8 || body.length > 400 || place.length > 80) {
+      setMessage("Revisa el nombre y el texto (entre 8 y 400 caracteres).");
+      return;
+    }
+    if (previewMode || !supabase) {
+      if (previewMode) setMessage("Vista previa: no se guarda nada.");
+      return;
+    }
+    const { error } = await supabase.from("tech_testimonials").insert({
+      display_name: displayName,
+      body,
+      place: place || null,
+      locale: "es",
+      status: "published",
+    });
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    setStoryName("");
+    setStoryBody("");
+    setStoryPlace("");
+    setMessage("Opinión publicada en la web.");
+    await load();
+  }
+
+  async function setTestimonialStatus(id: string, status: TestimonialRow["status"]) {
+    if (previewMode || !supabase) {
+      if (previewMode) setMessage("Vista previa: no se guarda nada.");
+      return;
+    }
+    const { error } = await supabase.from("tech_testimonials").update({ status }).eq("id", id);
+    setMessage(error ? error.message : status === "published" ? "Opinión visible en la web." : "Opinión oculta.");
+    if (!error) await load();
+  }
+
+  async function deleteTestimonial(id: string) {
+    if (previewMode || !supabase) {
+      if (previewMode) setMessage("Vista previa: no se borra nada.");
+      return;
+    }
+    if (!window.confirm("¿Borrar esta opinión?")) return;
+    const { error } = await supabase.from("tech_testimonials").delete().eq("id", id);
+    setMessage(error ? error.message : "Opinión borrada.");
+    if (!error) await load();
+  }
+
   function exportCsv() {
     const bySession = new Map(sessions.map((session) => [session.id, session]));
     const header = ["referencia", "estado", "cuando", "tipo", "contacto", "asiste", "telefono", "email", "pregunta", "pago", "asistencia", "origen", "creada"];
@@ -657,7 +1018,7 @@ export default function TechAdminApp() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "tech-made-easy-reservas.csv";
+    link.download = "guardamar-click-reservas.csv";
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -706,7 +1067,7 @@ export default function TechAdminApp() {
         <div className="tme-admin-shell tme-admin-login">
           <img
             className="tme-admin-logo"
-            src="/images/tech/guardamar-click-badge.png"
+            src="/images/tech/guardamar-click-badge-v2.png"
             alt=""
             width={72}
             height={72}
@@ -725,13 +1086,25 @@ export default function TechAdminApp() {
               onChange={(event) => setEmail(event.target.value)}
             />
             <label htmlFor="admin-password">Contraseña</label>
-            <input
-              id="admin-password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
+            <div className="tme-password-field">
+              <input
+                id="admin-password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+              <button
+                type="button"
+                className="tme-password-toggle"
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-pressed={showPassword}
+                aria-controls="admin-password"
+                onClick={() => setShowPassword((current) => !current)}
+              >
+                {showPassword ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
+              </button>
+            </div>
             {message ? (
               <p className="tme-alert" role="alert">
                 {message}
@@ -758,7 +1131,7 @@ export default function TechAdminApp() {
           <div className="tme-admin-brand">
             <img
               className="tme-admin-logo"
-              src="/images/tech/guardamar-click-badge.png"
+              src="/images/tech/guardamar-click-badge-v2.png"
               alt=""
               width={56}
               height={56}
@@ -773,7 +1146,7 @@ export default function TechAdminApp() {
             <button
               type="button"
               className="tme-secondary"
-              onClick={() => navigator.clipboard.writeText("https://iknowainhoa.com/tech-made-easy?src=flyer")}
+              onClick={() => navigator.clipboard.writeText("https://iknowainhoa.com/guardamar-click?src=flyer")}
             >
               Copiar cartel
             </button>
@@ -950,18 +1323,18 @@ export default function TechAdminApp() {
                 <div>
                   <label htmlFor="kind">Tipo</label>
                   <select id="kind" value={kind} onChange={(event) => setKind(event.target.value as "group" | "individual")}>
-                    <option value="group">Grupo · 75 min · 10 €</option>
+                    <option value="group">Grupo · 60 min · 10 €</option>
                     <option value="individual">Individual · 60 min · 25 €</option>
                   </select>
                 </div>
                 {kind === "group" ? (
                   <div>
-                    <label htmlFor="capacity">Plazas, máximo 5</label>
+                    <label htmlFor="capacity">Plazas, máximo {GROUP_CAPACITY}</label>
                     <input
                       id="capacity"
                       type="number"
                       min={1}
-                      max={5}
+                      max={GROUP_CAPACITY}
                       value={capacity}
                       onChange={(event) => setCapacity(Number(event.target.value))}
                     />
@@ -1075,6 +1448,9 @@ export default function TechAdminApp() {
                           {booking.phone}
                           {booking.email ? ` · ${booking.email}` : ""}
                         </p>
+                        <p className="tme-admin-note">
+                          Idioma: {booking.session_language === "en" ? "Inglés" : "Español"}
+                        </p>
                         {booking.question ? <p className="tme-admin-note">{booking.question}</p> : null}
                       </div>
                       <StatusPill
@@ -1149,6 +1525,9 @@ export default function TechAdminApp() {
                           {request.phone}
                           {request.email ? ` · ${request.email}` : ""}
                         </p>
+                        <p className="tme-admin-note">
+                          Idioma: {request.session_language === "en" ? "Inglés" : "Español"}
+                        </p>
                         {request.question ? <p className="tme-admin-note">{request.question}</p> : null}
                       </div>
                       <StatusPill status="pending" tone="warn" />
@@ -1178,33 +1557,232 @@ export default function TechAdminApp() {
           </section>
         ) : null}
 
+        {section === "opiniones" ? (
+          <section className="tme-admin-panel" aria-labelledby="admin-opiniones">
+            <div className="tme-admin-panel-head">
+              <h2 id="admin-opiniones">Opiniones</h2>
+              <p>Las que llegan desde la web esperan aquí. Publícalas para que salgan en la página, u ocúltalas.</p>
+            </div>
+            <form className="tme-admin-form tme-admin-card" onSubmit={addTestimonial}>
+              <h3>Añadir una a mano</h3>
+              <p className="tme-hint">Para una frase que te dijeron en persona. Se publica al guardar.</p>
+              <div className="tme-admin-form-grid">
+                <div>
+                  <label htmlFor="story-name">Nombre</label>
+                  <input id="story-name" value={storyName} maxLength={60} onChange={(event) => setStoryName(event.target.value)} required />
+                </div>
+                <div>
+                  <label htmlFor="story-place">Lugar, si quieres</label>
+                  <input id="story-place" value={storyPlace} maxLength={80} onChange={(event) => setStoryPlace(event.target.value)} />
+                </div>
+                <div className="tme-admin-span-2">
+                  <label htmlFor="story-body">Texto</label>
+                  <textarea id="story-body" rows={4} maxLength={400} value={storyBody} onChange={(event) => setStoryBody(event.target.value)} required />
+                </div>
+              </div>
+              <button type="submit" className="tme-primary">
+                Publicar en la web
+              </button>
+            </form>
+            <div className="tme-admin-list">
+              {testimonials.length === 0 ? <EmptyState>Todavía no hay opiniones.</EmptyState> : null}
+              {testimonials.map((story) => (
+                <article key={story.id} className="tme-admin-card">
+                  <div className="tme-admin-card-head">
+                    <div>
+                      <strong>{story.display_name}</strong>
+                      <p>
+                        {story.status === "published" ? "Visible" : story.status === "hidden" ? "Oculta" : "Pendiente"}
+                        {story.place ? ` · ${story.place}` : ""}
+                        {` · ${story.locale.toUpperCase()}`}
+                      </p>
+                      <p className="tme-admin-note">{story.body}</p>
+                    </div>
+                  </div>
+                  <div className="tme-admin-actions">
+                    {story.status !== "published" ? (
+                      <button type="button" className="tme-primary" onClick={() => setTestimonialStatus(story.id, "published")}>
+                        Publicar
+                      </button>
+                    ) : (
+                      <button type="button" className="tme-secondary" onClick={() => setTestimonialStatus(story.id, "hidden")}>
+                        Ocultar
+                      </button>
+                    )}
+                    <button type="button" className="tme-danger" onClick={() => deleteTestimonial(story.id)}>
+                      Borrar
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         {section === "mas" ? (
           <section className="tme-admin-panel" aria-labelledby="admin-mas">
             <div className="tme-admin-panel-head">
               <h2 id="admin-mas">Más</h2>
-              <p>Bloqueos, avisos, exportación y salida.</p>
+              <p>Horario del calendario público, bloqueos, avisos y herramientas.</p>
             </div>
 
-            <div className="tme-admin-grid">
-              <form className="tme-admin-form tme-admin-card" onSubmit={addBlock}>
-                <h3>Días bloqueados</h3>
-                <label htmlFor="block-day">Día</label>
-                <input id="block-day" type="date" value={blockDate} onChange={(event) => setBlockDate(event.target.value)} required />
-                <label htmlFor="block-reason">Motivo, solo para ti</label>
-                <input id="block-reason" value={blockReason} onChange={(event) => setBlockReason(event.target.value)} />
-                <button type="submit" className="tme-secondary">
-                  Bloquear día
-                </button>
-                <div className="tme-admin-list">
-                  {blocks.length === 0 ? <EmptyState>No hay días bloqueados.</EmptyState> : null}
-                  {blocks.map((block) => (
-                    <p key={block.id} className="tme-admin-muted-line">
-                      {formatMadrid(new Date(block.starts_at), "es")}
-                      {block.reason ? ` · ${block.reason}` : ""}
-                    </p>
-                  ))}
+            <form className="tme-admin-form tme-admin-card" onSubmit={saveCalendarSettings}>
+              <h3>Horario y calendario público</h3>
+              <p className="tme-hint">
+                La web solo muestra citas cuando activas el calendario. La plantilla semanal cubre de 08:00 a 20:00; las celdas ocupadas (y su margen) no se ofrecen.
+              </p>
+              <label className="tme-check">
+                <input
+                  type="checkbox"
+                  checked={calendarSettings.enabled}
+                  onChange={(event) => setCalendarSettings((current) => ({ ...current, enabled: event.target.checked }))}
+                />
+                <span>Calendario público activo (reservas en la web)</span>
+              </label>
+              <div className="tme-admin-form-grid">
+                <div>
+                  <span className="tme-admin-field-label">Ventana diaria</span>
+                  <p className="tme-admin-muted-line">08:00 – 20:00 (fija con la plantilla)</p>
                 </div>
-              </form>
+                <div>
+                  <label htmlFor="cal-buffer">Margen alrededor de ocupado (min)</label>
+                  <input
+                    id="cal-buffer"
+                    type="number"
+                    min={0}
+                    max={60}
+                    value={calendarSettings.buffer_minutes}
+                    onChange={(event) =>
+                      setCalendarSettings((current) => ({
+                        ...current,
+                        buffer_minutes: Number(event.target.value),
+                      }))
+                    }
+                  />
+                </div>
+                <div className="tme-admin-span-2">
+                  <label htmlFor="cal-venue">Lugar por defecto en reservas web</label>
+                  <input
+                    id="cal-venue"
+                    value={calendarSettings.default_venue_label}
+                    onChange={(event) =>
+                      setCalendarSettings((current) => ({ ...current, default_venue_label: event.target.value }))
+                    }
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" className="tme-primary">
+                Guardar horario
+              </button>
+
+              <h3>Plantilla semanal</h3>
+              <p className="tme-hint">
+                Pulsa una celda para marcarla libre u ocupada. Libre = se puede reservar; ocupada = bloqueada cada semana (más el margen).
+              </p>
+              <div className="tme-admin-legend" aria-hidden="true">
+                <span className="tme-admin-legend-item">
+                  <span className="tme-admin-swatch tme-admin-swatch-free" /> Libre
+                </span>
+                <span className="tme-admin-legend-item">
+                  <span className="tme-admin-swatch tme-admin-swatch-busy" /> Ocupada
+                </span>
+              </div>
+              <div className="tme-admin-sheet" role="region" aria-label="Plantilla semanal de disponibilidad">
+                <table className="tme-admin-week-grid">
+                  <thead>
+                    <tr>
+                      <th scope="col">Hora</th>
+                      {WEEKDAY_SHORT.map((label) => (
+                        <th key={label} scope="col">
+                          {label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {TEMPLATE_HOURS.map((hourStart) => (
+                      <tr key={hourStart}>
+                        <th scope="row">{minuteToHhMm(hourStart)}</th>
+                        {WEEKDAY_SHORT.map((_, index) => {
+                          const weekday = index + 1;
+                          const busy = hourIsWeeklyBusy(busyLikes, weekday, hourStart);
+                          return (
+                            <td key={`${weekday}-${hourStart}`}>
+                              <button
+                                type="button"
+                                className={busy ? "tme-admin-cell tme-admin-cell-busy" : "tme-admin-cell tme-admin-cell-free"}
+                                aria-pressed={busy}
+                                aria-label={`${WEEKDAY_SHORT[index]} ${minuteToHhMm(hourStart)} ${busy ? "ocupada" : "libre"}`}
+                                disabled={scheduleBusy}
+                                onClick={() => toggleWeeklyBusyHour(weekday, hourStart)}
+                              />
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </form>
+
+            <div className="tme-admin-grid">
+              <div className="tme-admin-card tme-admin-form">
+                <h3>Días cerrados</h3>
+                <p className="tme-hint">Pulsa un día para abrirlo o cerrarlo por completo. Cerrado = no se ofrecen citas ese día.</p>
+                <div className="tme-admin-legend" aria-hidden="true">
+                  <span className="tme-admin-legend-item">
+                    <span className="tme-admin-swatch tme-admin-swatch-free" /> Abierto
+                  </span>
+                  <span className="tme-admin-legend-item">
+                    <span className="tme-admin-swatch tme-admin-swatch-closed" /> Cerrado
+                  </span>
+                </div>
+                <div className="tme-admin-month-nav">
+                  <button type="button" className="tme-secondary" onClick={() => shiftClosedMonth(-1)}>
+                    Anterior
+                  </button>
+                  <strong className="tme-admin-month-label">{monthTitle(closedView.year, closedView.month)}</strong>
+                  <button type="button" className="tme-secondary" onClick={() => shiftClosedMonth(1)}>
+                    Siguiente
+                  </button>
+                </div>
+                <div className="tme-admin-month-grid" role="grid" aria-label="Días cerrados del mes">
+                  {WEEKDAY_SHORT.map((label) => (
+                    <div key={label} className="tme-admin-month-head" role="columnheader">
+                      {label}
+                    </div>
+                  ))}
+                  {closedMonthCells.map((cell, index) => {
+                    if (!cell.iso) {
+                      return <div key={`empty-${index}`} className="tme-admin-month-cell tme-admin-month-empty" />;
+                    }
+                    const closed = isClosedDay(cell.iso, closedRanges);
+                    const past = cell.iso < todayMadridIso();
+                    return (
+                      <button
+                        key={cell.iso}
+                        type="button"
+                        role="gridcell"
+                        className={[
+                          "tme-admin-month-cell",
+                          closed ? "tme-admin-month-closed" : "tme-admin-month-open",
+                          past ? "is-past" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        aria-pressed={closed}
+                        aria-label={`${cell.iso} ${closed ? "cerrado" : "abierto"}`}
+                        disabled={scheduleBusy}
+                        onClick={() => toggleClosedDay(cell.iso!)}
+                      >
+                        {Number(cell.iso.slice(-2))}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
               <div className="tme-admin-card">
                 <h3>Avisos</h3>
@@ -1232,7 +1810,7 @@ export default function TechAdminApp() {
                 <button
                   type="button"
                   className="tme-secondary"
-                  onClick={() => navigator.clipboard.writeText("https://iknowainhoa.com/tech-made-easy?src=flyer")}
+                  onClick={() => navigator.clipboard.writeText("https://iknowainhoa.com/guardamar-click?src=flyer")}
                 >
                   Copiar enlace del cartel
                 </button>

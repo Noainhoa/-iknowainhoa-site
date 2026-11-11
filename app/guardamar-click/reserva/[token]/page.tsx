@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Figtree, Fraunces } from "next/font/google";
 import TechConfirmation from "@/components/tech/TechConfirmation";
+import { TECH_BRAND } from "@/lib/tech/constants";
+import { getTechCopy } from "@/lib/tech/i18n";
 import { getTechLocale } from "@/lib/tech/locale";
-import "@/app/tech-made-easy/tech.css";
+import "@/app/guardamar-click/tech.css";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -17,15 +19,20 @@ const figtree = Figtree({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Reserva · Tech Made Easy",
-  robots: { index: false, follow: false, nocache: true },
-};
-
 type PageProps = {
   params: Promise<{ token: string }>;
   searchParams: Promise<{ lang?: string | string[] }>;
 };
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const query = await searchParams;
+  const locale = await getTechLocale(query.lang);
+  const copy = getTechCopy(locale);
+  return {
+    title: { absolute: `${copy.cancelTitle} · ${TECH_BRAND}` },
+    robots: { index: false, follow: false, nocache: true },
+  };
+}
 
 export default async function TechReservationPage({ params, searchParams }: PageProps) {
   const { token } = await params;

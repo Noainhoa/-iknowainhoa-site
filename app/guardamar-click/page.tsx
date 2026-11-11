@@ -30,13 +30,14 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const copy = getTechCopy(locale);
   const canonical = techCanonicalUrl(locale);
   return {
-    title: copy.metaTitle,
+    title: { absolute: copy.metaTitle },
     description: copy.metaDescription,
     alternates: {
       canonical,
       languages: {
         es: techCanonicalUrl("es"),
         en: techCanonicalUrl("en"),
+        nl: techCanonicalUrl("nl"),
         "x-default": techCanonicalUrl("es"),
       },
     },
@@ -44,7 +45,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       title: copy.metaTitle,
       description: copy.metaDescription,
       url: canonical,
-      locale: locale === "es" ? "es_ES" : "en_GB",
+      locale: locale === "es" ? "es_ES" : locale === "nl" ? "nl_NL" : "en_GB",
     },
   };
 }
@@ -56,7 +57,7 @@ export default async function TechMadeEasyPage({ searchParams }: PageProps) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Service",
-    name: "Tech Made Easy · Guardamar",
+    name: copy.brandName,
     description: copy.metaDescription,
     areaServed: "Guardamar del Segura",
     availableLanguage: ["Spanish", "English"],

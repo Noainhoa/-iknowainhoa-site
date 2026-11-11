@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Repeatable Tech Made Easy verification routine (local only).
+# Repeatable Guardamar Click verification routine (local only).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 echo "== 1. Lint =="
-npx eslint components/tech app/tech-made-easy lib/tech app/api/tech --max-warnings 0
+npx eslint components/tech app/guardamar-click lib/tech app/api/tech --max-warnings 0
 # Service-role must never be exposed as NEXT_PUBLIC_ (ignore *.test.ts guard strings)
-if rg -n "NEXT_PUBLIC_[A-Z0-9_]*SERVICE_ROLE|NEXT_PUBLIC_TECH_SUPABASE_SERVICE" lib/tech components/tech app/api/tech app/tech-made-easy .env.example -g '!**/*.test.ts'; then
+if rg -n "NEXT_PUBLIC_[A-Z0-9_]*SERVICE_ROLE|NEXT_PUBLIC_TECH_SUPABASE_SERVICE" lib/tech components/tech app/api/tech app/guardamar-click .env.example -g '!**/*.test.ts'; then
   echo "ERROR: service-role key must not be NEXT_PUBLIC_" >&2
   exit 1
 fi
@@ -27,7 +27,7 @@ npm run build
 
 echo "== 5. Manual follow-up =="
 echo "Start: npm run dev -- --port 3000"
-echo "Open: /tech-made-easy , /tech-made-easy?lang=en , /tech-made-easy/reserva/<token>"
+echo "Open: /guardamar-click , /guardamar-click?lang=en , /guardamar-click/reserva/<token>"
 echo "Screenshot at 375, 430, 768, 1280 into tmp/tech-verify-screenshots/"
 echo "Inspect Call/Book/WhatsApp: normal, hover, focus, disabled, error."
 echo "Check horizontal overflow, sticky bar vs #reservar, console errors, ES+EN."

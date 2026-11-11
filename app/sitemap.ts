@@ -87,12 +87,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     // Spanish = bare path; do not list ?lang=es (duplicate of canonical).
     {
-      url: `${baseUrl}/tech-made-easy`,
+      url: `${baseUrl}/guardamar-click`,
       changeFrequency: "weekly" as const,
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/tech-made-easy?lang=en`,
+      url: `${baseUrl}/guardamar-click?lang=en`,
+      changeFrequency: "weekly" as const,
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/guardamar-click?lang=nl`,
       changeFrequency: "weekly" as const,
       priority: 0.85,
     },

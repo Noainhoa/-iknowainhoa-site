@@ -71,8 +71,8 @@ export function madridLocalToUtc(date: string, time: string): Date {
   return new Date(asUtc.getTime() - offset);
 }
 
-export function formatMadrid(instant: Date, locale: "es" | "en"): string {
-  const tag = locale === "en" ? "en-GB" : "es-ES";
+export function formatMadrid(instant: Date, locale: "es" | "en" | "nl"): string {
+  const tag = locale === "en" ? "en-GB" : locale === "nl" ? "nl-NL" : "es-ES";
   return new Intl.DateTimeFormat(tag, {
     timeZone: TECH_TIMEZONE,
     weekday: "long",

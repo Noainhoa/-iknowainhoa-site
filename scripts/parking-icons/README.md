@@ -3,7 +3,7 @@
 ## Source
 
 - Parking: `public/images/parking/guardamar-parking-badge.png`
-- Click: `public/images/tech/guardamar-click-badge.png`
+- Click: `public/images/tech/guardamar-click-badge-v2.png`
 
 Both are circular badges with transparent corners. iOS shows transparent
 corners as black, so the generator continues each badge's rim colour out to

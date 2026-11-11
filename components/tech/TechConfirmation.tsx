@@ -6,6 +6,7 @@ import TechContactLinks from "@/components/tech/TechContactLinks";
 import { buildIcs } from "@/lib/tech/ics";
 import { getTechCopy } from "@/lib/tech/i18n";
 import type { TechLocale } from "@/lib/tech/locale";
+import { techPageHref } from "@/lib/tech/seo";
 import { customerWhatsAppText, euros } from "@/lib/tech/messages";
 import { formatMadrid } from "@/lib/tech/time";
 
@@ -111,10 +112,7 @@ export default function TechConfirmation({
     <main className="tme" lang={locale}>
       <div className="tme-wrap">
         <header className="tme-top">
-          <TechBrandLink
-            href={locale === "en" ? "/tech-made-easy?lang=en" : "/tech-made-easy"}
-            name={copy.brandName}
-          />
+          <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
         </header>
         <section className="tme-section" style={{ paddingTop: 12 }}>
           <h1>{copy.cancelTitle}</h1>
@@ -166,10 +164,7 @@ export default function TechConfirmation({
           </p>
           <TechContactLinks copy={copy} message={message} />
           <p style={{ marginTop: 16 }}>
-            <a
-              className="tme-secondary"
-              href={locale === "en" ? "/tech-made-easy?lang=en" : "/tech-made-easy"}
-            >
+            <a className="tme-secondary" href={techPageHref(locale)}>
               {copy.back}
             </a>
           </p>

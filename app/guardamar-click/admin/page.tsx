@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Figtree, Fraunces } from "next/font/google";
 import TechAdminApp from "@/components/tech/TechAdminApp";
-import "@/app/tech-made-easy/tech.css";
+import { TECH_BRAND } from "@/lib/tech/constants";
+import "@/app/guardamar-click/tech.css";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -17,7 +18,7 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
-  title: "Admin · Tech Made Easy",
+  title: { absolute: `Admin · ${TECH_BRAND}` },
   robots: { index: false, follow: false, nocache: true },
 };
 

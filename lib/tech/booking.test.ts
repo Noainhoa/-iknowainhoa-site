@@ -16,7 +16,7 @@ import {
   requestTimeAllowed,
   seatAvailable,
 } from "./time";
-import { notificationOutcome, readSource, validateBooking } from "./validate";
+import { notificationOutcome, readSource, validateBooking, validateTestimonial } from "./validate";
 
 const sql = readFileSync(new URL("../../supabase/tech-sessions.sql", import.meta.url), "utf8");
 
@@ -33,27 +33,28 @@ const validInput = {
   company: "",
   source: "flyer",
   locale: "es" as const,
+  sessionLanguage: "es" as const,
 };
 
 describe("tech booking rules", () => {
-  it("keeps a group open until the fifth confirmed place", () => {
-    assert.equal(seatAvailable(4, 5), true);
-    assert.equal(seatAvailable(5, 5), false);
+  it("keeps a group open until the seventh confirmed place", () => {
+    assert.equal(seatAvailable(6, 7), true);
+    assert.equal(seatAvailable(7, 7), false);
     assert.equal(seatAvailable(0, 1), true);
     assert.equal(seatAvailable(1, 1), false);
   });
 
   it("treats touching session times as free", () => {
-    const group = { startMs: 0, endMs: 75 * 60 * 1000 };
-    const next = { startMs: 75 * 60 * 1000, endMs: 150 * 60 * 1000 };
+    const group = { startMs: 0, endMs: 60 * 60 * 1000 };
+    const next = { startMs: 60 * 60 * 1000, endMs: 120 * 60 * 1000 };
     assert.equal(intervalsOverlap(group, next), false);
-    assert.equal(intervalsOverlap(group, { startMs: 60 * 60 * 1000, endMs: 120 * 60 * 1000 }), true);
+    assert.equal(intervalsOverlap(group, { startMs: 30 * 60 * 1000, endMs: 90 * 60 * 1000 }), true);
   });
 
   it("blocks approval when a confirmed session already occupies the hour", () => {
-    const existing = [{ startMs: Date.parse("2026-07-07T08:00:00Z"), endMs: Date.parse("2026-07-07T09:15:00Z") }];
+    const existing = [{ startMs: Date.parse("2026-07-07T08:00:00Z"), endMs: Date.parse("2026-07-07T09:00:00Z") }];
     const clash = { startMs: Date.parse("2026-07-07T08:30:00Z"), endMs: Date.parse("2026-07-07T09:30:00Z") };
-    const later = { startMs: Date.parse("2026-07-07T09:15:00Z"), endMs: Date.parse("2026-07-07T10:15:00Z") };
+    const later = { startMs: Date.parse("2026-07-07T09:00:00Z"), endMs: Date.parse("2026-07-07T10:00:00Z") };
     assert.equal(approvalBlocked(existing, clash), true);
     assert.equal(approvalBlocked(existing, later), false);
   });
@@ -119,7 +120,7 @@ describe("tech booking rules", () => {
     assert.match(mail.body, /AB23CD45/);
     assert.equal(mail.body.includes(token), false);
     assert.equal(mail.body.includes("/reserva/"), false);
-    assert.match(mail.body, /https:\/\/iknowainhoa\.com\/tech-made-easy\/admin\?focus=booking&ref=AB23CD45/);
+    assert.match(mail.body, /https:\/\/iknowainhoa\.com\/guardamar-click\/admin\?focus=booking&ref=AB23CD45/);
     assert.match(mail.subject, /Nueva reserva/);
   });
 
@@ -147,7 +148,7 @@ describe("tech booking rules", () => {
       reference: "AB23CD45",
       kind: "group",
       startsAt: madridLocalToUtc("2026-06-02", "10:00"),
-      durationMinutes: 75,
+      durationMinutes: 60,
       priceCents: 1000,
       venue: "Biblioteca",
       manageToken: token,
@@ -175,13 +176,13 @@ describe("tech booking rules", () => {
     assert.deepEqual(parseAdminFocus("booking", "ab23cd45"), { focus: "booking", ref: "AB23CD45" });
     assert.equal(parseAdminFocus("request", "bad"), null);
     assert.equal(parseAdminFocus("session", "AB23CD45"), null);
-    assert.match(techAdminFocusUrl("booking", "AB23CD45"), /^https:\/\/iknowainhoa\.com\/tech-made-easy\/admin\?/);
+    assert.match(techAdminFocusUrl("booking", "AB23CD45"), /^https:\/\/iknowainhoa\.com\/guardamar-click\/admin\?/);
   });
 
   it("builds a calendar file in UTC", () => {
     const ics = buildIcs({
       reference: "AB23CD45",
-      title: "Tech Made Easy",
+      title: "Guardamar Click",
       startsAt: new Date("2026-06-02T08:00:00.000Z"),
       endsAt: new Date("2026-06-02T09:15:00.000Z"),
       location: "Biblioteca, Guardamar",
@@ -191,27 +192,31 @@ describe("tech booking rules", () => {
     assert.match(ics, /LOCATION:Biblioteca\\, Guardamar/);
   });
 
-  it("uses Spanish and English only for this service", () => {
+  it("uses Spanish, English, and Dutch for this service", () => {
     assert.equal(resolveTechLocale(undefined, undefined), "es");
     assert.equal(resolveTechLocale(undefined, "en"), "en");
+    assert.equal(resolveTechLocale(undefined, "nl"), "nl");
     assert.equal(resolveTechLocale(undefined, "fr"), "es");
     assert.equal(resolveTechLocale("en", "es"), "en");
+    assert.equal(resolveTechLocale("nl", "en"), "nl");
     assert.equal(getTechCopy("es").headlineEm, "sin miedo");
     assert.equal(getTechCopy("en").headlineEm, "without fear");
-    assert.equal(shouldStripTechLangParam("/tech-made-easy", "es"), true);
-    assert.equal(shouldStripTechLangParam("/tech-made-easy", "en"), false);
-    assert.equal(shouldStripTechLangParam("/tech-made-easy", "fr"), true);
-    assert.equal(shouldStripTechLangParam("/tech-made-easy", "de"), true);
-    assert.equal(shouldStripTechLangParam("/tech-made-easy/admin", "es"), false);
+    assert.equal(getTechCopy("nl").headlineEm, "zonder angst");
+    assert.equal(shouldStripTechLangParam("/guardamar-click", "es"), true);
+    assert.equal(shouldStripTechLangParam("/guardamar-click", "en"), false);
+    assert.equal(shouldStripTechLangParam("/guardamar-click", "nl"), false);
+    assert.equal(shouldStripTechLangParam("/guardamar-click", "fr"), true);
+    assert.equal(shouldStripTechLangParam("/guardamar-click", "de"), true);
+    assert.equal(shouldStripTechLangParam("/guardamar-click/admin", "es"), false);
   });
 });
 
 describe("tech database migration", () => {
-  it("locks the session row, caps the group at five, and blocks overlapping confirmed time", () => {
+  it("locks the session row, caps the group at seven, and blocks overlapping confirmed time", () => {
     assert.match(sql, /FOR UPDATE/);
     assert.match(sql, /taken >= sess\.capacity/);
     assert.match(sql, /tech_sessions_no_overlap/);
-    assert.match(sql, /capacity BETWEEN 1 AND 5/);
+    assert.match(sql, /capacity BETWEEN 1 AND 7/);
     assert.match(sql, /kind = 'individual'[\s\S]*capacity = 1/);
   });
 
@@ -247,5 +252,47 @@ describe("tech database migration", () => {
     assert.match(cancelFn, /GRANT EXECUTE ON FUNCTION public\.tech_cancel_session\(JSONB\) TO authenticated/);
     assert.equal(/\bCOMMIT\b/i.test(cancelFn), false);
     assert.equal(/autonomous/i.test(cancelFn), false);
+  });
+});
+
+describe("tech testimonials", () => {
+  const storiesSql = readFileSync(new URL("../../supabase/tech-testimonials.sql", import.meta.url), "utf8");
+
+  it("keeps visitor opinions behind admin RLS and the service role", () => {
+    assert.match(storiesSql, /ENABLE ROW LEVEL SECURITY/);
+    assert.match(storiesSql, /is_tech_admin\(\)/);
+    assert.match(storiesSql, /REVOKE ALL ON tech_testimonials FROM PUBLIC, anon/);
+    assert.match(storiesSql, /GRANT SELECT, INSERT, UPDATE, DELETE ON tech_testimonials TO authenticated, service_role/);
+    assert.equal(/TO anon/.test(storiesSql), false);
+  });
+
+  it("accepts a short signed quote", () => {
+    const result = validateTestimonial({
+      displayName: "  María  ",
+      body: "  Por fin mandé la foto.  ",
+      place: "Guardamar",
+      consent: true,
+      locale: "es",
+    });
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.value.displayName, "María");
+      assert.equal(result.value.body, "Por fin mandé la foto.");
+      assert.equal(result.value.place, "Guardamar");
+    }
+  });
+
+  it("rejects a quote without consent or enough words", () => {
+    const result = validateTestimonial({
+      displayName: "Ana",
+      body: "Bien",
+      place: "",
+      consent: false,
+      locale: "en",
+    });
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.deepEqual(result.errors, ["quote", "consent"]);
+    }
   });
 });

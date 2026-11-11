@@ -1,100 +1,5 @@
 /** Claude V2 SVG illustrations — decorative only. */
 
-export function TechBrandMark({ size = 44 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 44 44" aria-hidden="true">
-      <circle cx="22" cy="22" r="22" fill="#0E4F5A" />
-      <circle cx="22" cy="16" r="6.5" fill="#F6BC3B" />
-      <path
-        d="M6 27c5-4 9-4 13 0s8 4 12 0 6-3 7-2"
-        stroke="#9CC8E4"
-        strokeWidth="3"
-        fill="none"
-        strokeLinecap="round"
-      />
-      <path
-        d="M9 34c4-3 7-3 10 0s7 3 10 0 5-2 6-1"
-        stroke="#FBF1DC"
-        strokeWidth="3"
-        fill="none"
-        strokeLinecap="round"
-        opacity=".7"
-      />
-    </svg>
-  );
-}
-
-export function TechHeroCoast() {
-  return (
-    <svg viewBox="0 0 360 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <defs>
-        <linearGradient id="tme-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#9CC8E4" />
-          <stop offset=".6" stopColor="#F7E8C8" />
-        </linearGradient>
-      </defs>
-      <rect width="360" height="450" fill="url(#tme-sky)" />
-      <circle cx="238" cy="150" r="80" fill="#F6BC3B" opacity=".16" />
-      <circle cx="238" cy="150" r="54" fill="#F6BC3B" opacity=".3" />
-      <circle cx="238" cy="150" r="34" fill="#F6BC3B" />
-      <path d="M0 250Q90 238 180 250T360 250V450H0Z" fill="#6FA9CF" />
-      <path d="M0 290Q90 276 180 290T360 290V450H0Z" fill="#3F86AE" />
-      <path d="M0 335Q90 320 180 335T360 335V450H0Z" fill="#1F6C84" />
-      <path d="M0 385Q100 365 200 385T360 372V450H0Z" fill="#0E4F5A" />
-      <path
-        d="M200 262h64M212 274h40M224 286h18"
-        stroke="#FBE3A3"
-        strokeWidth="3"
-        strokeLinecap="round"
-        opacity=".85"
-      />
-      <g transform="translate(78 212)">
-        <path d="M0 32h48l-8 10H8z" fill="#FBF1DC" />
-        <path d="M23 0v30H4z" fill="#fff" />
-        <path d="M27 8v22h19z" fill="#FBF1DC" />
-      </g>
-      <g transform="translate(298 328)">
-        <path d="M0 76V24" stroke="#5B3B22" strokeWidth="5" />
-        <ellipse cx="0" cy="20" rx="34" ry="14" fill="#2F6B4A" />
-        <ellipse cx="-8" cy="14" rx="20" ry="8" fill="#3C8059" />
-      </g>
-      <path d="M150 450C215 392 300 380 360 392V450z" fill="#EAD3A0" />
-      <path d="M200 450C250 415 310 410 360 418V450z" fill="#DDBF84" />
-    </svg>
-  );
-}
-
-export function TechPortrait() {
-  return (
-    <svg viewBox="0 0 240 300" aria-hidden="true">
-      <rect width="240" height="300" fill="#8DBBD9" />
-      <circle cx="170" cy="70" r="30" fill="#F6BC3B" />
-      <path d="M0 230q60-30 120-8t120-10v90H0z" fill="#3F86AE" opacity=".6" />
-      <circle cx="120" cy="140" r="42" fill="#E9B896" />
-      <path d="M72 138c-2-40 22-60 50-60s52 18 48 62c-8-22-22-30-48-30s-42 8-50 28z" fill="#4A2E22" />
-      <path d="M40 300c6-60 40-90 80-90s74 30 80 90z" fill="#FBF1DC" />
-      <path d="M100 212l20 22 20-22" fill="#E9B896" />
-      <circle cx="106" cy="144" r="3.5" fill="#3A2418" />
-      <circle cx="134" cy="144" r="3.5" fill="#3A2418" />
-      <path
-        d="M107 160c8 8 18 8 26 0"
-        stroke="#B9472F"
-        strokeWidth="3.5"
-        fill="none"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-export function TechWave() {
-  return (
-    <svg className="tme-wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0 80V40C160 8 320 8 480 40s320 32 480 0 320-32 480 0v40z" fill="currentColor" />
-    </svg>
-  );
-}
-
 export function IconPhone() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -182,7 +87,31 @@ export function IconWhatsAppBubble() {
   );
 }
 
-const TOPIC_ICONS = [IconChat, IconPhotos, IconCloud, IconSpark, IconVideo, IconShield] as const;
+/** Official-style WhatsApp phone-bubble mark (filled, currentColor). */
+export function IconWhatsApp() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+      />
+    </svg>
+  );
+}
+
+/** OpenAI / ChatGPT flower mark (filled, currentColor). */
+export function IconChatGPT() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .5157 4.9111 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0555 6.0555 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7581a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.1412.0852 4.783 2.758a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.1419-.0852-4.783-2.7625a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.097-.993l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"
+      />
+    </svg>
+  );
+}
+
+const TOPIC_ICONS = [IconWhatsApp, IconPhotos, IconCloud, IconChatGPT, IconVideo, IconShield] as const;
 
 export function TopicIcon({ index }: { index: number }) {
   const Icon = TOPIC_ICONS[index % TOPIC_ICONS.length];

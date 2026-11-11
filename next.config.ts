@@ -35,6 +35,36 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/tech-made-easy",
+        destination: "/guardamar-click",
+        permanent: true,
+      },
+      {
+        source: "/tech-made-easy/",
+        destination: "/guardamar-click/",
+        permanent: true,
+      },
+      {
+        source: "/tech-made-easy/admin",
+        destination: "/guardamar-click/admin",
+        permanent: true,
+      },
+      {
+        source: "/tech-made-easy/admin/",
+        destination: "/guardamar-click/admin/",
+        permanent: true,
+      },
+      {
+        source: "/tech-made-easy/reserva/:token",
+        destination: "/guardamar-click/reserva/:token",
+        permanent: true,
+      },
+      {
+        source: "/tech-made-easy/reserva/:token/",
+        destination: "/guardamar-click/reserva/:token/",
+        permanent: true,
+      },
+      {
         source: "/work/muebles-begui",
         destination: "https://mueblesbegui.es/",
         permanent: true,

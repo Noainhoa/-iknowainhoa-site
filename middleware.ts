@@ -9,9 +9,10 @@ export async function middleware(request: NextRequest) {
   const pathname = url.pathname.toLowerCase();
 
   // Persist language from ?lang= without stripping it, so URL and UI stay aligned.
+  // Tech also accepts nl (not a site-wide Locale); parking/site keep es|en|fr.
   const langParam = url.searchParams.get("lang");
   const applyLocaleCookie = (response: NextResponse) => {
-    if (langParam && isLocale(langParam)) {
+    if (langParam && (isLocale(langParam) || langParam === "nl")) {
       response.cookies.set("preferred_locale", langParam, {
         path: "/",
         sameSite: "lax",
