@@ -12,9 +12,7 @@ export type BookingInput = {
   phone: string;
   email: string;
   question: string;
-  acceptAttendance: boolean;
-  acceptCancellation: boolean;
-  acceptPrivacy: boolean;
+  acceptTerms: boolean;
   company: string;
   source: string | null;
   locale: TechLocale;
@@ -41,9 +39,7 @@ export type FieldError =
   | "email"
   | "question"
   | "secret"
-  | "attendance"
-  | "cancellation"
-  | "privacy"
+  | "terms"
   | "sessionLanguage";
 
 export function readSource(value: string | null | undefined): TechSource | null {
@@ -72,9 +68,7 @@ export function validateBooking(input: BookingInput): { ok: true; value: CleanBo
   const question = input.question.trim();
   if (question.length > 400) errors.push("question");
   if (question && SECRET_PATTERN.test(question)) errors.push("secret");
-  if (!input.acceptAttendance) errors.push("attendance");
-  if (!input.acceptCancellation) errors.push("cancellation");
-  if (!input.acceptPrivacy) errors.push("privacy");
+  if (!input.acceptTerms) errors.push("terms");
   const sessionLanguage = input.sessionLanguage === "en" || input.sessionLanguage === "es" ? input.sessionLanguage : null;
   if (!sessionLanguage) errors.push("sessionLanguage");
   if (errors.length || !phoneKey || !sessionLanguage) return { ok: false, errors };

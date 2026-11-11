@@ -27,7 +27,7 @@ import type { TechCopy } from "@/lib/tech/i18n";
 import type { TechLocale } from "@/lib/tech/locale";
 import { buildIcs } from "@/lib/tech/ics";
 import { customerWhatsAppText, euros } from "@/lib/tech/messages";
-import { techPageHref } from "@/lib/tech/seo";
+import { techConditionsHref, techPageHref } from "@/lib/tech/seo";
 import { readSource } from "@/lib/tech/validate";
 import { formatMadrid, madridLocalToUtc } from "@/lib/tech/time";
 import { newIdempotencyKey } from "@/lib/tech/idempotency";
@@ -101,9 +101,7 @@ export default function TechPublicApp({
   const [email, setEmail] = useState("");
   const [question, setQuestion] = useState("");
   const [sessionLanguage, setSessionLanguage] = useState<SessionLanguage>(locale === "en" ? "en" : "es");
-  const [attendance, setAttendance] = useState(false);
-  const [cancellation, setCancellation] = useState(false);
-  const [privacy, setPrivacy] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [company, setCompany] = useState("");
   const [source, setSource] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -260,9 +258,7 @@ export default function TechPublicApp({
           phone,
           email,
           question,
-          acceptAttendance: attendance,
-          acceptCancellation: cancellation,
-          acceptPrivacy: privacy,
+          acceptTerms,
           company,
           source,
           locale,
@@ -842,6 +838,7 @@ export default function TechPublicApp({
                 <label htmlFor="tme-name">{copy.contactName}</label>
                 <input
                   id="tme-name"
+                  type="text"
                   autoComplete="given-name"
                   value={contactName}
                   onChange={(event) => setContactName(event.target.value)}
@@ -856,6 +853,7 @@ export default function TechPublicApp({
                     <label htmlFor="tme-attendee">{copy.attendeeName}</label>
                     <input
                       id="tme-attendee"
+                      type="text"
                       value={attendeeName}
                       onChange={(event) => setAttendeeName(event.target.value)}
                       required
@@ -893,22 +891,22 @@ export default function TechPublicApp({
                 <label className="tme-check">
                   <input
                     type="checkbox"
-                    checked={attendance}
-                    onChange={(event) => setAttendance(event.target.checked)}
+                    checked={acceptTerms}
+                    onChange={(event) => setAcceptTerms(event.target.checked)}
                   />
-                  <span>{copy.attendance}</span>
-                </label>
-                <label className="tme-check">
-                  <input
-                    type="checkbox"
-                    checked={cancellation}
-                    onChange={(event) => setCancellation(event.target.checked)}
-                  />
-                  <span>{copy.cancellation}</span>
-                </label>
-                <label className="tme-check">
-                  <input type="checkbox" checked={privacy} onChange={(event) => setPrivacy(event.target.checked)} />
-                  <span>{copy.privacy}</span>
+                  <span>
+                    {copy.termsAcceptBefore}
+                    <a
+                      className="tme-inline-link"
+                      href={techConditionsHref(locale)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      {copy.termsLinkLabel}
+                    </a>
+                    {copy.termsAcceptAfter}
+                  </span>
                 </label>
                 <div className="tme-hp" aria-hidden="true">
                   <label htmlFor="tme-company">Company</label>
@@ -930,11 +928,6 @@ export default function TechPublicApp({
                 </button>
               </form>
             ) : null}
-
-            <section style={{ marginTop: 28 }}>
-              <h3 style={{ fontSize: 20 }}>{copy.privacyTitle}</h3>
-              <p className="tme-note">{copy.privacyBody}</p>
-            </section>
           </div>
         </div>
       </section>

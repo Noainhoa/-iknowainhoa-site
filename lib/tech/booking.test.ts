@@ -27,9 +27,7 @@ const validInput = {
   phone: "+34 636 67 01 03",
   email: "",
   question: "El móvil no abre el correo",
-  acceptAttendance: true,
-  acceptCancellation: true,
-  acceptPrivacy: true,
+  acceptTerms: true,
   company: "",
   source: "flyer",
   locale: "es" as const,
@@ -88,7 +86,7 @@ describe("tech booking rules", () => {
     if (ok.ok) assert.equal(ok.value.phoneKey, "34636670103");
     const secret = validateBooking({ ...validInput, question: "password: 1234" });
     assert.equal(secret.ok, false);
-    const consent = validateBooking({ ...validInput, acceptPrivacy: false });
+    const consent = validateBooking({ ...validInput, acceptTerms: false });
     assert.equal(consent.ok, false);
     assert.equal(readSource("Instagram"), "instagram");
     assert.equal(readSource("newsletter"), null);

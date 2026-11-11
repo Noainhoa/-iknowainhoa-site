@@ -942,6 +942,7 @@
   font-size: 15px;
 }
 
+.tme input:not([type]),
 .tme input[type="text"],
 .tme input[type="tel"],
 .tme input[type="email"],
@@ -975,6 +976,70 @@
   width: 18px;
   height: 18px;
   flex: none;
+}
+
+.tme-inline-link {
+  color: var(--tme-sea);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tme-inline-link:hover {
+  color: var(--tme-ink);
+}
+
+.tme-conditions-page {
+  padding-top: 28px;
+  padding-bottom: 48px;
+}
+
+.tme-conditions-inner {
+  max-width: 720px;
+  padding: 0 24px 40px;
+}
+
+.tme-conditions-inner .tme-lang {
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+.tme-conditions-back {
+  margin: 0 0 18px;
+  font-size: 15px;
+}
+
+.tme-conditions-back a {
+  color: var(--tme-sea);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tme-conditions-inner h1 {
+  margin: 0 0 12px;
+  font: 700 34px / 1.15 var(--tme-serif);
+  color: var(--tme-ink);
+}
+
+.tme-conditions-intro {
+  margin: 0 0 28px;
+  color: var(--tme-muted);
+}
+
+.tme-conditions-section {
+  margin-bottom: 22px;
+}
+
+.tme-conditions-section h2 {
+  margin: 0 0 8px;
+  font: 700 18px / 1.3 var(--tme-sans);
+  color: var(--tme-ink);
+}
+
+.tme-conditions-section p {
+  margin: 0 0 8px;
+  color: var(--tme-ink);
 }
 
 .tme-hint {

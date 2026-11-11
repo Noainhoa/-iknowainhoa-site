@@ -129,9 +129,9 @@ export type TechCopy = {
   questionHint: string;
   date: string;
   time: string;
-  attendance: string;
-  cancellation: string;
-  privacy: string;
+  termsAcceptBefore: string;
+  termsLinkLabel: string;
+  termsAcceptAfter: string;
   submitBook: string;
   submitRequest: string;
   saving: string;
@@ -150,8 +150,6 @@ export type TechCopy = {
   call: string;
   whatsapp: string;
   back: string;
-  privacyTitle: string;
-  privacyBody: string;
   cancelTitle: string;
   cancelButton: string;
   cancelling: string;
@@ -327,11 +325,9 @@ const es: TechCopy = {
   questionHint: "No escribas contraseñas, códigos ni datos bancarios.",
   date: "Día",
   time: "Hora",
-  attendance: "Confirmo que estaré.",
-  cancellation:
-    "Puedo cancelar gratis hasta 24 horas antes. Más tarde, llamaré a Ainhoa. No hay ningún cargo automático.",
-  privacy:
-    "Acepto que Ainhoa guarde mi nombre y mi teléfono para organizar esta reserva, y los borre cuando ya no hagan falta.",
+  termsAcceptBefore: "Acepto los ",
+  termsLinkLabel: "términos y condiciones",
+  termsAcceptAfter: ".",
   submitBook: "Confirmar reserva",
   submitRequest: "Enviar solicitud",
   saving: "Guardando…",
@@ -345,9 +341,7 @@ const es: TechCopy = {
     place: "El lugar es demasiado largo.",
     consent: "Marca que aceptas que se muestre tu opinión.",
     secret: "No envíes contraseñas ni códigos. Cuéntalo con tus palabras en la sesión.",
-    attendance: "Marca que estarás.",
-    cancellation: "Marca que has leído la cancelación.",
-    privacy: "Marca que aceptas guardar los datos de la reserva.",
+    terms: "Marca que aceptas los términos y condiciones.",
     sessionLanguage: "Elige si prefieres la sesión en español o en inglés.",
     tech_full: "Esa sesión se acaba de llenar. Elige otra.",
     tech_duplicate: "Este teléfono ya tiene una plaza en esa sesión.",
@@ -383,9 +377,6 @@ const es: TechCopy = {
   call: "Llamar a Ainhoa",
   whatsapp: "WhatsApp",
   back: "Volver a reservar",
-  privacyTitle: "Datos",
-  privacyBody:
-    "Ainhoa Ferrandis Perea guarda el nombre, el teléfono, el email si lo dejas y la nota si la escribes, solo para organizar la sesión. Puedes pedir que los borre. No se piden contraseñas ni datos de cuentas.",
   cancelTitle: "Tu reserva",
   cancelButton: "Cancelar reserva",
   cancelling: "Cancelando…",
@@ -562,11 +553,9 @@ const en: TechCopy = {
   questionHint: "Do not type passwords, codes, or bank details.",
   date: "Day",
   time: "Time",
-  attendance: "I confirm I will be there.",
-  cancellation:
-    "I can cancel free of charge until 24 hours before. After that, I will call Ainhoa. There is no automatic charge.",
-  privacy:
-    "I agree that Ainhoa keeps my name and phone number to organise this booking, and deletes them when they are no longer needed.",
+  termsAcceptBefore: "I accept the ",
+  termsLinkLabel: "terms and conditions",
+  termsAcceptAfter: ".",
   submitBook: "Confirm booking",
   submitRequest: "Send request",
   saving: "Saving…",
@@ -580,9 +569,7 @@ const en: TechCopy = {
     place: "That place name is too long.",
     consent: "Please agree that your testimonial can be shown.",
     secret: "Do not send passwords or codes. You can explain it in person.",
-    attendance: "Please confirm you will attend.",
-    cancellation: "Please confirm you have read the cancellation terms.",
-    privacy: "Please agree to storing the booking details.",
+    terms: "Please accept the terms and conditions.",
     sessionLanguage: "Choose whether you prefer the session in Spanish or English.",
     tech_full: "That session has just filled up. Please choose another.",
     tech_duplicate: "This phone number already has a place in that session.",
@@ -618,9 +605,6 @@ const en: TechCopy = {
   call: "Call Ainhoa",
   whatsapp: "WhatsApp",
   back: "Back to booking",
-  privacyTitle: "Your details",
-  privacyBody:
-    "Ainhoa Ferrandis Perea keeps the name, phone number, email if you leave one, and note if you write one, only to organise the session. You can ask for them to be deleted. Passwords and account details are not collected.",
   cancelTitle: "Your booking",
   cancelButton: "Cancel booking",
   cancelling: "Cancelling…",
@@ -797,11 +781,9 @@ const nl: TechCopy = {
   questionHint: "Schrijf geen wachtwoorden, codes of bankgegevens.",
   date: "Dag",
   time: "Tijd",
-  attendance: "Ik bevestig dat ik kom.",
-  cancellation:
-    "Ik kan gratis annuleren tot 24 uur van tevoren. Daarna bel ik Ainhoa. Er wordt niets automatisch afgeschreven.",
-  privacy:
-    "Ik ga akkoord dat Ainhoa mijn naam en telefoonnummer bewaart om deze reservering te organiseren, en ze verwijdert wanneer ze niet meer nodig zijn.",
+  termsAcceptBefore: "Ik accepteer de ",
+  termsLinkLabel: "algemene voorwaarden",
+  termsAcceptAfter: ".",
   submitBook: "Reservering bevestigen",
   submitRequest: "Aanvraag versturen",
   saving: "Opslaan…",
@@ -815,9 +797,7 @@ const nl: TechCopy = {
     place: "Die plaatsnaam is te lang.",
     consent: "Geef akkoord dat je ervaring getoond mag worden.",
     secret: "Stuur geen wachtwoorden of codes. Je kunt het tijdens de sessie uitleggen.",
-    attendance: "Bevestig dat je komt.",
-    cancellation: "Bevestig dat je de annuleringsvoorwaarden hebt gelezen.",
-    privacy: "Geef akkoord voor het bewaren van de reserveringsgegevens.",
+    terms: "Accepteer de algemene voorwaarden.",
     sessionLanguage: "Kies of je de sessie liever in het Spaans of Engels wilt.",
     tech_full: "Die sessie is net vol geraakt. Kies een andere.",
     tech_duplicate: "Dit telefoonnummer heeft al een plek in die sessie.",
@@ -855,9 +835,6 @@ const nl: TechCopy = {
   call: "Ainhoa bellen",
   whatsapp: "WhatsApp",
   back: "Terug naar reserveren",
-  privacyTitle: "Je gegevens",
-  privacyBody:
-    "Ainhoa Ferrandis Perea bewaart de naam, het telefoonnummer, de e-mail als je die achterlaat en de notitie als je die schrijft, alleen om de sessie te organiseren. Je kunt vragen om ze te verwijderen. Wachtwoorden en accountgegevens worden niet gevraagd.",
   cancelTitle: "Je reservering",
   cancelButton: "Reservering annuleren",
   cancelling: "Annuleren…",
