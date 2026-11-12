@@ -23,9 +23,11 @@ ALTER TABLE tech_sessions
     )
     OR (
       kind = 'individual'
-      AND duration_minutes = 60
       AND capacity = 1
-      AND price_cents = 2500
+      AND (
+        (duration_minutes = 60 AND price_cents = 2500)
+        OR (duration_minutes = 30 AND price_cents = 1000)
+      )
     )
   );
 

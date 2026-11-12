@@ -59,6 +59,7 @@ export type TechCopy = {
   individualTitle: string;
   individualAmtNote: string;
   individualDuration: string;
+  individualShortDuration: string;
   individualPoints: string[];
   bookGroup: string;
   bookIndividual: string;
@@ -87,6 +88,7 @@ export type TechCopy = {
   choose: string;
   groupOption: string;
   individualOption: string;
+  individualShortOption: string;
   otherTime: string;
   otherTimeHelp: string;
   loading: string;
@@ -236,6 +238,7 @@ const es: TechCopy = {
   individualTitle: "Sesión privada",
   individualAmtNote: "por sesión",
   individualDuration: "60 minutos",
+  individualShortDuration: "30 minutos",
   individualPoints: [
     "Tú y tus dudas, a tu ritmo",
     "Configuramos tu móvil juntos",
@@ -281,7 +284,8 @@ const es: TechCopy = {
   placeBody: "Guardamar del Segura. Junto a la Escuela de Música Auditorio",
   choose: "Elige el día y la hora",
   groupOption: "En grupo",
-  individualOption: "Privada",
+  individualOption: "Privada 60",
+  individualShortOption: "Privada 30",
   otherTime: "Pedir otra hora",
   otherTimeHelp:
     "Esto no reserva la hora. Ainhoa la revisa y te confirma solo si puede. Hasta entonces, la hora sigue libre.",
@@ -464,6 +468,7 @@ const en: TechCopy = {
   individualTitle: "Private session",
   individualAmtNote: "per session",
   individualDuration: "60 minutes",
+  individualShortDuration: "30 minutes",
   individualPoints: [
     "You and your questions, at your pace",
     "We set up your phone together",
@@ -509,7 +514,8 @@ const en: TechCopy = {
   placeBody: "Guardamar del Segura. Next to the Music School Auditorium",
   choose: "Choose the day and time",
   groupOption: "In a group",
-  individualOption: "Private",
+  individualOption: "Private 60",
+  individualShortOption: "Private 30",
   otherTime: "Ask for another time",
   otherTimeHelp:
     "This does not reserve the time. Ainhoa checks it and confirms only if she can. Until then, the time stays free.",
@@ -692,6 +698,7 @@ const nl: TechCopy = {
   individualTitle: "Privésessie",
   individualAmtNote: "per sessie",
   individualDuration: "60 minuten",
+  individualShortDuration: "30 minuten",
   individualPoints: [
     "Jij en je vragen, in jouw tempo",
     "We stellen je telefoon samen in",
@@ -737,7 +744,8 @@ const nl: TechCopy = {
   placeBody: "Guardamar del Segura. Naast de Escuela de Música Auditorio",
   choose: "Kies de dag en tijd",
   groupOption: "In een groep",
-  individualOption: "Privé",
+  individualOption: "Privé 60",
+  individualShortOption: "Privé 30",
   otherTime: "Vraag een andere tijd aan",
   otherTimeHelp:
     "Dit reserveert de tijd nog niet. Ainhoa bekijkt je aanvraag en bevestigt alleen als het kan. Tot die tijd blijft de tijd vrij.",

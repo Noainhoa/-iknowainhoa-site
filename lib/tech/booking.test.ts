@@ -216,6 +216,7 @@ describe("tech database migration", () => {
     assert.match(sql, /tech_sessions_no_overlap/);
     assert.match(sql, /capacity BETWEEN 1 AND 7/);
     assert.match(sql, /kind = 'individual'[\s\S]*capacity = 1/);
+    assert.match(sql, /duration_minutes = 30 AND price_cents = 1000/);
   });
 
   it("keeps customer rows and booking functions away from the public", () => {

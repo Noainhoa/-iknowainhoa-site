@@ -271,7 +271,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px 14px;
   padding: 8px 0 6px;
 }
@@ -291,8 +291,8 @@
 
 .tme-brand-logo {
   display: block;
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   /* Circle comes from PNG alpha (+ padding); avoid border-radius clipping the rim */
   border-radius: 0;
   object-fit: contain;
@@ -330,6 +330,10 @@
   line-height: 1.18;
   letter-spacing: -0.02em;
   color: var(--tme-ink);
+}
+
+.tme-brand-text h1 em {
+  white-space: nowrap;
 }
 
 .tme-brand-text .tme-meta {
@@ -2019,8 +2023,8 @@
   }
 
   .tme-brand-logo {
-    width: 72px;
-    height: 72px;
+    width: 48px;
+    height: 48px;
   }
 
   .tme-brand-block {
@@ -2112,7 +2116,11 @@
   }
 
   .tme-plans {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tme-plans .tme-amt {
+    font-size: 52px;
   }
 
   .tme-book {

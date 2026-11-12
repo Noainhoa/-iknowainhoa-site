@@ -55,9 +55,11 @@ CREATE TABLE IF NOT EXISTS tech_sessions (
     )
     OR (
       kind = 'individual'
-      AND duration_minutes = 60
       AND capacity = 1
-      AND price_cents = 2500
+      AND (
+        (duration_minutes = 60 AND price_cents = 2500)
+        OR (duration_minutes = 30 AND price_cents = 1000)
+      )
     )
   ),
   -- Note: hour-calendar template, ±15 life buffer, weekly slot cap (3), and

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { TechBrandLink } from "@/components/tech/TechBrandLink";
 import TechBookingCalendar, {
+  type BookingProduct,
   type CalendarSelection,
   type CalendarSession,
 } from "@/components/tech/TechBookingCalendar";
@@ -20,7 +21,14 @@ import {
 } from "@/components/tech/TechIllustrations";
 import WhatsAppMark from "@/components/tech/WhatsAppMark";
 import { externalAnchorProps } from "@/lib/links";
-import { GROUP_PRICE_CENTS, INDIVIDUAL_PRICE_CENTS, TECH_PATH } from "@/lib/tech/constants";
+import {
+  GROUP_PRICE_CENTS,
+  INDIVIDUAL_PRICE_CENTS,
+  INDIVIDUAL_SHORT_MINUTES,
+  INDIVIDUAL_SHORT_PRICE_CENTS,
+  TECH_PATH,
+  priceCentsForCreate,
+} from "@/lib/tech/constants";
 import { site, siteWhatsAppEnquiryHref } from "@/lib/site";
 import { formatNationalPhone, telHref } from "@/lib/tech/phone";
 import type { TechCopy } from "@/lib/tech/i18n";
@@ -38,7 +46,7 @@ const HERO_FAQ_ART: Record<TechLocale, string> = {
   nl: "/images/tech/everyday-faqs-nl.png",
 };
 
-type Kind = "group" | "individual" | "request";
+type Kind = "group" | "individual60" | "individual30" | "request";
 
 type Success = {
   title: string;
@@ -52,6 +60,11 @@ type Success = {
   durationMinutes: number;
   replayed: boolean;
 };
+
+function productFromKind(kind: Kind): BookingProduct | null {
+  if (kind === "group" || kind === "individual60" || kind === "individual30") return kind;
+  return null;
+}
 
 const TIMES = Array.from({ length: 20 }, (_, index) => {
   const minutes = 9 * 60 + index * 30;
@@ -86,6 +99,7 @@ export default function TechPublicApp({
   const [sessions, setSessions] = useState<CalendarSession[]>([]);
   const [templateReady, setTemplateReady] = useState(false);
   const [bookableStarts, setBookableStarts] = useState<string[]>([]);
+  const [bookableStartsShort, setBookableStartsShort] = useState<string[]>([]);
   const [nextJoinableGroup, setNextJoinableGroup] = useState<CalendarSession | null>(null);
   const [weekSlotCounts, setWeekSlotCounts] = useState<Record<string, number>>({});
   const [dayOpenMinute, setDayOpenMinute] = useState(540);
@@ -135,6 +149,7 @@ export default function TechPublicApp({
           settings?: { dayOpenMinute?: number; dayCloseMinute?: number; bufferMinutes?: number };
           sessions?: CalendarSession[];
           bookableStarts?: string[];
+          bookableStartsShort?: string[];
           nextJoinableGroup?: CalendarSession | null;
           weekSlotCounts?: Record<string, number>;
           error?: string;
@@ -152,6 +167,7 @@ export default function TechPublicApp({
           setTemplateReady(payload.templateReady === true);
           setSessions(payload.sessions ?? []);
           setBookableStarts(payload.bookableStarts ?? []);
+          setBookableStartsShort(payload.bookableStartsShort ?? []);
           setNextJoinableGroup(payload.nextJoinableGroup ?? null);
           setWeekSlotCounts(payload.weekSlotCounts ?? {});
           setDayOpenMinute(payload.settings?.dayOpenMinute ?? 540);
@@ -185,7 +201,7 @@ export default function TechPublicApp({
     return () => observer.disconnect();
   }, [success]);
 
-  function openBooking(next: "group" | "individual") {
+  function openBooking(next: BookingProduct) {
     setKind(next);
     setSelection(null);
     window.setTimeout(() => {
@@ -193,7 +209,9 @@ export default function TechPublicApp({
     }, 0);
   }
 
-  const bookingKind = kind === "request" ? null : kind;
+  const bookingProduct = productFromKind(kind);
+  const activeBookableStarts =
+    kind === "individual30" ? bookableStartsShort : bookableStarts;
 
   function downloadCalendar(item: Success) {
     if (item.kind === "request") return;
@@ -239,7 +257,11 @@ export default function TechPublicApp({
           : selection?.mode === "join"
             ? { sessionId: selection.session.id }
             : selection?.mode === "create"
-              ? { startsAt: selection.startsAt, kind: selection.kind }
+              ? {
+                  startsAt: selection.startsAt,
+                  kind: selection.kind,
+                  durationMinutes: selection.durationMinutes,
+                }
               : null;
       if (kind !== "request" && !bookPayload) {
         setSaving(false);
@@ -414,7 +436,6 @@ export default function TechPublicApp({
 
   const brandUnit = (
     <div className="tme-brand-block">
-      <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
       <div className="tme-brand-text">
         <p className="tme-eyebrow">{copy.kicker}</p>
         <h1>
@@ -505,7 +526,10 @@ export default function TechPublicApp({
   return (
     <div className="tme">
       <div className="tme-wrap">
-        <header className={`tme-top${navOpen ? " is-nav-open" : ""}`}>{utilities}</header>
+        <header className={`tme-top${navOpen ? " is-nav-open" : ""}`}>
+          <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
+          {utilities}
+        </header>
 
         <div className="tme-hero">
           <div className="tme-hero-copy">
@@ -643,7 +667,30 @@ export default function TechPublicApp({
                   <li key={point}>{point}</li>
                 ))}
               </ul>
-              <button type="button" className="tme-btn tme-btn-teal" onClick={() => openBooking("individual")}>
+              <button type="button" className="tme-btn tme-btn-teal" onClick={() => openBooking("individual60")}>
+                {copy.bookIndividual}
+              </button>
+            </div>
+            <div className="tme-plan tme-plan-i tme-plan-short">
+              <span className="tme-plan-k">{copy.individualKicker}</span>
+              <h3>{copy.individualTitle}</h3>
+              <div className="tme-amt">
+                {euros(INDIVIDUAL_SHORT_PRICE_CENTS, locale)}
+                <small>{copy.individualAmtNote}</small>
+              </div>
+              <div className="tme-dur">
+                <IconClock />
+                {copy.individualShortDuration}
+              </div>
+              <div className="tme-dots" aria-hidden="true">
+                <span />
+              </div>
+              <ul>
+                {copy.individualPoints.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+              <button type="button" className="tme-btn tme-btn-teal" onClick={() => openBooking("individual30")}>
                 {copy.bookIndividual}
               </button>
             </div>
@@ -698,13 +745,23 @@ export default function TechPublicApp({
               </button>
               <button
                 type="button"
-                aria-pressed={kind === "individual"}
+                aria-pressed={kind === "individual60"}
                 onClick={() => {
-                  setKind("individual");
+                  setKind("individual60");
                   setSelection(null);
                 }}
               >
                 {copy.individualOption}
+              </button>
+              <button
+                type="button"
+                aria-pressed={kind === "individual30"}
+                onClick={() => {
+                  setKind("individual30");
+                  setSelection(null);
+                }}
+              >
+                {copy.individualShortOption}
               </button>
               <button
                 type="button"
@@ -760,7 +817,7 @@ export default function TechPublicApp({
                     {copy.notConfigured}
                   </p>
                 ) : null}
-                {loadState === "ready" && bookingKind ? (
+                {loadState === "ready" && bookingProduct ? (
                   <TechBookingCalendar
                     copy={copy}
                     locale={locale}
@@ -768,7 +825,7 @@ export default function TechPublicApp({
                     sessions={sessions.filter(
                       (session) => !session.sessionLanguage || session.sessionLanguage === sessionLanguage
                     )}
-                    bookableStarts={bookableStarts}
+                    bookableStarts={activeBookableStarts}
                     nextJoinableGroup={
                       nextJoinableGroup &&
                       (!nextJoinableGroup.sessionLanguage ||
@@ -781,9 +838,10 @@ export default function TechPublicApp({
                     dayCloseMinute={dayCloseMinute}
                     selection={selection}
                     onSelect={setSelection}
-                    preferredKind={bookingKind}
-                    onPreferredKind={(next) => {
+                    preferredProduct={bookingProduct}
+                    onPreferredProduct={(next) => {
                       setKind(next);
+                      setSelection(null);
                     }}
                   />
                 ) : null}
@@ -806,12 +864,13 @@ export default function TechPublicApp({
                   <p className="tme-card">
                     <strong>{formatMadrid(new Date(selection.startsAt), locale)}</strong>
                     <br />
-                    {selection.kind === "group" ? copy.groupOption : copy.individualOption}
+                    {selection.kind === "group"
+                      ? copy.groupOption
+                      : selection.durationMinutes === INDIVIDUAL_SHORT_MINUTES
+                        ? copy.individualShortOption
+                        : copy.individualOption}
                     <br />
-                    {euros(
-                      selection.kind === "group" ? GROUP_PRICE_CENTS : INDIVIDUAL_PRICE_CENTS,
-                      locale
-                    )}
+                    {euros(priceCentsForCreate(selection.kind, selection.durationMinutes), locale)}
                   </p>
                 ) : null}
                 {kind === "request" ? (

@@ -4,6 +4,8 @@ import {
   GROUP_PRICE_CENTS,
   INDIVIDUAL_MINUTES,
   INDIVIDUAL_PRICE_CENTS,
+  isIndividualDuration,
+  priceCentsForCreate,
 } from "@/lib/tech/constants";
 import { deliverNotification } from "@/lib/tech/deliver";
 import { allowPublicWrite } from "@/lib/tech/guard";
@@ -59,6 +61,7 @@ export async function POST(request: Request) {
   const sessionId = text(body.sessionId);
   const startsAtRaw = text(body.startsAt);
   const createKind = text(body.kind);
+  const durationRaw = body.durationMinutes;
   const idempotencyKey = text(body.idempotencyKey);
   const isCreate = !sessionId && Boolean(startsAtRaw);
   const isJoin = Boolean(sessionId);
@@ -75,9 +78,23 @@ export async function POST(request: Request) {
   if (!isJoin && !isCreate) {
     return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
   }
+
+  let createDurationMinutes = GROUP_MINUTES;
   if (isCreate) {
     const starts = new Date(startsAtRaw);
     if (Number.isNaN(starts.getTime())) {
+      return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+    }
+    if (createKind === "group") {
+      createDurationMinutes = GROUP_MINUTES;
+      if (durationRaw != null && durationRaw !== GROUP_MINUTES) {
+        return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+      }
+    } else if (durationRaw == null) {
+      createDurationMinutes = INDIVIDUAL_MINUTES;
+    } else if (isIndividualDuration(durationRaw)) {
+      createDurationMinutes = durationRaw;
+    } else {
       return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
     }
   }
@@ -166,6 +183,7 @@ export async function POST(request: Request) {
         payload: {
           kind: createKind,
           starts_at: new Date(startsAtRaw).toISOString(),
+          duration_minutes: createDurationMinutes,
           idempotency_key: idempotencyKey,
           reference,
           token_hash: hashToken(token),
@@ -224,15 +242,19 @@ export async function POST(request: Request) {
   const durationMinutes =
     typeof data.duration_minutes === "number"
       ? data.duration_minutes
-      : kind === "group"
-        ? GROUP_MINUTES
-        : INDIVIDUAL_MINUTES;
+      : isCreate
+        ? createDurationMinutes
+        : kind === "group"
+          ? GROUP_MINUTES
+          : INDIVIDUAL_MINUTES;
   const priceCents =
     typeof data.price_cents === "number"
       ? data.price_cents
-      : kind === "group"
-        ? GROUP_PRICE_CENTS
-        : INDIVIDUAL_PRICE_CENTS;
+      : isCreate
+        ? priceCentsForCreate(kind, createDurationMinutes)
+        : kind === "group"
+          ? GROUP_PRICE_CENTS
+          : INDIVIDUAL_PRICE_CENTS;
   const startsAt = data.starts_at ?? startsForMail.toISOString();
   const venueLabel = data.venue_label ?? venueForMail;
 

@@ -130,11 +130,40 @@ describe("tech hour calendar", () => {
   it("locks group capacity at seven, one-hour sessions, and weekly create cap in SQL", () => {
     assert.match(sql, /capacity BETWEEN 1 AND 7/);
     assert.match(sql, /duration_minutes = 60/);
+    assert.match(sql, /duration_minutes = 30 AND price_cents = 1000/);
     assert.match(sql, /tech_create_and_book/);
     assert.match(sql, /week_count >= 3/);
     assert.match(sql, /tech_weekly_busy/);
     assert.match(sql, /buffer_minutes/);
     assert.match(sql, /tech_slot_blocked_by_life/);
+  });
+
+  it("can offer half-hour starts for 30-minute private sessions", () => {
+    const starts = computeBookableStarts({
+      settings: {
+        enabled: true,
+        dayOpenMinute: 10 * 60,
+        dayCloseMinute: 11 * 60,
+        bufferMinutes: 0,
+        defaultVenueLabel: "X",
+      },
+      busy: [],
+      closed: [],
+      occupied: [],
+      slotsByWeek: new Map(),
+      fromDate: "2026-11-10",
+      toDate: "2026-11-10",
+      now: madridLocalToUtc("2026-11-01", "09:00"),
+      durationMinutes: 30,
+      stepMinutes: 30,
+    });
+    assert.deepEqual(
+      starts,
+      [
+        madridLocalToUtc("2026-11-10", "10:00").toISOString(),
+        madridLocalToUtc("2026-11-10", "10:30").toISOString(),
+      ]
+    );
   });
 
   it("exposes 08:00–20:00 template hours for the admin grid", () => {

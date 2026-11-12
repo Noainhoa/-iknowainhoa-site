@@ -197,6 +197,8 @@ DECLARE
   v_kind tech_session_kind;
   v_starts TIMESTAMPTZ;
   v_session_id UUID;
+  v_duration INT;
+  v_price INT;
   taken INT;
   week_count INT;
   venue TEXT;
@@ -250,6 +252,19 @@ BEGIN
   END IF;
   v_kind := (payload->>'kind')::tech_session_kind;
   v_starts := (payload->>'starts_at')::TIMESTAMPTZ;
+  v_duration := COALESCE((payload->>'duration_minutes')::INT, 60);
+  IF v_kind = 'group' THEN
+    IF v_duration <> 60 THEN
+      RETURN jsonb_build_object('ok', false, 'error', 'tech_failed');
+    END IF;
+    v_price := 1000;
+  ELSIF v_duration = 30 THEN
+    v_price := 1000;
+  ELSIF v_duration = 60 THEN
+    v_price := 2500;
+  ELSE
+    RETURN jsonb_build_object('ok', false, 'error', 'tech_failed');
+  END IF;
 
   IF v_starts <= now() THEN
     RETURN jsonb_build_object('ok', false, 'error', 'tech_session_started');
@@ -354,14 +369,14 @@ BEGIN
     RETURN jsonb_build_object('ok', false, 'error', 'tech_week_full');
   END IF;
 
-  IF public.tech_slot_blocked_by_life(v_starts, 60) THEN
+  IF public.tech_slot_blocked_by_life(v_starts, v_duration) THEN
     RETURN jsonb_build_object('ok', false, 'error', 'tech_outside_hours');
   END IF;
 
   IF EXISTS (
     SELECT 1 FROM tech_blocks b
     WHERE tstzrange(b.starts_at, b.ends_at, '[)') &&
-          tstzrange(v_starts, public.tech_session_ends_at(v_starts, 60), '[)')
+          tstzrange(v_starts, public.tech_session_ends_at(v_starts, v_duration), '[)')
   ) THEN
     RETURN jsonb_build_object('ok', false, 'error', 'tech_blocked');
   END IF;
@@ -373,7 +388,7 @@ BEGIN
             s.starts_at,
             public.tech_session_ends_at(s.starts_at, s.duration_minutes),
             '[)'
-          ) && tstzrange(v_starts, public.tech_session_ends_at(v_starts, 60), '[)')
+          ) && tstzrange(v_starts, public.tech_session_ends_at(v_starts, v_duration), '[)')
   ) THEN
     RETURN jsonb_build_object('ok', false, 'error', 'tech_overlap');
   END IF;
@@ -390,9 +405,9 @@ BEGIN
     ) VALUES (
       v_kind,
       v_starts,
-      60,
+      v_duration,
       CASE WHEN v_kind = 'group' THEN 7 ELSE 1 END,
-      CASE WHEN v_kind = 'group' THEN 1000 ELSE 2500 END,
+      v_price,
       venue,
       true,
       'published',
@@ -419,7 +434,7 @@ BEGIN
       COALESCE(payload->>'locale', 'es'),
       v_session_language,
       NULLIF(payload->>'source', ''),
-      CASE WHEN v_kind = 'group' THEN 1000 ELSE 2500 END
+      v_price
     )
     RETURNING * INTO inserted;
   EXCEPTION

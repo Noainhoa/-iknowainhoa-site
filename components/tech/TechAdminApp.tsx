@@ -17,7 +17,12 @@ import {
   TEMPLATE_DAY_OPEN_MINUTE,
   type WeeklyBusyRowLike,
 } from "@/lib/tech/calendar";
-import { GROUP_CAPACITY, SESSION_MINUTES } from "@/lib/tech/constants";
+import {
+  GROUP_CAPACITY,
+  INDIVIDUAL_SHORT_MINUTES,
+  SESSION_MINUTES,
+  priceCentsForCreate,
+} from "@/lib/tech/constants";
 import { parseAdminFocus } from "@/lib/tech/seo";
 import {
   approvalBlocked,
@@ -40,6 +45,8 @@ type SessionRow = {
   venue_public: boolean;
   status: "draft" | "published" | "cancelled" | "completed";
 };
+
+type AdminProduct = "group" | "individual60" | "individual30";
 
 type BookingRow = {
   id: string;
@@ -348,7 +355,10 @@ export default function TechAdminApp() {
   const [storyName, setStoryName] = useState("");
   const [storyBody, setStoryBody] = useState("");
   const [storyPlace, setStoryPlace] = useState("");
-  const [kind, setKind] = useState<"group" | "individual">("group");
+  const [product, setProduct] = useState<AdminProduct>("group");
+  const kind = product === "group" ? "group" : "individual";
+  const sessionDuration =
+    product === "individual30" ? INDIVIDUAL_SHORT_MINUTES : SESSION_MINUTES;
   const [date, setDate] = useState("");
   const [time, setTime] = useState("10:00");
   const [capacity, setCapacity] = useState(GROUP_CAPACITY);
@@ -597,7 +607,7 @@ export default function TechAdminApp() {
       setMessage("Revisa el día y la hora.");
       return;
     }
-    const candidate = span(starts.toISOString(), SESSION_MINUTES);
+    const candidate = span(starts.toISOString(), sessionDuration);
     if (publish && approvalBlocked(occupied, candidate)) {
       setMessage("Esa hora se solapa con otra sesión confirmada.");
       return;
@@ -605,9 +615,9 @@ export default function TechAdminApp() {
     const { error } = await supabase.from("tech_sessions").insert({
       kind,
       starts_at: starts.toISOString(),
-      duration_minutes: SESSION_MINUTES,
+      duration_minutes: sessionDuration,
       capacity: kind === "group" ? capacity : 1,
-      price_cents: kind === "group" ? 1000 : 2500,
+      price_cents: priceCentsForCreate(kind, sessionDuration),
       venue_label: venue.trim(),
       venue_public: publish,
       status: publish ? "published" : "draft",
@@ -1245,7 +1255,7 @@ export default function TechAdminApp() {
                   <article key={session.id} className="tme-admin-item">
                     <div className="tme-admin-item-main">
                       <strong>
-                        {session.kind === "group" ? "Grupo" : "Individual"} · {formatMadrid(new Date(session.starts_at), "es")}
+                        {session.kind === "group" ? "Grupo" : "Individual"} · {session.duration_minutes} min · {formatMadrid(new Date(session.starts_at), "es")}
                       </strong>
                       <p>
                         {session.venue_public ? session.venue_label : "Lugar sin publicar"} · {bookedCountBySession.get(session.id) ?? 0}/
@@ -1324,9 +1334,14 @@ export default function TechAdminApp() {
               <div className="tme-admin-form-grid">
                 <div>
                   <label htmlFor="kind">Tipo</label>
-                  <select id="kind" value={kind} onChange={(event) => setKind(event.target.value as "group" | "individual")}>
+                  <select
+                    id="kind"
+                    value={product}
+                    onChange={(event) => setProduct(event.target.value as AdminProduct)}
+                  >
                     <option value="group">Grupo · 60 min · 10 €</option>
-                    <option value="individual">Individual · 60 min · 25 €</option>
+                    <option value="individual60">Individual · 60 min · 25 €</option>
+                    <option value="individual30">Individual · 30 min · 10 €</option>
                   </select>
                 </div>
                 {kind === "group" ? (
@@ -1373,7 +1388,7 @@ export default function TechAdminApp() {
                     <div className="tme-admin-card-head">
                       <div>
                         <strong>
-                          {session.kind === "group" ? "Grupo" : "Individual"} · {formatMadrid(new Date(session.starts_at), "es")}
+                          {session.kind === "group" ? "Grupo" : "Individual"} · {session.duration_minutes} min · {formatMadrid(new Date(session.starts_at), "es")}
                         </strong>
                         <p>
                           {session.venue_public ? session.venue_label : "Lugar sin publicar"} · {taken}/{session.capacity} plazas ·{" "}

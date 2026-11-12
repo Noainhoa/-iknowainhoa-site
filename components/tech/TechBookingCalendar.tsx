@@ -20,7 +20,14 @@ export type CalendarSession = {
 
 export type CalendarSelection =
   | { mode: "join"; session: CalendarSession }
-  | { mode: "create"; startsAt: string; kind: "group" | "individual" };
+  | {
+      mode: "create";
+      startsAt: string;
+      kind: "group" | "individual";
+      durationMinutes: number;
+    };
+
+export type BookingProduct = "group" | "individual60" | "individual30";
 
 type Props = {
   copy: TechCopy;
@@ -34,8 +41,8 @@ type Props = {
   dayCloseMinute: number;
   selection: CalendarSelection | null;
   onSelect: (next: CalendarSelection | null) => void;
-  preferredKind: "group" | "individual";
-  onPreferredKind: (kind: "group" | "individual") => void;
+  preferredProduct: BookingProduct;
+  onPreferredProduct: (product: BookingProduct) => void;
 };
 
 function todayMadrid(): string {
@@ -67,9 +74,11 @@ export default function TechBookingCalendar({
   dayCloseMinute,
   selection,
   onSelect,
-  preferredKind,
-  onPreferredKind,
+  preferredProduct,
+  onPreferredProduct,
 }: Props) {
+  const preferredKind = preferredProduct === "group" ? "group" : "individual";
+  const preferredDuration = preferredProduct === "individual30" ? 30 : 60;
   const today = todayMadrid();
   const [y, m] = today.split("-").map(Number);
   const [view, setView] = useState({ year: y, month: m });
@@ -243,15 +252,26 @@ export default function TechBookingCalendar({
           {weekFull ? <p className="tme-note">{copy.weekFull}</p> : null}
 
           <div className="tme-choice" role="group" aria-label={copy.choose}>
-            <button type="button" aria-pressed={preferredKind === "group"} onClick={() => onPreferredKind("group")}>
+            <button
+              type="button"
+              aria-pressed={preferredProduct === "group"}
+              onClick={() => onPreferredProduct("group")}
+            >
               {copy.groupOption}
             </button>
             <button
               type="button"
-              aria-pressed={preferredKind === "individual"}
-              onClick={() => onPreferredKind("individual")}
+              aria-pressed={preferredProduct === "individual60"}
+              onClick={() => onPreferredProduct("individual60")}
             >
               {copy.individualOption}
+            </button>
+            <button
+              type="button"
+              aria-pressed={preferredProduct === "individual30"}
+              onClick={() => onPreferredProduct("individual30")}
+            >
+              {copy.individualShortOption}
             </button>
           </div>
 
@@ -274,7 +294,7 @@ export default function TechBookingCalendar({
                   disabled={session.kind === "individual" || !open}
                   onClick={() => {
                     if (!open) return;
-                    onPreferredKind("group");
+                    onPreferredProduct("group");
                     onSelect({ mode: "join", session });
                   }}
                 >
@@ -295,7 +315,8 @@ export default function TechBookingCalendar({
               const selected =
                 selection?.mode === "create" &&
                 selection.startsAt === iso &&
-                selection.kind === preferredKind;
+                selection.kind === preferredKind &&
+                selection.durationMinutes === preferredDuration;
               const disabled = weekFull || !templateReady;
               return (
                 <button
@@ -303,7 +324,14 @@ export default function TechBookingCalendar({
                   type="button"
                   className={`tme-hour is-free${selected ? " is-selected" : ""}`}
                   disabled={disabled}
-                  onClick={() => onSelect({ mode: "create", startsAt: iso, kind: preferredKind })}
+                  onClick={() =>
+                    onSelect({
+                      mode: "create",
+                      startsAt: iso,
+                      kind: preferredKind,
+                      durationMinutes: preferredDuration,
+                    })
+                  }
                 >
                   <strong>
                     {formatMadrid(new Date(iso), locale).replace(/^.*,\s*/, "")}

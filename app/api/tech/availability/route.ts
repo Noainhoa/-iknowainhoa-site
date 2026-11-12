@@ -8,6 +8,7 @@ import {
   type PublicSessionSlot,
   type WeeklyBusyBlock,
 } from "@/lib/tech/calendar";
+import { INDIVIDUAL_SHORT_MINUTES, SESSION_MINUTES } from "@/lib/tech/constants";
 import { getTechServiceClient } from "@/lib/tech/server";
 import { madridDayKey } from "@/lib/tech/time";
 
@@ -120,7 +121,7 @@ export async function GET(request: Request) {
     (sessionRows ?? []).map((row) => ({ startsAt: row.starts_at }))
   );
 
-  const bookableStarts = computeBookableStarts({
+  const bookableArgs = {
     settings,
     busy,
     closed,
@@ -129,6 +130,16 @@ export async function GET(request: Request) {
     fromDate: from,
     toDate: to,
     now,
+  };
+  const bookableStarts = computeBookableStarts({
+    ...bookableArgs,
+    durationMinutes: SESSION_MINUTES,
+    stepMinutes: SESSION_MINUTES,
+  });
+  const bookableStartsShort = computeBookableStarts({
+    ...bookableArgs,
+    durationMinutes: INDIVIDUAL_SHORT_MINUTES,
+    stepMinutes: INDIVIDUAL_SHORT_MINUTES,
   });
 
   const weekCounts: Record<string, number> = {};
@@ -147,6 +158,7 @@ export async function GET(request: Request) {
       busy,
       sessions,
       bookableStarts,
+      bookableStartsShort,
       nextJoinableGroup: nextJoinableGroup(sessions, now),
       weekSlotCounts: weekCounts,
     },

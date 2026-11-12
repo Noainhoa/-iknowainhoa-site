@@ -177,8 +177,14 @@ export function computeBookableStarts(args: {
   fromDate: string;
   toDate: string;
   now?: Date;
+  /** Session length used for fit / overlap (defaults to 60). */
+  durationMinutes?: number;
+  /** Start grid step in minutes (defaults to durationMinutes). */
+  stepMinutes?: number;
 }): string[] {
   const { settings, busy, closed, occupied, slotsByWeek, fromDate, toDate } = args;
+  const durationMinutes = args.durationMinutes ?? SESSION_MINUTES;
+  const stepMinutes = args.stepMinutes ?? durationMinutes;
   const now = args.now ?? new Date();
   if (!settings.enabled) return [];
 
@@ -193,10 +199,10 @@ export function computeBookableStarts(args: {
 
     for (
       let minute = settings.dayOpenMinute;
-      minute + SESSION_MINUTES <= settings.dayCloseMinute;
-      minute += 60
+      minute + durationMinutes <= settings.dayCloseMinute;
+      minute += stepMinutes
     ) {
-      if (slotHitsBusy(minute, SESSION_MINUTES, busy, weekday, buffer)) continue;
+      if (slotHitsBusy(minute, durationMinutes, busy, weekday, buffer)) continue;
       let instant: Date;
       try {
         instant = madridLocalToUtc(day, minuteToHhMm(minute));
@@ -206,7 +212,7 @@ export function computeBookableStarts(args: {
       if (instant.getTime() <= now.getTime()) continue;
       const candidate: Interval = {
         startMs: instant.getTime(),
-        endMs: instant.getTime() + SESSION_MINUTES * 60 * 1000,
+        endMs: instant.getTime() + durationMinutes * 60 * 1000,
       };
       if (occupied.some((item) => intervalsOverlap(item, candidate))) continue;
       starts.push(instant.toISOString());
