@@ -120,7 +120,7 @@ AS $$
 DECLARE
   settings tech_calendar_settings%ROWTYPE;
   parts RECORD;
-  end_minute INT;
+  slot_end_minute INT;
   busy RECORD;
   buf INT;
   busy_start INT;
@@ -133,23 +133,23 @@ BEGIN
   END IF;
 
   SELECT * INTO parts FROM public.tech_madrid_parts(p_starts_at);
-  end_minute := parts.minute_of_day + p_duration_minutes;
+  slot_end_minute := parts.minute_of_day + p_duration_minutes;
 
   IF parts.minute_of_day < settings.day_open_minute
-     OR end_minute > settings.day_close_minute THEN
+     OR slot_end_minute > settings.day_close_minute THEN
     RETURN true;
   END IF;
 
   buf := settings.buffer_minutes;
   FOR busy IN
-    SELECT start_minute, end_minute
-    FROM tech_weekly_busy
-    WHERE weekday = parts.isodow
+    SELECT w.start_minute, w.end_minute
+    FROM tech_weekly_busy w
+    WHERE w.weekday = parts.isodow
   LOOP
     busy_start := GREATEST(0, busy.start_minute - buf);
     busy_end := LEAST(1440, busy.end_minute + buf);
-    -- Half-open overlap of [minute_of_day, end_minute) with [busy_start, busy_end)
-    IF parts.minute_of_day < busy_end AND busy_start < end_minute THEN
+    -- Half-open overlap of [minute_of_day, slot_end_minute) with [busy_start, busy_end)
+    IF parts.minute_of_day < busy_end AND busy_start < slot_end_minute THEN
       RETURN true;
     END IF;
   END LOOP;
