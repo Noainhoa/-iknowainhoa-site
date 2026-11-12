@@ -148,7 +148,7 @@ export default function TechBookingCalendar({
           type="button"
           className="tme-next-group"
           onClick={() => {
-            onPreferredKind("group");
+            onPreferredProduct("group");
             onSelect({ mode: "join", session: nextJoinableGroup });
             setDay(madridDayKey(new Date(nextJoinableGroup.startsAt)));
           }}
