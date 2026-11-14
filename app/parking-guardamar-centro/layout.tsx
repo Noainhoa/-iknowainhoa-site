@@ -36,7 +36,7 @@ export default async function ParkingLayout({
       <link
         rel="preload"
         as="image"
-        href="/images/parking/guardamar-parking-badge.png"
+        href="/images/parking/guardamar-parking-badge-128.png"
         fetchPriority="high"
       />
       <div lang={locale} className="parking-root">

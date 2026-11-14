@@ -33,7 +33,7 @@ describe("parking i18n", () => {
   it("returns concise Spanish copy", () => {
     const t = getParkingCopy("es");
     assert.equal(t.title, "Parking privado en el centro de Guardamar");
-    assert.match(t.intro, /Jorge Juan/i);
+    assert.match(t.intro, /Guardamar del Segura/i);
     assert.equal(t.spaceFact, "Garaje cubierto · 4,90 m × 2,40 m");
     assert.equal(
       t.metaTitle,
@@ -45,17 +45,17 @@ describe("parking i18n", () => {
     assert.equal(t.multiModeOr, "Cualquiera de estas opciones (alternativas)");
     assert.equal(t.labelEstimate, "Estimación");
     assert.equal(t.whatsappCta, "Solicitar por WhatsApp");
-    assert.equal(t.whatsappTonightLabel, "¿Esta noche?");
+    assert.equal(t.whatsappTonightLabel, "¿Parking esta noche?");
     assert.match(t.whatsappTonightMessage, /esta noche/i);
     assert.ok(t.faqItems.length >= 4);
-    assert.ok(t.aboutItems.length >= 4);
-    assert.ok(t.weekdays.includes("Lun"));
+    assert.ok(t.aboutItems.length >= 3);
+    assert.ok(t.weekdays.includes("L"));
   });
 
   it("returns concise English copy", () => {
     const t = getParkingCopy("en");
     assert.equal(t.title, "Private parking in central Guardamar");
-    assert.match(t.intro, /Jorge Juan/i);
+    assert.match(t.intro, /Guardamar del Segura/i);
     assert.equal(
       t.metaTitle,
       "Private Parking in Guardamar Centre | Daily Rental"
@@ -63,15 +63,15 @@ describe("parking i18n", () => {
     assert.equal(t.addPeriod, "Add these dates");
     assert.equal(t.labelEstimate, "Estimate");
     assert.equal(t.whatsappCta, "Enquire through WhatsApp");
-    assert.equal(t.whatsappTonightLabel, "Tonight?");
+    assert.equal(t.whatsappTonightLabel, "Parking tonight?");
     assert.match(t.whatsappTonightMessage, /tonight/i);
-    assert.ok(t.weekdays.includes("Mon"));
+    assert.ok(t.weekdays.includes("M"));
   });
 
   it("returns concise French copy", () => {
     const t = getParkingCopy("fr");
     assert.equal(t.title, "Parking privé au centre de Guardamar");
-    assert.match(t.intro, /Jorge Juan/i);
+    assert.match(t.intro, /Guardamar del Segura/i);
     assert.equal(t.spaceFact, "Garage couvert · 4,90 m × 2,40 m");
     assert.equal(
       t.metaTitle,
@@ -80,10 +80,10 @@ describe("parking i18n", () => {
     assert.equal(t.priceColSeason, "Tarifs par saison");
     assert.equal(t.addPeriod, "Ajouter ces dates");
     assert.equal(t.whatsappCta, "Demander via WhatsApp");
-    assert.equal(t.whatsappTonightLabel, "Ce soir ?");
+    assert.equal(t.whatsappTonightLabel, "Parking ce soir ?");
     assert.match(t.whatsappTonightMessage, /ce soir/i);
     assert.equal(t.accessImportant, "Hauteur maximale d’accès : 1,79 m.");
-    assert.ok(t.weekdays.includes("Lun"));
+    assert.ok(t.weekdays.includes("L"));
   });
 
   it("keeps past label for accessible calendar cells but legend uses other states", () => {
@@ -107,13 +107,33 @@ describe("parking i18n", () => {
     assert.match(formatShortParkingDate("2026-07-25", "fr"), /25.*juil.*2026/i);
   });
 
-  it("includes year in month range labels without Spanish de", () => {
+  it("lists each month name and attaches years to month groups", () => {
     const start = new Date(2026, 6, 1);
     const end = new Date(2026, 8, 1);
-    assert.equal(formatMonthRangeLabel(start, end, "es"), "Julio–septiembre 2026");
-    assert.equal(formatMonthRangeLabel(start, end, "en"), "July–September 2026");
-    assert.equal(formatMonthRangeLabel(start, end, "fr"), "Juillet–septembre 2026");
+    assert.equal(
+      formatMonthRangeLabel(start, end, "es"),
+      "Julio, agosto, septiembre 2026"
+    );
+    assert.equal(
+      formatMonthRangeLabel(start, end, "en"),
+      "July, August, September 2026"
+    );
+    assert.equal(
+      formatMonthRangeLabel(start, end, "fr"),
+      "Juillet, août, septembre 2026"
+    );
     assert.equal(formatMonthRangeLabel(start, start, "es"), "Julio 2026");
+
+    const crossStart = new Date(2026, 10, 1);
+    const crossEnd = new Date(2027, 0, 1);
+    assert.equal(
+      formatMonthRangeLabel(crossStart, crossEnd, "en"),
+      "November, December 2026, January 2027"
+    );
+    assert.equal(
+      formatMonthRangeLabel(crossStart, crossEnd, "es"),
+      "Noviembre, diciembre 2026, enero 2027"
+    );
   });
 
   it("keeps dash for unavailable price cells and unchanged amounts", () => {

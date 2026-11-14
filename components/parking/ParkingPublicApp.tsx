@@ -7,15 +7,20 @@ import {
   useMemo,
   useRef,
   useState,
+  type FormEvent,
+  type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
 import Link from "next/link";
 import LanguageToggle from "@/components/LanguageToggle";
+import ParkingGoogleReviews from "@/components/parking/ParkingGoogleReviews";
 import SiteCopyright from "@/components/SiteCopyright";
 import type { Locale } from "@/lib/i18n/shared";
 import { externalAnchorProps } from "@/lib/links";
 import { trackParkingEvent } from "@/lib/parking/analytics";
+import { PARKING_TERMS_VERSION } from "@/lib/parking/conditionsContent";
+import { PARKING_BADGE_SRC } from "@/lib/parking/constants";
 import {
   formatMonthRangeLabel,
   formatMonthWithYear,
@@ -28,12 +33,18 @@ import {
   DEFAULT_PARKING_RATES,
   estimateParkingPrice,
   formatEuroEstimate,
+  periodLabelsFromRows,
   ratesMapFromRows,
   seasonForMonth,
   type ParkingRateRow,
   type ParkingSeason,
 } from "@/lib/parking/pricing";
-import { parkingCanonicalUrl, parkingConditionsHref, parkingPrivacyHref } from "@/lib/parking/seo";
+import { PARKING_GOOGLE_MAPS_URL } from "@/lib/parking/googleReviews";
+import {
+  parkingCanonicalUrl,
+  parkingConditionsHref,
+  parkingPrivacyHref,
+} from "@/lib/parking/seo";
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
   buildWhatsAppMessage,
@@ -88,6 +99,11 @@ type PersistedEnquiry = {
   registration: string;
   vehicle: string;
   comments: string;
+  acceptHeight: boolean;
+  acceptBooking: boolean;
+  acceptPrivacy: boolean;
+  acceptPolicy: boolean;
+  termsVersion: string;
 };
 
 type WaStatus = "idle" | "opened" | "sent";
@@ -172,6 +188,7 @@ function readPersisted(): PersistedEnquiry | null {
             p.departure >= p.arrival
         )
       : [];
+    const termsOk = parsed.termsVersion === PARKING_TERMS_VERSION;
     return {
       arrival: typeof parsed.arrival === "string" ? parsed.arrival : null,
       departure: typeof parsed.departure === "string" ? parsed.departure : null,
@@ -182,6 +199,11 @@ function readPersisted(): PersistedEnquiry | null {
         typeof parsed.registration === "string" ? parsed.registration : "",
       vehicle: typeof parsed.vehicle === "string" ? parsed.vehicle : "",
       comments: typeof parsed.comments === "string" ? parsed.comments : "",
+      acceptHeight: termsOk && parsed.acceptHeight === true,
+      acceptBooking: termsOk && parsed.acceptBooking === true,
+      acceptPrivacy: termsOk && parsed.acceptPrivacy === true,
+      acceptPolicy: termsOk && parsed.acceptPolicy === true,
+      termsVersion: PARKING_TERMS_VERSION,
     };
   } catch {
     return null;
@@ -214,10 +236,24 @@ function PriceCell({ value, unavailableLabel }: { value: string; unavailableLabe
   return <span>{value}</span>;
 }
 
-export default function ParkingPublicApp({ locale }: { locale: Locale }) {
+export default function ParkingPublicApp({
+  locale,
+  gallery,
+  faq,
+}: {
+  locale: Locale;
+  gallery?: ReactNode;
+  faq?: ReactNode;
+}) {
   const [rates, setRates] = useState(() => DEFAULT_PARKING_RATES);
-  const t = useMemo(() => getParkingCopy(locale, rates), [locale, rates]);
-  const today = useMemo(() => startOfToday(), []);
+  const [periodLabels, setPeriodLabels] = useState<
+    [string, string, string] | null
+  >(null);
+  const t = useMemo(
+    () => getParkingCopy(locale, rates, periodLabels ?? undefined),
+    [locale, rates, periodLabels]
+  );
+  const [today, setToday] = useState(() => startOfToday());
   const currentMonth = useMemo(
     () => new Date(today.getFullYear(), today.getMonth(), 1),
     [today]
@@ -232,26 +268,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     () => parkingSupabaseConfigured()
   );
 
-  const [arrival, setArrival] = useState<string | null>(
-    () => readPersisted()?.arrival ?? null
-  );
-  const [departure, setDeparture] = useState<string | null>(
-    () => readPersisted()?.departure ?? null
-  );
-  const [periods, setPeriods] = useState<EnquiryPeriod[]>(
-    () => readPersisted()?.periods ?? []
-  );
-  const [multiMode, setMultiMode] = useState<"or" | "and">(
-    () => readPersisted()?.multiMode ?? "or"
-  );
+  // Empty SSR defaults — hydrate from sessionStorage after mount (avoid mismatch).
+  const [draftReady, setDraftReady] = useState(false);
+  const [arrival, setArrival] = useState<string | null>(null);
+  const [departure, setDeparture] = useState<string | null>(null);
+  const [periods, setPeriods] = useState<EnquiryPeriod[]>([]);
+  const [multiMode, setMultiMode] = useState<"or" | "and">("or");
   const [hover, setHover] = useState<string | null>(null);
 
-  const [name, setName] = useState(() => readPersisted()?.name ?? "");
-  const [registration, setRegistration] = useState(
-    () => readPersisted()?.registration ?? ""
-  );
-  const [vehicle, setVehicle] = useState(() => readPersisted()?.vehicle ?? "");
-  const [comments, setComments] = useState(() => readPersisted()?.comments ?? "");
+  const [name, setName] = useState("");
+  const [registration, setRegistration] = useState("");
+  const [vehicle, setVehicle] = useState("");
+  const [comments, setComments] = useState("");
 
   const [acceptHeight, setAcceptHeight] = useState(false);
   const [acceptBooking, setAcceptBooking] = useState(false);
@@ -268,12 +296,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   }>({});
   const [liveMessage, setLiveMessage] = useState("");
   const [preparing, setPreparing] = useState(false);
-  const [waStatus, setWaStatus] = useState<WaStatus>(() =>
-    typeof window === "undefined" ? "idle" : readWaStatus().status
-  );
-  const [waHref, setWaHref] = useState<string | null>(() =>
-    typeof window === "undefined" ? null : readWaStatus().href
-  );
+  const [fabHidden, setFabHidden] = useState(false);
+  const [waStatus, setWaStatus] = useState<WaStatus>("idle");
+  const [waHref, setWaHref] = useState<string | null>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
   const acceptHeightRef = useRef<HTMLInputElement>(null);
@@ -289,6 +314,48 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   useEffect(() => {
     trackParkingEvent({ name: "parking_view", language: locale });
   }, [locale]);
+
+  useEffect(() => {
+    const draft = readPersisted();
+    if (draft) {
+      setArrival(draft.arrival);
+      setDeparture(draft.departure);
+      setPeriods(draft.periods);
+      setMultiMode(draft.multiMode);
+      setName(draft.name);
+      setRegistration(draft.registration);
+      setVehicle(draft.vehicle);
+      setComments(draft.comments);
+      setAcceptHeight(draft.acceptHeight);
+      setAcceptBooking(draft.acceptBooking);
+      setAcceptPrivacy(draft.acceptPrivacy);
+      setAcceptPolicy(draft.acceptPolicy);
+    }
+    const wa = readWaStatus();
+    setWaStatus(wa.status);
+    setWaHref(wa.href);
+    setDraftReady(true);
+  }, []);
+
+  useEffect(() => {
+    function refreshToday() {
+      const next = startOfToday();
+      setToday((prev) => (prev.getTime() === next.getTime() ? prev : next));
+      setPreparing(false);
+    }
+    function onPageShow() {
+      refreshToday();
+    }
+    function onVisibility() {
+      if (document.visibilityState === "visible") refreshToday();
+    }
+    window.addEventListener("pageshow", onPageShow);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pageshow", onPageShow);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
 
   useEffect(() => {
     if (!arrival || !departure || departure < arrival) return;
@@ -310,6 +377,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     if (status === "idle") {
       setWaStatus("idle");
       setWaHref(null);
+      setPreparing(false);
       writeWaStatus("idle", null);
       return;
     }
@@ -320,6 +388,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   }
 
   useEffect(() => {
+    if (!draftReady) return;
     const payload: PersistedEnquiry = {
       arrival,
       departure,
@@ -329,13 +398,32 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
       registration,
       vehicle,
       comments,
+      acceptHeight,
+      acceptBooking,
+      acceptPrivacy,
+      acceptPolicy,
+      termsVersion: PARKING_TERMS_VERSION,
     };
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch {
       /* ignore quota / private mode */
     }
-  }, [arrival, departure, periods, multiMode, name, registration, vehicle, comments]);
+  }, [
+    draftReady,
+    arrival,
+    departure,
+    periods,
+    multiMode,
+    name,
+    registration,
+    vehicle,
+    comments,
+    acceptHeight,
+    acceptBooking,
+    acceptPrivacy,
+    acceptPolicy,
+  ]);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -354,6 +442,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     focusStatus();
 
     function onPageShow(event: PageTransitionEvent) {
+      setPreparing(false);
       if (event.persisted || document.visibilityState === "visible") {
         focusStatus();
       }
@@ -393,14 +482,22 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         setRanges((rangesResult.data || []) as ParkingUnavailableRange[]);
       }
       if (!ratesResult.error && ratesResult.data) {
-        setRates(ratesMapFromRows(ratesResult.data as ParkingRateRow[]));
+        const rows = ratesResult.data as ParkingRateRow[];
+        const fallback = getParkingCopy(locale).priceRows.map((r) => r.period) as [
+          string,
+          string,
+          string,
+        ];
+        setRates(ratesMapFromRows(rows));
+        setPeriodLabels(periodLabelsFromRows(rows, locale, fallback));
       } else {
         setRates(DEFAULT_PARKING_RATES);
+        setPeriodLabels(null);
       }
     } finally {
       setLoadingAvailability(false);
     }
-  }, [configured]);
+  }, [configured, locale]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -687,13 +784,23 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     return { ok: false, errors, summary, periodsOut };
   }
 
-  function focusFirstInvalid(errors: {
-    arrival?: string;
-    departure?: string;
-    periods?: string;
-    name?: string;
-    acceptances?: string;
-  }) {
+  function focusFirstInvalid(
+    errors: {
+      arrival?: string;
+      departure?: string;
+      periods?: string;
+      name?: string;
+      acceptances?: string;
+    },
+    summary: string | null
+  ) {
+    if (summary && Object.keys(errors).length > 1) {
+      requestAnimationFrame(() => {
+        formErrorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        formErrorRef.current?.focus();
+      });
+      return;
+    }
     if (errors.arrival || errors.departure || errors.periods) {
       arrivalSummaryRef.current?.focus();
       const cal = document.getElementById("pk-availability");
@@ -709,6 +816,17 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     }
   }
 
+  function onFormKeyDown(event: KeyboardEvent<HTMLFormElement>) {
+    if (event.key !== "Enter") return;
+    const target = event.target as HTMLElement | null;
+    if (!target) return;
+    const tag = target.tagName;
+    if (tag === "TEXTAREA" || tag === "BUTTON" || target.getAttribute("type") === "submit") {
+      return;
+    }
+    event.preventDefault();
+  }
+
   function openWhatsApp() {
     if (preparing) return;
 
@@ -722,7 +840,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         language: locale,
         errorKeys: Object.keys(result.errors),
       });
-      focusFirstInvalid(result.errors);
+      focusFirstInvalid(result.errors, result.summary);
       return;
     }
 
@@ -786,6 +904,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const mapsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
     `${t.locationLine1}, ${t.locationLine2}`
   )}`;
+  const listingHref = PARKING_GOOGLE_MAPS_URL;
   const phoneDisplay = formatNationalPhone(PARKING_WHATSAPP_NUMBER);
   const phoneHref = telHref(PARKING_WHATSAPP_NUMBER);
   const contactWaHref = whatsAppWebHref(t.contactWhatsAppMessage);
@@ -793,6 +912,13 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
 
   function onMapClick() {
     trackParkingEvent({ name: "parking_map_click", language: locale });
+  }
+
+  function onGoogleListingClick() {
+    trackParkingEvent({
+      name: "parking_google_listing_click",
+      language: locale,
+    });
   }
 
   function scrollToDates(event: MouseEvent<HTMLAnchorElement>) {
@@ -819,7 +945,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         <div className="pk-brand">
           <img
             className="pk-logo"
-            src="/images/parking/guardamar-parking-badge.png"
+            src={PARKING_BADGE_SRC}
             alt=""
             width={56}
             height={56}
@@ -833,8 +959,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
               <a
                 className="pk-directions"
                 href={mapsHref}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...externalAnchorProps(mapsHref)}
                 aria-label={t.directionsLabel}
                 title={t.directionsLabel}
                 onClick={onMapClick}
@@ -853,10 +978,9 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             <p className="pk-location">
               <a
                 className="pk-location-link"
-                href={mapsHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={onMapClick}
+                href={listingHref}
+                {...externalAnchorProps(listingHref)}
+                onClick={onGoogleListingClick}
               >
                 {t.locationLine1}, {t.locationLine2}
               </a>
@@ -865,31 +989,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         </div>
       </header>
 
-      <section className="pk-space" aria-label={t.galleryLabel}>
-        <div className="pk-gallery" role="group" aria-label={t.galleryLabel}>
-          {(
-            [
-              "/images/parking/plaza-1.jpg",
-              "/images/parking/plaza-2.jpg",
-              "/images/parking/plaza-3.jpg",
-            ] as const
-          ).map((src, i) => (
-            <figure key={src} className="pk-gallery-item">
-              <img
-                src={src}
-                alt={t.photoAlts[i]}
-                width={i === 1 ? 659 : 900}
-                height={i === 1 ? 900 : i === 0 ? 509 : 673}
-                loading={i === 0 ? "eager" : "lazy"}
-                decoding={i === 0 ? "sync" : "async"}
-                fetchPriority={i === 0 ? "high" : "low"}
-              />
-            </figure>
-          ))}
-        </div>
+      <ParkingGoogleReviews
+        locale={locale}
+        ratingLabel={t.googleRatingLabel}
+        ratingAria={t.googleRatingAria}
+        sourceLabel={t.googleOnMapsLabel}
+      />
 
-        <p className="pk-space-facts">{t.spaceFact}</p>
-      </section>
+      {gallery}
 
       <section className="pk-prices" aria-label={t.priceColSeason}>
         <table className="pk-prices-table">
@@ -1030,10 +1137,10 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
                           disabled={disabled}
                           aria-label={`${cell.getDate()} ${formatMonthWithYear(monthDate, locale)} — ${label}`}
                           aria-pressed={state === "selected" || state === "inrange"}
-                          onMouseEnter={() => {
+                          onPointerEnter={() => {
                             if (arrival && !departure && !disabled) setHover(iso);
                           }}
-                          onMouseLeave={() => setHover(null)}
+                          onPointerLeave={() => setHover(null)}
                           onFocus={() => {
                             if (arrival && !departure && !disabled) setHover(iso);
                           }}
@@ -1235,13 +1342,24 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         ) : null}
       </section>
 
-      <section className="pk-form-section" aria-labelledby="pk-form-heading">
+      <section
+        className="pk-form-section"
+        aria-labelledby="pk-form-heading"
+        onFocusCapture={() => setFabHidden(true)}
+        onBlurCapture={(event) => {
+          const next = event.relatedTarget as Node | null;
+          if (!next || !event.currentTarget.contains(next)) {
+            setFabHidden(false);
+          }
+        }}
+      >
         <h2 id="pk-form-heading">{t.formTitle}</h2>
 
         <form
           className="pk-form"
           noValidate
-          onSubmit={(e) => {
+          onKeyDown={onFormKeyDown}
+          onSubmit={(e: FormEvent<HTMLFormElement>) => {
             e.preventDefault();
             openWhatsApp();
           }}
@@ -1252,9 +1370,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             </span>
             <input
               ref={nameRef}
+              id="pk-name"
               required
               name="name"
               autoComplete="name"
+              enterKeyHint="next"
+              autoCapitalize="words"
               value={name}
               aria-invalid={fieldErrors.name ? true : undefined}
               aria-describedby={fieldErrors.name ? "pk-name-error" : undefined}
@@ -1277,8 +1398,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             <label>
               <span className="pk-lab">{t.registration}</span>
               <input
+                id="pk-registration"
                 name="registration"
                 autoComplete="off"
+                enterKeyHint="next"
+                autoCapitalize="characters"
+                spellCheck={false}
                 value={registration}
                 onChange={(e) => setRegistration(e.target.value)}
                 placeholder={t.registrationPlaceholder}
@@ -1288,8 +1413,11 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             <label>
               <span className="pk-lab">{t.vehicle}</span>
               <input
+                id="pk-vehicle"
                 name="vehicle"
                 autoComplete="off"
+                enterKeyHint="next"
+                autoCapitalize="sentences"
                 value={vehicle}
                 onChange={(e) => setVehicle(e.target.value)}
                 placeholder={t.vehiclePlaceholder}
@@ -1300,8 +1428,11 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           <label>
             <span className="pk-lab">{t.comments}</span>
             <textarea
+              id="pk-comments"
               name="comments"
               rows={3}
+              enterKeyHint="enter"
+              autoComplete="off"
               value={comments}
               onChange={(e) => setComments(e.target.value)}
               placeholder={t.commentsPlaceholder}
@@ -1417,7 +1548,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           </button>
 
           {formError ? (
-            <p className="pk-form-error" role="alert" ref={formErrorRef}>
+            <p
+              className="pk-form-error"
+              role="alert"
+              tabIndex={-1}
+              ref={formErrorRef}
+            >
               {formError}
             </p>
           ) : null}
@@ -1484,39 +1620,7 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         ) : null}
       </section>
 
-      <section className="pk-seo" aria-label={t.aboutTitle}>
-        <nav className="pk-breadcrumb" aria-label="Breadcrumb">
-          <ol>
-            <li>
-              <Link href="/">{t.breadcrumbHome}</Link>
-            </li>
-            <li aria-current="page">{t.breadcrumbCurrent}</li>
-          </ol>
-        </nav>
-
-        <p className="pk-seo-intro">{t.intro}</p>
-
-        <div className="pk-about">
-          <h2 className="pk-seo-heading">{t.aboutTitle}</h2>
-          <ul>
-            {t.aboutItems.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </div>
-
-        <p className="pk-seo-location">{t.locationSeo}</p>
-
-        <div className="pk-faq">
-          <h2 className="pk-seo-heading">{t.faqTitle}</h2>
-          {t.faqItems.map((item) => (
-            <details key={item.question} className="pk-faq-item">
-              <summary>{item.question}</summary>
-              <p>{item.answer}</p>
-            </details>
-          ))}
-        </div>
-      </section>
+      {faq}
     </div>
 
     <footer className="pk-contact" lang={locale}>
@@ -1576,10 +1680,12 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     </footer>
 
     <a
-      className="pk-wa-fab"
+      className={`pk-wa-fab${fabHidden ? " is-hidden" : ""}`}
       href={tonightWaHref}
       {...externalAnchorProps(tonightWaHref)}
       aria-label={t.whatsappTonightAria}
+      aria-hidden={fabHidden || undefined}
+      tabIndex={fabHidden ? -1 : undefined}
       onClick={(e) => {
         trackParkingEvent({
           name: "parking_whatsapp_tonight_click",

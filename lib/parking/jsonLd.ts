@@ -2,6 +2,12 @@ import type { Locale } from "@/lib/i18n/shared";
 import { getParkingCopy } from "@/lib/parking/i18n";
 import { parkingOfferSpecs } from "@/lib/parking/pricing";
 import {
+  PARKING_GOOGLE_MAPS_URL,
+  PARKING_GOOGLE_RATING,
+  PARKING_GOOGLE_REVIEWS,
+  parkingGoogleQuote,
+} from "@/lib/parking/googleReviews";
+import {
   PARKING_GEO,
   PARKING_ORIGIN,
   PARKING_PATH,
@@ -100,6 +106,28 @@ export function buildParkingJsonLd(locale: Locale) {
           latitude: PARKING_GEO.latitude,
           longitude: PARKING_GEO.longitude,
         },
+        sameAs: [PARKING_GOOGLE_MAPS_URL],
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: PARKING_GOOGLE_RATING.ratingValue,
+          reviewCount: PARKING_GOOGLE_RATING.reviewCount,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        review: PARKING_GOOGLE_REVIEWS.map((item) => ({
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: item.author,
+          },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: PARKING_GOOGLE_RATING.ratingValue,
+            bestRating: 5,
+            worstRating: 1,
+          },
+          reviewBody: parkingGoogleQuote(item, locale),
+        })),
         publicAccess: false,
         additionalProperty: [
           {

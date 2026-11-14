@@ -6,6 +6,7 @@ import {
   customerWhatsAppHref,
   downloadBlob,
 } from "@/lib/parking/confirmationImage";
+import { PARKING_BADGE_SRC } from "@/lib/parking/constants";
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
   DEFAULT_PARKING_RATES,
@@ -24,6 +25,8 @@ import {
   type ParkingBooking,
   type ParkingBookingStatus,
 } from "@/lib/parking/types";
+
+const LOGO_SRC = PARKING_BADGE_SRC;
 
 const SEASON_LABELS_ES: Record<ParkingSeason, string> = {
   summer: "Junio–agosto",
@@ -72,8 +75,6 @@ const EMPTY_FORM = {
   price_eur: "",
   private_notes: "",
 };
-
-const LOGO_SRC = "/images/parking/guardamar-parking-badge.png";
 
 const SCHEMA_MIGRATE_HINT =
   "Falta una columna en Supabase. Abre SQL Editor del proyecto y ejecuta supabase/parking-booking-fields.sql (incluye customer_dni / customer_surnames y NOTIFY pgrst).";
@@ -943,8 +944,8 @@ export default function ParkingAdminApp() {
       <form className="card form" onSubmit={(e) => void onSave(e)}>
         <h2>{form.id ? "Editar registro" : "Confirmar reserva"}</h2>
         <p className="hint">
-          Sube la foto del DNI primero: se rellenan nombre, apellidos y número.
-          Luego completa fechas, teléfono e importe.
+          Puedes rellenar nombre, apellidos y DNI a mano. La foto es obligatoria;
+          la lectura automática es opcional y a veces falla con fotos borrosas.
         </p>
         <label>
           <span className="adm-lab">
@@ -957,7 +958,11 @@ export default function ParkingAdminApp() {
             onChange={(e) => void onPickDni(e.target.files?.[0] || null)}
           />
         </label>
-        {ocrBusy ? <p className="hint">Leyendo el DNI…</p> : null}
+        {ocrBusy ? (
+          <p className="hint">
+            Intentando leer el DNI… Si tarda o falla, completa los campos a mano.
+          </p>
+        ) : null}
         {dniLocalPreview ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={dniLocalPreview} alt="Vista previa DNI" className="dni-preview" />
@@ -1004,6 +1009,10 @@ export default function ParkingAdminApp() {
               DNI / NIE <span className="req">*</span>
             </span>
             <input
+              name="customer_dni"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
               value={form.customer_dni}
               onChange={(e) => setForm({ ...form, customer_dni: e.target.value })}
             />
@@ -1079,6 +1088,10 @@ export default function ParkingAdminApp() {
           <label>
             <span className="adm-lab">Matrícula</span>
             <input
+              name="vehicle_registration"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
               value={form.vehicle_registration}
               onChange={(e) =>
                 setForm({ ...form, vehicle_registration: e.target.value })
@@ -1088,6 +1101,8 @@ export default function ParkingAdminApp() {
           <label>
             <span className="adm-lab">Vehículo</span>
             <input
+              name="vehicle_description"
+              autoComplete="off"
               value={form.vehicle_description}
               onChange={(e) =>
                 setForm({ ...form, vehicle_description: e.target.value })

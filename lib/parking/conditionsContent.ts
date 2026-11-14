@@ -1,9 +1,10 @@
 import type { Locale } from "@/lib/i18n/shared";
+import { parkingAccessHeightLabel } from "@/lib/parking/constants";
 
 export const PARKING_CONDITIONS_PATH =
   "/parking-guardamar-centro/condiciones";
 
-/** Bump when published terms text changes (for future confirmations). */
+/** Bump when published terms text changes (invalidates saved acceptances). */
 export const PARKING_TERMS_VERSION = "2026-07-27";
 
 export type ConditionsSection = {
@@ -45,7 +46,7 @@ const es: ParkingConditionsCopy = {
     {
       heading: "Vehículo permitido",
       paragraphs: [
-        "La plaza está destinada a turismos de dimensiones convencionales. La altura máxima de acceso es de 1,79 m, incluyendo baca, cofre, antenas, portabicicletas y otros accesorios.",
+        `La plaza está destinada a turismos de dimensiones convencionales. La altura máxima de acceso es de ${parkingAccessHeightLabel("es")}, incluyendo baca, cofre, antenas, portabicicletas y otros accesorios.`,
         "Los vehículos especialmente altos, largos o anchos, así como aquellos con accesorios exteriores, deberán comunicarse antes del pago.",
         "Si el vehículo no puede acceder debido a dimensiones o accesorios no comunicados, no procederá el reembolso. Cualquier otro caso se valorará según sus circunstancias.",
       ],
@@ -123,7 +124,7 @@ const en: ParkingConditionsCopy = {
     {
       heading: "Permitted vehicle",
       paragraphs: [
-        "The space is intended for conventional passenger cars. The maximum access height is 1.79 m, including roof boxes, antennas, bike racks and other accessories.",
+        `The space is intended for conventional passenger cars. The maximum access height is ${parkingAccessHeightLabel("en")}, including roof boxes, antennas, bike racks and other accessories.`,
         "Especially tall, long or wide vehicles, and those with external accessories, must be disclosed before payment.",
         "If the vehicle cannot access because of undeclared dimensions or accessories, no refund is due. Any other case will be assessed on its circumstances.",
       ],
@@ -201,7 +202,7 @@ const fr: ParkingConditionsCopy = {
     {
       heading: "Véhicule autorisé",
       paragraphs: [
-        "La place est destinée aux voitures particulières de dimensions conventionnelles. La hauteur maximale d’accès est de 1,79 m, y compris coffre de toit, antennes, porte-vélos et autres accessoires.",
+        `La place est destinée aux voitures particulières de dimensions conventionnelles. La hauteur maximale d’accès est de ${parkingAccessHeightLabel("fr")}, y compris coffre de toit, antennes, porte-vélos et autres accessoires.`,
         "Les véhicules particulièrement hauts, longs ou larges, ainsi que ceux munis d’accessoires extérieurs, doivent être signalés avant le paiement.",
         "Si le véhicule ne peut pas accéder en raison de dimensions ou d’accessoires non communiqués, aucun remboursement n’est dû. Tout autre cas sera évalué selon ses circonstances.",
       ],

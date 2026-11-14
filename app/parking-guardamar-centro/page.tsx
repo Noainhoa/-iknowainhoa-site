@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import ParkingFaqAbout from "@/components/parking/ParkingFaqAbout";
+import ParkingGallery from "@/components/parking/ParkingGallery";
 import ParkingPublicApp from "@/components/parking/ParkingPublicApp";
 import { getParkingCopy } from "@/lib/parking/i18n";
 import { buildParkingJsonLd } from "@/lib/parking/jsonLd";
@@ -68,28 +70,6 @@ export async function generateMetadata({
       canonical,
       languages: parkingHreflangMap(),
     },
-    icons: {
-      icon: [
-        {
-          url: "/parking-icons/v2/icon-192.png",
-          type: "image/png",
-          sizes: "192x192",
-        },
-        {
-          url: "/parking-icons/v2/icon-512.png",
-          type: "image/png",
-          sizes: "512x512",
-        },
-      ],
-      apple: [
-        {
-          url: "/parking-icons/v2/apple-touch-icon.png",
-          type: "image/png",
-          sizes: "180x180",
-        },
-      ],
-      shortcut: "/parking-icons/v2/icon-192.png",
-    },
     openGraph: {
       title: t.metaTitle,
       description: t.metaDescription,
@@ -140,6 +120,7 @@ export async function generateMetadata({
 export default async function ParkingPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const locale = await getParkingLocale(params.lang);
+  const t = getParkingCopy(locale);
   const jsonLd = buildParkingJsonLd(locale);
 
   return (
@@ -148,7 +129,25 @@ export default async function ParkingPage({ searchParams }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ParkingPublicApp locale={locale} />
+      <ParkingPublicApp
+        locale={locale}
+        gallery={
+          <ParkingGallery
+            galleryLabel={t.galleryLabel}
+            spaceFact={t.spaceFact}
+            photoAlts={t.photoAlts}
+          />
+        }
+        faq={
+          <ParkingFaqAbout
+            faqTitle={t.faqTitle}
+            faqItems={t.faqItems}
+            aboutTitle={t.aboutTitle}
+            intro={t.intro}
+            aboutItems={t.aboutItems}
+          />
+        }
+      />
     </main>
   );
 }

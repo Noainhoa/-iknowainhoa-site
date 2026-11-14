@@ -1,6 +1,10 @@
 import type { Locale } from "@/lib/i18n/shared";
 import { localeTag } from "@/lib/i18n/shared";
 import {
+  parkingAccessHeightLabel,
+  parkingBaySizeLabel,
+} from "@/lib/parking/constants";
+import {
   localizedPriceRows,
   PRICE_DASH,
   type ParkingPriceRow,
@@ -21,6 +25,9 @@ export type ParkingCopy = {
   locationLine1: string;
   locationLine2: string;
   directionsLabel: string;
+  googleRatingLabel: string;
+  googleRatingAria: string;
+  googleOnMapsLabel: string;
   heroAlt: string;
   spaceFact: string;
   galleryLabel: string;
@@ -36,7 +43,6 @@ export type ParkingCopy = {
   breadcrumbCurrent: string;
   aboutTitle: string;
   aboutItems: string[];
-  locationSeo: string;
   faqTitle: string;
   faqItems: ParkingFaqItem[];
   availabilityTitle: string;
@@ -138,10 +144,13 @@ const es: ParkingCopySource = {
   brand: "Parking Guardamar Centro",
   title: "Parking privado en el centro de Guardamar",
   intro:
-    "Plaza de garaje cubierta y privada en Carrer de Jorge Juan, 13 (Guardamar del Segura). Consulta disponibilidad por días, semanas o meses según la temporada.",
+    "Plaza privada cubierta en el centro de Guardamar del Segura: útil cerca del casco urbano sin depender del parking de calle.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
   directionsLabel: "Cómo llegar en Google Maps",
+  googleRatingLabel: "5,0",
+  googleRatingAria: "5,0 de 5 en Google · 1 reseña",
+  googleOnMapsLabel: "en reseñas de Google",
   heroAlt:
     "Plaza de garaje privada cubierta en el centro de Guardamar del Segura",
   spaceFact: "Garaje cubierto · 4,90 m × 2,40 m",
@@ -163,14 +172,10 @@ const es: ParkingCopySource = {
   breadcrumbCurrent: "Parking en Guardamar",
   aboutTitle: "Sobre esta plaza",
   aboutItems: [
-    "Una plaza privada en garaje cubierto",
-    "Medidas: 4,90 m de largo × 2,40 m de ancho",
-    "Altura máxima de acceso: 1,79 m",
-    "Dirección: Carrer de Jorge Juan, 13, Guardamar del Segura (03140)",
-    "Disponibilidad por días, semanas o meses según temporada",
+    "Carrer de Jorge Juan, 13 (03140)",
+    "4,90 m × 2,40 m · altura máxima de acceso 1,79 m",
+    "Por días, semanas o meses según temporada",
   ],
-  locationSeo:
-    "La plaza está en el centro de Guardamar del Segura, en Carrer de Jorge Juan, 13. Ideal si buscas aparcamiento privado cerca del casco urbano sin depender del parking de calle.",
   faqTitle: "Preguntas frecuentes",
   faqItems: [
     {
@@ -295,7 +300,7 @@ const es: ParkingCopySource = {
   announceInvalidRange:
     "El periodo incluye fechas no disponibles. Selección reiniciada.",
   languageLabel: "Seleccionar idioma",
-  weekdays: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+  weekdays: ["L", "M", "X", "J", "V", "S", "D"],
   metaTitle: "Parking en Guardamar Centro por Días | Plaza Privada",
   metaDescription:
     "Alquila una plaza de garaje privada y cubierta en el centro de Guardamar del Segura (Jorge Juan 13). 4,90×2,40 m · acceso máx. 1,79 m. Tarifas por temporada. Consulta disponibilidad y solicita por WhatsApp.",
@@ -305,10 +310,13 @@ const en: ParkingCopySource = {
   brand: "Parking Guardamar Centro",
   title: "Private parking in central Guardamar",
   intro:
-    "Covered private garage space at Carrer de Jorge Juan, 13 (Guardamar del Segura). Check availability by day, week or month depending on the season.",
+    "Private covered garage in central Guardamar del Segura — useful near the town centre without relying on street parking.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
   directionsLabel: "Directions in Google Maps",
+  googleRatingLabel: "5.0",
+  googleRatingAria: "5.0 out of 5 on Google · 1 review",
+  googleOnMapsLabel: "on Google Reviews",
   heroAlt: "Covered private parking space in central Guardamar del Segura",
   spaceFact: "Covered garage · 4.90 m × 2.40 m",
   galleryLabel: "Garage space photos",
@@ -329,14 +337,10 @@ const en: ParkingCopySource = {
   breadcrumbCurrent: "Parking in Guardamar",
   aboutTitle: "About this space",
   aboutItems: [
-    "One private bay in a covered garage",
-    "Size: 4.90 m long × 2.40 m wide",
-    "Maximum access height: 1.79 m",
-    "Address: Carrer de Jorge Juan, 13, Guardamar del Segura (03140)",
-    "Available by day, week or month depending on the season",
+    "Carrer de Jorge Juan, 13 (03140)",
+    "4.90 m × 2.40 m · max access height 1.79 m",
+    "By day, week or month depending on the season",
   ],
-  locationSeo:
-    "The space is in central Guardamar del Segura, at Carrer de Jorge Juan, 13. Useful if you want private parking near the town centre without relying on street parking.",
   faqTitle: "Frequently asked questions",
   faqItems: [
     {
@@ -458,7 +462,7 @@ const en: ParkingCopySource = {
   announceInvalidRange:
     "The period includes unavailable dates. Selection restarted.",
   languageLabel: "Select language",
-  weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  weekdays: ["M", "T", "W", "T", "F", "S", "S"],
   metaTitle: "Private Parking in Guardamar Centre | Daily Rental",
   metaDescription:
     "Rent a private covered garage space in central Guardamar del Segura (Jorge Juan 13). 4.90×2.40 m · max access height 1.79 m. Seasonal rates. Check availability and enquire on WhatsApp.",
@@ -468,10 +472,13 @@ const fr: ParkingCopySource = {
   brand: "Parking Guardamar Centro",
   title: "Parking privé au centre de Guardamar",
   intro:
-    "Place de garage privée et couverte au Carrer de Jorge Juan, 13 (Guardamar del Segura). Consultez la disponibilité à la journée, à la semaine ou au mois selon la saison.",
+    "Place privée couverte au centre de Guardamar del Segura : pratique près du centre-ville sans dépendre du stationnement de rue.",
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
   directionsLabel: "Itinéraire sur Google Maps",
+  googleRatingLabel: "5,0",
+  googleRatingAria: "5,0 sur 5 sur Google · 1 avis",
+  googleOnMapsLabel: "sur les avis Google",
   heroAlt: "Place de parking privée couverte au centre de Guardamar del Segura",
   spaceFact: "Garage couvert · 4,90 m × 2,40 m",
   galleryLabel: "Photos de la place de garage",
@@ -492,14 +499,10 @@ const fr: ParkingCopySource = {
   breadcrumbCurrent: "Parking à Guardamar",
   aboutTitle: "À propos de cette place",
   aboutItems: [
-    "Une place privée dans un garage couvert",
-    "Dimensions : 4,90 m de long × 2,40 m de large",
-    "Hauteur maximale d’accès : 1,79 m",
-    "Adresse : Carrer de Jorge Juan, 13, Guardamar del Segura (03140)",
-    "Disponible à la journée, à la semaine ou au mois selon la saison",
+    "Carrer de Jorge Juan, 13 (03140)",
+    "4,90 m × 2,40 m · hauteur d’accès max. 1,79 m",
+    "À la journée, à la semaine ou au mois selon la saison",
   ],
-  locationSeo:
-    "La place se trouve au centre de Guardamar del Segura, au Carrer de Jorge Juan, 13. Pratique si vous cherchez un parking privé près du centre-ville sans dépendre du stationnement de rue.",
   faqTitle: "Questions fréquentes",
   faqItems: [
     {
@@ -624,7 +627,7 @@ const fr: ParkingCopySource = {
   announceInvalidRange:
     "La période inclut des dates non disponibles. Sélection réinitialisée.",
   languageLabel: "Choisir la langue",
-  weekdays: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+  weekdays: ["L", "M", "M", "J", "V", "S", "D"],
   metaTitle: "Parking privé au centre de Guardamar | Location",
   metaDescription:
     "Louez une place de garage privée et couverte au centre de Guardamar del Segura (Jorge Juan 13). 4,90×2,40 m · hauteur d’accès max. 1,79 m. Tarifs saisonniers. Consultez la disponibilité et demandez via WhatsApp.",
@@ -634,13 +637,30 @@ const copyByLocale: Record<Locale, ParkingCopySource> = { es, en, fr };
 
 export function getParkingCopy(
   locale: Locale,
-  rates?: ParkingRatesMap
+  rates?: ParkingRatesMap,
+  periodLabels?: [string, string, string]
 ): ParkingCopy {
   const source = copyByLocale[locale];
   const { pricePeriodLabels, ...rest } = source;
+  const height = parkingAccessHeightLabel(locale);
+  const bay = parkingBaySizeLabel(locale);
+  const spaceFact =
+    locale === "es"
+      ? `Garaje cubierto · ${bay}`
+      : locale === "fr"
+        ? `Garage couvert · ${bay}`
+        : `Covered garage · ${bay}`;
+  const accessImportant =
+    locale === "es"
+      ? `Máxima altura de acceso: ${height}.`
+      : locale === "fr"
+        ? `Hauteur maximale d’accès : ${height}.`
+        : `Maximum access height: ${height}.`;
   return {
     ...rest,
-    priceRows: localizedPriceRows(pricePeriodLabels, rates),
+    spaceFact,
+    accessImportant,
+    priceRows: localizedPriceRows(periodLabels ?? pricePeriodLabels, rates),
   };
 }
 
@@ -685,22 +705,38 @@ export function formatMonthRangeLabel(
   end: Date,
   locale: Locale
 ): string {
-  const startY = start.getFullYear();
-  const endY = end.getFullYear();
-  const startM = formatMonthLabel(start, locale);
-  const endM = formatMonthLabel(end, locale);
-
-  if (start.getFullYear() === end.getFullYear() && start.getMonth() === end.getMonth()) {
+  if (
+    start.getFullYear() === end.getFullYear() &&
+    start.getMonth() === end.getMonth()
+  ) {
     return formatMonthWithYear(start, locale);
   }
 
-  if (startY === endY) {
-    const endLabel = locale === "en" ? endM : endM.toLowerCase();
-    return `${startM}–${endLabel} ${startY}`;
+  const months: Date[] = [];
+  const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+  const last = new Date(end.getFullYear(), end.getMonth(), 1);
+  while (cursor <= last) {
+    months.push(new Date(cursor));
+    cursor.setMonth(cursor.getMonth() + 1);
   }
 
-  const endLabel = locale === "en" ? endM : endM.toLowerCase();
-  return `${startM} ${startY}–${endLabel} ${endY}`;
+  // Same year → "January, February, March 2027"
+  // Cross year → "November, December 2026, January 2027"
+  const chunks: string[] = [];
+  let i = 0;
+  let isFirstName = true;
+  while (i < months.length) {
+    const year = months[i].getFullYear();
+    const names: string[] = [];
+    while (i < months.length && months[i].getFullYear() === year) {
+      const label = formatMonthLabel(months[i], locale);
+      names.push(locale === "en" || isFirstName ? label : label.toLowerCase());
+      isFirstName = false;
+      i += 1;
+    }
+    chunks.push(`${names.join(", ")} ${year}`);
+  }
+  return chunks.join(", ");
 }
 
 export { PRICE_DASH };

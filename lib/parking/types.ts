@@ -6,8 +6,6 @@ import type { Locale } from "@/lib/i18n/shared";
 import { localeTag } from "@/lib/i18n/shared";
 
 export const PARKING_WHATSAPP_NUMBER = "34636670103";
-/** Official click-to-chat (works with WhatsApp Business accounts). */
-export const PARKING_WHATSAPP_URL = `https://api.whatsapp.com/send/?phone=${PARKING_WHATSAPP_NUMBER}&type=phone_number&app_absent=0`;
 export const PARKING_DNI_BUCKET = "parking-dni";
 
 /**

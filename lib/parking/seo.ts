@@ -12,6 +12,14 @@ export const PARKING_GEO = {
   longitude: -0.6488313283580208,
 } as const;
 
+export {
+  PARKING_GOOGLE_MAPS_URL,
+  PARKING_GOOGLE_RATING,
+  PARKING_GOOGLE_REVIEWS,
+  parkingGoogleQuote,
+  type ParkingGoogleReview,
+} from "@/lib/parking/googleReviews";
+
 /** Absolute public parking URL (Spanish = bare path). */
 export function parkingCanonicalUrl(locale: Locale): string {
   if (locale === "es") return `${PARKING_ORIGIN}${PARKING_PATH}`;

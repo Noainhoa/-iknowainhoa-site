@@ -23,6 +23,7 @@ export type ParkingAnalyticsEvent =
       hasQuote: boolean;
     }
   | { name: "parking_map_click"; language: Locale }
+  | { name: "parking_google_listing_click"; language: Locale }
   | { name: "parking_whatsapp_tonight_click"; language: Locale }
   | { name: "parking_whatsapp_contact_click"; language: Locale }
   | { name: "parking_language_change"; language: Locale; to: Locale }
