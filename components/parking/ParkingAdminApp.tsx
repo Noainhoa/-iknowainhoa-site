@@ -73,7 +73,7 @@ const EMPTY_FORM = {
   private_notes: "",
 };
 
-const LOGO_SRC = "/images/parking/guardamar-parking-logo.png";
+const LOGO_SRC = "/images/parking/guardamar-parking-badge.png";
 
 const SCHEMA_MIGRATE_HINT =
   "Falta una columna en Supabase. Abre SQL Editor del proyecto y ejecuta supabase/parking-booking-fields.sql (incluye customer_dni / customer_surnames y NOTIFY pgrst).";
