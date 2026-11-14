@@ -1107,8 +1107,8 @@ export default function ParkingPublicApp({
               return (
                 <div key={monthKey} className="pk-month">
                   <div className="pk-weekdays" aria-hidden="true">
-                    {t.weekdays.map((d) => (
-                      <div key={d}>{d}</div>
+                    {t.weekdays.map((d, weekdayIndex) => (
+                      <div key={`${monthKey}-wd-${weekdayIndex}`}>{d}</div>
                     ))}
                   </div>
                   <div className="pk-grid">
