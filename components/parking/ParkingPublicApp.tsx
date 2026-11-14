@@ -1064,99 +1064,110 @@ export default function ParkingPublicApp({
         ) : null}
 
         <div className={`pk-cal${loadingAvailability ? " is-loading" : ""}`}>
-          <div className="pk-cal-nav">
-            <button
-              type="button"
-              className="pk-nav-btn"
-              aria-label={t.prevMonths}
-              disabled={!canGoPrev || loadingAvailability}
-              onClick={() =>
-                setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))
-              }
-            >
-              ‹
-            </button>
-            <h3 className="pk-cal-range">
-              {navRangeLabel}
-            </h3>
-            <button
-              type="button"
-              className="pk-nav-btn"
-              aria-label={t.nextMonths}
-              disabled={loadingAvailability}
-              onClick={() =>
-                setView(new Date(view.getFullYear(), view.getMonth() + 1, 1))
-              }
-            >
-              ›
-            </button>
-          </div>
-
+          <h3 className="sr-only">{navRangeLabel}</h3>
           {loadingAvailability ? (
             <p className="pk-cal-loading" role="status" aria-live="polite">
               {t.loadingAvailability}
             </p>
           ) : (
-          <div
-            className="pk-months"
-            style={{ gridTemplateColumns: `repeat(${visibleMonthCount}, minmax(0, 1fr))` }}
-          >
-            {months.map((monthDate) => {
-              const cells = buildMonthCells(monthDate);
-              const monthKey = `${monthDate.getFullYear()}-${monthDate.getMonth()}`;
-              return (
-                <div key={monthKey} className="pk-month">
-                  <div className="pk-weekdays" aria-hidden="true">
-                    {t.weekdays.map((d, weekdayIndex) => (
-                      <div key={`${monthKey}-wd-${weekdayIndex}`}>{d}</div>
-                    ))}
-                  </div>
-                  <div className="pk-grid">
-                    {cells.map((cell, i) => {
-                      if (!cell) {
-                        return (
-                          <div key={`e-${monthKey}-${i}`} className="pk-cell empty" />
-                        );
-                      }
-                      const iso = toISODate(cell);
-                      const state = dayState(iso);
-                      const disabled = state === "past" || state === "unavailable";
-                      const label =
-                        state === "past"
-                          ? t.past
-                          : state === "unavailable"
-                            ? t.unavailable
-                            : state === "selected" || state === "inrange"
-                              ? t.selected
-                              : t.available;
-                      return (
-                        <button
-                          key={iso}
-                          type="button"
-                          className={`pk-cell day ${state}`}
-                          disabled={disabled}
-                          aria-label={`${cell.getDate()} ${formatMonthWithYear(monthDate, locale)} — ${label}`}
-                          aria-pressed={state === "selected" || state === "inrange"}
-                          onPointerEnter={() => {
-                            if (arrival && !departure && !disabled) setHover(iso);
-                          }}
-                          onPointerLeave={() => setHover(null)}
-                          onFocus={() => {
-                            if (arrival && !departure && !disabled) setHover(iso);
-                          }}
-                          onBlur={() => setHover(null)}
-                          onClick={() => onSelectDay(iso)}
-                        >
-                          <span className="num">{cell.getDate()}</span>
-                          <span className="sr-only">{label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+            <div className="pk-cal-chrome">
+              <button
+                type="button"
+                className="pk-nav-btn"
+                aria-label={t.prevMonths}
+                disabled={!canGoPrev}
+                onClick={() =>
+                  setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))
+                }
+              >
+                ‹
+              </button>
+              <div
+                className="pk-months"
+                style={{
+                  gridTemplateColumns: `repeat(${visibleMonthCount}, minmax(0, 1fr))`,
+                }}
+              >
+                {months.map((monthDate) => {
+                  const cells = buildMonthCells(monthDate);
+                  const monthKey = `${monthDate.getFullYear()}-${monthDate.getMonth()}`;
+                  return (
+                    <div key={monthKey} className="pk-month">
+                      <h4 className="pk-month-label">
+                        {formatMonthWithYear(monthDate, locale)}
+                      </h4>
+                      <div className="pk-weekdays" aria-hidden="true">
+                        {t.weekdays.map((d, weekdayIndex) => (
+                          <div key={`${monthKey}-wd-${weekdayIndex}`}>{d}</div>
+                        ))}
+                      </div>
+                      <div className="pk-grid">
+                        {cells.map((cell, i) => {
+                          if (!cell) {
+                            return (
+                              <div
+                                key={`e-${monthKey}-${i}`}
+                                className="pk-cell empty"
+                              />
+                            );
+                          }
+                          const iso = toISODate(cell);
+                          const state = dayState(iso);
+                          const disabled =
+                            state === "past" || state === "unavailable";
+                          const label =
+                            state === "past"
+                              ? t.past
+                              : state === "unavailable"
+                                ? t.unavailable
+                                : state === "selected" || state === "inrange"
+                                  ? t.selected
+                                  : t.available;
+                          return (
+                            <button
+                              key={iso}
+                              type="button"
+                              className={`pk-cell day ${state}`}
+                              disabled={disabled}
+                              aria-label={`${cell.getDate()} ${formatMonthWithYear(monthDate, locale)} — ${label}`}
+                              aria-pressed={
+                                state === "selected" || state === "inrange"
+                              }
+                              onPointerEnter={() => {
+                                if (arrival && !departure && !disabled) {
+                                  setHover(iso);
+                                }
+                              }}
+                              onPointerLeave={() => setHover(null)}
+                              onFocus={() => {
+                                if (arrival && !departure && !disabled) {
+                                  setHover(iso);
+                                }
+                              }}
+                              onBlur={() => setHover(null)}
+                              onClick={() => onSelectDay(iso)}
+                            >
+                              <span className="num">{cell.getDate()}</span>
+                              <span className="sr-only">{label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <button
+                type="button"
+                className="pk-nav-btn"
+                aria-label={t.nextMonths}
+                onClick={() =>
+                  setView(new Date(view.getFullYear(), view.getMonth() + 1, 1))
+                }
+              >
+                ›
+              </button>
+            </div>
           )}
         </div>
 
