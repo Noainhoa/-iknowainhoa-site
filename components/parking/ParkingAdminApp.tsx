@@ -1487,7 +1487,7 @@ const styles = `
   button { min-height: 44px; border: 0; border-radius: 10px; background: #111; color: #fff; font-weight: 650; cursor: pointer; padding: 0 14px; }
   .ghost { background: #fff; color: #111; border: 1px solid #ccc; }
   .danger { background: #8b1e1e; }
-  .wa { background: #128c7e; }
+  .wa { background: #25d366; }
   .actions { display: flex; flex-wrap: wrap; gap: 8px; }
   .preview { width: 100%; max-width: 360px; border-radius: 10px; border: 1px solid #e6e6e6; margin: 8px 0 12px; }
   .dni-preview { width: 100%; max-width: 280px; border-radius: 10px; border: 1px solid #e6e6e6; }
