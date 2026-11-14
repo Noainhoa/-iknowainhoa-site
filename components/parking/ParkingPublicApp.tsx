@@ -1,9 +1,20 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
 import LanguageToggle from "@/components/LanguageToggle";
+import SiteCopyright from "@/components/SiteCopyright";
 import type { Locale } from "@/lib/i18n/shared";
+import { externalAnchorProps } from "@/lib/links";
 import { trackParkingEvent } from "@/lib/parking/analytics";
 import {
   formatMonthRangeLabel,
@@ -39,6 +50,7 @@ import {
   type EnquiryPeriod,
   type ParkingUnavailableRange,
 } from "@/lib/parking/types";
+import { formatNationalPhone, telHref } from "@/lib/tech/phone";
 
 const WA_ICON_PATH =
   "M12.04 2a9.9 9.9 0 0 0-9.9 9.9c0 1.75.46 3.45 1.33 4.95L2 22l5.3-1.39a9.87 9.87 0 0 0 4.74 1.21h.01a9.9 9.9 0 0 0 9.9-9.9 9.86 9.86 0 0 0-9.91-9.92Zm5.76 14.07c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.29.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.59.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.39-.43.52-.14.14-.29.3-.12.58.16.29.73 1.2 1.56 1.94 1.08.96 1.98 1.26 2.27 1.4.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.19-.29.38-.24.64-.14.26.1 1.66.78 1.95.92.28.15.47.21.54.33.07.12.07.68-.17 1.36Z";
@@ -774,12 +786,24 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
   const mapsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
     `${t.locationLine1}, ${t.locationLine2}`
   )}`;
+  const phoneDisplay = formatNationalPhone(PARKING_WHATSAPP_NUMBER);
+  const phoneHref = telHref(PARKING_WHATSAPP_NUMBER);
+  const contactWaHref = whatsAppWebHref(t.contactWhatsAppMessage);
+  const tonightWaHref = whatsAppWebHref(t.whatsappTonightMessage);
 
   function onMapClick() {
     trackParkingEvent({ name: "parking_map_click", language: locale });
   }
 
+  function scrollToDates(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    document
+      .getElementById("pk-availability")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
+    <>
     <div className="pk" lang={locale}>
       <div className="pk-top">
         <Suspense fallback={null}>
@@ -1493,37 +1517,78 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
           ))}
         </div>
       </section>
-
-      <footer className="pk-footer">
-        <Link
-          href={parkingPrivacyHref(locale)}
-          className="pk-footer-link"
-        >
-          {t.footerPrivacyLabel}
-        </Link>
-      </footer>
-
-      <a
-        className="pk-wa-fab"
-        href={whatsAppWebHref(t.whatsappTonightMessage)}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={t.whatsappTonightAria}
-        onClick={(e) => {
-          trackParkingEvent({
-            name: "parking_whatsapp_tonight_click",
-            language: locale,
-          });
-          const href = whatsAppHref(t.whatsappTonightMessage);
-          if (href.startsWith("intent:")) {
-            e.preventDefault();
-            window.location.assign(href);
-          }
-        }}
-      >
-        <WhatsAppIcon className="pk-wa-fab-icon" />
-        <span className="pk-wa-fab-label">{t.whatsappTonightLabel}</span>
-      </a>
     </div>
+
+    <footer className="pk-contact" lang={locale}>
+      <div className="pk-contact-inner">
+        <div className="pk-contact-lead">
+          <h2 className="pk-contact-title">{t.contactTitle}</h2>
+          <a className="pk-contact-phone" href={phoneHref}>
+            {phoneDisplay}
+          </a>
+          <p className="pk-contact-sub">{t.contactSub}</p>
+        </div>
+        <div className="pk-contact-ctas">
+          <a
+            className="pk-contact-btn pk-contact-btn-wa"
+            href={contactWaHref}
+            {...externalAnchorProps(contactWaHref)}
+            onClick={(e) => {
+              trackParkingEvent({
+                name: "parking_whatsapp_contact_click",
+                language: locale,
+              });
+              const href = whatsAppHref(t.contactWhatsAppMessage);
+              if (href.startsWith("intent:")) {
+                e.preventDefault();
+                window.location.assign(href);
+              }
+            }}
+          >
+            <WhatsAppIcon className="pk-contact-wa-icon" />
+            {t.contactWhatsApp}
+          </a>
+          <a
+            className="pk-contact-btn pk-contact-btn-ghost"
+            href="#pk-availability"
+            onClick={scrollToDates}
+          >
+            {t.contactDatesCta}
+          </a>
+        </div>
+        <div className="pk-contact-meta">
+          <span className="pk-contact-place">{t.contactPlace}</span>
+          <Link
+            href={parkingPrivacyHref(locale)}
+            className="pk-contact-privacy"
+          >
+            {t.footerPrivacyLabel}
+          </Link>
+          <SiteCopyright className="pk-contact-copy" />
+        </div>
+      </div>
+    </footer>
+
+    <a
+      className="pk-wa-fab"
+      href={tonightWaHref}
+      {...externalAnchorProps(tonightWaHref)}
+      aria-label={t.whatsappTonightAria}
+      onClick={(e) => {
+        trackParkingEvent({
+          name: "parking_whatsapp_tonight_click",
+          language: locale,
+        });
+        const href = whatsAppHref(t.whatsappTonightMessage);
+        if (href.startsWith("intent:")) {
+          e.preventDefault();
+          window.location.assign(href);
+        }
+      }}
+    >
+      <WhatsAppIcon className="pk-wa-fab-icon" />
+      <span className="pk-wa-fab-label">{t.whatsappTonightLabel}</span>
+    </a>
+    </>
   );
 }

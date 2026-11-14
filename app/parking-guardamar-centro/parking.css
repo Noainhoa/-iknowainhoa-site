@@ -25,7 +25,7 @@
           --space-section: 18px;
           max-width: 820px;
           margin: 0 auto;
-          padding: 10px 16px calc(88px + env(safe-area-inset-bottom, 0px));
+          padding: 10px 16px 28px;
           padding-left: max(16px, env(safe-area-inset-left, 0px));
           padding-right: max(16px, env(safe-area-inset-right, 0px));
           color: var(--ink);
@@ -1169,23 +1169,169 @@
           font-weight: 550;
         }
 
-.parking-root .pk-footer {
-          margin-top: 16px;
-          padding-top: 10px;
-          border-top: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
+.parking-root .pk-contact {
+          --pk-navy: #005288;
+          --pk-contact-ink: #f4f8fb;
+          --pk-contact-muted: color-mix(in srgb, #f4f8fb 82%, transparent);
+          --pk-contact-accent: #9fd0f0;
+          --wa: #25d366;
+          --wa-hover: #0c7532;
+          margin: 0;
+          padding: 32px 20px calc(84px + env(safe-area-inset-bottom, 0px));
+          padding-left: max(20px, env(safe-area-inset-left, 0px));
+          padding-right: max(20px, env(safe-area-inset-right, 0px));
+          background: var(--pk-navy);
+          color: var(--pk-contact-ink);
           text-align: center;
+          font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
 
-.parking-root .pk-footer .pk-footer-link {
-          color: var(--muted);
-          font-size: 0.86rem;
-          font-weight: 550;
+.parking-root .pk-contact-inner {
+          max-width: 820px;
+          margin: 0 auto;
+          display: grid;
+          gap: 18px;
+          justify-items: center;
+        }
+
+.parking-root .pk-contact-lead {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: baseline;
+          justify-content: center;
+          column-gap: 0.55em;
+          row-gap: 2px;
+          font-size: clamp(1.15rem, 2.6vw, 1.35rem);
+          font-weight: 600;
+          line-height: 1.25;
+        }
+
+.parking-root .pk-contact-title {
+          margin: 0;
+          font: inherit;
+          font-weight: 700;
+          letter-spacing: -0.015em;
+        }
+
+.parking-root .pk-contact-phone {
+          color: #fff;
+          font: inherit;
+          font-weight: 700;
+          font-variant-numeric: tabular-nums;
+          letter-spacing: 0.01em;
+          text-decoration: none;
+        }
+
+.parking-root .pk-contact-phone:hover {
+          color: var(--pk-contact-accent);
+        }
+
+.parking-root .pk-contact-sub {
+          margin: 0;
+          color: var(--pk-contact-muted);
+          font: inherit;
+          font-weight: 500;
+        }
+
+.parking-root .pk-contact-ctas {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+        }
+
+.parking-root .pk-contact-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          min-height: 40px;
+          padding: 0 16px;
+          border-radius: 999px;
+          border: 1.5px solid transparent;
+          font-size: 0.9rem;
+          font-weight: 650;
+          text-decoration: none;
+          white-space: nowrap;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+.parking-root .pk-contact-wa-icon {
+          width: 17px;
+          height: 17px;
+          flex: none;
+        }
+
+.parking-root .pk-contact-btn-wa {
+          background: var(--wa);
+          color: #fff;
+        }
+
+.parking-root .pk-contact-btn-wa:hover {
+          background: var(--wa-hover);
+          color: #fff;
+        }
+
+.parking-root .pk-contact-btn-ghost {
+          border-color: color-mix(in srgb, var(--pk-contact-ink) 45%, transparent);
+          color: var(--pk-contact-ink);
+          background: transparent;
+        }
+
+.parking-root .pk-contact-btn-ghost:hover {
+          border-color: var(--pk-contact-accent);
+          background: color-mix(in srgb, var(--pk-contact-accent) 14%, transparent);
+          color: var(--pk-contact-accent);
+        }
+
+.parking-root .pk-contact-meta {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
+          column-gap: 0;
+          row-gap: 4px;
+          font-size: 0.88rem;
+          font-weight: 500;
+          line-height: 1.35;
+          color: var(--pk-contact-muted);
+        }
+
+.parking-root .pk-contact-meta > * + *::before {
+          content: "·";
+          margin: 0 0.65em;
+          opacity: 0.7;
+          speak: never;
+        }
+
+.parking-root .pk-contact-place {
+          opacity: 1;
+        }
+
+.parking-root .pk-contact-privacy {
+          color: inherit;
+          font-weight: inherit;
           text-decoration: underline;
           text-underline-offset: 2px;
         }
 
-.parking-root .pk-footer .pk-footer-link:hover {
-          color: var(--pk-navy);
+.parking-root .pk-contact-privacy:hover {
+          color: #fff;
+        }
+
+.parking-root .pk-contact-copy {
+          margin: 0 !important;
+          font-size: inherit !important;
+          font-weight: inherit !important;
+          color: inherit !important;
+          text-align: inherit !important;
+        }
+
+.parking-root .pk-contact-btn:focus-visible,
+.parking-root .pk-contact-phone:focus-visible,
+.parking-root .pk-contact-privacy:focus-visible {
+          outline: 2px solid #fff;
+          outline-offset: 3px;
         }
 
 .parking-root .pk-wa-fab {

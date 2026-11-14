@@ -13,7 +13,8 @@ import SiteCopyright from "@/components/SiteCopyright";
  * Orange/yellow accent strip is blog-only (including nested blog routes).
  * Home overlays the header on the portrait.
  * Parking is a standalone mini-app (no chrome at all).
- * Copyright appears on every page except the Tech Made Easy admin workspace.
+ * Copyright appears on every page except Tech admin and the parking public home
+ * (which embeds it in the contact footer).
  */
 export default function SiteChrome({
   locale,
@@ -28,6 +29,8 @@ export default function SiteChrome({
     pathname.startsWith("/parking-guardamar-centro/") ||
     pathname === "/parking" ||
     pathname.startsWith("/parking/");
+  const isParkingPublicHome =
+    pathname === "/parking-guardamar-centro" || pathname === "/parking";
   const isTech =
     pathname === "/guardamar-click" || pathname.startsWith("/guardamar-click/");
   const isTechAdmin =
@@ -36,7 +39,8 @@ export default function SiteChrome({
   const isAnicca = pathname === "/anicca" || pathname.startsWith("/anicca/");
   const showAccent = isBlog;
   const showHeaderFooter = !isParking && !isTech && !isBlog;
-  const showCopyright = !showHeaderFooter && !isTechAdmin;
+  // Parking home embeds copyright in pk-contact; keep the strip on legal/admin.
+  const showCopyright = !showHeaderFooter && !isTechAdmin && !isParkingPublicHome;
 
   useEffect(() => {
     document.documentElement.classList.toggle("page-anicca", isAnicca);

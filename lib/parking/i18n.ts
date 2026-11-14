@@ -85,6 +85,12 @@ export type ParkingCopy = {
   privacyPolicyLinkLabel: string;
   privacyPolicyAcceptAfter: string;
   footerPrivacyLabel: string;
+  contactTitle: string;
+  contactSub: string;
+  contactWhatsApp: string;
+  contactDatesCta: string;
+  contactPlace: string;
+  contactWhatsAppMessage: string;
   conditionsNoticeHold: string;
   conditionsNoticeVehicle: string;
   conditionsLinkLabel: string;
@@ -239,6 +245,13 @@ const es: ParkingCopySource = {
   privacyPolicyLinkLabel: "Política de Privacidad",
   privacyPolicyAcceptAfter: ".",
   footerPrivacyLabel: "Política de Privacidad",
+  contactTitle: "Llámanos",
+  contactSub: "Respondo yo personalmente.",
+  contactWhatsApp: "Escribir por WhatsApp",
+  contactDatesCta: "Consultar fechas",
+  contactPlace: "Parking Guardamar Centro · Guardamar del Segura",
+  contactWhatsAppMessage:
+    "Hola, me interesa la plaza de parking en Guardamar Centro.",
   conditionsNoticeHold:
     "La solicitud no bloquea las fechas. La reserva se confirma tras aceptar las condiciones y realizar el pago.",
   conditionsNoticeVehicle:
@@ -397,6 +410,13 @@ const en: ParkingCopySource = {
   privacyPolicyLinkLabel: "Privacy Policy",
   privacyPolicyAcceptAfter: ".",
   footerPrivacyLabel: "Privacy Policy",
+  contactTitle: "Call us",
+  contactSub: "I answer personally.",
+  contactWhatsApp: "Message on WhatsApp",
+  contactDatesCta: "Check dates",
+  contactPlace: "Parking Guardamar Centro · Guardamar del Segura",
+  contactWhatsAppMessage:
+    "Hi, I’m interested in the parking space in Guardamar Centro.",
   conditionsNoticeHold:
     "Sending an enquiry does not hold the dates. The booking is confirmed after accepting the conditions and completing payment.",
   conditionsNoticeVehicle:
@@ -554,6 +574,13 @@ const fr: ParkingCopySource = {
   privacyPolicyLinkLabel: "Politique de confidentialité",
   privacyPolicyAcceptAfter: ".",
   footerPrivacyLabel: "Politique de confidentialité",
+  contactTitle: "Appelez-nous",
+  contactSub: "Je réponds personnellement.",
+  contactWhatsApp: "Écrire sur WhatsApp",
+  contactDatesCta: "Voir les dates",
+  contactPlace: "Parking Guardamar Centro · Guardamar del Segura",
+  contactWhatsAppMessage:
+    "Bonjour, je suis intéressé(e) par la place de parking à Guardamar Centro.",
   conditionsNoticeHold:
     "La demande ne bloque pas les dates. La réservation est confirmée après acceptation des conditions et paiement.",
   conditionsNoticeVehicle:
