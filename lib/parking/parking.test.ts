@@ -23,6 +23,7 @@ import {
   buildWhatsAppMessage,
   countInclusiveDays,
   isDateUnavailable,
+  nextAvailableDate,
   rangeContainsUnavailable,
   whatsAppHref,
   type ParkingUnavailableRange,
@@ -271,6 +272,13 @@ describe("parking availability rules", () => {
     assert.equal(isDateUnavailable("2026-08-10", ranges), true);
     assert.equal(isDateUnavailable("2026-08-14", ranges), true);
     assert.equal(isDateUnavailable("2026-08-15", ranges), false);
+  });
+
+  it("finds the next free day on or after a start date", () => {
+    assert.equal(nextAvailableDate("2026-08-09", ranges), "2026-08-09");
+    assert.equal(nextAvailableDate("2026-08-10", ranges), "2026-08-15");
+    assert.equal(nextAvailableDate("2026-08-14", ranges), "2026-08-15");
+    assert.equal(nextAvailableDate("2026-08-15", ranges), "2026-08-15");
   });
 
   it("rejects ranges that cross unavailable dates", () => {

@@ -40,6 +40,12 @@ export type ParkingCopy = {
   faqTitle: string;
   faqItems: ParkingFaqItem[];
   availabilityTitle: string;
+  /** Short label on the next-available ribbon (e.g. NOTICE). */
+  nextAvailableTag: string;
+  /** Shown only when the next free day is after today. */
+  nextAvailableNotice: (formattedDate: string) => string;
+  /** Accessible label for the clickable next-available ribbon. */
+  nextAvailableNoticeAria: (formattedDate: string) => string;
   availabilityHintDeparture: string;
   selectedDatesTitle: string;
   periodsTitle: string;
@@ -188,6 +194,11 @@ const es: ParkingCopySource = {
     },
   ],
   availabilityTitle: "Selecciona tus fechas",
+  nextAvailableTag: "AVISO",
+  nextAvailableNotice: (formattedDate) =>
+    `Próxima disponibilidad: ${formattedDate}`,
+  nextAvailableNoticeAria: (formattedDate) =>
+    `Ir a la próxima disponibilidad (${formattedDate}) y usarla como fecha de entrada`,
   availabilityHintDeparture: "Ahora selecciona la fecha de salida.",
   selectedDatesTitle: "Fechas seleccionadas",
   periodsTitle: "Periodos de la solicitud",
@@ -342,6 +353,10 @@ const en: ParkingCopySource = {
     },
   ],
   availabilityTitle: "Select your dates",
+  nextAvailableTag: "NOTICE",
+  nextAvailableNotice: (formattedDate) => `Next available: ${formattedDate}`,
+  nextAvailableNoticeAria: (formattedDate) =>
+    `Go to next available date (${formattedDate}) and use it as arrival`,
   availabilityHintDeparture: "Now select your departure date.",
   selectedDatesTitle: "Selected dates",
   periodsTitle: "Enquiry periods",
@@ -494,6 +509,11 @@ const fr: ParkingCopySource = {
     },
   ],
   availabilityTitle: "Choisissez vos dates",
+  nextAvailableTag: "AVIS",
+  nextAvailableNotice: (formattedDate) =>
+    `Prochaine disponibilité : ${formattedDate}`,
+  nextAvailableNoticeAria: (formattedDate) =>
+    `Aller à la prochaine disponibilité (${formattedDate}) et l’utiliser comme date d’arrivée`,
   availabilityHintDeparture: "Sélectionnez maintenant la date de départ.",
   selectedDatesTitle: "Dates sélectionnées",
   periodsTitle: "Périodes de la demande",
@@ -507,7 +527,7 @@ const fr: ParkingCopySource = {
   labelTotalDuration: "Total",
   legend: "Légende",
   available: "Disponible",
-  unavailable: "Indisponible",
+  unavailable: "Non disponible",
   past: "Passé",
   selected: "Sélectionné",
   prevMonths: "Mois précédents",
@@ -563,8 +583,8 @@ const fr: ParkingCopySource = {
   errNeedDeparture: "Sélectionnez une date de départ.",
   errDepartureAfter:
     "La date de départ doit être postérieure à la date d’arrivée.",
-  errUnavailable: "La période sélectionnée inclut des dates indisponibles.",
-  errRangeUnavailable: "La période sélectionnée inclut des dates indisponibles.",
+  errUnavailable: "La période sélectionnée inclut des dates non disponibles.",
+  errRangeUnavailable: "La période sélectionnée inclut des dates non disponibles.",
   errNeedName: "Indiquez votre nom.",
   errNeedPeriod: "Ajoutez au moins une période de dates.",
   errMaxPeriods: "Vous pouvez ajouter jusqu’à 3 périodes.",
@@ -575,7 +595,7 @@ const fr: ParkingCopySource = {
   announceDeparture: "Date de départ sélectionnée.",
   announceCleared: "Sélection de dates effacée.",
   announceInvalidRange:
-    "La période inclut des dates indisponibles. Sélection réinitialisée.",
+    "La période inclut des dates non disponibles. Sélection réinitialisée.",
   languageLabel: "Choisir la langue",
   weekdays: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
   metaTitle: "Parking privé au centre de Guardamar | Location",

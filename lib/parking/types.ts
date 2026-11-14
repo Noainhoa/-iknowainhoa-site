@@ -366,6 +366,24 @@ export function isDateUnavailable(
   );
 }
 
+/**
+ * First free day on/after `fromIso` (inclusive).
+ * Returns null only if nothing is free within `maxDays` (should not happen in prod).
+ */
+export function nextAvailableDate(
+  fromIso: string,
+  ranges: ParkingUnavailableRange[],
+  maxDays = 548
+): string | null {
+  let cur = parseISODate(fromIso);
+  for (let i = 0; i < maxDays; i++) {
+    const iso = toISODate(cur);
+    if (!isDateUnavailable(iso, ranges)) return iso;
+    cur = addDays(cur, 1);
+  }
+  return null;
+}
+
 export function rangeContainsUnavailable(
   startIso: string,
   endIso: string,

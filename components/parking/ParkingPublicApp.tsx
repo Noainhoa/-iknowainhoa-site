@@ -8,6 +8,7 @@ import { trackParkingEvent } from "@/lib/parking/analytics";
 import {
   formatMonthRangeLabel,
   formatMonthWithYear,
+  formatParkingDate,
   formatShortParkingDate,
   getParkingCopy,
   PRICE_DASH,
@@ -29,6 +30,7 @@ import {
   enquiryPeriodsOverlap,
   isDateUnavailable,
   MAX_ENQUIRY_PERIODS,
+  nextAvailableDate,
   PARKING_WHATSAPP_NUMBER,
   parseISODate,
   rangeContainsUnavailable,
@@ -411,6 +413,14 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     return formatMonthRangeLabel(start, end, locale);
   }, [months, locale]);
 
+  const todayIso = useMemo(() => toISODate(today), [today]);
+  const nextAvailableIso = useMemo(() => {
+    if (loadingAvailability) return null;
+    const next = nextAvailableDate(todayIso, ranges);
+    if (!next || next === todayIso) return null;
+    return next;
+  }, [loadingAvailability, todayIso, ranges]);
+
   const canGoPrev =
     view.getFullYear() > currentMonth.getFullYear() ||
     (view.getFullYear() === currentMonth.getFullYear() &&
@@ -459,23 +469,38 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
     return "available";
   }
 
+  function selectArrivalOnly(iso: string) {
+    setArrival(iso);
+    setDeparture(null);
+    setHover(null);
+    setFormError(null);
+    setFieldErrors((prev) => ({
+      ...prev,
+      arrival: undefined,
+      departure: undefined,
+      periods: undefined,
+    }));
+    announce(t.announceArrival);
+  }
+
+  function onSelectNextAvailable() {
+    if (!nextAvailableIso || loadingAvailability) return;
+    const d = parseISODate(nextAvailableIso);
+    if (d < today || isDateUnavailable(nextAvailableIso, ranges)) return;
+    setView(new Date(d.getFullYear(), d.getMonth(), 1));
+    selectArrivalOnly(nextAvailableIso);
+    document
+      .getElementById("pk-availability")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function onSelectDay(iso: string) {
     if (loadingAvailability) return;
     const state = dayState(iso);
     if (state === "past" || state === "unavailable") return;
 
     if (!arrival || (arrival && departure)) {
-      setArrival(iso);
-      setDeparture(null);
-      setHover(null);
-      setFormError(null);
-      setFieldErrors((prev) => ({
-        ...prev,
-        arrival: undefined,
-        departure: undefined,
-        periods: undefined,
-      }));
-      announce(t.announceArrival);
+      selectArrivalOnly(iso);
       return;
     }
 
@@ -887,22 +912,25 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         aria-labelledby="pk-availability-heading"
         aria-busy={loadingAvailability || undefined}
       >
+        {nextAvailableIso ? (
+          <button
+            type="button"
+            className="pk-next-available"
+            onClick={onSelectNextAvailable}
+            aria-label={t.nextAvailableNoticeAria(
+              formatParkingDate(nextAvailableIso, locale)
+            )}
+          >
+            <span className="pk-next-available-tag">{t.nextAvailableTag}</span>
+            <span className="pk-next-available-text">
+              {t.nextAvailableNotice(formatParkingDate(nextAvailableIso, locale))}
+            </span>
+          </button>
+        ) : null}
         <h2 id="pk-availability-heading">{t.availabilityTitle}</h2>
         {arrival && !departure ? (
           <p className="pk-availability-hint">{t.availabilityHintDeparture}</p>
         ) : null}
-
-        <div className="pk-legend" aria-label={t.legend}>
-          <span>
-            <i className="swatch available" aria-hidden="true" /> {t.available}
-          </span>
-          <span>
-            <i className="swatch unavailable" aria-hidden="true" /> {t.unavailable}
-          </span>
-          <span>
-            <i className="swatch selected" aria-hidden="true" /> {t.selected}
-          </span>
-        </div>
 
         <div className={`pk-cal${loadingAvailability ? " is-loading" : ""}`}>
           <div className="pk-cal-nav">
@@ -999,6 +1027,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
             })}
           </div>
           )}
+        </div>
+
+        <div className="pk-legend" aria-label={t.legend}>
+          <span>
+            <i className="swatch available" aria-hidden="true" /> {t.available}
+          </span>
+          <span>
+            <i className="swatch unavailable" aria-hidden="true" /> {t.unavailable}
+          </span>
+          <span>
+            <i className="swatch selected" aria-hidden="true" /> {t.selected}
+          </span>
         </div>
 
         {bothDatesSelected && arrival && departure ? (
