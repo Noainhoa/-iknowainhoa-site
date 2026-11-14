@@ -5,11 +5,8 @@
 - Parking: `public/images/parking/guardamar-parking-badge.png`
 - Click: `public/images/tech/guardamar-click-badge-v2.png`
 
-Both are circular badges with transparent corners.
-
-Parking icons extend the badge rim to the square edges (iOS paints
-transparent corners black). Click icons keep the circular badge with
-transparent corners for the browser tab.
+Both are circular badges with transparent corners. Generated icons keep
+that round badge shape (no rim fill to square edges).
 
 ## Regenerate
 

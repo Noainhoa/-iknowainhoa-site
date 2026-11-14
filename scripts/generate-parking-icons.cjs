@@ -1,9 +1,8 @@
 /**
  * Home Screen / tab icons for Guardamar Parking and Guardamar Click.
  *
- * Parking: transparent circular badge, with rim colour extended to the
- * square edges (iOS paints transparent corners black).
- * Click: keep the circular badge with transparent corners for the browser tab.
+ * Parking + Click: keep the circular badge with transparent corners
+ * (browser tab / favicon reads as a round badge, not a filled square).
  *
  * Usage: npm run icons:parking
  */
@@ -24,7 +23,7 @@ const JOBS = [
   {
     source: "public/images/parking/guardamar-parking-badge.png",
     outDir: "public/parking-icons/v2",
-    mode: "rim",
+    mode: "circle",
     copies: [
       ["apple-touch-icon.png", "app/parking-guardamar-centro/apple-icon.png"],
       ["icon-512.png", "app/parking-guardamar-centro/icon.png"],
