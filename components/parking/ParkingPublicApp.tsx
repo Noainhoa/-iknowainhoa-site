@@ -1558,12 +1558,18 @@ export default function ParkingPublicApp({ locale }: { locale: Locale }) {
         </div>
         <div className="pk-contact-meta">
           <span className="pk-contact-place">{t.contactPlace}</span>
+          <span className="pk-contact-sep" aria-hidden="true">
+            ·
+          </span>
           <Link
             href={parkingPrivacyHref(locale)}
             className="pk-contact-privacy"
           >
             {t.footerPrivacyLabel}
           </Link>
+          <span className="pk-contact-sep" aria-hidden="true">
+            ·
+          </span>
           <SiteCopyright className="pk-contact-copy" />
         </div>
       </div>

@@ -268,8 +268,8 @@ const es: ParkingCopySource = {
   whatsappSentTitle: "Mensaje enviado",
   whatsappSentBody:
     "Gracias. Te responderé por WhatsApp para confirmar la disponibilidad, el precio y el pago.",
-  whatsappTonightLabel: "¿Esta noche?",
-  whatsappTonightAria: "WhatsApp: preguntar por esta noche",
+  whatsappTonightLabel: "¿Parking esta noche?",
+  whatsappTonightAria: "WhatsApp: preguntar si hay parking esta noche",
   whatsappTonightMessage:
     "Hola, ¿está libre la plaza esta noche? (llegada hoy)",
   supabaseHint:
@@ -433,8 +433,8 @@ const en: ParkingCopySource = {
   whatsappSentTitle: "Message sent",
   whatsappSentBody:
     "Thank you. I will reply through WhatsApp to confirm availability, the price and payment.",
-  whatsappTonightLabel: "Tonight?",
-  whatsappTonightAria: "WhatsApp: ask about tonight",
+  whatsappTonightLabel: "Parking tonight?",
+  whatsappTonightAria: "WhatsApp: ask if parking is free tonight",
   whatsappTonightMessage:
     "Hi, is the parking space free tonight? (arrival today)",
   supabaseHint:
@@ -597,8 +597,8 @@ const fr: ParkingCopySource = {
   whatsappSentTitle: "Message envoyé",
   whatsappSentBody:
     "Merci. Je vous répondrai sur WhatsApp pour confirmer la disponibilité, le prix et le paiement.",
-  whatsappTonightLabel: "Ce soir ?",
-  whatsappTonightAria: "WhatsApp : demander pour ce soir",
+  whatsappTonightLabel: "Parking ce soir ?",
+  whatsappTonightAria: "WhatsApp : demander si le parking est libre ce soir",
   whatsappTonightMessage:
     "Bonjour, la place est-elle libre ce soir ? (arrivée aujourd’hui)",
   supabaseHint:
