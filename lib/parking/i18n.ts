@@ -31,7 +31,10 @@ export type ParkingCopy = {
   googlePrevReviewAria: string;
   googleNextReviewAria: string;
   /** Relatable fitted-vehicle note shown near Google reviews (no personal data). */
-  fittedVehicleNote: string;
+  fittedVehicleNoteBefore: string;
+  fittedVehicleName: string;
+  fittedVehicleNoteAfter: string;
+  fittedVehiclePreviewAria: string;
   heroAlt: string;
   spaceFact: string;
   galleryLabel: string;
@@ -162,8 +165,11 @@ const es: ParkingCopySource = {
   googleOnMapsLabel: "en reseñas de Google",
   googlePrevReviewAria: "Reseña anterior",
   googleNextReviewAria: "Reseña siguiente",
-  fittedVehicleNote:
-    "Por referencia, un Mercedes Classe 580 ha aparcado aquí. No furgonetas: altura máxima de acceso 1,79 m.",
+  fittedVehicleNoteBefore: "Por referencia, un ",
+  fittedVehicleName: "Mercedes Classe 580",
+  fittedVehicleNoteAfter:
+    " ha aparcado aquí. No furgonetas: altura máxima de acceso 1,79 m.",
+  fittedVehiclePreviewAria: "Ver foto de un Mercedes Classe 580",
   heroAlt:
     "Plaza de garaje privada cubierta en el centro de Guardamar del Segura",
   spaceFact: "Garaje cubierto · 4,90 m × 2,40 m",
@@ -337,8 +343,11 @@ const en: ParkingCopySource = {
   googleOnMapsLabel: "on Google Reviews",
   googlePrevReviewAria: "Previous review",
   googleNextReviewAria: "Next review",
-  fittedVehicleNote:
-    "For reference, a Mercedes Classe 580 has parked here. Not for vans: maximum access height 1.79 m.",
+  fittedVehicleNoteBefore: "For reference, a ",
+  fittedVehicleName: "Mercedes Classe 580",
+  fittedVehicleNoteAfter:
+    " has parked here. Not for vans: maximum access height 1.79 m.",
+  fittedVehiclePreviewAria: "Show a photo of a Mercedes Classe 580",
   heroAlt: "Covered private parking space in central Guardamar del Segura",
   spaceFact: "Covered garage · 4.90 m × 2.40 m",
   galleryLabel: "Garage space photos",
@@ -508,8 +517,11 @@ const fr: ParkingCopySource = {
   googleOnMapsLabel: "sur les avis Google",
   googlePrevReviewAria: "Avis précédent",
   googleNextReviewAria: "Avis suivant",
-  fittedVehicleNote:
-    "Pour référence, une Mercedes Classe 580 a déjà stationné ici. Pas pour les vans : hauteur d’accès max. 1,79 m.",
+  fittedVehicleNoteBefore: "Pour référence, une ",
+  fittedVehicleName: "Mercedes Classe 580",
+  fittedVehicleNoteAfter:
+    " a déjà stationné ici. Pas pour les vans : hauteur d’accès max. 1,79 m.",
+  fittedVehiclePreviewAria: "Voir une photo d’une Mercedes Classe 580",
   heroAlt: "Place de parking privée couverte au centre de Guardamar del Segura",
   spaceFact: "Garage couvert · 4,90 m × 2,40 m",
   galleryLabel: "Photos de la place de garage",

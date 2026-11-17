@@ -14,6 +14,7 @@ import {
 } from "react";
 import Link from "next/link";
 import LanguageToggle from "@/components/LanguageToggle";
+import ParkingFittedVehicleNote from "@/components/parking/ParkingFittedVehicleNote";
 import ParkingGoogleReviews from "@/components/parking/ParkingGoogleReviews";
 import SiteCopyright from "@/components/SiteCopyright";
 import type { Locale } from "@/lib/i18n/shared";
@@ -998,7 +999,12 @@ export default function ParkingPublicApp({
           prevReviewAria={t.googlePrevReviewAria}
           nextReviewAria={t.googleNextReviewAria}
         />
-        <p className="pk-fit-note">{t.fittedVehicleNote}</p>
+        <ParkingFittedVehicleNote
+          before={t.fittedVehicleNoteBefore}
+          name={t.fittedVehicleName}
+          after={t.fittedVehicleNoteAfter}
+          previewAria={t.fittedVehiclePreviewAria}
+        />
       </div>
 
       {gallery}
