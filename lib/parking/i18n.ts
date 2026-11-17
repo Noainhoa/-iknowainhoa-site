@@ -28,6 +28,8 @@ export type ParkingCopy = {
   googleRatingLabel: string;
   googleRatingAria: string;
   googleOnMapsLabel: string;
+  googlePrevReviewAria: string;
+  googleNextReviewAria: string;
   heroAlt: string;
   spaceFact: string;
   galleryLabel: string;
@@ -148,9 +150,11 @@ const es: ParkingCopySource = {
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
   directionsLabel: "Cómo llegar en Google Maps",
-  googleRatingLabel: "5,0",
-  googleRatingAria: "5,0 de 5 en Google · 1 reseña",
+  googleRatingLabel: "4,5",
+  googleRatingAria: "4,5 de 5 en Google · 2 reseñas",
   googleOnMapsLabel: "en reseñas de Google",
+  googlePrevReviewAria: "Reseña anterior",
+  googleNextReviewAria: "Reseña siguiente",
   heroAlt:
     "Plaza de garaje privada cubierta en el centro de Guardamar del Segura",
   spaceFact: "Garaje cubierto · 4,90 m × 2,40 m",
@@ -254,7 +258,7 @@ const es: ParkingCopySource = {
   contactSub: "Respondo yo personalmente.",
   contactWhatsApp: "Escribir por WhatsApp",
   contactDatesCta: "Consultar fechas",
-  contactPlace: "Parking Guardamar Centro · Guardamar del Segura",
+  contactPlace: "Parking Guardamar Centro",
   contactWhatsAppMessage:
     "Hola, me interesa la plaza de parking en Guardamar Centro.",
   conditionsNoticeHold:
@@ -314,9 +318,11 @@ const en: ParkingCopySource = {
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
   directionsLabel: "Directions in Google Maps",
-  googleRatingLabel: "5.0",
-  googleRatingAria: "5.0 out of 5 on Google · 1 review",
+  googleRatingLabel: "4.5",
+  googleRatingAria: "4.5 out of 5 on Google · 2 reviews",
   googleOnMapsLabel: "on Google Reviews",
+  googlePrevReviewAria: "Previous review",
+  googleNextReviewAria: "Next review",
   heroAlt: "Covered private parking space in central Guardamar del Segura",
   spaceFact: "Covered garage · 4.90 m × 2.40 m",
   galleryLabel: "Garage space photos",
@@ -418,7 +424,7 @@ const en: ParkingCopySource = {
   contactSub: "I answer personally.",
   contactWhatsApp: "Message on WhatsApp",
   contactDatesCta: "Check dates",
-  contactPlace: "Parking Guardamar Centro · Guardamar del Segura",
+  contactPlace: "Parking Guardamar Centro",
   contactWhatsAppMessage:
     "Hi, I’m interested in the parking space in Guardamar Centro.",
   conditionsNoticeHold:
@@ -476,9 +482,11 @@ const fr: ParkingCopySource = {
   locationLine1: "Carrer de Jorge Juan, 13",
   locationLine2: "Guardamar del Segura",
   directionsLabel: "Itinéraire sur Google Maps",
-  googleRatingLabel: "5,0",
-  googleRatingAria: "5,0 sur 5 sur Google · 1 avis",
+  googleRatingLabel: "4,5",
+  googleRatingAria: "4,5 sur 5 sur Google · 2 avis",
   googleOnMapsLabel: "sur les avis Google",
+  googlePrevReviewAria: "Avis précédent",
+  googleNextReviewAria: "Avis suivant",
   heroAlt: "Place de parking privée couverte au centre de Guardamar del Segura",
   spaceFact: "Garage couvert · 4,90 m × 2,40 m",
   galleryLabel: "Photos de la place de garage",
@@ -581,7 +589,7 @@ const fr: ParkingCopySource = {
   contactSub: "Je réponds personnellement.",
   contactWhatsApp: "Écrire sur WhatsApp",
   contactDatesCta: "Voir les dates",
-  contactPlace: "Parking Guardamar Centro · Guardamar del Segura",
+  contactPlace: "Parking Guardamar Centro",
   contactWhatsAppMessage:
     "Bonjour, je suis intéressé(e) par la place de parking à Guardamar Centro.",
   conditionsNoticeHold:

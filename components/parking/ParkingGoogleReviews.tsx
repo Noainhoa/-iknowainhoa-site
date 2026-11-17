@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FocusEvent } from "react";
 import type { Locale } from "@/lib/i18n/shared";
 import { externalAnchorProps } from "@/lib/links";
 import { trackParkingEvent } from "@/lib/parking/analytics";
@@ -17,6 +17,8 @@ type Props = {
   ratingLabel: string;
   ratingAria: string;
   sourceLabel: string;
+  prevReviewAria: string;
+  nextReviewAria: string;
 };
 
 export default function ParkingGoogleReviews({
@@ -24,6 +26,8 @@ export default function ParkingGoogleReviews({
   ratingLabel,
   ratingAria,
   sourceLabel,
+  prevReviewAria,
+  nextReviewAria,
 }: Props) {
   const reviews = PARKING_GOOGLE_REVIEWS;
   const canRotate = reviews.length > 1;
@@ -50,35 +54,69 @@ export default function ParkingGoogleReviews({
   const quote = parkingGoogleQuote(review, locale);
   const href = PARKING_GOOGLE_MAPS_URL;
 
+  function step(delta: number) {
+    setIndex((current) => (current + delta + reviews.length) % reviews.length);
+  }
+
+  function onBlurResume(event: FocusEvent<HTMLElement>) {
+    const next = event.relatedTarget;
+    if (next instanceof Node && event.currentTarget.contains(next)) return;
+    setPaused(false);
+  }
+
   return (
-    <a
+    <div
       className={canRotate ? "pk-google is-carousel" : "pk-google"}
-      href={href}
-      {...externalAnchorProps(href)}
-      aria-label={ratingAria}
-      onClick={() => {
-        trackParkingEvent({
-          name: "parking_google_listing_click",
-          language: locale,
-        });
-      }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={onBlurResume}
     >
-      <span className="pk-google-score" aria-hidden="true">
-        ★ {ratingLabel}
-      </span>
-      <span className="pk-google-source" aria-hidden="true">
-        {sourceLabel}
-      </span>
-      <span className="pk-google-body" aria-live="polite">
-        <span className="pk-google-slide" key={review.id}>
-          <span className="pk-google-quote">“{quote}”</span>
-          <span className="pk-google-author">· {review.author}</span>
+      <a
+        className="pk-google-link"
+        href={href}
+        {...externalAnchorProps(href)}
+        aria-label={ratingAria}
+        onClick={() => {
+          trackParkingEvent({
+            name: "parking_google_listing_click",
+            language: locale,
+          });
+        }}
+      >
+        <span className="pk-google-score" aria-hidden="true">
+          ★ {ratingLabel}
         </span>
-      </span>
-    </a>
+        <span className="pk-google-source" aria-hidden="true">
+          {sourceLabel}
+        </span>
+        <span className="pk-google-body" aria-live="polite">
+          <span className="pk-google-slide" key={review.id}>
+            <span className="pk-google-quote">“{quote}”</span>
+            <span className="pk-google-author">· {review.author}</span>
+          </span>
+        </span>
+      </a>
+      {canRotate ? (
+        <div className="pk-google-nav">
+          <button
+            type="button"
+            className="pk-google-nav-btn"
+            aria-label={prevReviewAria}
+            onClick={() => step(-1)}
+          >
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button
+            type="button"
+            className="pk-google-nav-btn"
+            aria-label={nextReviewAria}
+            onClick={() => step(1)}
+          >
+            <span aria-hidden="true">›</span>
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }

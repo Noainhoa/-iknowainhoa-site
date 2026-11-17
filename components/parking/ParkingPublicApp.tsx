@@ -994,6 +994,8 @@ export default function ParkingPublicApp({
         ratingLabel={t.googleRatingLabel}
         ratingAria={t.googleRatingAria}
         sourceLabel={t.googleOnMapsLabel}
+        prevReviewAria={t.googlePrevReviewAria}
+        nextReviewAria={t.googleNextReviewAria}
       />
 
       {gallery}

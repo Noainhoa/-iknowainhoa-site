@@ -698,8 +698,6 @@ export default function TechPublicApp({
         </div>
       </section>
 
-      <TechTestimonials copy={copy} locale={locale} />
-
       <section className="tme-section" id="reservar" ref={bookingRef} style={{ paddingTop: 0 }}>
         <div className="tme-wrap tme-book">
           <div>
@@ -1001,6 +999,8 @@ export default function TechPublicApp({
           </div>
         </div>
       </section>
+
+      <TechTestimonials copy={copy} locale={locale} />
 
       <footer className="tme-contact">
         <div className="tme-wrap">
