@@ -14,6 +14,7 @@ import {
 } from "react";
 import Link from "next/link";
 import LanguageToggle from "@/components/LanguageToggle";
+import ParkingChevron from "@/components/parking/ParkingChevron";
 import ParkingFittedVehicleNote from "@/components/parking/ParkingFittedVehicleNote";
 import ParkingGoogleReviews from "@/components/parking/ParkingGoogleReviews";
 import SiteCopyright from "@/components/SiteCopyright";
@@ -1091,7 +1092,7 @@ export default function ParkingPublicApp({
                   setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))
                 }
               >
-                ‹
+                <ParkingChevron direction="left" className="pk-nav-icon" />
               </button>
               <div
                 className="pk-months"
@@ -1176,7 +1177,7 @@ export default function ParkingPublicApp({
                   setView(new Date(view.getFullYear(), view.getMonth() + 1, 1))
                 }
               >
-                ›
+                <ParkingChevron direction="right" className="pk-nav-icon" />
               </button>
             </div>
           )}

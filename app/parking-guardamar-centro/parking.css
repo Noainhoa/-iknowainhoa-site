@@ -358,10 +358,15 @@
           border-radius: 999px;
           background: color-mix(in srgb, #fff 72%, transparent);
           color: var(--pk-navy);
-          font-size: 1.15rem;
-          line-height: 1;
           cursor: pointer;
           -webkit-tap-highlight-color: transparent;
+        }
+
+.parking-root .pk-google-nav-icon {
+          display: block;
+          width: 18px;
+          height: 18px;
+          flex: none;
         }
 
 .parking-root .pk-google-nav-btn:hover {
@@ -590,10 +595,15 @@
           border-radius: 999px;
           background: color-mix(in srgb, #fff 14%, transparent);
           color: #fff;
-          font-size: 2rem;
-          line-height: 1;
           cursor: pointer;
           user-select: none;
+        }
+
+.pk-lightbox-nav-icon {
+          display: block;
+          width: 28px;
+          height: 28px;
+          flex: none;
         }
 
 .pk-lightbox-nav:hover,
@@ -1038,18 +1048,27 @@
           position: absolute;
           top: 0;
           z-index: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           min-width: 44px;
           min-height: 44px;
           width: 44px;
           height: 44px;
+          padding: 0;
           border-radius: 10px;
           border: 1px solid var(--line);
           background: var(--bg);
-          font-size: 1.4rem;
-          line-height: 1;
           cursor: pointer;
           color: var(--ink);
           transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+.parking-root .pk-nav-icon {
+          display: block;
+          width: 22px;
+          height: 22px;
+          flex: none;
         }
 
 .parking-root .pk-cal-chrome > .pk-nav-btn:first-child {

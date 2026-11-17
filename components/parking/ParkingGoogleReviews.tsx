@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FocusEvent } from "react";
+import ParkingChevron from "@/components/parking/ParkingChevron";
 import type { Locale } from "@/lib/i18n/shared";
 import { externalAnchorProps } from "@/lib/links";
 import { trackParkingEvent } from "@/lib/parking/analytics";
@@ -105,7 +106,7 @@ export default function ParkingGoogleReviews({
             aria-label={prevReviewAria}
             onClick={() => step(-1)}
           >
-            <span aria-hidden="true">‹</span>
+            <ParkingChevron direction="left" className="pk-google-nav-icon" />
           </button>
           <button
             type="button"
@@ -113,7 +114,7 @@ export default function ParkingGoogleReviews({
             aria-label={nextReviewAria}
             onClick={() => step(1)}
           >
-            <span aria-hidden="true">›</span>
+            <ParkingChevron direction="right" className="pk-google-nav-icon" />
           </button>
         </div>
       ) : null}

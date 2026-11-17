@@ -11,6 +11,7 @@ import {
   type TouchEvent as ReactTouchEvent,
 } from "react";
 import { createPortal } from "react-dom";
+import ParkingChevron from "@/components/parking/ParkingChevron";
 
 const PHOTOS = [
   {
@@ -212,7 +213,7 @@ export default function ParkingGallery({
             go(-1);
           }}
         >
-          <span aria-hidden="true">‹</span>
+          <ParkingChevron direction="left" className="pk-lightbox-nav-icon" />
         </button>
 
         <div
@@ -259,7 +260,7 @@ export default function ParkingGallery({
             go(1);
           }}
         >
-          <span aria-hidden="true">›</span>
+          <ParkingChevron direction="right" className="pk-lightbox-nav-icon" />
         </button>
       </div>
     ) : null;
