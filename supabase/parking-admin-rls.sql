@@ -51,13 +51,34 @@ FROM auth.users u
 WHERE u.email IS NOT NULL AND u.email <> ''
 ON CONFLICT (email) DO NOTHING;
 
+-- Bookings: select / insert / update only — never hard-delete from admin.
+-- Cancel by setting status = 'cancelled'. See parking-no-hard-delete.sql.
 DROP POLICY IF EXISTS parking_bookings_admin_all ON parking_bookings;
-CREATE POLICY parking_bookings_admin_all
+DROP POLICY IF EXISTS parking_bookings_admin_select ON parking_bookings;
+DROP POLICY IF EXISTS parking_bookings_admin_insert ON parking_bookings;
+DROP POLICY IF EXISTS parking_bookings_admin_update ON parking_bookings;
+DROP POLICY IF EXISTS parking_bookings_admin_delete ON parking_bookings;
+
+CREATE POLICY parking_bookings_admin_select
   ON parking_bookings
-  FOR ALL
+  FOR SELECT
+  TO authenticated
+  USING (public.is_parking_admin());
+
+CREATE POLICY parking_bookings_admin_insert
+  ON parking_bookings
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (public.is_parking_admin());
+
+CREATE POLICY parking_bookings_admin_update
+  ON parking_bookings
+  FOR UPDATE
   TO authenticated
   USING (public.is_parking_admin())
   WITH CHECK (public.is_parking_admin());
+
+REVOKE DELETE ON parking_bookings FROM authenticated;
 
 DROP POLICY IF EXISTS "parking_dni_select_authenticated" ON storage.objects;
 DROP POLICY IF EXISTS "parking_dni_insert_authenticated" ON storage.objects;

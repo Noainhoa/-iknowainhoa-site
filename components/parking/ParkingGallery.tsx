@@ -68,7 +68,14 @@ export default function ParkingGallery({
   const open = lightboxIndex !== null;
   const activeIndex = lightboxIndex ?? 0;
   const activePhoto = PHOTOS[activeIndex];
-  const showDims = open && activeIndex === 0;
+  /* Lightbox dims: plaza-1 (0) and plaza-2 (1); plaza-3 has no painted bay lines */
+  const showDims = open && (activeIndex === 0 || activeIndex === 1);
+  const dimsSlideClass =
+    activeIndex === 0
+      ? "pk-lightbox-dims--plaza-1"
+      : activeIndex === 1
+        ? "pk-lightbox-dims--plaza-2"
+        : "";
 
   useEffect(() => {
     setMounted(true);
@@ -228,7 +235,10 @@ export default function ParkingGallery({
               draggable={false}
             />
             {showDims ? (
-              <div className="pk-lightbox-dims" aria-hidden="true">
+              <div
+                className={`pk-lightbox-dims ${dimsSlideClass}`}
+                aria-hidden="true"
+              >
                 <span className="pk-dim pk-lightbox-dim-length">
                   {lengthLabel}
                 </span>

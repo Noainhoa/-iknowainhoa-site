@@ -30,6 +30,8 @@ export type ParkingCopy = {
   googleOnMapsLabel: string;
   googlePrevReviewAria: string;
   googleNextReviewAria: string;
+  /** Relatable fitted-vehicle note shown near Google reviews (no personal data). */
+  fittedVehicleNote: string;
   heroAlt: string;
   spaceFact: string;
   galleryLabel: string;
@@ -160,6 +162,8 @@ const es: ParkingCopySource = {
   googleOnMapsLabel: "en reseñas de Google",
   googlePrevReviewAria: "Reseña anterior",
   googleNextReviewAria: "Reseña siguiente",
+  fittedVehicleNote:
+    "Por referencia, un Mercedes Classe 580 ha aparcado aquí. No furgonetas: altura máxima de acceso 1,79 m.",
   heroAlt:
     "Plaza de garaje privada cubierta en el centro de Guardamar del Segura",
   spaceFact: "Garaje cubierto · 4,90 m × 2,40 m",
@@ -215,7 +219,7 @@ const es: ParkingCopySource = {
     {
       question: "¿Puedo aparcar cualquier coche?",
       answer:
-        "Solo si cabe en 4,90 × 2,40 m y no supera 1,79 m de altura de acceso. No es un parking público ni un aparcamiento de varios vehículos.",
+        "Solo si cabe en 4,90 × 2,40 m y no supera 1,79 m de altura de acceso. Por referencia, un Mercedes Classe 580 ha aparcado aquí; las furgonetas altas no. No es un parking público ni un aparcamiento de varios vehículos.",
     },
   ],
   availabilityTitle: "Selecciona tus fechas",
@@ -333,6 +337,8 @@ const en: ParkingCopySource = {
   googleOnMapsLabel: "on Google Reviews",
   googlePrevReviewAria: "Previous review",
   googleNextReviewAria: "Next review",
+  fittedVehicleNote:
+    "For reference, a Mercedes Classe 580 has parked here. Not for vans: maximum access height 1.79 m.",
   heroAlt: "Covered private parking space in central Guardamar del Segura",
   spaceFact: "Covered garage · 4.90 m × 2.40 m",
   galleryLabel: "Garage space photos",
@@ -387,7 +393,7 @@ const en: ParkingCopySource = {
     {
       question: "Can any car park here?",
       answer:
-        "Only if it fits 4.90 × 2.40 m and does not exceed 1.79 m access height. This is not a public multi-space car park.",
+        "Only if it fits 4.90 × 2.40 m and does not exceed 1.79 m access height. For reference, a Mercedes Classe 580 has parked here; tall vans have not. This is not a public multi-space car park.",
     },
   ],
   availabilityTitle: "Select your dates",
@@ -502,6 +508,8 @@ const fr: ParkingCopySource = {
   googleOnMapsLabel: "sur les avis Google",
   googlePrevReviewAria: "Avis précédent",
   googleNextReviewAria: "Avis suivant",
+  fittedVehicleNote:
+    "Pour référence, une Mercedes Classe 580 a déjà stationné ici. Pas pour les vans : hauteur d’accès max. 1,79 m.",
   heroAlt: "Place de parking privée couverte au centre de Guardamar del Segura",
   spaceFact: "Garage couvert · 4,90 m × 2,40 m",
   galleryLabel: "Photos de la place de garage",
@@ -556,7 +564,7 @@ const fr: ParkingCopySource = {
     {
       question: "Puis-je garer n’importe quelle voiture ?",
       answer:
-        "Uniquement si elle tient dans 4,90 × 2,40 m et ne dépasse pas 1,79 m de hauteur d’accès. Ce n’est pas un parking public multi-places.",
+        "Uniquement si elle tient dans 4,90 × 2,40 m et ne dépasse pas 1,79 m de hauteur d’accès. Pour référence, une Mercedes Classe 580 a déjà stationné ici ; pas les vans hauts. Ce n’est pas un parking public multi-places.",
     },
   ],
   availabilityTitle: "Choisissez vos dates",

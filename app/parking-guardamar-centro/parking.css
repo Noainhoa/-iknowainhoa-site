@@ -158,11 +158,26 @@
           text-decoration-color: var(--pk-navy);
         }
 
+.parking-root .pk-proof {
+          display: grid;
+          gap: 8px;
+          margin: 0 0 var(--space-group);
+        }
+
+.parking-root .pk-fit-note {
+          margin: 0;
+          max-width: 42rem;
+          color: var(--muted);
+          font-size: 0.78rem;
+          line-height: 1.45;
+          text-wrap: pretty;
+        }
+
 .parking-root .pk-google {
           display: flex;
           align-items: flex-start;
           gap: 8px;
-          margin: 0 0 var(--space-group);
+          margin: 0;
           max-width: none;
           padding: 7px 10px;
           border-radius: 8px;
@@ -570,16 +585,31 @@
         }
 
 /* plaza-1 contain framing: natural image coords (uncropped) */
-.pk-lightbox-dim-length {
+.pk-lightbox-dims--plaza-1 .pk-lightbox-dim-length {
           left: 50%;
           bottom: 4.5%;
           transform: translateX(-50%);
         }
 
-.pk-lightbox-dim-width {
-          left: 16%;
-          top: 58%;
-          transform: translate(-50%, -50%) rotate(-58deg);
+.pk-lightbox-dims--plaza-1 .pk-lightbox-dim-width {
+          left: 23%;
+          top: 72%;
+          transform: translate(-50%, -50%);
+        }
+
+/* plaza-2 portrait: width mid-bay (pillar↔right line); length mid-depth (front↔back) */
+.pk-lightbox-dims--plaza-2 .pk-lightbox-dim-length {
+          /* 4.90 m — mid-way along bay depth (front floor line → back wall) */
+          left: 74%;
+          top: 68%;
+          transform: translate(-50%, -50%);
+        }
+
+.pk-lightbox-dims--plaza-2 .pk-lightbox-dim-width {
+          /* 2.40 m — mid-bay across width (left pillar ↔ right floor line) */
+          left: 33%;
+          top: 76%;
+          transform: translate(-50%, -50%);
         }
 
 @media (max-width: 640px) {

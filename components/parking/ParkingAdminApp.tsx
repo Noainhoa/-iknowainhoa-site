@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Trash2 } from "lucide-react";
 import {
   buildConfirmationImage,
   customerWhatsAppHref,
@@ -31,9 +31,19 @@ import {
   dniStoragePath,
   formatSpanishDate,
   rangesOverlap,
+  statusOccupiesSpot,
   type ParkingBooking,
   type ParkingBookingStatus,
 } from "@/lib/parking/types";
+
+const STATUS_OPTIONS: ParkingBookingStatus[] = [
+  "reserved",
+  "completed",
+  "blocked",
+  "cancelled",
+  "refunded",
+  "eliminated",
+];
 
 const LOGO_SRC = PARKING_BADGE_SRC;
 
@@ -153,6 +163,7 @@ export default function ParkingAdminApp() {
   const [message, setMessage] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<ParkingBooking | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [ticketViewerOpen, setTicketViewerOpen] = useState(false);
   const [dniFile, setDniFile] = useState<File | null>(null);
   const [dniLocalPreview, setDniLocalPreview] = useState<string | null>(null);
   const [ocrBusy, setOcrBusy] = useState(false);
@@ -215,8 +226,28 @@ export default function ParkingAdminApp() {
       setRows([]);
       return;
     }
+    const list = (data || []) as ParkingBooking[];
+    const n = new Date();
+    const todayIso = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+    // Checkout day (end_date) still counts as the stay; complete the day after.
+    const due = list.filter(
+      (r) => r.status === "reserved" && r.end_date < todayIso
+    );
+    if (due.length > 0) {
+      const ids = due.map((r) => r.id);
+      const { error: autoErr } = await supabase
+        .from("parking_bookings")
+        .update({ status: "completed" })
+        .in("id", ids)
+        .eq("status", "reserved");
+      if (!autoErr) {
+        for (const r of list) {
+          if (ids.includes(r.id)) r.status = "completed";
+        }
+      }
+    }
     setLoadError(null);
-    setRows((data || []) as ParkingBooking[]);
+    setRows(list);
   }, [supabase, sessionEmail]);
 
   const loadRates = useCallback(async () => {
@@ -522,6 +553,11 @@ export default function ParkingAdminApp() {
     setMessage(null);
     setLastSaved(row);
     setDetailId(null);
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById("parking-booking-form")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   async function openDniImage(path: string) {
@@ -552,17 +588,54 @@ export default function ParkingAdminApp() {
     status: ParkingBookingStatus,
     id?: string
   ) {
-    if (status !== "reserved" && status !== "blocked") return null;
+    if (!statusOccupiesSpot(status)) return null;
     const clash = rows.find(
       (r) =>
         r.id !== id &&
-        (r.status === "reserved" || r.status === "blocked") &&
+        statusOccupiesSpot(r.status) &&
         rangesOverlap(start, end, r.start_date, r.end_date)
     );
     if (clash) {
       return `Las fechas se solapan con un registro existente (${STATUS_LABELS_ES[clash.status]}: ${clash.start_date} – ${clash.end_date}).`;
     }
     return null;
+  }
+
+  function canBuildConfirmation(booking: {
+    customer_name: string | null;
+    customer_surnames: string | null;
+    customer_dni: string | null;
+    customer_phone: string | null;
+    price_eur: number | null;
+  }) {
+    return Boolean(
+      booking.customer_name &&
+        booking.customer_surnames &&
+        booking.customer_dni &&
+        booking.customer_phone &&
+        booking.price_eur != null
+    );
+  }
+
+  async function buildConfirmationBlob(booking: {
+    customer_name: string | null;
+    customer_surnames: string | null;
+    customer_dni: string | null;
+    customer_phone: string | null;
+    start_date: string;
+    end_date: string;
+    price_eur: number | null;
+  }) {
+    if (!canBuildConfirmation(booking)) return null;
+    return buildConfirmationImage({
+      name: booking.customer_name!,
+      surnames: booking.customer_surnames!,
+      dni: booking.customer_dni!,
+      phone: booking.customer_phone!,
+      startDate: booking.start_date,
+      endDate: booking.end_date,
+      priceEur: Number(booking.price_eur),
+    });
   }
 
   async function makeConfirmation(booking: {
@@ -574,30 +647,46 @@ export default function ParkingAdminApp() {
     end_date: string;
     price_eur: number | null;
   }) {
-    if (
-      !booking.customer_name ||
-      !booking.customer_surnames ||
-      !booking.customer_dni ||
-      !booking.customer_phone ||
-      booking.price_eur == null
-    ) {
-      return;
-    }
-    const blob = await buildConfirmationImage({
-      name: booking.customer_name,
-      surnames: booking.customer_surnames,
-      dni: booking.customer_dni,
-      phone: booking.customer_phone,
-      startDate: booking.start_date,
-      endDate: booking.end_date,
-      priceEur: Number(booking.price_eur),
-    });
+    const blob = await buildConfirmationBlob(booking);
+    if (!blob) return;
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(URL.createObjectURL(blob));
     downloadBlob(
       blob,
       `confirmacion-parking-${booking.start_date}-${booking.customer_dni}.png`
     );
+  }
+
+  /** Show the booking ticket / comprobante inline (blob: URLs cannot be opened as new tabs reliably). */
+  async function viewConfirmationTicket(booking: ParkingBooking) {
+    try {
+      const blob = await buildConfirmationBlob(booking);
+      if (!blob) {
+        setMessage(
+          "Faltan datos (nombre, apellidos, DNI, teléfono o importe) para ver el comprobante."
+        );
+        return;
+      }
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      const url = URL.createObjectURL(blob);
+      setPreviewUrl(url);
+      setLastSaved(booking);
+      setTicketViewerOpen(true);
+    } catch {
+      setMessage("No se pudo generar el comprobante.");
+    }
+  }
+
+  function closeTicketViewer() {
+    setTicketViewerOpen(false);
+  }
+
+  function downloadCurrentTicket() {
+    if (!previewUrl || !lastSaved) return;
+    const a = document.createElement("a");
+    a.href = previewUrl;
+    a.download = `confirmacion-parking-${lastSaved.start_date}-${lastSaved.customer_dni || "ticket"}.png`;
+    a.click();
   }
 
   async function onSave(e: FormEvent) {
@@ -739,24 +828,62 @@ export default function ParkingAdminApp() {
     }
   }
 
-  async function onDelete(id: string) {
+  /** Soft status change — rows are never hard-deleted from admin. */
+  async function updateBookingStatus(
+    id: string,
+    status: ParkingBookingStatus,
+    opts?: { silent?: boolean }
+  ) {
     if (!supabase) return;
-    if (!window.confirm("¿Eliminar este registro?")) return;
     const row = rows.find((r) => r.id === id);
-    if (row?.customer_dni_image_path) {
-      await supabase.storage
-        .from(PARKING_DNI_BUCKET)
-        .remove([row.customer_dni_image_path]);
+    if (!row || row.status === status) return;
+
+    if (statusOccupiesSpot(status)) {
+      const clash = validateOverlap(row.start_date, row.end_date, status, id);
+      if (clash) {
+        setMessage(clash);
+        return;
+      }
     }
-    const { error } = await supabase.from("parking_bookings").delete().eq("id", id);
+
+    const { data, error } = await supabase
+      .from("parking_bookings")
+      .update({ status })
+      .eq("id", id)
+      .select()
+      .single();
     if (error) {
-      setMessage(error.message);
+      setMessage(formatParkingError(error.message));
       return;
     }
-    if (form.id === id) resetForm();
-    if (lastSaved?.id === id) setLastSaved(null);
-    if (detailId === id) setDetailId(null);
+    const saved = data as ParkingBooking;
+    if (!opts?.silent) {
+      setMessage(`Estado actualizado: ${STATUS_LABELS_ES[saved.status]}.`);
+    }
+    if (form.id === id) setForm(bookingToForm(saved));
+    if (lastSaved?.id === id) setLastSaved(saved);
     await loadRows();
+  }
+
+  async function onEliminateBooking(id: string) {
+    if (!supabase) return;
+    const row = rows.find((r) => r.id === id);
+    if (!row) return;
+    if (row.status === "eliminated") {
+      setMessage("Este registro ya está eliminado (sigue en el historial).");
+      return;
+    }
+    if (
+      !window.confirm(
+        "¿Eliminar este registro del uso activo?\n\nNo se borra de la base de datos: queda como Eliminado (tachado en el registro) y conserva DNI, vehículo e historial. Puedes cambiar el estado después si hace falta."
+      )
+    ) {
+      return;
+    }
+    await updateBookingStatus(id, "eliminated");
+    setMessage(
+      "Registro eliminado del uso activo. Sigue visible en el historial (tachado)."
+    );
   }
 
   function openCustomerWhatsApp(booking: ParkingBooking) {
@@ -1045,7 +1172,11 @@ export default function ParkingAdminApp() {
         </div>
       </form>
 
-      <form className="card form" onSubmit={(e) => void onSave(e)}>
+      <form
+        id="parking-booking-form"
+        className="card form"
+        onSubmit={(e) => void onSave(e)}
+      >
         <h2>{form.id ? "Editar registro" : "Confirmar reserva"}</h2>
         <p className="hint">
           Puedes rellenar nombre, apellidos y DNI a mano. La foto es obligatoria;
@@ -1169,10 +1300,11 @@ export default function ParkingAdminApp() {
                 setForm({ ...form, status: e.target.value as ParkingBookingStatus })
               }
             >
-              <option value="reserved">Reservado (confirmado)</option>
-              <option value="blocked">No disponible (bloqueado)</option>
-              <option value="completed">Finalizado</option>
-              <option value="cancelled">Cancelado</option>
+              {STATUS_OPTIONS.map((s) => (
+                <option key={s} value={s}>
+                  {STATUS_LABELS_ES[s]}
+                </option>
+              ))}
             </select>
           </label>
           <label>
@@ -1314,7 +1446,10 @@ export default function ParkingAdminApp() {
         <h2>Todos los registros</h2>
         <p className="hint">
           Vista compacta: fechas, estado, nombre, matrícula, marca y modelo.
-          Pulsa la i para ver el resto y las acciones.
+          Pulsa la i para ver el resto y las acciones. Los registros no se
+          borran: cambia el estado o usa el icono de papelera (Eliminado,
+          tachado en el historial). Las reservas pagadas pasan a Finalizado
+          solas cuando pasa la fecha de salida.
         </p>
         <div className="table-wrap">
           <table>
@@ -1332,14 +1467,30 @@ export default function ParkingAdminApp() {
             <tbody>
               {rows.map((r) => {
                 const open = detailId === r.id;
+                const rowClass = [
+                  open ? "row-open" : null,
+                  r.status === "eliminated"
+                    ? "row-eliminated"
+                    : r.status === "cancelled"
+                      ? "row-cancelled"
+                      : r.status === "refunded"
+                        ? "row-refunded"
+                        : null,
+                ]
+                  .filter(Boolean)
+                  .join(" ");
                 return (
                   <Fragment key={r.id}>
-                    <tr className={open ? "row-open" : undefined}>
+                    <tr className={rowClass || undefined}>
                       <td>
                         {formatSpanishDate(r.start_date)} →{" "}
                         {formatSpanishDate(r.end_date)}
                       </td>
-                      <td>{STATUS_LABELS_ES[r.status]}</td>
+                      <td>
+                        <span className={`status-pill status-${r.status}`}>
+                          {STATUS_LABELS_ES[r.status]}
+                        </span>
+                      </td>
                       <td>{r.customer_name || "—"}</td>
                       <td>{r.vehicle_registration || "—"}</td>
                       <td>{r.vehicle_brand || "—"}</td>
@@ -1371,6 +1522,17 @@ export default function ParkingAdminApp() {
                             <path d="M12 8h.01" />
                           </svg>
                         </button>
+                        {r.status !== "eliminated" ? (
+                          <button
+                            type="button"
+                            className="icon-btn danger-icon"
+                            onClick={() => void onEliminateBooking(r.id)}
+                            aria-label="Eliminar (conservar en historial)"
+                            title="Eliminar (conservar en historial)"
+                          >
+                            <Trash2 size={15} aria-hidden="true" />
+                          </button>
+                        ) : null}
                       </td>
                     </tr>
                     {open ? (
@@ -1393,21 +1555,9 @@ export default function ParkingAdminApp() {
                               <div>
                                 <dt>Foto DNI</dt>
                                 <dd>
-                                  {r.customer_dni_image_path ? (
-                                    <button
-                                      type="button"
-                                      className="linkish"
-                                      onClick={() =>
-                                        void openDniImage(
-                                          r.customer_dni_image_path!
-                                        )
-                                      }
-                                    >
-                                      Ver
-                                    </button>
-                                  ) : (
-                                    "—"
-                                  )}
+                                  {r.customer_dni_image_path
+                                    ? "Subida"
+                                    : "Sin foto"}
                                 </dd>
                               </div>
                               <div>
@@ -1431,80 +1581,91 @@ export default function ParkingAdminApp() {
                                 <dd>{r.private_notes || "—"}</dd>
                               </div>
                             </dl>
-                            <div className="ops detail-ops">
+                            <div className="detail-actions">
                               <button
                                 type="button"
-                                className="icon-btn"
+                                className="ghost action-btn"
                                 onClick={() => editRow(r)}
-                                aria-label="Editar"
-                                title="Editar"
                               >
-                                <svg
-                                  aria-hidden="true"
-                                  viewBox="0 0 24 24"
-                                  width="16"
-                                  height="16"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2.25"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path d="M12 20h9" />
-                                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                                </svg>
+                                Editar
+                              </button>
+                              <button
+                                type="button"
+                                className="ghost action-btn"
+                                disabled={!r.customer_dni_image_path}
+                                onClick={() => {
+                                  if (!r.customer_dni_image_path) return;
+                                  void openDniImage(r.customer_dni_image_path);
+                                }}
+                              >
+                                Ver DNI
+                              </button>
+                              <button
+                                type="button"
+                                className="ghost action-btn"
+                                disabled={!canBuildConfirmation(r)}
+                                onClick={() => void viewConfirmationTicket(r)}
+                              >
+                                Ver comprobante
                               </button>
                               {r.customer_phone &&
                               (r.status === "reserved" ||
                                 r.status === "completed") ? (
                                 <button
                                   type="button"
-                                  className="icon-btn wa"
+                                  className="wa action-btn"
                                   onClick={() => {
                                     setLastSaved(r);
-                                    void makeConfirmation(r).then(() =>
-                                      openCustomerWhatsApp(r)
-                                    );
+                                    void (async () => {
+                                      if (!canBuildConfirmation(r)) {
+                                        setMessage(
+                                          "Faltan datos para el comprobante; se abre WhatsApp sin imagen."
+                                        );
+                                        openCustomerWhatsApp(r);
+                                        return;
+                                      }
+                                      await makeConfirmation(r);
+                                      openCustomerWhatsApp(r);
+                                    })();
                                   }}
-                                  aria-label="WhatsApp Business"
-                                  title="WhatsApp Business"
                                 >
-                                  <svg
-                                    aria-hidden="true"
-                                    viewBox="0 0 24 24"
-                                    width="16"
-                                    height="16"
-                                    fill="currentColor"
-                                  >
-                                    <path d="M12.04 2a9.9 9.9 0 0 0-9.9 9.9c0 1.75.46 3.45 1.33 4.95L2 22l5.3-1.39a9.87 9.87 0 0 0 4.74 1.21h.01a9.9 9.9 0 0 0 9.9-9.9 9.86 9.86 0 0 0-9.91-9.92Zm5.76 14.07c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.29.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.59.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.39-.43.52-.14.14-.29.3-.12.58.16.29.73 1.2 1.56 1.94 1.08.96 1.98 1.26 2.27 1.4.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.19-.29.38-.24.64-.14.26.1 1.66.78 1.95.92.28.15.47.21.54.33.07.12.07.68-.17 1.36Z" />
-                                  </svg>
+                                  WhatsApp
                                 </button>
                               ) : null}
-                              <button
-                                type="button"
-                                className="icon-btn danger"
-                                onClick={() => void onDelete(r.id)}
-                                aria-label="Eliminar"
-                                title="Eliminar"
-                              >
-                                <svg
-                                  aria-hidden="true"
-                                  viewBox="0 0 24 24"
-                                  width="16"
-                                  height="16"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2.25"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
+                              <label className="status-menu">
+                                <span className="sr-only">Cambiar estado</span>
+                                <select
+                                  className="status-select"
+                                  value={r.status}
+                                  aria-label="Cambiar estado"
+                                  onChange={(e) => {
+                                    const next = e.target
+                                      .value as ParkingBookingStatus;
+                                    if (next === "eliminated") {
+                                      void onEliminateBooking(r.id);
+                                      return;
+                                    }
+                                    void updateBookingStatus(r.id, next);
+                                  }}
                                 >
-                                  <path d="M3 6h18" />
-                                  <path d="M8 6V4h8v2" />
-                                  <path d="M19 6l-1 14H6L5 6" />
-                                  <path d="M10 11v6" />
-                                  <path d="M14 11v6" />
-                                </svg>
-                              </button>
+                                  {STATUS_OPTIONS.map((s) => (
+                                    <option key={s} value={s}>
+                                      {STATUS_LABELS_ES[s]}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                              {r.status !== "eliminated" ? (
+                                <button
+                                  type="button"
+                                  className="danger action-btn"
+                                  onClick={() => void onEliminateBooking(r.id)}
+                                >
+                                  Eliminar
+                                </button>
+                              ) : (
+                                <span className="muted">Ya eliminado</span>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -1518,6 +1679,50 @@ export default function ParkingAdminApp() {
           {rows.length === 0 ? <p className="muted">Sin registros.</p> : null}
         </div>
       </section>
+
+      {ticketViewerOpen && previewUrl ? (
+        <div
+          className="ticket-viewer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Comprobante de reserva"
+          onClick={closeTicketViewer}
+        >
+          <div
+            className="ticket-viewer-panel"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="ticket-viewer-top">
+              <h2>Comprobante</h2>
+              <button
+                type="button"
+                className="ghost action-btn"
+                onClick={closeTicketViewer}
+              >
+                Cerrar
+              </button>
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewUrl}
+              alt="Comprobante de reserva"
+              className="ticket-viewer-img"
+            />
+            <div className="actions">
+              <button type="button" onClick={downloadCurrentTicket}>
+                Descargar
+              </button>
+              <button
+                type="button"
+                className="ghost"
+                onClick={closeTicketViewer}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <style jsx>{styles}</style>
     </div>
@@ -1776,11 +1981,81 @@ const styles = `
     word-break: break-word;
   }
   .detail-wide { grid-column: 1 / -1; }
-  .detail-ops { padding-top: 2px; }
+  .detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 2px;
+  }
+  .action-btn {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 0.82rem;
+  }
+  .action-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
   .ops .icon-btn.active {
     background: #111;
     color: #fff;
     border-color: #111;
+  }
+  .ops .danger-icon {
+    color: #8b1e1e;
+    border-color: #e2b4b4;
+  }
+  .ops .danger-icon:hover {
+    background: #8b1e1e;
+    color: #fff;
+    border-color: #8b1e1e;
+  }
+  .status-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 650;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .status-reserved { background: #e7f6ee; color: #0b6e4f; }
+  .status-completed { background: #e8eef8; color: #2a4a7a; }
+  .status-blocked { background: #f3efe6; color: #7a5b20; }
+  .status-cancelled { background: #f8e8e8; color: #8b1e1e; }
+  .status-refunded { background: #f3e9f8; color: #6b3a8a; }
+  .status-eliminated { background: #ececec; color: #666; text-decoration: line-through; }
+  .row-cancelled td { color: #7a3a3a; }
+  .row-refunded td { color: #5c3a70; }
+  .row-eliminated td {
+    color: #888;
+    text-decoration: line-through;
+  }
+  .row-eliminated .status-pill,
+  .row-eliminated .ops {
+    text-decoration: none;
+  }
+  .status-menu { display: inline-flex; margin: 0; }
+  .status-select {
+    min-height: 36px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 0 10px;
+    background: #fff;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 650;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
   button { min-height: 44px; border: 0; border-radius: 10px; background: #111; color: #fff; font-weight: 650; cursor: pointer; padding: 0 14px; }
   .ghost { background: #fff; color: #111; border: 1px solid #ccc; }
@@ -1789,6 +2064,44 @@ const styles = `
   .actions { display: flex; flex-wrap: wrap; gap: 8px; }
   .preview { width: 100%; max-width: 360px; border-radius: 10px; border: 1px solid #e6e6e6; margin: 8px 0 12px; }
   .dni-preview { width: 100%; max-width: 280px; border-radius: 10px; border: 1px solid #e6e6e6; }
+  .ticket-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .ticket-viewer-panel {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    max-width: min(420px, 100%);
+    width: 100%;
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+  }
+  .ticket-viewer-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .ticket-viewer-top h2 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .ticket-viewer-img {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #e6e6e6;
+    display: block;
+    margin-bottom: 12px;
+  }
   .linkish { background: none; border: 0; color: #0b6e4f; text-decoration: underline; cursor: pointer; padding: 0; min-height: auto; font: inherit; font-weight: 650; }
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }

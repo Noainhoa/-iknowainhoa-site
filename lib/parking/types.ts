@@ -45,7 +45,9 @@ export type ParkingBookingStatus =
   | "reserved"
   | "completed"
   | "blocked"
-  | "cancelled";
+  | "cancelled"
+  | "refunded"
+  | "eliminated";
 
 export type ParkingBooking = {
   id: string;
@@ -79,11 +81,18 @@ export type ParkingUnavailableRange = {
 };
 
 export const STATUS_LABELS_ES: Record<ParkingBookingStatus, string> = {
-  reserved: "Reservado",
+  reserved: "Reservado (pagado)",
   completed: "Finalizado",
   blocked: "No disponible",
   cancelled: "Cancelado",
+  refunded: "Reembolsado",
+  eliminated: "Eliminado",
 };
+
+/** Statuses that still occupy the spot for overlap checks. */
+export function statusOccupiesSpot(status: ParkingBookingStatus): boolean {
+  return status === "reserved" || status === "blocked";
+}
 
 export function parseISODate(iso: string): Date {
   const [y, m, d] = iso.split("-").map(Number);

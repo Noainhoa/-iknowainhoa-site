@@ -989,14 +989,17 @@ export default function ParkingPublicApp({
         </div>
       </header>
 
-      <ParkingGoogleReviews
-        locale={locale}
-        ratingLabel={t.googleRatingLabel}
-        ratingAria={t.googleRatingAria}
-        sourceLabel={t.googleOnMapsLabel}
-        prevReviewAria={t.googlePrevReviewAria}
-        nextReviewAria={t.googleNextReviewAria}
-      />
+      <div className="pk-proof">
+        <ParkingGoogleReviews
+          locale={locale}
+          ratingLabel={t.googleRatingLabel}
+          ratingAria={t.googleRatingAria}
+          sourceLabel={t.googleOnMapsLabel}
+          prevReviewAria={t.googlePrevReviewAria}
+          nextReviewAria={t.googleNextReviewAria}
+        />
+        <p className="pk-fit-note">{t.fittedVehicleNote}</p>
+      </div>
 
       {gallery}
 

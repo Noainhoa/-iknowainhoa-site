@@ -8,7 +8,9 @@ DO $$ BEGIN
     'reserved',
     'completed',
     'blocked',
-    'cancelled'
+    'cancelled',
+    'refunded',
+    'eliminated'
   );
 EXCEPTION
   WHEN duplicate_object THEN NULL;
@@ -71,13 +73,21 @@ CREATE TRIGGER parking_bookings_updated_at
 
 ALTER TABLE parking_bookings ENABLE ROW LEVEL SECURITY;
 
+-- Prefer parking-admin-rls.sql in production (allowlist + no hard delete).
+-- Bootstrap fallback: authenticated can read/write but not delete rows.
 DROP POLICY IF EXISTS parking_bookings_admin_all ON parking_bookings;
-CREATE POLICY parking_bookings_admin_all
-  ON parking_bookings
-  FOR ALL
-  TO authenticated
-  USING (true)
-  WITH CHECK (true);
+DROP POLICY IF EXISTS parking_bookings_admin_select ON parking_bookings;
+DROP POLICY IF EXISTS parking_bookings_admin_insert ON parking_bookings;
+DROP POLICY IF EXISTS parking_bookings_admin_update ON parking_bookings;
+
+CREATE POLICY parking_bookings_admin_select
+  ON parking_bookings FOR SELECT TO authenticated USING (true);
+CREATE POLICY parking_bookings_admin_insert
+  ON parking_bookings FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY parking_bookings_admin_update
+  ON parking_bookings FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+REVOKE DELETE ON parking_bookings FROM authenticated;
 
 CREATE OR REPLACE FUNCTION public.parking_unavailable_ranges()
 RETURNS TABLE (
