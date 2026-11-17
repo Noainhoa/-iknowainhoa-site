@@ -33,6 +33,11 @@ export type ParkingCopy = {
   heroAlt: string;
   spaceFact: string;
   galleryLabel: string;
+  galleryDimsToggleAria: string;
+  galleryOpenAria: string;
+  galleryCloseAria: string;
+  galleryPrevAria: string;
+  galleryNextAria: string;
   photoAlts: [string, string, string];
   priceColSeason: string;
   priceColDay: string;
@@ -159,6 +164,11 @@ const es: ParkingCopySource = {
     "Plaza de garaje privada cubierta en el centro de Guardamar del Segura",
   spaceFact: "Garaje cubierto · 4,90 m × 2,40 m",
   galleryLabel: "Fotos de la plaza de garaje",
+  galleryDimsToggleAria: "Mostrar u ocultar medidas de la plaza",
+  galleryOpenAria: "Ampliar foto",
+  galleryCloseAria: "Cerrar",
+  galleryPrevAria: "Foto anterior",
+  galleryNextAria: "Foto siguiente",
   photoAlts: [
     "Plaza de garaje privada cubierta en Guardamar del Segura, 240 cm de ancho y 490 cm de largo",
     "Vista frontal de la plaza de parking en garaje cerrado, centro de Guardamar",
@@ -326,6 +336,11 @@ const en: ParkingCopySource = {
   heroAlt: "Covered private parking space in central Guardamar del Segura",
   spaceFact: "Covered garage · 4.90 m × 2.40 m",
   galleryLabel: "Garage space photos",
+  galleryDimsToggleAria: "Show or hide bay dimensions",
+  galleryOpenAria: "Enlarge photo",
+  galleryCloseAria: "Close",
+  galleryPrevAria: "Previous photo",
+  galleryNextAria: "Next photo",
   photoAlts: [
     "Private covered garage space in Guardamar del Segura, 240 cm wide and 490 cm long",
     "Front view of the private parking bay in a closed garage, Guardamar centre",
@@ -490,6 +505,11 @@ const fr: ParkingCopySource = {
   heroAlt: "Place de parking privée couverte au centre de Guardamar del Segura",
   spaceFact: "Garage couvert · 4,90 m × 2,40 m",
   galleryLabel: "Photos de la place de garage",
+  galleryDimsToggleAria: "Afficher ou masquer les dimensions de la place",
+  galleryOpenAria: "Agrandir la photo",
+  galleryCloseAria: "Fermer",
+  galleryPrevAria: "Photo précédente",
+  galleryNextAria: "Photo suivante",
   photoAlts: [
     "Place de garage privée couverte à Guardamar del Segura, 240 cm de large et 490 cm de long",
     "Vue de face de la place de parking dans un garage fermé, centre de Guardamar",

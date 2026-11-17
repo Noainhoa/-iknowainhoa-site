@@ -340,6 +340,7 @@
         }
 
 .parking-root .pk-gallery-item {
+          position: relative;
           margin: 0;
           min-width: 0;
           min-height: 0;
@@ -350,16 +351,271 @@
           grid-row: 1 / span 2;
         }
 
-.parking-root .pk-gallery-item img,
-.parking-root .pk-gallery-item span {
+.parking-root .pk-gallery-item img {
           display: block;
           width: 100% !important;
           height: 100% !important;
           max-width: none !important;
+          object-fit: cover;
         }
 
-.parking-root .pk-gallery-item img {
-          object-fit: cover;
+.parking-root .pk-gallery-open {
+          position: absolute;
+          inset: 0;
+          z-index: 3;
+          margin: 0;
+          padding: 0;
+          border: 0;
+          background: transparent;
+          cursor: zoom-in;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+.parking-root .pk-dims {
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+
+/* In-page hero: hover-only preview on fine pointers (click opens lightbox) */
+@media (hover: hover) and (pointer: fine) {
+          .parking-root .pk-gallery-item--dims:hover .pk-dims {
+            opacity: 1;
+          }
+        }
+
+.parking-root .pk-dim {
+          position: absolute;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 3px 8px;
+          border-radius: 4px;
+          background: color-mix(in srgb, #0b1c2c 62%, transparent);
+          color: #fff;
+          font-size: clamp(0.72rem, 1.7vw, 0.88rem);
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          line-height: 1.1;
+          white-space: nowrap;
+          box-shadow: 0 1px 4px color-mix(in srgb, #000 28%, transparent);
+        }
+
+/* plaza-1 cover crop: length only in-page (width is lightbox-only) */
+.parking-root .pk-dim-length {
+          left: 50%;
+          bottom: 2.5%;
+          transform: translateX(-50%);
+        }
+
+@media (prefers-reduced-motion: reduce) {
+          .parking-root .pk-dims {
+            transition: none;
+          }
+        }
+
+/* Full-screen gallery lightbox (portaled to document.body) */
+.pk-lightbox {
+          position: fixed;
+          inset: 0;
+          z-index: 80;
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr) auto;
+          grid-template-rows: auto minmax(0, 1fr);
+          align-items: center;
+          justify-items: center;
+          gap: 0;
+          padding: max(12px, env(safe-area-inset-top))
+            max(12px, env(safe-area-inset-right))
+            max(12px, env(safe-area-inset-bottom))
+            max(12px, env(safe-area-inset-left));
+          background: color-mix(in srgb, #0b1c2c 88%, transparent);
+          color: #fff;
+        }
+
+.pk-lightbox-title {
+          grid-column: 1 / -1;
+          grid-row: 1;
+          margin: 0;
+          justify-self: start;
+          padding-right: 3.5rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          opacity: 0.85;
+        }
+
+.pk-lightbox-close {
+          position: absolute;
+          top: max(10px, env(safe-area-inset-top));
+          right: max(10px, env(safe-area-inset-right));
+          z-index: 2;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 44px;
+          height: 44px;
+          margin: 0;
+          padding: 0;
+          border: 0;
+          border-radius: 999px;
+          background: color-mix(in srgb, #fff 16%, transparent);
+          color: #fff;
+          font-size: 1.75rem;
+          line-height: 1;
+          cursor: pointer;
+        }
+
+.pk-lightbox-close:hover,
+.pk-lightbox-close:focus-visible {
+          background: color-mix(in srgb, #fff 28%, transparent);
+          outline: 2px solid #fff;
+          outline-offset: 2px;
+        }
+
+.pk-lightbox-nav {
+          grid-row: 2;
+          z-index: 2;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 44px;
+          height: 44px;
+          margin: 0;
+          padding: 0;
+          border: 0;
+          border-radius: 999px;
+          background: color-mix(in srgb, #fff 14%, transparent);
+          color: #fff;
+          font-size: 2rem;
+          line-height: 1;
+          cursor: pointer;
+          user-select: none;
+        }
+
+.pk-lightbox-nav:hover,
+.pk-lightbox-nav:focus-visible {
+          background: color-mix(in srgb, #fff 28%, transparent);
+          outline: 2px solid #fff;
+          outline-offset: 2px;
+        }
+
+.pk-lightbox-nav--prev {
+          grid-column: 1;
+        }
+
+.pk-lightbox-nav--next {
+          grid-column: 3;
+        }
+
+.pk-lightbox-stage {
+          grid-column: 2;
+          grid-row: 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          min-width: 0;
+          min-height: 0;
+          touch-action: pan-y;
+        }
+
+.pk-lightbox-frame {
+          position: relative;
+          margin: 0;
+          max-width: min(100%, 1100px);
+          max-height: min(82vh, 100%);
+          width: fit-content;
+          height: fit-content;
+          line-height: 0;
+        }
+
+.pk-lightbox-img {
+          display: block;
+          width: auto !important;
+          height: auto !important;
+          max-width: min(100%, 1100px) !important;
+          max-height: min(82vh, 100%) !important;
+          object-fit: contain;
+          user-select: none;
+          -webkit-user-drag: none;
+        }
+
+.pk-lightbox-dims {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+/* Portaled outside .parking-root — repeat dim pill base */
+.pk-lightbox .pk-dim {
+          position: absolute;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px 10px;
+          border-radius: 4px;
+          background: color-mix(in srgb, #0b1c2c 62%, transparent);
+          color: #fff;
+          font-size: clamp(0.8rem, 2.2vw, 1rem);
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          line-height: 1.1;
+          white-space: nowrap;
+          box-shadow: 0 1px 4px color-mix(in srgb, #000 28%, transparent);
+        }
+
+/* plaza-1 contain framing: natural image coords (uncropped) */
+.pk-lightbox-dim-length {
+          left: 50%;
+          bottom: 4.5%;
+          transform: translateX(-50%);
+        }
+
+.pk-lightbox-dim-width {
+          left: 16%;
+          top: 58%;
+          transform: translate(-50%, -50%) rotate(-58deg);
+        }
+
+@media (max-width: 640px) {
+          .pk-lightbox {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+          }
+
+          .pk-lightbox-title {
+            grid-column: 1 / -1;
+          }
+
+          .pk-lightbox-stage {
+            grid-column: 1 / -1;
+            grid-row: 2;
+          }
+
+          .pk-lightbox-nav--prev {
+            grid-column: 1;
+            grid-row: 3;
+            justify-self: start;
+          }
+
+          .pk-lightbox-nav--next {
+            grid-column: 2;
+            grid-row: 3;
+            justify-self: end;
+          }
+        }
+
+@media (prefers-reduced-motion: reduce) {
+          .pk-lightbox-close,
+          .pk-lightbox-nav {
+            transition: none;
+          }
         }
 
 .parking-root .pk-privacy-page {
@@ -370,23 +626,10 @@
           font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
 
-.parking-root .pk-space-facts {
-          margin: 0;
-          padding: 0;
-          color: var(--ink);
-          font-size: 0.88rem;
-          line-height: 1.35;
-          font-weight: 500;
-        }
-
 @media (min-width: 560px) {
           .parking-root .pk-gallery {
             grid-template-rows: 200px 200px;
             gap: 8px;
-          }
-
-.parking-root .pk-space-facts {
-            font-size: 0.95rem;
           }
         }
 

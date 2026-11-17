@@ -18,8 +18,20 @@ export function parkingAccessHeightLabel(locale: Locale): string {
   return `${n} m`;
 }
 
+function parkingMetersLabel(meters: number, locale: Locale): string {
+  const n =
+    locale === "en" ? meters.toFixed(2) : meters.toFixed(2).replace(".", ",");
+  return `${n} m`;
+}
+
+export function parkingBayLengthLabel(locale: Locale): string {
+  return parkingMetersLabel(PARKING_BAY_LENGTH_M, locale);
+}
+
+export function parkingBayWidthLabel(locale: Locale): string {
+  return parkingMetersLabel(PARKING_BAY_WIDTH_M, locale);
+}
+
 export function parkingBaySizeLabel(locale: Locale): string {
-  const fmt = (n: number) =>
-    locale === "en" ? n.toFixed(2) : n.toFixed(2).replace(".", ",");
-  return `${fmt(PARKING_BAY_LENGTH_M)} m × ${fmt(PARKING_BAY_WIDTH_M)} m`;
+  return `${parkingBayLengthLabel(locale)} × ${parkingBayWidthLabel(locale)}`;
 }

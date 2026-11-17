@@ -1,12 +1,21 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Fragment,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { Eye, EyeOff } from "lucide-react";
 import {
   buildConfirmationImage,
   customerWhatsAppHref,
   downloadBlob,
 } from "@/lib/parking/confirmationImage";
 import { PARKING_BADGE_SRC } from "@/lib/parking/constants";
+import { PARKING_ORIGIN, PARKING_PATH } from "@/lib/parking/seo";
 import { getParkingSupabase, parkingSupabaseConfigured } from "@/lib/parking/supabase";
 import {
   DEFAULT_PARKING_RATES,
@@ -71,17 +80,19 @@ const EMPTY_FORM = {
   customer_dni_image_path: "" as string,
   customer_phone: "",
   vehicle_registration: "",
+  vehicle_brand: "",
+  vehicle_model: "",
   vehicle_description: "",
   price_eur: "",
   private_notes: "",
 };
 
 const SCHEMA_MIGRATE_HINT =
-  "Falta una columna en Supabase. Abre SQL Editor del proyecto y ejecuta supabase/parking-booking-fields.sql (incluye customer_dni / customer_surnames y NOTIFY pgrst).";
+  "Falta una columna en Supabase. Abre SQL Editor del proyecto y ejecuta supabase/parking-booking-fields.sql y/o supabase/parking-vehicle-brand-model.sql (incluye NOTIFY pgrst).";
 
 function formatParkingError(message: string): string {
   if (
-    /customer_dni|customer_surnames|customer_dni_image_path|schema cache/i.test(
+    /customer_dni|customer_surnames|customer_dni_image_path|vehicle_brand|vehicle_model|schema cache/i.test(
       message
     )
   ) {
@@ -90,12 +101,40 @@ function formatParkingError(message: string): string {
   return message;
 }
 
+function composeVehicleDescription(brand: string, model: string): string | null {
+  const parts = [brand.trim(), model.trim()].filter(Boolean);
+  return parts.length ? parts.join(" ") : null;
+}
+
+function bookingToForm(row: ParkingBooking) {
+  return {
+    id: row.id,
+    start_date: row.start_date,
+    end_date: row.end_date,
+    status: row.status,
+    customer_name: row.customer_name || "",
+    customer_surnames: row.customer_surnames || "",
+    customer_dni: row.customer_dni || "",
+    customer_dni_image_path: row.customer_dni_image_path || "",
+    customer_phone: row.customer_phone || "",
+    vehicle_registration: row.vehicle_registration || "",
+    vehicle_brand: row.vehicle_brand || "",
+    vehicle_model: row.vehicle_model || "",
+    vehicle_description: row.vehicle_description || "",
+    price_eur: row.price_eur != null ? String(row.price_eur) : "",
+    private_notes: row.private_notes || "",
+  };
+}
+
 export default function ParkingAdminApp() {
   const configured = parkingSupabaseConfigured();
   const supabase = getParkingSupabase();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [recoveryMode, setRecoveryMode] = useState(() => {
@@ -123,6 +162,7 @@ export default function ParkingAdminApp() {
   const [ratesSaving, setRatesSaving] = useState(false);
   const [ratesMessage, setRatesMessage] = useState<string | null>(null);
   const [ratesError, setRatesError] = useState<string | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   const refreshSession = useCallback(async () => {
     if (!supabase) return;
@@ -218,15 +258,25 @@ export default function ParkingAdminApp() {
   useEffect(() => {
     const hash = window.location.hash.replace(/^#/, "");
     const hashParams = new URLSearchParams(hash);
-    if (hashParams.get("type") === "recovery") {
+    const params = new URLSearchParams(window.location.search);
+    if (hashParams.get("type") === "recovery" || params.get("type") === "recovery") {
       setRecoveryMode(true);
     }
-    const params = new URLSearchParams(window.location.search);
     if (params.get("admin") === "denied") {
       setAuthError("No tienes permiso de administrador.");
       window.history.replaceState({}, "", window.location.pathname);
     }
   }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setRecoveryMode(true);
+      }
+    });
+    return () => data.subscription.unsubscribe();
+  }, [supabase]);
 
   useEffect(() => {
     void refreshSession();
@@ -332,7 +382,9 @@ export default function ParkingAdminApp() {
       return;
     }
     setAuthBusy(true);
-    const redirectTo = `${window.location.origin}/parking-guardamar-centro/admin`;
+    // Always send users to the production admin path so the email link opens
+    // the “new password” screen (not the site homepage / Site URL fallback).
+    const redirectTo = `${PARKING_ORIGIN}${PARKING_PATH}/admin`;
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo,
     });
@@ -369,7 +421,18 @@ export default function ParkingAdminApp() {
     setRecoveryMode(false);
     setNewPassword("");
     setConfirmPassword("");
-    window.history.replaceState({}, "", window.location.pathname);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+    const url = new URL(window.location.href);
+    url.hash = "";
+    url.searchParams.delete("type");
+    url.searchParams.delete("code");
+    const search = url.searchParams.toString();
+    window.history.replaceState(
+      {},
+      "",
+      url.pathname + (search ? `?${search}` : "")
+    );
     await refreshSession();
   }
 
@@ -452,26 +515,13 @@ export default function ParkingAdminApp() {
   }
 
   function editRow(row: ParkingBooking) {
-    setForm({
-      id: row.id,
-      start_date: row.start_date,
-      end_date: row.end_date,
-      status: row.status,
-      customer_name: row.customer_name || "",
-      customer_surnames: row.customer_surnames || "",
-      customer_dni: row.customer_dni || "",
-      customer_dni_image_path: row.customer_dni_image_path || "",
-      customer_phone: row.customer_phone || "",
-      vehicle_registration: row.vehicle_registration || "",
-      vehicle_description: row.vehicle_description || "",
-      price_eur: row.price_eur != null ? String(row.price_eur) : "",
-      private_notes: row.private_notes || "",
-    });
+    setForm(bookingToForm(row));
     setDniFile(null);
     if (dniLocalPreview) URL.revokeObjectURL(dniLocalPreview);
     setDniLocalPreview(null);
     setMessage(null);
     setLastSaved(row);
+    setDetailId(null);
   }
 
   async function openDniImage(path: string) {
@@ -611,6 +661,9 @@ export default function ParkingAdminApp() {
         dniPath = await uploadDniForBooking(bookingId, dniFile);
       }
 
+      const brand = form.vehicle_brand.trim();
+      const model = form.vehicle_model.trim();
+      const composed = composeVehicleDescription(brand, model);
       const payload = {
         id: bookingId,
         start_date: form.start_date,
@@ -622,7 +675,10 @@ export default function ParkingAdminApp() {
         customer_dni_image_path: dniPath,
         customer_phone: form.customer_phone.trim() || null,
         vehicle_registration: form.vehicle_registration.trim() || null,
-        vehicle_description: form.vehicle_description.trim() || null,
+        vehicle_brand: brand || null,
+        vehicle_model: model || null,
+        vehicle_description:
+          form.vehicle_description.trim() || composed || null,
         price_eur: form.price_eur === "" ? null : Number(form.price_eur),
         private_notes: form.private_notes.trim() || null,
       };
@@ -645,21 +701,7 @@ export default function ParkingAdminApp() {
       const wasUpdate = Boolean(form.id);
       setLastSaved(saved);
       // Keep the saved booking loaded so missing fields can be fixed and saved again.
-      setForm({
-        id: saved.id,
-        start_date: saved.start_date,
-        end_date: saved.end_date,
-        status: saved.status,
-        customer_name: saved.customer_name || "",
-        customer_surnames: saved.customer_surnames || "",
-        customer_dni: saved.customer_dni || "",
-        customer_dni_image_path: saved.customer_dni_image_path || "",
-        customer_phone: saved.customer_phone || "",
-        vehicle_registration: saved.vehicle_registration || "",
-        vehicle_description: saved.vehicle_description || "",
-        price_eur: saved.price_eur != null ? String(saved.price_eur) : "",
-        private_notes: saved.private_notes || "",
-      });
+      setForm(bookingToForm(saved));
       setDniFile(null);
       if (dniLocalPreview) URL.revokeObjectURL(dniLocalPreview);
       setDniLocalPreview(null);
@@ -713,6 +755,7 @@ export default function ParkingAdminApp() {
     }
     if (form.id === id) resetForm();
     if (lastSaved?.id === id) setLastSaved(null);
+    if (detailId === id) setDetailId(null);
     await loadRows();
   }
 
@@ -759,31 +802,71 @@ export default function ParkingAdminApp() {
           <h1 className="auth-title">Nueva contraseña</h1>
           <p className="auth-sub">Elige una contraseña segura para tu cuenta de administrador.</p>
           <form className="auth-form" onSubmit={(e) => void onSetNewPassword(e)}>
-            <label className="auth-label">
+            <label className="auth-label" htmlFor="parking-new-password">
               Nueva contraseña
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                autoComplete="new-password"
-                className="auth-input"
-                placeholder="Mínimo 8 caracteres"
-              />
+              <div className="auth-password-field">
+                <input
+                  id="parking-new-password"
+                  type={showNewPassword ? "text" : "password"}
+                  required
+                  minLength={8}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className="auth-input"
+                  placeholder="Mínimo 8 caracteres"
+                />
+                <button
+                  type="button"
+                  className="auth-password-toggle"
+                  aria-label={
+                    showNewPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                  }
+                  aria-pressed={showNewPassword}
+                  aria-controls="parking-new-password"
+                  onClick={() => setShowNewPassword((v) => !v)}
+                >
+                  {showNewPassword ? (
+                    <EyeOff size={18} aria-hidden="true" />
+                  ) : (
+                    <Eye size={18} aria-hidden="true" />
+                  )}
+                </button>
+              </div>
             </label>
-            <label className="auth-label">
+            <label className="auth-label" htmlFor="parking-confirm-password">
               Confirmar contraseña
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-                className="auth-input"
-                placeholder="Repite la contraseña"
-              />
+              <div className="auth-password-field">
+                <input
+                  id="parking-confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  minLength={8}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className="auth-input"
+                  placeholder="Repite la contraseña"
+                />
+                <button
+                  type="button"
+                  className="auth-password-toggle"
+                  aria-label={
+                    showConfirmPassword
+                      ? "Ocultar contraseña"
+                      : "Mostrar contraseña"
+                  }
+                  aria-pressed={showConfirmPassword}
+                  aria-controls="parking-confirm-password"
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} aria-hidden="true" />
+                  ) : (
+                    <Eye size={18} aria-hidden="true" />
+                  )}
+                </button>
+              </div>
             </label>
             {authError ? <p className="auth-err">{authError}</p> : null}
             <button type="submit" className="auth-btn" disabled={authBusy}>
@@ -818,22 +901,43 @@ export default function ParkingAdminApp() {
                 placeholder="tu@email.com"
               />
             </label>
-            <label className="auth-label">
+            <label className="auth-label" htmlFor="parking-admin-password">
               Contraseña
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                className="auth-input"
-                placeholder="••••••••"
-              />
+              <div className="auth-password-field">
+                <input
+                  id="parking-admin-password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  className="auth-input"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  className="auth-password-toggle"
+                  aria-label={
+                    showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                  }
+                  aria-pressed={showPassword}
+                  aria-controls="parking-admin-password"
+                  onClick={() => setShowPassword((v) => !v)}
+                >
+                  {showPassword ? (
+                    <EyeOff size={18} aria-hidden="true" />
+                  ) : (
+                    <Eye size={18} aria-hidden="true" />
+                  )}
+                </button>
+              </div>
             </label>
             {authError ? <p className="auth-err">{authError}</p> : null}
             {resetSent ? (
               <p className="auth-success">
-                ✓ Email enviado. Abre el enlace desde este mismo navegador.
+                ✓ Email enviado. Abre «Reset password» — debe llevarte a esta
+                página de administración para elegir la nueva contraseña (no a
+                la home del sitio).
               </p>
             ) : null}
             <button type="submit" className="auth-btn" disabled={authBusy}>
@@ -1084,7 +1188,7 @@ export default function ParkingAdminApp() {
             />
           </label>
         </div>
-        <div className="row">
+        <div className="row row-3">
           <label>
             <span className="adm-lab">Matrícula</span>
             <input
@@ -1099,17 +1203,42 @@ export default function ParkingAdminApp() {
             />
           </label>
           <label>
-            <span className="adm-lab">Vehículo</span>
+            <span className="adm-lab">Marca</span>
             <input
-              name="vehicle_description"
+              name="vehicle_brand"
               autoComplete="off"
-              value={form.vehicle_description}
+              value={form.vehicle_brand}
               onChange={(e) =>
-                setForm({ ...form, vehicle_description: e.target.value })
+                setForm({ ...form, vehicle_brand: e.target.value })
               }
+              placeholder="Mercedes"
+            />
+          </label>
+          <label>
+            <span className="adm-lab">Modelo</span>
+            <input
+              name="vehicle_model"
+              autoComplete="off"
+              value={form.vehicle_model}
+              onChange={(e) =>
+                setForm({ ...form, vehicle_model: e.target.value })
+              }
+              placeholder="Classe 580"
             />
           </label>
         </div>
+        <label>
+          <span className="adm-lab">Notas del vehículo</span>
+          <input
+            name="vehicle_description"
+            autoComplete="off"
+            value={form.vehicle_description}
+            onChange={(e) =>
+              setForm({ ...form, vehicle_description: e.target.value })
+            }
+            placeholder="Opcional — se rellena con marca + modelo si lo dejas vacío"
+          />
+        </label>
         <label>
           <span className="adm-lab">Notas privadas</span>
           <textarea
@@ -1183,125 +1312,207 @@ export default function ParkingAdminApp() {
 
       <section className="card">
         <h2>Todos los registros</h2>
+        <p className="hint">
+          Vista compacta: fechas, estado, nombre, matrícula, marca y modelo.
+          Pulsa la i para ver el resto y las acciones.
+        </p>
         <div className="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>Fechas</th>
                 <th>Estado</th>
-                <th>Cliente</th>
-                <th>DNI</th>
-                <th>Foto</th>
-                <th>Tel.</th>
-                <th>€</th>
+                <th>Nombre</th>
+                <th>Matrícula</th>
+                <th>Marca</th>
+                <th>Modelo</th>
                 <th />
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
-                <tr key={r.id}>
-                  <td>
-                    {formatSpanishDate(r.start_date)} →{" "}
-                    {formatSpanishDate(r.end_date)}
-                  </td>
-                  <td>{STATUS_LABELS_ES[r.status]}</td>
-                  <td>
-                    {[r.customer_name, r.customer_surnames]
-                      .filter(Boolean)
-                      .join(" ") || "—"}
-                  </td>
-                  <td>{r.customer_dni || "—"}</td>
-                  <td>
-                    {r.customer_dni_image_path ? (
-                      <button
-                        type="button"
-                        className="ghost"
-                        onClick={() => void openDniImage(r.customer_dni_image_path!)}
-                      >
-                        Ver
-                      </button>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td>{r.customer_phone || "—"}</td>
-                  <td>{r.price_eur != null ? r.price_eur : "—"}</td>
-                  <td className="ops">
-                    <button
-                      type="button"
-                      className="icon-btn"
-                      onClick={() => editRow(r)}
-                      aria-label="Editar"
-                      title="Editar"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        viewBox="0 0 24 24"
-                        width="16"
-                        height="16"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.25"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M12 20h9" />
-                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                      </svg>
-                    </button>
-                    {r.customer_phone &&
-                    (r.status === "reserved" || r.status === "completed") ? (
-                      <button
-                        type="button"
-                        className="icon-btn wa"
-                        onClick={() => {
-                          setLastSaved(r);
-                          void makeConfirmation(r).then(() =>
-                            openCustomerWhatsApp(r)
-                          );
-                        }}
-                        aria-label="WhatsApp Business"
-                        title="WhatsApp Business"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          viewBox="0 0 24 24"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
+              {rows.map((r) => {
+                const open = detailId === r.id;
+                return (
+                  <Fragment key={r.id}>
+                    <tr className={open ? "row-open" : undefined}>
+                      <td>
+                        {formatSpanishDate(r.start_date)} →{" "}
+                        {formatSpanishDate(r.end_date)}
+                      </td>
+                      <td>{STATUS_LABELS_ES[r.status]}</td>
+                      <td>{r.customer_name || "—"}</td>
+                      <td>{r.vehicle_registration || "—"}</td>
+                      <td>{r.vehicle_brand || "—"}</td>
+                      <td>{r.vehicle_model || "—"}</td>
+                      <td className="ops">
+                        <button
+                          type="button"
+                          className={`icon-btn${open ? " active" : ""}`}
+                          onClick={() =>
+                            setDetailId((id) => (id === r.id ? null : r.id))
+                          }
+                          aria-expanded={open}
+                          aria-label={open ? "Ocultar detalles" : "Más detalles"}
+                          title={open ? "Ocultar detalles" : "Más detalles"}
                         >
-                          <path d="M12.04 2a9.9 9.9 0 0 0-9.9 9.9c0 1.75.46 3.45 1.33 4.95L2 22l5.3-1.39a9.87 9.87 0 0 0 4.74 1.21h.01a9.9 9.9 0 0 0 9.9-9.9 9.86 9.86 0 0 0-9.91-9.92Zm5.76 14.07c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.29.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.59.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.39-.43.52-.14.14-.29.3-.12.58.16.29.73 1.2 1.56 1.94 1.08.96 1.98 1.26 2.27 1.4.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.19-.29.38-.24.64-.14.26.1 1.66.78 1.95.92.28.15.47.21.54.33.07.12.07.68-.17 1.36Z" />
-                        </svg>
-                      </button>
+                          <svg
+                            aria-hidden="true"
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.25"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M12 16v-4" />
+                            <path d="M12 8h.01" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                    {open ? (
+                      <tr className="detail-row">
+                        <td colSpan={7}>
+                          <div className="detail-panel">
+                            <dl className="detail-grid">
+                              <div>
+                                <dt>Nombre completo</dt>
+                                <dd>
+                                  {[r.customer_name, r.customer_surnames]
+                                    .filter(Boolean)
+                                    .join(" ") || "—"}
+                                </dd>
+                              </div>
+                              <div>
+                                <dt>DNI / NIE</dt>
+                                <dd>{r.customer_dni || "—"}</dd>
+                              </div>
+                              <div>
+                                <dt>Foto DNI</dt>
+                                <dd>
+                                  {r.customer_dni_image_path ? (
+                                    <button
+                                      type="button"
+                                      className="linkish"
+                                      onClick={() =>
+                                        void openDniImage(
+                                          r.customer_dni_image_path!
+                                        )
+                                      }
+                                    >
+                                      Ver
+                                    </button>
+                                  ) : (
+                                    "—"
+                                  )}
+                                </dd>
+                              </div>
+                              <div>
+                                <dt>Teléfono</dt>
+                                <dd>{r.customer_phone || "—"}</dd>
+                              </div>
+                              <div>
+                                <dt>Importe</dt>
+                                <dd>
+                                  {r.price_eur != null
+                                    ? `${r.price_eur} €`
+                                    : "—"}
+                                </dd>
+                              </div>
+                              <div>
+                                <dt>Notas vehículo</dt>
+                                <dd>{r.vehicle_description || "—"}</dd>
+                              </div>
+                              <div className="detail-wide">
+                                <dt>Notas privadas</dt>
+                                <dd>{r.private_notes || "—"}</dd>
+                              </div>
+                            </dl>
+                            <div className="ops detail-ops">
+                              <button
+                                type="button"
+                                className="icon-btn"
+                                onClick={() => editRow(r)}
+                                aria-label="Editar"
+                                title="Editar"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  viewBox="0 0 24 24"
+                                  width="16"
+                                  height="16"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2.25"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M12 20h9" />
+                                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                                </svg>
+                              </button>
+                              {r.customer_phone &&
+                              (r.status === "reserved" ||
+                                r.status === "completed") ? (
+                                <button
+                                  type="button"
+                                  className="icon-btn wa"
+                                  onClick={() => {
+                                    setLastSaved(r);
+                                    void makeConfirmation(r).then(() =>
+                                      openCustomerWhatsApp(r)
+                                    );
+                                  }}
+                                  aria-label="WhatsApp Business"
+                                  title="WhatsApp Business"
+                                >
+                                  <svg
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                  >
+                                    <path d="M12.04 2a9.9 9.9 0 0 0-9.9 9.9c0 1.75.46 3.45 1.33 4.95L2 22l5.3-1.39a9.87 9.87 0 0 0 4.74 1.21h.01a9.9 9.9 0 0 0 9.9-9.9 9.86 9.86 0 0 0-9.91-9.92Zm5.76 14.07c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.29.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.59.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.39-.43.52-.14.14-.29.3-.12.58.16.29.73 1.2 1.56 1.94 1.08.96 1.98 1.26 2.27 1.4.28.14.45.12.61-.07.17-.2.7-.82.89-1.1.19-.29.38-.24.64-.14.26.1 1.66.78 1.95.92.28.15.47.21.54.33.07.12.07.68-.17 1.36Z" />
+                                  </svg>
+                                </button>
+                              ) : null}
+                              <button
+                                type="button"
+                                className="icon-btn danger"
+                                onClick={() => void onDelete(r.id)}
+                                aria-label="Eliminar"
+                                title="Eliminar"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  viewBox="0 0 24 24"
+                                  width="16"
+                                  height="16"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2.25"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M3 6h18" />
+                                  <path d="M8 6V4h8v2" />
+                                  <path d="M19 6l-1 14H6L5 6" />
+                                  <path d="M10 11v6" />
+                                  <path d="M14 11v6" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
                     ) : null}
-                    <button
-                      type="button"
-                      className="icon-btn danger"
-                      onClick={() => void onDelete(r.id)}
-                      aria-label="Eliminar"
-                      title="Eliminar"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        viewBox="0 0 24 24"
-                        width="16"
-                        height="16"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.25"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M3 6h18" />
-                        <path d="M8 6V4h8v2" />
-                        <path d="M19 6l-1 14H6L5 6" />
-                        <path d="M10 11v6" />
-                        <path d="M14 11v6" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                  </Fragment>
+                );
+              })}
             </tbody>
           </table>
           {rows.length === 0 ? <p className="muted">Sin registros.</p> : null}
@@ -1411,6 +1622,38 @@ const styles = `
     transition: border-color 0.15s;
     box-sizing: border-box;
   }
+  .auth-password-field {
+    position: relative;
+    display: grid;
+  }
+  .auth-password-field .auth-input {
+    padding-right: 44px;
+  }
+  .auth-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    min-height: 36px;
+    min-width: 36px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #555;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .auth-password-toggle:hover,
+  .auth-password-toggle:focus-visible {
+    color: #111;
+    background: #f0f0f0;
+    outline: none;
+  }
   .auth-input:focus { border-color: #111; }
   .auth-err {
     margin: 0;
@@ -1498,7 +1741,47 @@ const styles = `
   input, select, textarea { min-height: 44px; border: 1px solid #ccc; border-radius: 8px; padding: 8px 10px; font: inherit; font-weight: 400; }
   textarea { min-height: 80px; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 720px) { .row-3 { grid-template-columns: 1fr; } }
   @media (max-width: 560px) { .row { grid-template-columns: 1fr; } .top { flex-direction: column; } }
+  .row-open td { border-bottom-color: transparent; }
+  .detail-row td {
+    background: #f7f7f7;
+    border-bottom: 1px solid #e6e6e6;
+    padding: 0 6px 12px;
+  }
+  .detail-panel {
+    display: grid;
+    gap: 12px;
+    padding: 10px 8px 4px;
+    border-radius: 10px;
+  }
+  .detail-grid {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px 14px;
+  }
+  .detail-grid dt {
+    margin: 0;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #666;
+    font-weight: 650;
+  }
+  .detail-grid dd {
+    margin: 2px 0 0;
+    font-weight: 500;
+    word-break: break-word;
+  }
+  .detail-wide { grid-column: 1 / -1; }
+  .detail-ops { padding-top: 2px; }
+  .ops .icon-btn.active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+  }
   button { min-height: 44px; border: 0; border-radius: 10px; background: #111; color: #fff; font-weight: 650; cursor: pointer; padding: 0 14px; }
   .ghost { background: #fff; color: #111; border: 1px solid #ccc; }
   .danger { background: #8b1e1e; }

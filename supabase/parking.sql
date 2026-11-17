@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS parking_bookings (
   customer_dni_image_path TEXT,
   customer_phone TEXT,
   vehicle_registration TEXT,
+  vehicle_brand TEXT,
+  vehicle_model TEXT,
   vehicle_description TEXT,
   arrival_time TIME,
   departure_time TIME,

@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import ParkingFaqAbout from "@/components/parking/ParkingFaqAbout";
 import ParkingGallery from "@/components/parking/ParkingGallery";
 import ParkingPublicApp from "@/components/parking/ParkingPublicApp";
+import {
+  parkingBayLengthLabel,
+  parkingBayWidthLabel,
+} from "@/lib/parking/constants";
 import { getParkingCopy } from "@/lib/parking/i18n";
 import { buildParkingJsonLd } from "@/lib/parking/jsonLd";
 import { getParkingLocale } from "@/lib/parking/locale";
@@ -134,8 +138,13 @@ export default async function ParkingPage({ searchParams }: PageProps) {
         gallery={
           <ParkingGallery
             galleryLabel={t.galleryLabel}
-            spaceFact={t.spaceFact}
             photoAlts={t.photoAlts}
+            lengthLabel={parkingBayLengthLabel(locale)}
+            widthLabel={parkingBayWidthLabel(locale)}
+            openAria={t.galleryOpenAria}
+            closeAria={t.galleryCloseAria}
+            prevAria={t.galleryPrevAria}
+            nextAria={t.galleryNextAria}
           />
         }
         faq={

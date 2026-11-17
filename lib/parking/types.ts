@@ -58,6 +58,9 @@ export type ParkingBooking = {
   customer_dni_image_path: string | null;
   customer_phone: string | null;
   vehicle_registration: string | null;
+  vehicle_brand: string | null;
+  vehicle_model: string | null;
+  /** Free-text fallback / combined label; prefer brand + model when set. */
   vehicle_description: string | null;
   arrival_time: string | null;
   departure_time: string | null;
