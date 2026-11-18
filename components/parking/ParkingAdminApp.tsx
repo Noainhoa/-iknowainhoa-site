@@ -724,10 +724,6 @@ export default function ParkingAdminApp() {
         setMessage("El importe pagado es obligatorio para una reserva.");
         return;
       }
-      if (!dniFile && !form.customer_dni_image_path) {
-        setMessage("Sube una foto o PDF del DNI para confirmar la reserva.");
-        return;
-      }
     }
 
     const overlap = validateOverlap(
@@ -1179,13 +1175,12 @@ export default function ParkingAdminApp() {
       >
         <h2>{form.id ? "Editar registro" : "Confirmar reserva"}</h2>
         <p className="hint">
-          Puedes rellenar nombre, apellidos y DNI a mano. La foto es obligatoria;
-          la lectura automática es opcional y a veces falla con fotos borrosas.
+          Puedes rellenar nombre, apellidos y DNI a mano. La foto del DNI es
+          opcional; si la subes, la lectura automática a veces falla con fotos
+          borrosas.
         </p>
         <label>
-          <span className="adm-lab">
-            Foto del DNI <span className="req">*</span>
-          </span>
+          <span className="adm-lab">Foto del DNI</span>
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp,image/heic"
@@ -1996,20 +1991,6 @@ const styles = `
     opacity: 0.45;
     cursor: not-allowed;
   }
-  .ops .icon-btn.active {
-    background: #111;
-    color: #fff;
-    border-color: #111;
-  }
-  .ops .danger-icon {
-    color: #8b1e1e;
-    border-color: #e2b4b4;
-  }
-  .ops .danger-icon:hover {
-    background: #8b1e1e;
-    color: #fff;
-    border-color: #8b1e1e;
-  }
   .status-pill {
     display: inline-block;
     padding: 2px 8px;
@@ -2117,6 +2098,100 @@ const styles = `
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
+    background: #fff;
+    color: #005288;
+    border: 1px solid #c9d7e3;
+  }
+  .ops .icon-btn:hover,
+  .ops .icon-btn:focus-visible {
+    background: #e8f2f8;
+    border-color: #005288;
+  }
+  .ops .icon-btn.active {
+    background: #005288;
+    color: #fff;
+    border-color: #005288;
+  }
+  .ops .danger-icon {
+    color: #e31c23;
+    background: #fff;
+    border-color: #f3c2c4;
+  }
+  .ops .danger-icon:hover,
+  .ops .danger-icon:focus-visible {
+    background: #e31c23;
+    color: #fff;
+    border-color: #e31c23;
   }
   .ops .icon-btn svg { display: block; }
+
+  @media (prefers-color-scheme: dark) {
+    .adm { color: var(--foreground); }
+    .muted, .hint, .detail-grid dt { color: var(--foreground-muted); }
+    .card, .rates-season, .auth-card {
+      background: #111622;
+      border-color: var(--border);
+    }
+    .auth-page { background: var(--background); }
+    .auth-title, .auth-label { color: var(--foreground); }
+    .auth-sub, .auth-link { color: var(--foreground-muted); }
+    .auth-link:hover { color: var(--foreground); }
+    .auth-input, input, select, textarea, .status-select {
+      background: var(--background);
+      color: var(--foreground);
+      border-color: var(--border);
+    }
+    .auth-input:focus { border-color: #9fd0f0; }
+    .auth-password-toggle { color: var(--foreground-muted); }
+    .auth-password-toggle:hover,
+    .auth-password-toggle:focus-visible {
+      color: var(--foreground);
+      background: #161922;
+    }
+    button {
+      background: var(--primary);
+      color: var(--primary-contrast);
+    }
+    .auth-btn:hover:not(:disabled) { background: #fff; }
+    .ghost {
+      background: transparent;
+      color: var(--foreground);
+      border-color: var(--border);
+    }
+    th, td { border-bottom-color: var(--border); }
+    .detail-row td {
+      background: #161922;
+      border-bottom-color: var(--border);
+    }
+    .row-cancelled td { color: #f0b4b4; }
+    .row-refunded td { color: #e0c2ee; }
+    .row-eliminated td { color: #a3a3a3; }
+    .linkish { color: #8fd4ae; }
+    .ops .icon-btn {
+      background: transparent;
+      color: #9fd0f0;
+      border-color: color-mix(in srgb, #9fd0f0 55%, var(--border));
+    }
+    .ops .icon-btn:hover,
+    .ops .icon-btn:focus-visible {
+      background: color-mix(in srgb, #9fd0f0 16%, transparent);
+      border-color: #9fd0f0;
+    }
+    .ops .icon-btn.active {
+      background: #9fd0f0;
+      color: #0b1c2c;
+      border-color: #9fd0f0;
+    }
+    .ops .danger-icon {
+      color: #ff8d8d;
+      background: transparent;
+      border-color: color-mix(in srgb, #ff8d8d 55%, var(--border));
+    }
+    .ops .danger-icon:hover,
+    .ops .danger-icon:focus-visible {
+      background: #e31c23;
+      color: #fff;
+      border-color: #e31c23;
+    }
+  }
 `;

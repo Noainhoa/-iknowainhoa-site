@@ -1129,19 +1129,14 @@
 
 .parking-root .pk-cell {
           aspect-ratio: 1;
+          width: 100%;
+          max-width: 100%;
           min-width: 0;
           min-height: 0;
           border-radius: 8px;
           border: 0;
           background: transparent;
           touch-action: manipulation;
-        }
-
-/* Single-month (narrow) only — multi-month columns are too tight for 44px. */
-@media (max-width: 719px) {
-          .parking-root .pk-cell {
-            min-height: 44px;
-          }
         }
 
 .parking-root .pk-cell.day {
@@ -2025,3 +2020,17 @@
             transform: none;
           }
         }
+
+.parking-admin-main {
+  margin: 0;
+  min-height: 100vh;
+  background: #f4f4f2;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  .parking-admin-main {
+    background: var(--background);
+    color-scheme: dark;
+  }
+}

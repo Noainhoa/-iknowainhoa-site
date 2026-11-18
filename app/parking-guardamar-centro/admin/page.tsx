@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function ParkingAdminPage() {
   return (
-    <main style={{ margin: 0, minHeight: "100vh", background: "#f4f4f2" }}>
+    <main className="parking-admin-main">
       <ParkingAdminApp />
     </main>
   );
