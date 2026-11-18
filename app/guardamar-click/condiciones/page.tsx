@@ -55,30 +55,33 @@ export default async function TechConditionsPage({ searchParams }: PageProps) {
   return (
     <div className={`${fraunces.variable} ${figtree.variable}`} lang={locale}>
       <main className="tme tme-conditions-page">
-        <div className="tme-wrap tme-conditions-inner">
-          <nav className="tme-lang" aria-label={copy.langLabel}>
-            {LOCALES.map((item, index) => (
-              <span key={item}>
-                {index > 0 ? (
-                  <span className="tme-lang-sep" aria-hidden="true">
-                    ·
-                  </span>
-                ) : null}
-                <Link
-                  href={techConditionsHref(item)}
-                  {...(item === locale ? { "aria-current": "page" as const } : {})}
-                >
-                  {item.toUpperCase()}
-                </Link>
-              </span>
-            ))}
-          </nav>
+        <div className="tme-conditions-inner">
+          <div className="tme-conditions-lang">
+            <nav className="tme-lang" aria-label={copy.langLabel}>
+              {LOCALES.map((item, index) => (
+                <span key={item} className="tme-lang-item">
+                  {index > 0 ? (
+                    <span className="tme-lang-sep" aria-hidden="true">
+                      /
+                    </span>
+                  ) : null}
+                  <Link
+                    href={techConditionsHref(item)}
+                    {...(item === locale ? { "aria-current": "page" as const } : {})}
+                  >
+                    {item.toUpperCase()}
+                  </Link>
+                </span>
+              ))}
+            </nav>
+          </div>
 
           <p className="tme-conditions-back">
             <Link href={bookingHref}>← {copy.backToBooking}</Link>
           </p>
 
           <h1>{copy.title}</h1>
+          <p className="tme-conditions-updated">{copy.updated}</p>
           <p className="tme-conditions-intro">{copy.intro}</p>
 
           {copy.sections.map((section) => (

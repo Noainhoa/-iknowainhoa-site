@@ -498,6 +498,22 @@
   margin: 20px 0 0;
 }
 
+.tme-hero-price {
+  margin: 12px 0 0;
+  font: 650 0.95rem / 1.35 var(--tme-sans);
+  color: var(--tme-muted);
+}
+
+.tme-hero-price a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tme-hero-price a:hover {
+  color: var(--tme-sea);
+}
+
 .tme-meta {
   display: flex;
   flex-wrap: wrap;
@@ -993,57 +1009,122 @@
   color: var(--tme-ink);
 }
 
-.tme-conditions-page {
-  padding-top: 28px;
-  padding-bottom: 48px;
+/* Legal document — parking rhythm/weight, Guardamar Click cream + sea */
+.tme.tme-conditions-page {
+  padding: 0;
+  font: 400 1rem / 1.55 var(--tme-sans);
+  letter-spacing: 0;
 }
 
 .tme-conditions-inner {
   max-width: 720px;
-  padding: 0 24px 40px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
 }
 
-.tme-conditions-inner .tme-lang {
+.tme-conditions-lang {
+  display: flex;
   justify-content: flex-end;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
-.tme-conditions-back {
-  margin: 0 0 18px;
-  font-size: 15px;
+.tme.tme-conditions-page .tme-lang {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  max-width: none;
+  font: 500 12px / 1.2 var(--tme-sans);
+  white-space: nowrap;
 }
 
-.tme-conditions-back a {
+.tme.tme-conditions-page .tme-lang-item {
+  display: contents;
+}
+
+.tme.tme-conditions-page .tme-lang-sep {
+  opacity: 0.35;
+  color: inherit;
+  user-select: none;
+}
+
+.tme.tme-conditions-page .tme-lang a {
+  flex: none;
+  padding: 0 0 1px;
+  color: var(--tme-ink);
+  font-weight: 500;
+  opacity: 0.7;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.tme.tme-conditions-page .tme-lang a[aria-current="page"] {
+  color: var(--tme-sea);
+  font-weight: 700;
+  opacity: 1;
+  border-bottom-color: var(--tme-sea);
+  background: transparent;
+}
+
+.tme.tme-conditions-page .tme-conditions-back {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.tme.tme-conditions-page .tme-conditions-back a {
   color: var(--tme-sea);
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.tme-conditions-inner h1 {
-  margin: 0 0 12px;
-  font: 700 34px / 1.15 var(--tme-serif);
+.tme.tme-conditions-page .tme-conditions-back a:hover {
   color: var(--tme-ink);
 }
 
-.tme-conditions-intro {
-  margin: 0 0 28px;
+/* Sans title like parking docs — same optical weight, Click sea colour */
+.tme.tme-conditions-page h1 {
+  margin: 0 0 8px;
+  font: 750 1.65rem / 1.2 var(--tme-sans);
+  letter-spacing: -0.02em;
+  color: var(--tme-sea);
+}
+
+.tme.tme-conditions-page p.tme-conditions-updated {
+  margin: 0 0 16px;
+  font: 400 0.9rem / 1.4 var(--tme-sans);
   color: var(--tme-muted);
 }
 
-.tme-conditions-section {
-  margin-bottom: 22px;
-}
-
-.tme-conditions-section h2 {
-  margin: 0 0 8px;
-  font: 700 18px / 1.3 var(--tme-sans);
+.tme.tme-conditions-page p.tme-conditions-intro {
+  margin: 0 0 28px;
+  font: 400 1rem / 1.55 var(--tme-sans);
+  letter-spacing: 0;
   color: var(--tme-ink);
 }
 
-.tme-conditions-section p {
-  margin: 0 0 8px;
+.tme.tme-conditions-page .tme-conditions-section {
+  margin: 0 0 24px;
+  padding: 0;
+}
+
+.tme.tme-conditions-page .tme-conditions-section h2 {
+  margin: 0 0 10px;
+  font: 700 1.1rem / 1.3 var(--tme-sans);
+  letter-spacing: 0;
+  color: var(--tme-sea);
+}
+
+.tme.tme-conditions-page .tme-conditions-section p {
+  margin: 0 0 10px;
+  font: 400 0.95rem / 1.55 var(--tme-sans);
+  letter-spacing: 0;
   color: var(--tme-ink);
+}
+
+.tme.tme-conditions-page .tme-conditions-inner > .tme-conditions-back:last-child {
+  margin: 32px 0 0;
 }
 
 .tme-hint {
@@ -1875,28 +1956,79 @@
   background: var(--tme-deep);
   color: var(--tme-deep-ink);
   text-align: center;
-  padding: 64px 0 120px;
+  padding: 32px 0 calc(84px + env(safe-area-inset-bottom, 0px));
+}
+
+.tme-contact-inner {
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+  max-width: 820px;
+}
+
+.tme-contact-lead {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  max-width: 28rem;
 }
 
 .tme-contact .tme-eyebrow {
   justify-content: center;
   color: var(--tme-eyebrow-soft);
+  margin-bottom: 0;
+  font-size: 12px;
+  letter-spacing: 0.14em;
 }
 
-.tme-big {
+.tme-contact h2 {
+  font-size: clamp(22px, 4vw, 28px);
+  margin-bottom: 0;
+  line-height: 1.15;
+}
+
+.tme-contact h2 em {
+  color: var(--tme-sun);
+}
+
+.tme-big,
+.tme a.tme-big {
   display: inline-block;
-  font: 500 clamp(40px, 10vw, 76px) / 1.05 var(--tme-serif);
+  font: 500 clamp(1.7rem, 5.5vw, 2.35rem) / 1.1 var(--tme-serif);
   color: var(--tme-sun);
   text-decoration: none;
-  margin: 10px 0 8px;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.tme a.tme-big:hover {
+  color: var(--tme-sun);
 }
 
 .tme-contact p {
   opacity: 0.9;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  margin-top: 2px;
 }
 
 .tme-contact .tme-ctas {
   justify-content: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.tme-contact .tme-btn {
+  min-height: 40px;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 0.9rem;
+  border-width: 1.5px;
+}
+
+.tme-contact .tme-btn svg {
+  width: 17px;
+  height: 17px;
 }
 
 .tme-contact .tme-btn-ghost,
@@ -1911,10 +2043,48 @@
   color: var(--tme-sun);
 }
 
-.tme-place {
-  margin-top: 26px;
-  font-size: 16px;
+.tme-contact-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 0.65em;
+  row-gap: 4px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.35;
   opacity: 0.8;
+}
+
+.tme-contact-sep {
+  opacity: 0.7;
+  user-select: none;
+}
+
+.tme-place {
+  margin: 0;
+  font-size: inherit;
+  opacity: 1;
+}
+
+.tme-contact-legal {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tme-contact-legal:hover {
+  color: var(--tme-sun);
+}
+
+.tme-contact-copy {
+  margin: 0 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+  text-align: inherit !important;
+  opacity: 1;
 }
 
 .tme-copy {

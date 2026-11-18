@@ -33,14 +33,16 @@ export default function SiteChrome({
     pathname === "/parking-guardamar-centro" || pathname === "/parking";
   const isTech =
     pathname === "/guardamar-click" || pathname.startsWith("/guardamar-click/");
+  const isTechPublicHome = pathname === "/guardamar-click";
   const isTechAdmin =
     pathname === "/guardamar-click/admin" || pathname.startsWith("/guardamar-click/admin/");
   const isBlog = pathname === "/blog" || pathname.startsWith("/blog/");
   const isAnicca = pathname === "/anicca" || pathname.startsWith("/anicca/");
   const showAccent = isBlog;
   const showHeaderFooter = !isParking && !isTech && !isBlog;
-  // Parking home embeds copyright in pk-contact; keep the strip on legal/admin.
-  const showCopyright = !showHeaderFooter && !isTechAdmin && !isParkingPublicHome;
+  // Parking / tech home embed copyright in their contact footers; keep the strip on legal/admin.
+  const showCopyright =
+    !showHeaderFooter && !isTechAdmin && !isParkingPublicHome && !isTechPublicHome;
 
   useEffect(() => {
     document.documentElement.classList.toggle("page-anicca", isAnicca);

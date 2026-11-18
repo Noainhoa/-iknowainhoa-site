@@ -22,6 +22,8 @@ export type TechCopy = {
   metaChips: string[];
   reserveCta: string;
   callCta: string;
+  /** Hero price cue; `{price}` is replaced with the formatted group price. */
+  heroPriceFrom: string;
   heroArtAlt: string;
   topicsKicker: string;
   topicsTitleBefore: string;
@@ -77,6 +79,8 @@ export type TechCopy = {
   contactSub: string;
   writeWhatsApp: string;
   placeFooter: string;
+  /** Footer link to the combined conditions + privacy page. */
+  footerLegalLabel: string;
   barCall: string;
   barReserve: string;
   preferCall: string;
@@ -187,6 +191,7 @@ const es: TechCopy = {
   metaChips: ["Tu propio dispositivo", "Sin prisas", "Español · English"],
   reserveCta: "Reservar sesión",
   callCta: "Llamar 636 67 01 03",
+  heroPriceFrom: "Desde {price} en grupo",
   heroArtAlt:
     "Preguntas habituales en notas: qué hago con un aviso, dónde están las fotos, cómo envío una foto, qué pasa si borro algo y si un mensaje es de verdad.",
   topicsKicker: "Preguntas que oigo cada semana",
@@ -252,11 +257,11 @@ const es: TechCopy = {
   steps: [
     {
       title: "Elige un día y una hora",
-      body: "O llámame y lo hacemos juntos por teléfono.",
+      body: "O llama y lo hacemos juntos por teléfono.",
     },
     {
       title: "Guarda la confirmación",
-      body: "La verás en pantalla (y por email si lo dejas). También puedes escribirme por WhatsApp si lo prefieres.",
+      body: "La verás en pantalla (y por email si lo dejas). También puedes escribir por WhatsApp si lo prefieres.",
     },
     {
       title: "Trae tu móvil",
@@ -267,18 +272,19 @@ const es: TechCopy = {
   englishTitle: "Speak English?",
   englishTitleEm: "Welcome.",
   englishBody:
-    "Sessions run in English too. Whether it’s WhatsApp, your photos or ChatGPT, I’ll explain it slowly and clearly. Call or message me any time.",
+    "Sessions run in English too. Whether it’s WhatsApp, your photos or ChatGPT, I’ll explain it slowly and clearly. Call or use WhatsApp when it suits you.",
   contactKicker: "Hablemos",
-  contactTitleBefore: "Llámame,",
+  contactTitleBefore: "Llama,",
   contactTitleEm: "sin compromiso",
   contactSub: "Respondo yo personalmente.",
   writeWhatsApp: "Escribir por WhatsApp",
-  placeFooter: `${TECH_BRAND} · Guardamar del Segura`,
+  placeFooter: TECH_BRAND,
+  footerLegalLabel: "Condiciones y privacidad",
   barCall: "Llamar",
   barReserve: "Reservar",
-  preferCall: "También puedes llamarme. No hace falta reservar por internet.",
+  preferCall: "También puedes llamar. No hace falta reservar por internet.",
   talkTitle: "¿Prefieres hablar?",
-  talkBody: "No hace falta reservar por internet. Llámame al 636 67 01 03, o escríbeme por WhatsApp.",
+  talkBody: "No hace falta reservar por internet. Llama al 636 67 01 03, o escribe por WhatsApp.",
   pay: "Paga en la sesión como prefieras: efectivo, transferencia, tarjeta o Bizum. Lo importante es que vengas tranquila; no hay pago por internet.",
   placeTitle: "Dónde",
   placeBody: "Guardamar del Segura. Junto a la Escuela de Música Auditorio",
@@ -291,11 +297,11 @@ const es: TechCopy = {
     "Esto no reserva la hora. Ainhoa la revisa y te confirma solo si puede. Hasta entonces, la hora sigue libre.",
   loading: "Buscando huecos…",
   loadError:
-    "No he podido cargar las horas ahora. Parece un problema de conexión o del servidor. Inténtalo otra vez, o llámame / escríbeme por WhatsApp.",
+    "No he podido cargar las horas ahora. Parece un problema de conexión o del servidor. Inténtalo otra vez, o llama / escribe por WhatsApp.",
   empty:
     "Ahora no hay huecos de este tipo. Puedes pedir otra hora, llamar o escribir por WhatsApp.",
   notConfigured:
-    "En este entorno la reserva online aún no está configurada. No es que no haya huecos: aquí no se puede reservar por internet. Llámame o escríbeme por WhatsApp.",
+    "En este entorno la reserva online aún no está configurada. No es que no haya huecos: aquí no se puede reservar por internet. Llama o escribe por WhatsApp.",
   calendarOff: "El calendario no acepta reservas en este momento.",
   nextGroupLabel: "Próximo grupo",
   nextGroupEmpty: "Aún no hay un grupo publicado.",
@@ -329,8 +335,8 @@ const es: TechCopy = {
   questionHint: "No escribas contraseñas, códigos ni datos bancarios.",
   date: "Día",
   time: "Hora",
-  termsAcceptBefore: "Acepto los ",
-  termsLinkLabel: "términos y condiciones",
+  termsAcceptBefore: "Acepto las ",
+  termsLinkLabel: "condiciones y privacidad",
   termsAcceptAfter: ".",
   submitBook: "Confirmar reserva",
   submitRequest: "Enviar solicitud",
@@ -345,7 +351,7 @@ const es: TechCopy = {
     place: "El lugar es demasiado largo.",
     consent: "Marca que aceptas que se muestre tu opinión.",
     secret: "No envíes contraseñas ni códigos. Cuéntalo con tus palabras en la sesión.",
-    terms: "Marca que aceptas los términos y condiciones.",
+    terms: "Marca que aceptas las condiciones y privacidad.",
     sessionLanguage: "Elige si prefieres la sesión en español o en inglés.",
     tech_full: "Esa sesión se acaba de llenar. Elige otra.",
     tech_duplicate: "Este teléfono ya tiene una plaza en esa sesión.",
@@ -363,7 +369,7 @@ const es: TechCopy = {
     tech_failed: "No se ha podido guardar. Inténtalo otra vez.",
     tech_rate: "Has enviado varios intentos seguidos. Espera unos minutos.",
     unavailable:
-      "En este entorno la reserva online aún no está configurada. Llámame o escríbeme por WhatsApp.",
+      "En este entorno la reserva online aún no está configurada. Llama o escribe por WhatsApp.",
     network: "No ha llegado la respuesta. Si no ves la confirmación, no vuelvas a enviar: llama a Ainhoa.",
   },
   confirmedTitle: "Reserva guardada",
@@ -417,6 +423,7 @@ const en: TechCopy = {
   metaChips: ["Your own device", "No rush", "Spanish · English"],
   reserveCta: "Book a session",
   callCta: "Call 636 67 01 03",
+  heroPriceFrom: "From {price} in a group",
   heroArtAlt:
     "Everyday phone questions on notes: what to do with an alert, where photos are, how to send a photo, deleting by mistake, and whether a message is real.",
   topicsKicker: "Questions I hear every week",
@@ -482,11 +489,11 @@ const en: TechCopy = {
   steps: [
     {
       title: "Choose a day and time",
-      body: "Or call me and we’ll do it together on the phone.",
+      body: "Or call and we’ll do it together on the phone.",
     },
     {
       title: "Keep the confirmation",
-      body: "You’ll see it on screen (and by email if you leave one). You can also message me on WhatsApp if you prefer.",
+      body: "You’ll see it on screen (and by email if you leave one). You can also use WhatsApp if you prefer.",
     },
     {
       title: "Bring your phone",
@@ -497,18 +504,19 @@ const en: TechCopy = {
   englishTitle: "¿Hablas español?",
   englishTitleEm: "Bienvenida.",
   englishBody:
-    "Las sesiones también son en español. WhatsApp, fotos o ChatGPT: te lo explico con calma. Llámame o escríbeme cuando quieras.",
+    "Las sesiones también son en español. WhatsApp, fotos o ChatGPT: te lo explico con calma. Llama o escribe por WhatsApp cuando te venga bien.",
   contactKicker: "Let’s talk",
-  contactTitleBefore: "Call me,",
+  contactTitleBefore: "Call,",
   contactTitleEm: "no pressure",
   contactSub: "I answer personally.",
   writeWhatsApp: "Message on WhatsApp",
-  placeFooter: `${TECH_BRAND} · Guardamar del Segura`,
+  placeFooter: TECH_BRAND,
+  footerLegalLabel: "Conditions & privacy",
   barCall: "Call",
   barReserve: "Book",
-  preferCall: "You can also call me. You do not have to book online.",
+  preferCall: "You can also call. You do not have to book online.",
   talkTitle: "Would you rather talk?",
-  talkBody: "You do not have to book online. Call me on 636 67 01 03, or message me on WhatsApp.",
+  talkBody: "You do not have to book online. Call 636 67 01 03, or message on WhatsApp.",
   pay: "Pay at the session in whatever way suits you: cash, bank transfer, card or Bizum. Money should not be the stressful part; there is no online checkout.",
   placeTitle: "Where",
   placeBody: "Guardamar del Segura. Next to the Music School Auditorium",
@@ -521,11 +529,11 @@ const en: TechCopy = {
     "This does not reserve the time. Ainhoa checks it and confirms only if she can. Until then, the time stays free.",
   loading: "Looking for available times…",
   loadError:
-    "I couldn’t load the available times just now. This looks like a connection or server problem. Please try again, or call / message me on WhatsApp.",
+    "I couldn’t load the available times just now. This looks like a connection or server problem. Please try again, or call / use WhatsApp.",
   empty:
     "There are no times of this kind available right now. You can ask for another time, call, or use WhatsApp.",
   notConfigured:
-    "Online booking is not set up in this environment. That does not mean there are no times — booking here is unavailable. Please call or message me on WhatsApp.",
+    "Online booking is not set up in this environment. That does not mean there are no times — booking here is unavailable. Please call or use WhatsApp.",
   calendarOff: "The calendar is not accepting bookings right now.",
   nextGroupLabel: "Next group session",
   nextGroupEmpty: "No group session is published yet.",
@@ -560,7 +568,7 @@ const en: TechCopy = {
   date: "Day",
   time: "Time",
   termsAcceptBefore: "I accept the ",
-  termsLinkLabel: "terms and conditions",
+  termsLinkLabel: "conditions and privacy",
   termsAcceptAfter: ".",
   submitBook: "Confirm booking",
   submitRequest: "Send request",
@@ -575,7 +583,7 @@ const en: TechCopy = {
     place: "That place name is too long.",
     consent: "Please agree that your testimonial can be shown.",
     secret: "Do not send passwords or codes. You can explain it in person.",
-    terms: "Please accept the terms and conditions.",
+    terms: "Please accept the conditions and privacy.",
     sessionLanguage: "Choose whether you prefer the session in Spanish or English.",
     tech_full: "That session has just filled up. Please choose another.",
     tech_duplicate: "This phone number already has a place in that session.",
@@ -593,7 +601,7 @@ const en: TechCopy = {
     tech_failed: "It could not be saved. Please try again.",
     tech_rate: "Several attempts were sent in a row. Please wait a few minutes.",
     unavailable:
-      "Online booking is not set up in this environment. Please call or message me on WhatsApp.",
+      "Online booking is not set up in this environment. Please call or use WhatsApp.",
     network: "The answer did not arrive. If you do not see a confirmation, do not send it again: call Ainhoa.",
   },
   confirmedTitle: "Booking saved",
@@ -647,6 +655,7 @@ const nl: TechCopy = {
   metaChips: ["Je eigen apparaat", "Zonder haast", "Español · English"],
   reserveCta: "Sessie reserveren",
   callCta: "Bel 636 67 01 03",
+  heroPriceFrom: "Vanaf {price} in een groep",
   heroArtAlt:
     "Alledaagse telefoonvragen op briefjes: wat te doen bij een melding, waar foto’s zijn, hoe je een foto stuurt, per ongeluk wissen, en of een bericht echt is.",
   topicsKicker: "Vragen die ik elke week hoor",
@@ -712,11 +721,11 @@ const nl: TechCopy = {
   steps: [
     {
       title: "Kies een dag en tijd",
-      body: "Of bel me en dan doen we het samen aan de telefoon.",
+      body: "Of bel en dan doen we het samen aan de telefoon.",
     },
     {
       title: "Bewaar de bevestiging",
-      body: "Je ziet hem op het scherm (en per e-mail als je die achterlaat). Je kunt me ook via WhatsApp schrijven als je dat liever doet.",
+      body: "Je ziet hem op het scherm (en per e-mail als je die achterlaat). Je kunt ook via WhatsApp schrijven als je dat liever doet.",
     },
     {
       title: "Breng je telefoon mee",
@@ -729,16 +738,17 @@ const nl: TechCopy = {
   englishBody:
     "Ainhoa spreekt Spaans en Engels. Ze spreekt geen Nederlands, maar helpt rustig en duidelijk met WhatsApp, foto’s, ChatGPT of je andere vragen.",
   contactKicker: "Laten we praten",
-  contactTitleBefore: "Bel me,",
+  contactTitleBefore: "Bel,",
   contactTitleEm: "zonder verplichting",
   contactSub: "Ik antwoord persoonlijk.",
   writeWhatsApp: "Schrijf via WhatsApp",
-  placeFooter: `${TECH_BRAND} · Guardamar del Segura`,
+  placeFooter: TECH_BRAND,
+  footerLegalLabel: "Voorwaarden en privacy",
   barCall: "Bellen",
   barReserve: "Reserveren",
-  preferCall: "Je kunt me ook bellen. Online reserveren hoeft niet.",
+  preferCall: "Je kunt ook bellen. Online reserveren hoeft niet.",
   talkTitle: "Praat je liever even?",
-  talkBody: "Online reserveren hoeft niet. Bel me op 636 67 01 03, of schrijf me via WhatsApp.",
+  talkBody: "Online reserveren hoeft niet. Bel naar 636 67 01 03, of schrijf via WhatsApp.",
   pay: "Betaal tijdens de sessie zoals jij wilt: contant, via overschrijving, met kaart of met Bizum. Geld hoeft geen stress te geven; er is geen online betaling.",
   placeTitle: "Waar",
   placeBody: "Guardamar del Segura. Naast de Escuela de Música Auditorio",
@@ -751,11 +761,11 @@ const nl: TechCopy = {
     "Dit reserveert de tijd nog niet. Ainhoa bekijkt je aanvraag en bevestigt alleen als het kan. Tot die tijd blijft de tijd vrij.",
   loading: "Beschikbare tijden zoeken…",
   loadError:
-    "Ik kon de beschikbare tijden nu niet laden. Het lijkt op een verbindings- of serverprobleem. Probeer het opnieuw, of bel / schrijf me via WhatsApp.",
+    "Ik kon de beschikbare tijden nu niet laden. Het lijkt op een verbindings- of serverprobleem. Probeer het opnieuw, of bel / schrijf via WhatsApp.",
   empty:
     "Er zijn nu geen tijden van dit type beschikbaar. Je kunt een andere tijd aanvragen, bellen of WhatsApp gebruiken.",
   notConfigured:
-    "Online reserveren is in deze omgeving nog niet ingesteld. Dat betekent niet dat er geen tijden zijn: reserveren kan hier niet. Bel of schrijf me via WhatsApp.",
+    "Online reserveren is in deze omgeving nog niet ingesteld. Dat betekent niet dat er geen tijden zijn: reserveren kan hier niet. Bel of schrijf via WhatsApp.",
   calendarOff: "De agenda accepteert op dit moment geen reserveringen.",
   nextGroupLabel: "Volgende groepssessie",
   nextGroupEmpty: "Er is nog geen groepssessie gepubliceerd.",
@@ -790,7 +800,7 @@ const nl: TechCopy = {
   date: "Dag",
   time: "Tijd",
   termsAcceptBefore: "Ik accepteer de ",
-  termsLinkLabel: "algemene voorwaarden",
+  termsLinkLabel: "voorwaarden en privacy",
   termsAcceptAfter: ".",
   submitBook: "Reservering bevestigen",
   submitRequest: "Aanvraag versturen",
@@ -805,7 +815,7 @@ const nl: TechCopy = {
     place: "Die plaatsnaam is te lang.",
     consent: "Geef akkoord dat je ervaring getoond mag worden.",
     secret: "Stuur geen wachtwoorden of codes. Je kunt het tijdens de sessie uitleggen.",
-    terms: "Accepteer de algemene voorwaarden.",
+    terms: "Accepteer de voorwaarden en privacy.",
     sessionLanguage: "Kies of je de sessie liever in het Spaans of Engels wilt.",
     tech_full: "Die sessie is net vol geraakt. Kies een andere.",
     tech_duplicate: "Dit telefoonnummer heeft al een plek in die sessie.",
@@ -823,7 +833,7 @@ const nl: TechCopy = {
     tech_failed: "Opslaan is niet gelukt. Probeer het opnieuw.",
     tech_rate: "Er zijn meerdere pogingen achter elkaar verstuurd. Wacht een paar minuten.",
     unavailable:
-      "Online reserveren is in deze omgeving nog niet ingesteld. Bel of schrijf me via WhatsApp.",
+      "Online reserveren is in deze omgeving nog niet ingesteld. Bel of schrijf via WhatsApp.",
     network:
       "Het antwoord is niet aangekomen. Als je geen bevestiging ziet, verstuur het dan niet opnieuw: bel Ainhoa.",
   },

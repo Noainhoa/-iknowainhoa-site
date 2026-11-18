@@ -12,13 +12,13 @@ import TechBookingCalendar, {
 } from "@/components/tech/TechBookingCalendar";
 import type { SessionLanguage } from "@/lib/tech/calendar";
 import TechContactLinks from "@/components/tech/TechContactLinks";
-import TechTestimonials from "@/components/tech/TechTestimonials";
 import {
   IconCalendar,
   IconClock,
   IconPhone,
   TopicIcon,
 } from "@/components/tech/TechIllustrations";
+import SiteCopyright from "@/components/SiteCopyright";
 import WhatsAppMark from "@/components/tech/WhatsAppMark";
 import { externalAnchorProps } from "@/lib/links";
 import {
@@ -353,9 +353,6 @@ export default function TechPublicApp({
         <a href="#precios" onClick={closeNav}>
           {copy.navPrices}
         </a>
-        <a href="#opiniones" onClick={closeNav}>
-          {copy.navStories}
-        </a>
         <a
           href="#reservar"
           onClick={(event) => {
@@ -552,6 +549,11 @@ export default function TechPublicApp({
                 {copy.callCta}
               </a>
             </div>
+            <p className="tme-hero-price">
+              <a href="#precios">
+                {copy.heroPriceFrom.replace("{price}", euros(GROUP_PRICE_CENTS, locale))}
+              </a>
+            </p>
           </div>
           <div className="tme-art">
             <Image
@@ -956,8 +958,6 @@ export default function TechPublicApp({
                     <a
                       className="tme-inline-link"
                       href={techConditionsHref(locale)}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       onClick={(event) => event.stopPropagation()}
                     >
                       {copy.termsLinkLabel}
@@ -1000,18 +1000,18 @@ export default function TechPublicApp({
         </div>
       </section>
 
-      <TechTestimonials copy={copy} locale={locale} />
-
       <footer className="tme-contact">
-        <div className="tme-wrap">
-          <div className="tme-eyebrow">{copy.contactKicker}</div>
-          <h2 style={{ marginBottom: 6 }}>
-            {copy.contactTitleBefore} <em style={{ color: "var(--tme-sun)" }}>{copy.contactTitleEm}</em>
-          </h2>
-          <a className="tme-big" href={telHref()}>
-            {phoneDisplay}
-          </a>
-          <p>{copy.contactSub}</p>
+        <div className="tme-wrap tme-contact-inner">
+          <div className="tme-contact-lead">
+            <div className="tme-eyebrow">{copy.contactKicker}</div>
+            <h2>
+              {copy.contactTitleBefore} <em>{copy.contactTitleEm}</em>
+            </h2>
+            <a className="tme-big" href={telHref()}>
+              {phoneDisplay}
+            </a>
+            <p>{copy.contactSub}</p>
+          </div>
           <div className="tme-ctas">
             <a className="tme-btn tme-btn-wa" href={enquiryHref} {...externalAnchorProps(enquiryHref)}>
               <WhatsAppMark />
@@ -1028,7 +1028,19 @@ export default function TechPublicApp({
               {copy.reserveCta}
             </a>
           </div>
-          <div className="tme-place">{copy.placeFooter}</div>
+          <div className="tme-contact-meta">
+            <span className="tme-place">{copy.placeFooter}</span>
+            <span className="tme-contact-sep" aria-hidden="true">
+              ·
+            </span>
+            <Link href={techConditionsHref(locale)} className="tme-contact-legal">
+              {copy.footerLegalLabel}
+            </Link>
+            <span className="tme-contact-sep" aria-hidden="true">
+              ·
+            </span>
+            <SiteCopyright className="tme-contact-copy" />
+          </div>
         </div>
       </footer>
 
