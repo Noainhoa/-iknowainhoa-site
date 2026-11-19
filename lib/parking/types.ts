@@ -2,6 +2,7 @@ import {
   estimateParkingPrice,
   formatEuroEstimate,
 } from "@/lib/parking/pricing";
+import { normalizeParkingPlate } from "@/lib/parking/plate";
 import type { Locale } from "@/lib/i18n/shared";
 import { localeTag } from "@/lib/i18n/shared";
 
@@ -70,6 +71,20 @@ export type ParkingBooking = {
   private_notes: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type ParkingFeedbackMood = "good" | "ok" | "problem";
+export type ParkingFeedbackStatus = "new" | "read" | "archived";
+
+export type ParkingFeedback = {
+  id: string;
+  created_at: string;
+  locale: string | null;
+  mood: ParkingFeedbackMood | null;
+  message: string;
+  reference: string | null;
+  page_url: string | null;
+  status: ParkingFeedbackStatus;
 };
 
 /** Public-safe range from the view / filtered fetch */
@@ -234,9 +249,7 @@ export function buildWhatsAppMessage(input: {
         ? "Aucun commentaire"
         : "No additional comments";
 
-  const registration = input.registration?.trim()
-    ? input.registration.trim().toUpperCase()
-    : emptyReg;
+  const registration = normalizeParkingPlate(input.registration || "") || emptyReg;
   const vehicle = input.vehicle?.trim()
     ? input.vehicle.trim()
     : emptyVehicle;

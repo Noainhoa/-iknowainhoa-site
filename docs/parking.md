@@ -11,8 +11,9 @@ Brand name: **Parking Guardamar Centro**
 1. Create a Supabase project.
 2. Run `supabase/parking.sql` in the SQL editor.
 3. Run `supabase/parking-rates.sql` (public seasonal tariffs + admin Tarifas editor).
-4. Authentication → Users → create an admin user (email/password).
-5. Copy project URL + anon key into Vercel / `.env.local`:
+4. Run `supabase/parking-feedback.sql` (private ops feedback from the public footer + admin inbox).
+5. Authentication → Users → create an admin user (email/password).
+6. Copy project URL + anon key into Vercel / `.env.local`:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
@@ -21,7 +22,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 
 Also set the same two variables in **Vercel → Project → Settings → Environment Variables** (Production), then redeploy.
 
-6. **Auth redirect URLs** (required for password reset emails):
+7. **Auth redirect URLs** (required for password reset emails):
 
 In [Authentication → URL Configuration](https://supabase.com/dashboard/project/cbvpybxuwraovlxxbdpk/auth/url-configuration):
 

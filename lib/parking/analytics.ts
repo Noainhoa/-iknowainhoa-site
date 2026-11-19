@@ -27,7 +27,14 @@ export type ParkingAnalyticsEvent =
   | { name: "parking_whatsapp_tonight_click"; language: Locale }
   | { name: "parking_whatsapp_contact_click"; language: Locale }
   | { name: "parking_language_change"; language: Locale; to: Locale }
-  | { name: "parking_form_error"; language: Locale; errorKeys: string[] };
+  | { name: "parking_form_error"; language: Locale; errorKeys: string[] }
+  | {
+      name: "parking_feedback_submit";
+      language: Locale;
+      hasMood: boolean;
+      hasReference: boolean;
+    }
+  | { name: "parking_feedback_error"; language: Locale };
 
 export function trackParkingEvent(event: ParkingAnalyticsEvent): void {
   if (typeof window === "undefined") return;

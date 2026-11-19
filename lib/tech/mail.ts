@@ -3,7 +3,12 @@ import "server-only";
 import nodemailer from "nodemailer";
 
 export function notifyAddress(): string | null {
-  return process.env.TECH_NOTIFY_EMAIL || process.env.CONTACT_TO || process.env.SMTP_USER || null;
+  return (
+    process.env.TECH_NOTIFY_EMAIL ||
+    process.env.CONTACT_TO ||
+    process.env.SMTP_USER ||
+    "hola@iknowainhoa.com"
+  );
 }
 
 export function smtpConfigured(): boolean {

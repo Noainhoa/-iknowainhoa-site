@@ -34,7 +34,21 @@ import {
   statusOccupiesSpot,
   type ParkingBooking,
   type ParkingBookingStatus,
+  type ParkingFeedback,
+  type ParkingFeedbackStatus,
 } from "@/lib/parking/types";
+
+const FEEDBACK_MOOD_ES: Record<NonNullable<ParkingFeedback["mood"]>, string> = {
+  good: "Bien",
+  ok: "Regular",
+  problem: "Problema",
+};
+
+const FEEDBACK_STATUS_ES: Record<ParkingFeedbackStatus, string> = {
+  new: "Nuevo",
+  read: "Leído",
+  archived: "Archivado",
+};
 
 const STATUS_OPTIONS: ParkingBookingStatus[] = [
   "reserved",
@@ -174,6 +188,8 @@ export default function ParkingAdminApp() {
   const [ratesMessage, setRatesMessage] = useState<string | null>(null);
   const [ratesError, setRatesError] = useState<string | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [feedbackRows, setFeedbackRows] = useState<ParkingFeedback[]>([]);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
 
   const refreshSession = useCallback(async () => {
     if (!supabase) return;
@@ -286,6 +302,42 @@ export default function ParkingAdminApp() {
     setRateForm(ratesToForm(map));
   }, [supabase, sessionEmail]);
 
+  const loadFeedback = useCallback(async () => {
+    if (!supabase || !sessionEmail) return;
+    const { data, error } = await supabase
+      .from("parking_feedback")
+      .select("id, created_at, locale, mood, message, reference, page_url, status")
+      .neq("status", "archived")
+      .order("created_at", { ascending: false })
+      .limit(40);
+    if (error) {
+      if (!/could not find|PGRST202|42P01|parking_feedback/i.test(error.message)) {
+        setFeedbackError(error.message);
+      } else {
+        setFeedbackError(
+          "Falta la tabla de feedback. Ejecuta supabase/parking-feedback.sql en el SQL Editor."
+        );
+      }
+      setFeedbackRows([]);
+      return;
+    }
+    setFeedbackError(null);
+    setFeedbackRows((data || []) as ParkingFeedback[]);
+  }, [supabase, sessionEmail]);
+
+  async function setFeedbackStatus(id: string, status: ParkingFeedbackStatus) {
+    if (!supabase) return;
+    const { error } = await supabase
+      .from("parking_feedback")
+      .update({ status })
+      .eq("id", id);
+    if (error) {
+      setFeedbackError(error.message);
+      return;
+    }
+    await loadFeedback();
+  }
+
   useEffect(() => {
     const hash = window.location.hash.replace(/^#/, "");
     const hashParams = new URLSearchParams(hash);
@@ -317,8 +369,9 @@ export default function ParkingAdminApp() {
     if (sessionEmail) {
       void loadRows();
       void loadRates();
+      void loadFeedback();
     }
-  }, [sessionEmail, loadRows, loadRates]);
+  }, [sessionEmail, loadRows, loadRates, loadFeedback]);
 
   useEffect(() => {
     return () => {
@@ -1102,6 +1155,78 @@ export default function ParkingAdminApp() {
         <DashCard title="Reservas actuales" rows={current} />
         <DashCard title="Finalizadas" rows={completed} />
       </div>
+
+      <section className="card">
+        <h2>
+          Feedback privado
+          {feedbackRows.some((f) => f.status === "new") ? (
+            <span className="feedback-new-count">
+              {" "}
+              · {feedbackRows.filter((f) => f.status === "new").length} nuevo
+              {feedbackRows.filter((f) => f.status === "new").length === 1
+                ? ""
+                : "s"}
+            </span>
+          ) : null}
+        </h2>
+        <p className="hint">
+          Mensajes del pie de la página pública. Solo tú los ves. Márcalo como
+          leído o archívalo cuando ya no lo necesites.
+        </p>
+        {feedbackError ? <p className="err">{feedbackError}</p> : null}
+        {feedbackRows.length === 0 && !feedbackError ? (
+          <p className="hint">Todavía no hay feedback.</p>
+        ) : null}
+        {feedbackRows.length > 0 ? (
+          <ul className="feedback-list">
+            {feedbackRows.map((item) => (
+              <li
+                key={item.id}
+                className={`feedback-item${item.status === "new" ? " is-new" : ""}`}
+              >
+                <div className="feedback-meta">
+                  <span className={`feedback-status status-${item.status}`}>
+                    {FEEDBACK_STATUS_ES[item.status]}
+                  </span>
+                  {item.mood ? (
+                    <span className="feedback-mood">
+                      {FEEDBACK_MOOD_ES[item.mood]}
+                    </span>
+                  ) : null}
+                  <span className="muted">
+                    {new Date(item.created_at).toLocaleString("es-ES")}
+                  </span>
+                  {item.reference ? (
+                    <span className="feedback-ref">{item.reference}</span>
+                  ) : null}
+                  {item.locale ? (
+                    <span className="muted">{item.locale.toUpperCase()}</span>
+                  ) : null}
+                </div>
+                <p className="feedback-message">{item.message}</p>
+                <div className="feedback-actions">
+                  {item.status === "new" ? (
+                    <button
+                      type="button"
+                      className="ghost"
+                      onClick={() => void setFeedbackStatus(item.id, "read")}
+                    >
+                      Marcar leído
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="ghost"
+                    onClick={() => void setFeedbackStatus(item.id, "archived")}
+                  >
+                    Archivar
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </section>
 
       <form className="card form" onSubmit={(e) => void onSaveRates(e)}>
         <h2>Tarifas públicas</h2>
@@ -1912,6 +2037,49 @@ const styles = `
   .logo { width: 48px; height: 48px; flex-shrink: 0; border-radius: 50%; display: block; }
   .muted { color: #666; font-size: 0.9rem; }
   .hint { margin: 0 0 8px; color: #555; font-size: 0.88rem; line-height: 1.45; font-weight: 400; }
+  .feedback-new-count { color: #0b6e4f; font-size: 0.92rem; font-weight: 700; }
+  .feedback-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .feedback-item {
+    border: 1px solid #e6e6e6;
+    border-radius: 12px;
+    padding: 12px;
+    background: #fafafa;
+  }
+  .feedback-item.is-new {
+    border-color: #9fd0b5;
+    background: #f3fbf6;
+  }
+  .feedback-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+  }
+  .feedback-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #eee;
+    font-weight: 700;
+  }
+  .feedback-status.status-new { background: #d8f3e4; color: #0b6e4f; }
+  .feedback-mood { font-weight: 700; }
+  .feedback-ref {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 650;
+  }
+  .feedback-message {
+    margin: 0 0 10px;
+    white-space: pre-wrap;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+  .feedback-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .feedback-actions .ghost { min-height: 36px; font-size: 0.82rem; }
   .warn { background: #fff6d6; border: 1px solid #f0e0a0; padding: 12px; border-radius: 10px; line-height: 1.5; }
   .err { color: #8b1e1e; }
   .msg { color: #1b5e34; }

@@ -104,11 +104,25 @@ export type ParkingCopy = {
   privacyPolicyAcceptAfter: string;
   footerPrivacyLabel: string;
   contactTitle: string;
-  contactSub: string;
   contactWhatsApp: string;
   contactDatesCta: string;
   contactPlace: string;
   contactWhatsAppMessage: string;
+  feedbackSummary: string;
+  feedbackLead: string;
+  feedbackMoodLabel: string;
+  feedbackMoodGood: string;
+  feedbackMoodOk: string;
+  feedbackMoodProblem: string;
+  feedbackMessageLabel: string;
+  feedbackMessagePlaceholder: string;
+  feedbackReferenceLabel: string;
+  feedbackReferencePlaceholder: string;
+  feedbackSubmit: string;
+  feedbackSubmitting: string;
+  feedbackSuccess: string;
+  feedbackError: string;
+  feedbackPrivacy: string;
   conditionsNoticeHold: string;
   conditionsNoticeVehicle: string;
   conditionsLinkLabel: string;
@@ -263,7 +277,7 @@ const es: ParkingCopySource = {
   vehicle: "Modelo",
   comments: "Comentarios",
   namePlaceholder: "Tu nombre",
-  registrationPlaceholder: "Opcional",
+  registrationPlaceholder: "1234 ABC",
   vehiclePlaceholder: "Opcional",
   commentsPlaceholder: "Horario de llegada, dudas…",
   accessImportant: "Máxima altura de acceso: 1,79 m.",
@@ -274,13 +288,29 @@ const es: ParkingCopySource = {
   privacyPolicyLinkLabel: "Política de Privacidad",
   privacyPolicyAcceptAfter: ".",
   footerPrivacyLabel: "Política de Privacidad",
-  contactTitle: "Llámanos",
-  contactSub: "Respondo yo personalmente.",
+  contactTitle: "Llámanos: respondo yo personalmente.",
   contactWhatsApp: "Escribir por WhatsApp",
   contactDatesCta: "Consultar fechas",
   contactPlace: "Parking Guardamar Centro",
   contactWhatsAppMessage:
     "Hola, me interesa la plaza de parking en Guardamar Centro.",
+  feedbackSummary: "¿Ya usaste la plaza? Enviar feedback privado",
+  feedbackLead:
+    "Solo lo leo yo, para mejorar el acceso y el servicio. No se publica.",
+  feedbackMoodLabel: "¿Cómo fue?",
+  feedbackMoodGood: "Bien",
+  feedbackMoodOk: "Regular",
+  feedbackMoodProblem: "Problema",
+  feedbackMessageLabel: "Tu mensaje",
+  feedbackMessagePlaceholder: "Acceso, tamaño, limpieza, comunicación…",
+  feedbackReferenceLabel: "Matrícula (opcional)",
+  feedbackReferencePlaceholder: "1234 ABC",
+  feedbackSubmit: "Enviar feedback",
+  feedbackSubmitting: "Enviando…",
+  feedbackSuccess: "Gracias. He recibido tu feedback.",
+  feedbackError: "No se ha podido enviar. Inténtalo de nuevo o escríbeme por WhatsApp.",
+  feedbackPrivacy:
+    "Uso este mensaje solo para operaciones. No aparece en la página ni en Google.",
   conditionsNoticeHold:
     "La solicitud no bloquea las fechas. La reserva se confirma tras aceptar las condiciones y realizar el pago.",
   conditionsNoticeVehicle:
@@ -439,7 +469,7 @@ const en: ParkingCopySource = {
   vehicle: "Vehicle model",
   comments: "Comments",
   namePlaceholder: "Your name",
-  registrationPlaceholder: "Optional",
+  registrationPlaceholder: "1234 ABC",
   vehiclePlaceholder: "Optional",
   commentsPlaceholder: "Arrival time, questions…",
   accessImportant: "Maximum access height: 1.79 m.",
@@ -450,13 +480,29 @@ const en: ParkingCopySource = {
   privacyPolicyLinkLabel: "Privacy Policy",
   privacyPolicyAcceptAfter: ".",
   footerPrivacyLabel: "Privacy Policy",
-  contactTitle: "Call us",
-  contactSub: "I answer personally.",
+  contactTitle: "Call us, I answer personally.",
   contactWhatsApp: "Message on WhatsApp",
   contactDatesCta: "Check dates",
   contactPlace: "Parking Guardamar Centro",
   contactWhatsAppMessage:
     "Hi, I’m interested in the parking space in Guardamar Centro.",
+  feedbackSummary: "Already used the space? Send private feedback",
+  feedbackLead:
+    "I read this myself, to improve access and the service. It is not published.",
+  feedbackMoodLabel: "How was it?",
+  feedbackMoodGood: "Good",
+  feedbackMoodOk: "OK",
+  feedbackMoodProblem: "Problem",
+  feedbackMessageLabel: "Your message",
+  feedbackMessagePlaceholder: "Access, size, cleanliness, communication…",
+  feedbackReferenceLabel: "Registration plate (optional)",
+  feedbackReferencePlaceholder: "1234 ABC",
+  feedbackSubmit: "Send feedback",
+  feedbackSubmitting: "Sending…",
+  feedbackSuccess: "Thank you. I’ve received your feedback.",
+  feedbackError: "Could not send. Try again or message me on WhatsApp.",
+  feedbackPrivacy:
+    "I use this message for operations only. It does not appear on the page or on Google.",
   conditionsNoticeHold:
     "Sending an enquiry does not hold the dates. The booking is confirmed after accepting the conditions and completing payment.",
   conditionsNoticeVehicle:
@@ -614,7 +660,7 @@ const fr: ParkingCopySource = {
   vehicle: "Modèle",
   comments: "Commentaires",
   namePlaceholder: "Votre nom",
-  registrationPlaceholder: "Facultatif",
+  registrationPlaceholder: "1234 ABC",
   vehiclePlaceholder: "Facultatif",
   commentsPlaceholder: "Heure d’arrivée, questions…",
   accessImportant: "Hauteur maximale d’accès : 1,79 m.",
@@ -625,13 +671,29 @@ const fr: ParkingCopySource = {
   privacyPolicyLinkLabel: "Politique de confidentialité",
   privacyPolicyAcceptAfter: ".",
   footerPrivacyLabel: "Politique de confidentialité",
-  contactTitle: "Appelez-nous",
-  contactSub: "Je réponds personnellement.",
+  contactTitle: "Appelez-nous : je réponds personnellement.",
   contactWhatsApp: "Écrire sur WhatsApp",
   contactDatesCta: "Voir les dates",
   contactPlace: "Parking Guardamar Centro",
   contactWhatsAppMessage:
     "Bonjour, je suis intéressé(e) par la place de parking à Guardamar Centro.",
+  feedbackSummary: "Vous avez déjà utilisé la place ? Envoyer un avis privé",
+  feedbackLead:
+    "Je le lis moi-même, pour améliorer l’accès et le service. Ce n’est pas publié.",
+  feedbackMoodLabel: "Comment c’était ?",
+  feedbackMoodGood: "Bien",
+  feedbackMoodOk: "Correct",
+  feedbackMoodProblem: "Problème",
+  feedbackMessageLabel: "Votre message",
+  feedbackMessagePlaceholder: "Accès, taille, propreté, communication…",
+  feedbackReferenceLabel: "Immatriculation (facultatif)",
+  feedbackReferencePlaceholder: "1234 ABC",
+  feedbackSubmit: "Envoyer l’avis",
+  feedbackSubmitting: "Envoi…",
+  feedbackSuccess: "Merci. J’ai bien reçu votre avis.",
+  feedbackError: "Envoi impossible. Réessayez ou écrivez-moi sur WhatsApp.",
+  feedbackPrivacy:
+    "J’utilise ce message uniquement pour l’exploitation. Il n’apparaît pas sur la page ni sur Google.",
   conditionsNoticeHold:
     "La demande ne bloque pas les dates. La réservation est confirmée après acceptation des conditions et paiement.",
   conditionsNoticeVehicle:
