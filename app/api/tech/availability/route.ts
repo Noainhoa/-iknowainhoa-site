@@ -117,8 +117,12 @@ export async function GET(request: Request) {
     return { startMs, endMs: startMs + row.duration_minutes * 60 * 1000 };
   });
 
+  // Only future sessions count toward the weekly create cap — past ones must not
+  // wipe the rest of the week's remaining free gaps.
   const slotsByWeek = countSlotsByWeek(
-    (sessionRows ?? []).map((row) => ({ startsAt: row.starts_at }))
+    (sessionRows ?? [])
+      .filter((row) => new Date(row.starts_at).getTime() > now.getTime())
+      .map((row) => ({ startsAt: row.starts_at }))
   );
 
   const bookableArgs = {

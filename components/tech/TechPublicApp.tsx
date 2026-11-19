@@ -7,11 +7,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { TechBrandLink } from "@/components/tech/TechBrandLink";
 import TechContactLinks from "@/components/tech/TechContactLinks";
-import { HeroBubbleIcon, IconPhone } from "@/components/tech/TechIllustrations";
+import { HeroBubbleIcon, IconCalendar, IconPhone } from "@/components/tech/TechIllustrations";
+import WhatsAppMark from "@/components/tech/WhatsAppMark";
 import SiteCopyright from "@/components/SiteCopyright";
 import { externalAnchorProps } from "@/lib/links";
-import type { SessionLanguage } from "@/lib/tech/calendar";
+import { madridMinuteOfDay, minuteToHhMm, type SessionLanguage } from "@/lib/tech/calendar";
 import {
+  GROUP_MINUTES,
   GROUP_PRICE_CENTS,
   INDIVIDUAL_MINUTES,
   INDIVIDUAL_SHORT_MINUTES,
@@ -34,6 +36,11 @@ import {
   type OfferSession,
   type PublicOffer,
 } from "@/lib/tech/public-offers";
+import {
+  filterStartsToPublicWindows,
+  isShortNotice,
+  isWithinPublicOfferWindow,
+} from "@/lib/tech/public-windows";
 
 const TIMES = Array.from({ length: 20 }, (_, index) => {
   const minutes = 9 * 60 + index * 30;
@@ -269,27 +276,71 @@ export default function TechPublicApp({
     }
   }, [view, offer?.key]);
 
+  const privateDuration = privateMinutes === 30 ? INDIVIDUAL_SHORT_MINUTES : INDIVIDUAL_MINUTES;
+  const calendarBookableStarts = useMemo(
+    () => filterStartsToPublicWindows(bookableStarts, GROUP_MINUTES),
+    [bookableStarts]
+  );
+  const calendarBookableStartsShort = useMemo(
+    () => filterStartsToPublicWindows(bookableStartsShort, INDIVIDUAL_SHORT_MINUTES),
+    [bookableStartsShort]
+  );
+  const calendarSessions = useMemo(
+    () =>
+      sessions.filter(
+        (session) =>
+          session.kind !== "group" ||
+          isWithinPublicOfferWindow(session.startsAt, session.durationMinutes)
+      ),
+    [sessions]
+  );
+
   const groupOffers = useMemo(
     () =>
       buildGroupOffers({
-        sessions,
-        bookableStarts,
+        sessions: calendarSessions,
+        bookableStarts: calendarBookableStarts,
         templateReady,
         createLanguage: spoken,
       }),
-    [sessions, bookableStarts, templateReady, spoken]
+    [calendarSessions, calendarBookableStarts, templateReady, spoken]
   );
 
   const privateOffers = useMemo(
     () =>
       buildPrivateOffers({
-        bookableStarts: privateMinutes === 30 ? bookableStartsShort : bookableStarts,
-        durationMinutes: privateMinutes === 30 ? INDIVIDUAL_SHORT_MINUTES : INDIVIDUAL_MINUTES,
+        bookableStarts: privateMinutes === 30 ? calendarBookableStartsShort : calendarBookableStarts,
+        durationMinutes: privateDuration,
         templateReady,
         createLanguage: spoken,
       }),
-    [bookableStarts, bookableStartsShort, privateMinutes, templateReady, spoken]
+    [calendarBookableStarts, calendarBookableStartsShort, privateDuration, privateMinutes, templateReady, spoken]
   );
+
+  // Request flow: any real admin free start (30 or 60 grid), not tied to private duration toggle.
+  const requestAdminStarts = useMemo(() => {
+    return new Set([...bookableStarts, ...bookableStartsShort]);
+  }, [bookableStarts, bookableStartsShort]);
+
+  const requestTimesForDate = useMemo(() => {
+    const options = new Set<string>();
+    for (const iso of requestAdminStarts) {
+      if (madridDayKey(new Date(iso)) !== date) continue;
+      if (new Date(iso).getTime() <= Date.now()) continue;
+      options.add(minuteToHhMm(madridMinuteOfDay(new Date(iso))));
+    }
+    return [...options].sort();
+  }, [date, requestAdminStarts]);
+
+  useEffect(() => {
+    if (view !== "request") return;
+    if (requestTimesForDate.includes(time)) return;
+    setTime(requestTimesForDate[0] ?? "10:00");
+  }, [view, requestTimesForDate, time]);
+
+  const requestInstant = useMemo(() => madridLocalToUtc(date, time), [date, time]);
+  const requestIsAdminFree = requestAdminStarts.has(requestInstant.toISOString());
+  const requestNeedsCall = requestIsAdminFree && isShortNotice(requestInstant);
   const hasPrivate = templateReady && (bookableStarts.length > 0 || bookableStartsShort.length > 0);
   const activeOffers = view === "private" ? privateOffers : groupOffers;
   const todayKey = madridDayKey(new Date());
@@ -392,8 +443,15 @@ export default function TechPublicApp({
     event.preventDefault();
     if (saving) return;
     setError(null);
-    setSaving(true);
     const requesting = view === "request";
+    if (requesting) {
+      if (!requestIsAdminFree || requestTimesForDate.length === 0) {
+        setError("tech_not_bookable");
+        return;
+      }
+      if (requestNeedsCall) return;
+    }
+    setSaving(true);
     const endpoint = requesting ? "/api/tech/request" : "/api/tech/book";
     let requestedStart: string | undefined;
     if (requesting) {
@@ -514,7 +572,7 @@ export default function TechPublicApp({
       : locale === "nl"
         ? "Hallo Ainhoa, ik zou graag technische hulp in Guardamar willen."
         : "Hola Ainhoa, me gustaría una sesión de ayuda tecnológica en Guardamar.";
-  const enquiryHref = siteWhatsAppEnquiryHref(enquiryMessage);
+  const fabWhatsAppHref = siteWhatsAppEnquiryHref(copy.fabWhatsAppMessage);
 
   function chipLabel(item: PublicOffer): string {
     const place = seats(item);
@@ -525,28 +583,34 @@ export default function TechPublicApp({
   function personFields(submitLabel: string) {
     return (
       <>
-        <label htmlFor="tme-name">{copy.contactName}</label>
-        <input
-          id="tme-name"
-          type="text"
-          name="name"
-          autoComplete="name"
-          autoCapitalize="words"
-          value={contactName}
-          onChange={(event) => setContactName(event.target.value)}
-          required
-        />
-        <label htmlFor="tme-phone">{copy.phone}</label>
-        <input
-          id="tme-phone"
-          type="tel"
-          name="tel"
-          autoComplete="tel"
-          inputMode="tel"
-          value={phone}
-          onChange={(event) => setPhone(event.target.value)}
-          required
-        />
+        <div className="tme-request-when">
+          <div className="tme-request-field">
+            <label htmlFor="tme-name">{copy.contactName}</label>
+            <input
+              id="tme-name"
+              type="text"
+              name="name"
+              autoComplete="name"
+              autoCapitalize="words"
+              value={contactName}
+              onChange={(event) => setContactName(event.target.value)}
+              required
+            />
+          </div>
+          <div className="tme-request-field">
+            <label htmlFor="tme-phone">{copy.phone}</label>
+            <input
+              id="tme-phone"
+              type="tel"
+              name="tel"
+              autoComplete="tel"
+              inputMode="tel"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              required
+            />
+          </div>
+        </div>
         <label className="tme-check">
           <input
             type="checkbox"
@@ -710,8 +774,22 @@ export default function TechPublicApp({
         </header>
 
         <section className="tme-panel" aria-labelledby="tme-choose" ref={pickRef}>
-            <div className="tme-panel-head">
-              <h2 id="tme-choose">
+            <div className={`tme-panel-head${view === "request" ? " is-request" : ""}`}>
+              {view === "request" ? (
+                <button
+                  type="button"
+                  className="tme-linkish tme-panel-back"
+                  onClick={() => {
+                    setView(listView.current);
+                    setError(null);
+                  }}
+                >
+                  <ChevronLeft className="tme-panel-back-chevron" aria-hidden="true" />
+                  <IconCalendar />
+                  <span>{copy.requestBack}</span>
+                </button>
+              ) : null}
+              <h2 id="tme-choose" className={view === "request" ? "tme-panel-title-accent" : undefined}>
                 {view === "private"
                   ? copy.privateHeading
                   : view === "request"
@@ -757,35 +835,78 @@ export default function TechPublicApp({
 
             {loadState === "ready" && view === "request" ? (
               <form onSubmit={onSubmit} noValidate>
-                <p className="tme-note">{copy.otherTimeHelp}</p>
-                <label htmlFor="tme-date">{copy.date}</label>
-                <input
-                  id="tme-date"
-                  type="date"
-                  value={date}
-                  min={madridDayKey(new Date())}
-                  onChange={(event) => setDate(event.target.value)}
-                  required
-                />
-                <label htmlFor="tme-time">{copy.time}</label>
-                <select id="tme-time" value={time} onChange={(event) => setTime(event.target.value)}>
-                  {TIMES.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  className="tme-linkish"
-                  onClick={() => {
-                    setView("groups");
-                    setError(null);
-                  }}
-                >
-                  {copy.requestBack}
-                </button>
-                {personFields(copy.submitRequest)}
+                <div className="tme-request-when is-compact">
+                  <div className="tme-request-field">
+                    <label htmlFor="tme-date">{copy.date}</label>
+                    <input
+                      id="tme-date"
+                      className="tme-date-input"
+                      type="date"
+                      value={date}
+                      min={madridDayKey(new Date())}
+                      onChange={(event) => setDate(event.target.value)}
+                      onClick={(event) => {
+                        const input = event.currentTarget;
+                        try {
+                          if (typeof input.showPicker === "function") input.showPicker();
+                        } catch {
+                          /* Older browsers / blocked showPicker — native click still works. */
+                        }
+                      }}
+                      required
+                    />
+                  </div>
+                  <div className="tme-request-field">
+                    <label htmlFor="tme-time">{copy.time}</label>
+                    <select
+                      id="tme-time"
+                      value={requestTimesForDate.length > 0 ? time : ""}
+                      onChange={(event) => setTime(event.target.value)}
+                      disabled={requestTimesForDate.length === 0}
+                      aria-invalid={requestTimesForDate.length === 0 || undefined}
+                    >
+                      {requestTimesForDate.length === 0 ? (
+                        <option value="">{copy.dayUnavailable}</option>
+                      ) : (
+                        requestTimesForDate.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+                {requestTimesForDate.length === 0 ? (
+                  <p className="tme-request-status" role="status">
+                    {copy.requestDayUnavailable}{" "}
+                    <a href={telHref()}>
+                      {copy.callNow} {phoneDisplay}
+                    </a>
+                  </p>
+                ) : null}
+                {requestNeedsCall ? (
+                  <p className="tme-request-status is-urgent" role="status">
+                    {copy.requestShortNotice.replace("{when}", (() => {
+                      const day = dayTitle(date, locale);
+                      const named =
+                        locale === "en"
+                          ? day
+                          : day.replace(/^./, (char) => char.toLocaleLowerCase(localeTag(locale)));
+                      return `${named} · ${time}`;
+                    })())}{" "}
+                    <a href={telHref()}>
+                      {copy.callNow} {phoneDisplay}
+                    </a>
+                  </p>
+                ) : null}
+                {requestTimesForDate.length > 0 && !requestNeedsCall && requestIsAdminFree
+                  ? personFields(copy.submitRequest)
+                  : null}
+                <p className="tme-request-footnote">
+                  <span aria-hidden="true">*</span>
+                  <strong>{copy.otherTimeNoteLabel}:</strong> {copy.otherTimeHelp}
+                </p>
               </form>
             ) : null}
 
@@ -860,8 +981,9 @@ export default function TechPublicApp({
                             <button
                               key={day}
                               type="button"
-                              className={`tme-date${open ? (hasJoin ? " is-group" : " is-free") : " is-closed"}`}
+                              className={`tme-date${open ? (hasJoin ? " is-group" : " is-free") : " is-closed"}${day === todayKey ? " is-today" : ""}`}
                               aria-pressed={open && day === selectedDay}
+                              aria-current={day === todayKey ? "date" : undefined}
                               disabled={!open}
                               aria-label={
                                 open
@@ -936,9 +1058,6 @@ export default function TechPublicApp({
                 ) : (
                   <div className="tme-empty">
                     <p role="status">{copy.noTimesWeek}</p>
-                    <a className="tme-book" href={telHref()}>
-                      {copy.callNow} {phoneDisplay}
-                    </a>
                   </div>
                 )}
 
@@ -1021,15 +1140,30 @@ export default function TechPublicApp({
         <footer className="tme-foot">
           <p>{copy.placeBody}</p>
           <p className="tme-foot-pay">{copy.payShort}</p>
-          <p className="tme-foot-links">
+          <div className="tme-foot-links">
             <a href={telHref()}>{copy.callNow} {phoneDisplay}</a>
             <span aria-hidden="true">·</span>
-            <a href={enquiryHref} {...externalAnchorProps(enquiryHref)}>{copy.whatsapp}</a>
-            <span aria-hidden="true">·</span>
             <Link href={techConditionsHref(locale)}>{copy.footerLegalLabel}</Link>
-          </p>
-          <SiteCopyright style={{ color: "inherit", fontSize: "0.85rem", textAlign: "center" }} />
+            <span aria-hidden="true">·</span>
+            <SiteCopyright style={{ margin: 0, color: "inherit", fontSize: "0.85rem", textAlign: "inherit" }} />
+          </div>
         </footer>
+      </div>
+
+      <div className="tme-urgent-fab" role="group" aria-label={copy.fabCallAria}>
+        <a className="tme-urgent-call" href={telHref()} aria-label={copy.fabCallAria}>
+          <IconPhone />
+          <span>{copy.fabCallLabel}</span>
+        </a>
+        <a
+          className="tme-urgent-wa"
+          href={fabWhatsAppHref}
+          {...externalAnchorProps(fabWhatsAppHref)}
+          aria-label={copy.fabWhatsAppAria}
+        >
+          <WhatsAppMark className="tme-urgent-wa-mark" />
+          <span>{copy.fabWhatsAppLabel}</span>
+        </a>
       </div>
     </div>
   );

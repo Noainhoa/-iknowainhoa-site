@@ -142,6 +142,7 @@ export type TechCopy = {
   individualShortOption: string;
   otherTime: string;
   otherTimeHelp: string;
+  otherTimeNoteLabel: string;
   loading: string;
   /** Temporary network / backend failure while loading sessions. */
   loadError: string;
@@ -202,6 +203,15 @@ export type TechCopy = {
   calendar: string;
   call: string;
   whatsapp: string;
+  fabCallLabel: string;
+  fabCallAria: string;
+  fabWhatsAppLabel: string;
+  fabWhatsAppAria: string;
+  fabWhatsAppMessage: string;
+  /** `{when}` is the chosen day and time, e.g. "sábado, 21 de noviembre · 10:00". */
+  requestShortNotice: string;
+  requestUnavailable: string;
+  requestDayUnavailable: string;
   back: string;
   cancelTitle: string;
   cancelButton: string;
@@ -286,7 +296,7 @@ const es: TechCopy = {
   openSeat: "Hora libre",
   minutesLong: "{n} minutos",
   changeTime: "Elegir otra hora",
-  requestBack: "Volver a las horas",
+  requestBack: "Calendario",
   formLead: "Tu nombre y tu teléfono.",
   payShort: "Pagas en la sesión: efectivo, transferencia, tarjeta o Bizum. No hay pago por internet.",
   inEnglish: "En inglés",
@@ -394,14 +404,15 @@ const es: TechCopy = {
   groupOption: "En grupo",
   individualOption: "Privada 60",
   individualShortOption: "Privada 30",
-  otherTime: "Pedir otra hora",
+  otherTime: "Pedir cita",
   otherTimeHelp:
     "Esto no reserva la hora. Ainhoa la revisa y te confirma solo si puede. Hasta entonces, la hora sigue libre.",
+  otherTimeNoteLabel: "Nota",
   loading: "Buscando huecos…",
   loadError:
     "No he podido cargar las horas ahora. Parece un problema de conexión o del servidor. Inténtalo otra vez, o llama / escribe por WhatsApp.",
   empty:
-    "Ahora no hay huecos de este tipo. Puedes pedir otra hora, llamar o escribir por WhatsApp.",
+    "Ahora no hay huecos de este tipo. Puedes pedir cita, llamar o escribir por WhatsApp.",
   notConfigured:
     "En este entorno la reserva online aún no está configurada. No es que no haya huecos: aquí no se puede reservar por internet. Llama o escribe por WhatsApp.",
   calendarOff: "El calendario no acepta reservas en este momento.",
@@ -422,7 +433,7 @@ const es: TechCopy = {
   seatsOne: "Queda 1 plaza",
   seatsMany: "Quedan {n} plazas",
   formTitle: "Tus datos",
-  requestTitle: "Pedir otra hora",
+  requestTitle: "Pedir cita",
   contactName: "Tu nombre",
   attendeeName: "Nombre de quien asiste",
   forOther: "Reservo para otra persona",
@@ -488,6 +499,17 @@ const es: TechCopy = {
   calendar: "Añadir al calendario",
   call: "Llamar a Ainhoa",
   whatsapp: "WhatsApp",
+  fabCallLabel: "¿Ayuda hoy?",
+  fabCallAria: "Llamar: necesito ayuda con el móvil hoy",
+  fabWhatsAppLabel: "WhatsApp",
+  fabWhatsAppAria: "WhatsApp: pedir ayuda con el móvil hoy",
+  fabWhatsAppMessage:
+    "Hola Ainhoa, tengo un problema con el móvil y necesito ayuda. Me gustaría que me ayudaras hoy si es posible. ¿Puedes responder si estás disponible?",
+  requestShortNotice:
+    "Faltan menos de 48 horas para el {when}. Llama mejor y cuéntale qué pasa.",
+  requestUnavailable: "Esa hora no está libre en la agenda. Elige otra o llama.",
+  requestDayUnavailable:
+    "Este día no hay huecos libres en la agenda. Elige otro día o llama.",
   back: "Volver a reservar",
   cancelTitle: "Tu reserva",
   cancelButton: "Cancelar reserva",
@@ -573,7 +595,7 @@ const en: TechCopy = {
   openSeat: "Free time",
   minutesLong: "{n} minutes",
   changeTime: "Choose another time",
-  requestBack: "Back to the times",
+  requestBack: "Calendar",
   formLead: "Your name and phone number.",
   payShort: "You pay at the session: cash, bank transfer, card or Bizum. There is no online payment.",
   inEnglish: "In English",
@@ -684,6 +706,7 @@ const en: TechCopy = {
   otherTime: "Ask for another time",
   otherTimeHelp:
     "This does not reserve the time. Ainhoa checks it and confirms only if she can. Until then, the time stays free.",
+  otherTimeNoteLabel: "Note",
   loading: "Looking for available times…",
   loadError:
     "I couldn’t load the available times just now. This looks like a connection or server problem. Please try again, or call / use WhatsApp.",
@@ -775,6 +798,17 @@ const en: TechCopy = {
   calendar: "Add to calendar",
   call: "Call Ainhoa",
   whatsapp: "WhatsApp",
+  fabCallLabel: "Help today?",
+  fabCallAria: "Call: I need phone help today",
+  fabWhatsAppLabel: "WhatsApp",
+  fabWhatsAppAria: "WhatsApp: ask for phone help today",
+  fabWhatsAppMessage:
+    "Hi Ainhoa, I have an issue with my phone and need help. I would like some help today if possible. Please get back to me if you are available.",
+  requestShortNotice:
+    "{when} is inside 48 hours. Calling is best so you can explain what is going on.",
+  requestUnavailable: "That time is not free on the schedule. Choose another or call.",
+  requestDayUnavailable:
+    "There are no free times on this day. Choose another day or call.",
   back: "Back to booking",
   cancelTitle: "Your booking",
   cancelButton: "Cancel booking",
@@ -860,7 +894,7 @@ const nl: TechCopy = {
   openSeat: "Vrije tijd",
   minutesLong: "{n} minuten",
   changeTime: "Kies een andere tijd",
-  requestBack: "Terug naar de tijden",
+  requestBack: "Agenda",
   formLead: "Je naam en telefoonnummer.",
   payShort: "Je betaalt tijdens de sessie: contant, overschrijving, kaart of Bizum. Er is geen online betaling.",
   inEnglish: "In het Engels",
@@ -971,6 +1005,7 @@ const nl: TechCopy = {
   otherTime: "Vraag een andere tijd aan",
   otherTimeHelp:
     "Dit reserveert de tijd nog niet. Ainhoa bekijkt je aanvraag en bevestigt alleen als het kan. Tot die tijd blijft de tijd vrij.",
+  otherTimeNoteLabel: "Let op",
   loading: "Beschikbare tijden zoeken…",
   loadError:
     "Ik kon de beschikbare tijden nu niet laden. Het lijkt op een verbindings- of serverprobleem. Probeer het opnieuw, of bel / schrijf via WhatsApp.",
@@ -1064,6 +1099,17 @@ const nl: TechCopy = {
   calendar: "Toevoegen aan agenda",
   call: "Ainhoa bellen",
   whatsapp: "WhatsApp",
+  fabCallLabel: "Hulp vandaag?",
+  fabCallAria: "Bellen: ik heb vandaag hulp nodig met mijn telefoon",
+  fabWhatsAppLabel: "WhatsApp",
+  fabWhatsAppAria: "WhatsApp: vraag vandaag hulp met je telefoon",
+  fabWhatsAppMessage:
+    "Hallo Ainhoa, ik heb een probleem met mijn telefoon en heb hulp nodig. Ik zou vandaag graag hulp willen als dat mogelijk is. Kun je reageren als je beschikbaar bent?",
+  requestShortNotice:
+    "Het is binnen 48 uur voor {when}. Bel liever, zodat je kunt uitleggen wat er speelt.",
+  requestUnavailable: "Die tijd is niet vrij in de agenda. Kies een andere of bel.",
+  requestDayUnavailable:
+    "Op deze dag zijn er geen vrije tijden. Kies een andere dag of bel.",
   back: "Terug naar reserveren",
   cancelTitle: "Je reservering",
   cancelButton: "Reservering annuleren",
