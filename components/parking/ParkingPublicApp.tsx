@@ -1101,7 +1101,6 @@ export default function ParkingPublicApp({
             ))}
           </tbody>
         </table>
-        <p className="pk-prices-note">{t.pricesDisclaimer}</p>
       </section>
 
       {!configured ? (
@@ -1136,19 +1135,25 @@ export default function ParkingPublicApp({
             </span>
           </button>
         ) : null}
-        <h2 id="pk-availability-heading">{t.availabilityTitle}</h2>
-        {arrival && !departure ? (
-          <p className="pk-availability-hint">{t.availabilityHintDeparture}</p>
-        ) : null}
+        <div className="pk-availability-head">
+          <h2 id="pk-availability-heading">{t.availabilityTitle}</h2>
+          <div className="pk-legend" aria-label={t.legend}>
+            <span>
+              <i className="swatch available" aria-hidden="true" /> {t.available}
+            </span>
+            <span>
+              <i className="swatch unavailable" aria-hidden="true" />{" "}
+              {t.unavailable}
+            </span>
+            <span>
+              <i className="swatch selected" aria-hidden="true" /> {t.selected}
+            </span>
+          </div>
+        </div>
 
-        <div className={`pk-cal${loadingAvailability ? " is-loading" : ""}`}>
+        <div className="pk-cal">
           <h3 className="sr-only">{navRangeLabel}</h3>
-          {loadingAvailability ? (
-            <p className="pk-cal-loading" role="status" aria-live="polite">
-              {t.loadingAvailability}
-            </p>
-          ) : (
-            <div className="pk-cal-chrome">
+          <div className="pk-cal-chrome">
               <button
                 type="button"
                 className="pk-nav-btn"
@@ -1245,20 +1250,7 @@ export default function ParkingPublicApp({
               >
                 <ParkingChevron direction="right" className="pk-nav-icon" />
               </button>
-            </div>
-          )}
-        </div>
-
-        <div className="pk-legend" aria-label={t.legend}>
-          <span>
-            <i className="swatch available" aria-hidden="true" /> {t.available}
-          </span>
-          <span>
-            <i className="swatch unavailable" aria-hidden="true" /> {t.unavailable}
-          </span>
-          <span>
-            <i className="swatch selected" aria-hidden="true" /> {t.selected}
-          </span>
+          </div>
         </div>
 
         {(fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods) ? (

@@ -766,13 +766,26 @@
           border-radius: var(--radius);
         }
 
-.parking-root .pk-availability h2,
-.parking-root .pk-form-section h2 {
+.parking-root .pk-availability-head {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px 14px;
           margin: 0 0 6px;
+        }
+
+.parking-root .pk-availability-head h2,
+.parking-root .pk-form-section h2 {
+          margin: 0;
           font-size: 1.1rem;
           font-weight: 750;
           color: var(--pk-navy);
           letter-spacing: -0.01em;
+        }
+
+.parking-root .pk-form-section h2 {
+          margin: 0 0 6px;
         }
 
 .parking-root .pk-prices-table {
@@ -872,16 +885,6 @@
           border-color: #f0bcbc;
         }
 
-.parking-root .pk-cal-loading {
-          margin: 12px 0 4px;
-          padding: 28px 12px;
-          text-align: center;
-          color: #005288;
-          font-size: 0.95rem;
-          font-weight: 600;
-          line-height: 1.4;
-        }
-
 .parking-root .pk-availability {
           margin: 0 0 var(--space-section);
         }
@@ -959,18 +962,11 @@
           letter-spacing: 0.01em;
         }
 
-.parking-root .pk-availability-hint {
-          margin: 0 0 6px;
-          color: var(--muted);
-          font-size: 0.9rem;
-          line-height: 1.4;
-        }
-
 .parking-root .pk-legend {
           display: flex;
           flex-wrap: wrap;
           gap: 8px 12px;
-          margin: 10px 0 0;
+          margin: 0;
           font-size: 0.82rem;
           color: var(--muted);
         }
@@ -2190,13 +2186,6 @@
 .parking-root .pk-wa-fab-label {
           line-height: 1.1;
           white-space: nowrap;
-        }
-
-.parking-root .pk-prices-note {
-          margin: 8px 0 0;
-          color: var(--muted);
-          font-size: 0.82rem;
-          line-height: 1.4;
         }
 
 .parking-root .pk-seo {

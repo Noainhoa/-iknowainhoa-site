@@ -93,8 +93,8 @@ describe("parking i18n", () => {
     assert.equal(es.past, "Pasado");
     assert.equal(en.past, "Past");
     assert.equal(fr.past, "Passé");
-    assert.equal(es.available, "Disponible");
-    assert.equal(es.unavailable, "No disponible");
+    assert.equal(es.available, "Libre");
+    assert.equal(es.unavailable, "Ocupado");
     assert.equal(es.selected, "Seleccionado");
   });
 

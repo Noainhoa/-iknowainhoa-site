@@ -49,7 +49,6 @@ export type ParkingCopy = {
   priceColWeek: string;
   priceColMonth: string;
   priceRows: ParkingPriceRow[];
-  pricesDisclaimer: string;
   priceUnavailableLabel: string;
   breadcrumbHome: string;
   breadcrumbCurrent: string;
@@ -64,7 +63,6 @@ export type ParkingCopy = {
   nextAvailableNotice: (formattedDate: string) => string;
   /** Accessible label for the clickable next-available ribbon. */
   nextAvailableNoticeAria: (formattedDate: string) => string;
-  availabilityHintDeparture: string;
   selectedDatesTitle: string;
   periodsTitle: string;
   addPeriod: string;
@@ -141,7 +139,6 @@ export type ParkingCopy = {
   whatsappTonightAria: string;
   whatsappTonightMessage: string;
   supabaseHint: string;
-  loadingAvailability: string;
   loadError: string;
   errNeedArrival: string;
   errNeedDeparture: string;
@@ -205,8 +202,6 @@ const es: ParkingCopySource = {
   priceColWeek: "Semana",
   priceColMonth: "Mes",
   pricePeriodLabels: ["Junio–agosto", "Septiembre", "Octubre–mayo"],
-  pricesDisclaimer:
-    "Las tarifas dependen de la temporada. La estimación es orientativa; el precio final se confirma por WhatsApp.",
   priceUnavailableLabel: "No disponible",
   breadcrumbHome: "Inicio",
   breadcrumbCurrent: "Parking en Guardamar",
@@ -244,13 +239,12 @@ const es: ParkingCopySource = {
         "Solo si cabe en 4,90 × 2,40 m y no supera 1,79 m de altura de acceso. Por referencia, un Mercedes Classe 580 ha aparcado aquí; las furgonetas altas no. No es un parking público ni un aparcamiento de varios vehículos.",
     },
   ],
-  availabilityTitle: "Selecciona tus fechas",
+  availabilityTitle: "Disponibilidad",
   nextAvailableTag: "AVISO",
   nextAvailableNotice: (formattedDate) =>
-    `Próxima disponibilidad: ${formattedDate}`,
+    `Libre a partir de ${formattedDate}`,
   nextAvailableNoticeAria: (formattedDate) =>
-    `Ir a la próxima disponibilidad (${formattedDate}) y usarla como fecha de entrada`,
-  availabilityHintDeparture: "Ahora selecciona la fecha de salida.",
+    `Ir a la primera fecha libre (${formattedDate}) y usarla como fecha de entrada`,
   selectedDatesTitle: "Fechas seleccionadas",
   periodsTitle: "Periodos de la solicitud",
   addPeriod: "Añadir estas fechas",
@@ -265,8 +259,8 @@ const es: ParkingCopySource = {
   labelTotalEstimate: "Estimación total",
   labelTotalDuration: "Total",
   legend: "Leyenda",
-  available: "Disponible",
-  unavailable: "No disponible",
+  available: "Libre",
+  unavailable: "Ocupado",
   past: "Pasado",
   selected: "Seleccionado",
   prevMonths: "Meses anteriores",
@@ -334,7 +328,6 @@ const es: ParkingCopySource = {
     "Hola, ¿está libre la plaza esta noche? (llegada hoy)",
   supabaseHint:
     "Calendario en modo local: falta configurar Supabase. Todas las fechas futuras aparecen como disponibles hasta que se conecte la base de datos.",
-  loadingAvailability: "Cargando disponibilidad…",
   loadError:
     "No se ha podido cargar la disponibilidad. Inténtalo de nuevo más tarde.",
   errNeedArrival: "Selecciona una fecha de entrada.",
@@ -397,8 +390,6 @@ const en: ParkingCopySource = {
   priceColWeek: "Week",
   priceColMonth: "Month",
   pricePeriodLabels: ["June–August", "September", "October–May"],
-  pricesDisclaimer:
-    "Rates depend on the season. The estimate is indicative; the final price is confirmed on WhatsApp.",
   priceUnavailableLabel: "Not available",
   breadcrumbHome: "Home",
   breadcrumbCurrent: "Parking in Guardamar",
@@ -436,12 +427,11 @@ const en: ParkingCopySource = {
         "Only if it fits 4.90 × 2.40 m and does not exceed 1.79 m access height. For reference, a Mercedes Classe 580 has parked here; tall vans have not. This is not a public multi-space car park.",
     },
   ],
-  availabilityTitle: "Select your dates",
+  availabilityTitle: "Availability",
   nextAvailableTag: "NOTICE",
-  nextAvailableNotice: (formattedDate) => `Next available: ${formattedDate}`,
+  nextAvailableNotice: (formattedDate) => `Free from ${formattedDate}`,
   nextAvailableNoticeAria: (formattedDate) =>
-    `Go to next available date (${formattedDate}) and use it as arrival`,
-  availabilityHintDeparture: "Now select your departure date.",
+    `Go to the first free date (${formattedDate}) and use it as arrival`,
   selectedDatesTitle: "Selected dates",
   periodsTitle: "Enquiry periods",
   addPeriod: "Add these dates",
@@ -456,8 +446,8 @@ const en: ParkingCopySource = {
   labelTotalEstimate: "Total estimate",
   labelTotalDuration: "Total",
   legend: "Legend",
-  available: "Available",
-  unavailable: "Unavailable",
+  available: "Free",
+  unavailable: "Occupied",
   past: "Past",
   selected: "Selected",
   prevMonths: "Previous months",
@@ -525,7 +515,6 @@ const en: ParkingCopySource = {
     "Hi, is the parking space free tonight? (arrival today)",
   supabaseHint:
     "Calendar in local mode: Supabase is not configured. All future dates show as available until the database is connected.",
-  loadingAvailability: "Loading availability…",
   loadError: "Could not load availability. Please try again later.",
   errNeedArrival: "Select an arrival date.",
   errNeedDeparture: "Select a departure date.",
@@ -586,8 +575,6 @@ const fr: ParkingCopySource = {
   priceColWeek: "Semaine",
   priceColMonth: "Mois",
   pricePeriodLabels: ["Juin–août", "Septembre", "Octobre–mai"],
-  pricesDisclaimer:
-    "Les tarifs dépendent de la saison. L’estimation est indicative ; le prix final est confirmé sur WhatsApp.",
   priceUnavailableLabel: "Non disponible",
   breadcrumbHome: "Accueil",
   breadcrumbCurrent: "Parking à Guardamar",
@@ -625,13 +612,12 @@ const fr: ParkingCopySource = {
         "Uniquement si elle tient dans 4,90 × 2,40 m et ne dépasse pas 1,79 m de hauteur d’accès. Pour référence, une Mercedes Classe 580 a déjà stationné ici ; pas les vans hauts. Ce n’est pas un parking public multi-places.",
     },
   ],
-  availabilityTitle: "Choisissez vos dates",
+  availabilityTitle: "Disponibilité",
   nextAvailableTag: "AVIS",
   nextAvailableNotice: (formattedDate) =>
-    `Prochaine disponibilité : ${formattedDate}`,
+    `Libre à partir du ${formattedDate}`,
   nextAvailableNoticeAria: (formattedDate) =>
-    `Aller à la prochaine disponibilité (${formattedDate}) et l’utiliser comme date d’arrivée`,
-  availabilityHintDeparture: "Sélectionnez maintenant la date de départ.",
+    `Aller à la première date libre (${formattedDate}) et l’utiliser comme date d’arrivée`,
   selectedDatesTitle: "Dates sélectionnées",
   periodsTitle: "Périodes de la demande",
   addPeriod: "Ajouter ces dates",
@@ -646,8 +632,8 @@ const fr: ParkingCopySource = {
   labelTotalEstimate: "Estimation totale",
   labelTotalDuration: "Total",
   legend: "Légende",
-  available: "Disponible",
-  unavailable: "Non disponible",
+  available: "Libre",
+  unavailable: "Occupé",
   past: "Passé",
   selected: "Sélectionné",
   prevMonths: "Mois précédents",
@@ -715,7 +701,6 @@ const fr: ParkingCopySource = {
     "Bonjour, la place est-elle libre ce soir ? (arrivée aujourd’hui)",
   supabaseHint:
     "Calendrier en mode local : Supabase n’est pas configuré. Toutes les dates futures apparaissent comme disponibles jusqu’à la connexion à la base de données.",
-  loadingAvailability: "Chargement de la disponibilité…",
   loadError:
     "Impossible de charger la disponibilité. Réessayez plus tard.",
   errNeedArrival: "Sélectionnez une date d’arrivée.",
