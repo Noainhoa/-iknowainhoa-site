@@ -3,50 +3,59 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { TechBrandLink } from "@/components/tech/TechBrandLink";
-import TechBookingCalendar, {
-  type BookingProduct,
-  type CalendarSelection,
-  type CalendarSession,
-} from "@/components/tech/TechBookingCalendar";
-import type { SessionLanguage } from "@/lib/tech/calendar";
 import TechContactLinks from "@/components/tech/TechContactLinks";
-import {
-  IconCalendar,
-  IconClock,
-  IconPhone,
-  TopicIcon,
-} from "@/components/tech/TechIllustrations";
+import { HeroBubbleIcon, IconPhone } from "@/components/tech/TechIllustrations";
 import SiteCopyright from "@/components/SiteCopyright";
-import WhatsAppMark from "@/components/tech/WhatsAppMark";
 import { externalAnchorProps } from "@/lib/links";
+import type { SessionLanguage } from "@/lib/tech/calendar";
 import {
   GROUP_PRICE_CENTS,
-  INDIVIDUAL_PRICE_CENTS,
+  INDIVIDUAL_MINUTES,
   INDIVIDUAL_SHORT_MINUTES,
-  INDIVIDUAL_SHORT_PRICE_CENTS,
   TECH_PATH,
   priceCentsForCreate,
 } from "@/lib/tech/constants";
-import { site, siteWhatsAppEnquiryHref } from "@/lib/site";
+import { siteWhatsAppEnquiryHref } from "@/lib/site";
 import { formatNationalPhone, telHref } from "@/lib/tech/phone";
 import type { TechCopy } from "@/lib/tech/i18n";
 import type { TechLocale } from "@/lib/tech/locale";
 import { buildIcs } from "@/lib/tech/ics";
-import { customerWhatsAppText, euros } from "@/lib/tech/messages";
+import { customerWhatsAppText } from "@/lib/tech/messages";
 import { techConditionsHref, techPageHref } from "@/lib/tech/seo";
 import { readSource } from "@/lib/tech/validate";
-import { formatMadrid, madridLocalToUtc } from "@/lib/tech/time";
+import { formatMadrid, madridDayKey, madridLocalToUtc } from "@/lib/tech/time";
 import { newIdempotencyKey } from "@/lib/tech/idempotency";
+import {
+  buildGroupOffers,
+  buildPrivateOffers,
+  type OfferSession,
+  type PublicOffer,
+} from "@/lib/tech/public-offers";
 
-const HERO_FAQ_ART: Record<TechLocale, string> = {
-  es: "/images/tech/everyday-faqs-es.png",
-  en: "/images/tech/everyday-faqs-en.png",
-  nl: "/images/tech/everyday-faqs-nl.png",
-};
+const TIMES = Array.from({ length: 20 }, (_, index) => {
+  const minutes = 9 * 60 + index * 30;
+  const hour = String(Math.floor(minutes / 60)).padStart(2, "0");
+  const minute = String(minutes % 60).padStart(2, "0");
+  return `${hour}:${minute}`;
+});
 
-type Kind = "group" | "individual60" | "individual30" | "request";
+const SLOT_GONE = new Set([
+  "tech_full",
+  "tech_not_bookable",
+  "tech_overlap",
+  "tech_week_full",
+  "tech_blocked",
+  "tech_session_started",
+  "tech_calendar_off",
+  "tech_outside_hours",
+  "tech_language_mismatch",
+  "tech_too_far",
+]);
+
+type View = "groups" | "private" | "request" | "details";
 
 type Success = {
   title: string;
@@ -61,25 +70,94 @@ type Success = {
   replayed: boolean;
 };
 
-function productFromKind(kind: Kind): BookingProduct | null {
-  if (kind === "group" || kind === "individual60" || kind === "individual30") return kind;
-  return null;
+function plainEuros(cents: number, locale: TechLocale): string {
+  const tag = locale === "en" ? "en-GB" : locale === "nl" ? "nl-NL" : "es-ES";
+  const whole = cents % 100 === 0;
+  return new Intl.NumberFormat(tag, {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: whole ? 0 : 2,
+    maximumFractionDigits: whole ? 0 : 2,
+  }).format(cents / 100);
 }
 
-const TIMES = Array.from({ length: 20 }, (_, index) => {
-  const minutes = 9 * 60 + index * 30;
-  const hour = String(Math.floor(minutes / 60)).padStart(2, "0");
-  const minute = String(minutes % 60).padStart(2, "0");
-  return `${hour}:${minute}`;
-});
+function sentenceCase(value: string): string {
+  if (!value) return value;
+  return value.charAt(0).toLocaleUpperCase() + value.slice(1);
+}
 
-function todayMadrid(): string {
-  return new Intl.DateTimeFormat("en-CA", {
+function classLanguage(locale: TechLocale): SessionLanguage {
+  return locale === "en" ? "en" : "es";
+}
+
+function localeTag(locale: TechLocale): string {
+  return locale === "en" ? "en-GB" : locale === "nl" ? "nl-NL" : "es-ES";
+}
+
+function dayBits(day: string, locale: TechLocale): { weekday: string; dayNum: string; month: string } {
+  const instant = madridLocalToUtc(day, "12:00");
+  const tag = localeTag(locale);
+  const format = (options: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat(tag, { timeZone: "Europe/Madrid", ...options }).format(instant);
+  const tidy = (value: string) => {
+    const cleaned = value.replace(".", "");
+    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  };
+  return {
+    weekday: tidy(format({ weekday: "short" })),
+    dayNum: format({ day: "numeric" }),
+    month: tidy(format({ month: "short" })),
+  };
+}
+
+function clock(iso: string, locale: TechLocale): string {
+  return new Intl.DateTimeFormat(localeTag(locale), {
     timeZone: "Europe/Madrid",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(new Date(iso));
+}
+
+function shiftDay(day: string, days: number): string {
+  const instant = madridLocalToUtc(day, "12:00");
+  instant.setUTCDate(instant.getUTCDate() + days);
+  return madridDayKey(instant);
+}
+
+function weekMonday(day: string): string {
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Madrid",
+    weekday: "short",
+  }).format(madridLocalToUtc(day, "12:00"));
+  const index = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(weekday);
+  return shiftDay(day, index < 0 ? 0 : -index);
+}
+
+function weekTitle(start: string, locale: TechLocale, weekCount = 1): string {
+  const end = shiftDay(start, weekCount * 7 - 1);
+  const tag = localeTag(locale);
+  const format = (day: string, options: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat(tag, { timeZone: "Europe/Madrid", ...options })
+      .format(madridLocalToUtc(day, "12:00"))
+      .replace(".", "");
+  const startNum = format(start, { day: "numeric" });
+  const endNum = format(end, { day: "numeric" });
+  const startMonth = format(start, { month: "short" });
+  const endMonth = format(end, { month: "short" });
+  if (startMonth.toLowerCase() === endMonth.toLowerCase()) return `${startNum}–${endNum} ${endMonth}`;
+  return `${startNum} ${startMonth} – ${endNum} ${endMonth}`;
+}
+
+function dayTitle(day: string, locale: TechLocale): string {
+  return sentenceCase(
+    new Intl.DateTimeFormat(localeTag(locale), {
+      timeZone: "Europe/Madrid",
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    }).format(madridLocalToUtc(day, "12:00"))
+  );
 }
 
 export default function TechPublicApp({
@@ -90,31 +168,24 @@ export default function TechPublicApp({
   copy: TechCopy;
 }) {
   const searchParams = useSearchParams();
-  function langHref(next: TechLocale) {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("lang", next);
-    return `${TECH_PATH}?${params.toString()}`;
-  }
-  const [kind, setKind] = useState<Kind>("group");
-  const [sessions, setSessions] = useState<CalendarSession[]>([]);
+  const phoneDisplay = formatNationalPhone();
+  const spoken = classLanguage(locale);
+  const [sessions, setSessions] = useState<OfferSession[]>([]);
   const [templateReady, setTemplateReady] = useState(false);
   const [bookableStarts, setBookableStarts] = useState<string[]>([]);
   const [bookableStartsShort, setBookableStartsShort] = useState<string[]>([]);
-  const [nextJoinableGroup, setNextJoinableGroup] = useState<CalendarSession | null>(null);
-  const [weekSlotCounts, setWeekSlotCounts] = useState<Record<string, number>>({});
-  const [dayOpenMinute, setDayOpenMinute] = useState(540);
-  const [dayCloseMinute, setDayCloseMinute] = useState(1080);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error" | "off">("loading");
-  const [selection, setSelection] = useState<CalendarSelection | null>(null);
-  const [date, setDate] = useState(todayMadrid);
+  const [view, setView] = useState<View>("groups");
+  const [offer, setOffer] = useState<PublicOffer | null>(null);
+  const [selection, setSelection] = useState<PublicOffer | null>(null);
+  const [dayKey, setDayKey] = useState<string | null>(null);
+  const [weekStart, setWeekStart] = useState(() => weekMonday(madridDayKey(new Date())));
+  const [weeksExpanded, setWeeksExpanded] = useState(false);
+  const [privateMinutes, setPrivateMinutes] = useState<30 | 60>(30);
+  const [date, setDate] = useState(() => madridDayKey(new Date()));
   const [time, setTime] = useState("10:00");
   const [contactName, setContactName] = useState("");
-  const [attendeeName, setAttendeeName] = useState("");
-  const [forOther, setForOther] = useState(false);
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [question, setQuestion] = useState("");
-  const [sessionLanguage, setSessionLanguage] = useState<SessionLanguage>(locale === "en" ? "en" : "es");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [company, setCompany] = useState("");
   const [source, setSource] = useState<string | null>(null);
@@ -122,96 +193,293 @@ export default function TechPublicApp({
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState<Success | null>(null);
   const idempotency = useRef(newIdempotencyKey());
+  const reloadRef = useRef<() => void>(() => undefined);
   const successRef = useRef<HTMLHeadingElement>(null);
-  const bookingRef = useRef<HTMLDivElement>(null);
-  const [barHidden, setBarHidden] = useState(false);
-  const [navOpen, setNavOpen] = useState(false);
-  const phoneDisplay = formatNationalPhone();
+  const pickRef = useRef<HTMLElement>(null);
+  const listView = useRef<"groups" | "private">("groups");
 
-  function closeNav() {
-    setNavOpen(false);
+  function langHref(next: TechLocale) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("lang", next);
+    return `${TECH_PATH}?${params.toString()}`;
   }
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setSource(readSource(params.get("src")));
+    setSource(readSource(searchParams.get("src")));
+  }, [searchParams]);
+
+  useEffect(() => {
     let cancelled = false;
-    fetch("/api/tech/availability")
-      .then(async (response) => {
-        // 503 = booking backend not configured in this environment (not “no sessions”).
+    async function load(quiet: boolean) {
+      if (!quiet && !cancelled) setLoadState("loading");
+      try {
+        const response = await fetch("/api/tech/availability");
+        if (cancelled) return;
         if (response.status === 503) {
-          if (!cancelled) setLoadState("off");
+          setLoadState("off");
           return;
         }
-        let payload: {
+        const payload = (await response.json().catch(() => null)) as {
           ok?: boolean;
           templateReady?: boolean;
-          settings?: { dayOpenMinute?: number; dayCloseMinute?: number; bufferMinutes?: number };
-          sessions?: CalendarSession[];
+          sessions?: OfferSession[];
           bookableStarts?: string[];
           bookableStartsShort?: string[];
-          nextJoinableGroup?: CalendarSession | null;
-          weekSlotCounts?: Record<string, number>;
           error?: string;
-        } | null = null;
-        try {
-          payload = await response.json();
-        } catch {
-          throw new Error("network");
-        }
-        // Any other failure is a real load/connection/backend problem — not emptiness.
-        if (!response.ok || !payload?.ok) {
-          throw new Error(payload?.error || "tech_failed");
-        }
-        if (!cancelled) {
-          setTemplateReady(payload.templateReady === true);
-          setSessions(payload.sessions ?? []);
-          setBookableStarts(payload.bookableStarts ?? []);
-          setBookableStartsShort(payload.bookableStartsShort ?? []);
-          setNextJoinableGroup(payload.nextJoinableGroup ?? null);
-          setWeekSlotCounts(payload.weekSlotCounts ?? {});
-          setDayOpenMinute(payload.settings?.dayOpenMinute ?? 540);
-          setDayCloseMinute(payload.settings?.dayCloseMinute ?? 1080);
-          setLoadState("ready");
-        }
-      })
-      .catch(() => {
+        } | null;
+        if (!response.ok || !payload?.ok) throw new Error(payload?.error || "tech_failed");
+        if (cancelled) return;
+        setTemplateReady(payload.templateReady === true);
+        setSessions(
+          (payload.sessions ?? []).map((session) => ({
+            ...session,
+            sessionLanguage: session.sessionLanguage === "en" ? "en" : "es",
+            venueLabel: session.venueLabel || "",
+          }))
+        );
+        setBookableStarts(payload.bookableStarts ?? []);
+        setBookableStartsShort(payload.bookableStartsShort ?? []);
+        setLoadState("ready");
+      } catch {
         if (!cancelled) setLoadState("error");
-      });
+      }
+    }
+    reloadRef.current = () => {
+      void load(true);
+    };
+    void load(false);
     return () => {
       cancelled = true;
     };
   }, []);
 
+  const bookingIdentity = offer?.key ?? (view === "request" ? `request:${date}:${time}` : "");
+
   useEffect(() => {
     idempotency.current = newIdempotencyKey();
-  }, [kind, selection, date, time]);
+  }, [bookingIdentity]);
 
   useEffect(() => {
     successRef.current?.focus();
   }, [success]);
 
   useEffect(() => {
-    const node = bookingRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      setBarHidden(entry.isIntersecting);
-    }, { threshold: 0 });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [success]);
+    if (view === "details" || view === "request") {
+      pickRef.current?.scrollIntoView({ block: "nearest" });
+    }
+  }, [view, offer?.key]);
 
-  function openBooking(next: BookingProduct) {
-    setKind(next);
-    setSelection(null);
-    window.setTimeout(() => {
-      bookingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 0);
+  const groupOffers = useMemo(
+    () =>
+      buildGroupOffers({
+        sessions,
+        bookableStarts,
+        templateReady,
+        createLanguage: spoken,
+      }),
+    [sessions, bookableStarts, templateReady, spoken]
+  );
+
+  const privateOffers = useMemo(
+    () =>
+      buildPrivateOffers({
+        bookableStarts: privateMinutes === 30 ? bookableStartsShort : bookableStarts,
+        durationMinutes: privateMinutes === 30 ? INDIVIDUAL_SHORT_MINUTES : INDIVIDUAL_MINUTES,
+        templateReady,
+        createLanguage: spoken,
+      }),
+    [bookableStarts, bookableStartsShort, privateMinutes, templateReady, spoken]
+  );
+  const hasPrivate = templateReady && (bookableStarts.length > 0 || bookableStartsShort.length > 0);
+  const activeOffers = view === "private" ? privateOffers : groupOffers;
+  const todayKey = madridDayKey(new Date());
+  const weekCount = weeksExpanded ? 4 : 1;
+  const visibleDays = useMemo(
+    () => Array.from({ length: weekCount * 7 }, (_, index) => shiftDay(weekStart, index)),
+    [weekStart, weekCount]
+  );
+  const visibleWeeks = useMemo(
+    () => Array.from({ length: weekCount }, (_, index) => shiftDay(weekStart, index * 7)),
+    [weekStart, weekCount]
+  );
+  const offerMap = useMemo(() => {
+    const map = new Map<string, PublicOffer[]>();
+    for (const item of activeOffers) {
+      const key = madridDayKey(new Date(item.startsAt));
+      const list = map.get(key) ?? [];
+      list.push(item);
+      map.set(key, list);
+    }
+    return map;
+  }, [activeOffers]);
+  const selectedDay =
+    dayKey && visibleDays.includes(dayKey) && (offerMap.get(dayKey)?.length ?? 0) > 0
+      ? dayKey
+      : (visibleDays.find((day) => (offerMap.get(day)?.length ?? 0) > 0) ?? null);
+  const dayOffers = selectedDay ? (offerMap.get(selectedDay) ?? []) : [];
+  const lastOfferDay = activeOffers.length
+    ? madridDayKey(new Date(activeOffers[activeOffers.length - 1].startsAt))
+    : todayKey;
+  const canPrev = weekStart > weekMonday(todayKey);
+  const canNext = shiftDay(weekStart, weekCount * 7) <= weekMonday(lastOfferDay);
+
+  const priceLabel = plainEuros(GROUP_PRICE_CENTS, locale);
+
+  function languageNote(language: SessionLanguage): string | null {
+    if (language === locale) return null;
+    return language === "en" ? copy.inEnglish : copy.inSpanish;
   }
 
-  const bookingProduct = productFromKind(kind);
-  const activeBookableStarts =
-    kind === "individual30" ? bookableStartsShort : bookableStarts;
+  function minutes(value: number): string {
+    return copy.minutesLong.replace("{n}", String(value));
+  }
+
+  function seats(item: PublicOffer): string | null {
+    if (item.kind === "individual") return copy.alone;
+    if (item.seatsLeft == null) return copy.openSeat;
+    if (item.seatsLeft === 1) return copy.seatsOne;
+    return copy.seatsMany.replace("{n}", String(item.seatsLeft));
+  }
+
+  function openOffer(next: PublicOffer, from: "groups" | "private") {
+    listView.current = from;
+    setError(null);
+    setSelection(next);
+    setOffer(next);
+    setView("details");
+  }
+
+  function backToList() {
+    setOffer(null);
+    setView(listView.current);
+    setError(null);
+  }
+
+  function chooseDay(key: string) {
+    setDayKey(key);
+    setSelection((current) =>
+      current && madridDayKey(new Date(current.startsAt)) === key ? current : null
+    );
+  }
+
+  function shiftWeek(direction: number) {
+    setWeekStart((current) => shiftDay(current, direction * weekCount * 7));
+    setDayKey(null);
+    setSelection(null);
+    setError(null);
+  }
+
+  function toggleWeeksExpanded() {
+    setWeeksExpanded((current) => !current);
+    setDayKey(null);
+    setSelection(null);
+    setError(null);
+  }
+
+  function dropOffer(item: PublicOffer) {
+    if (item.mode === "join" && item.sessionId) {
+      setSessions((current) => current.filter((session) => session.id !== item.sessionId));
+      return;
+    }
+    if (item.durationMinutes === INDIVIDUAL_SHORT_MINUTES) {
+      setBookableStartsShort((current) => current.filter((start) => start !== item.startsAt));
+      return;
+    }
+    setBookableStarts((current) => current.filter((start) => start !== item.startsAt));
+  }
+
+  async function onSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (saving) return;
+    setError(null);
+    setSaving(true);
+    const requesting = view === "request";
+    const endpoint = requesting ? "/api/tech/request" : "/api/tech/book";
+    let requestedStart: string | undefined;
+    if (requesting) {
+      try {
+        requestedStart = madridLocalToUtc(date, time).toISOString();
+      } catch {
+        setSaving(false);
+        setError("tech_failed");
+        return;
+      }
+    }
+    const bookPayload = requesting
+      ? { requestedStart }
+      : offer?.mode === "join" && offer.sessionId
+        ? { sessionId: offer.sessionId }
+        : offer?.mode === "create"
+          ? {
+              startsAt: offer.startsAt,
+              kind: offer.kind,
+              durationMinutes: offer.durationMinutes,
+            }
+          : null;
+    if (!bookPayload) {
+      setSaving(false);
+      setError("tech_failed");
+      return;
+    }
+    const sessionLanguage = offer?.sessionLanguage ?? spoken;
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...bookPayload,
+          idempotencyKey: idempotency.current,
+          contactName,
+          attendeeName: "",
+          bookingForOther: false,
+          phone,
+          email: "",
+          question: "",
+          acceptTerms,
+          company,
+          source,
+          locale,
+          sessionLanguage,
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (payload?.ignored) {
+        setSaving(false);
+        return;
+      }
+      if (!response.ok || !payload?.ok) {
+        const code = typeof payload?.error === "string" ? payload.error : "tech_failed";
+        setError(code);
+        if (!requesting && offer && SLOT_GONE.has(code)) {
+          dropOffer(offer);
+          setOffer(null);
+          setSelection(null);
+          setView(listView.current);
+          reloadRef.current();
+        }
+        setSaving(false);
+        return;
+      }
+      const startsAt = payload.startsAt as string;
+      const kind = payload.kind as Success["kind"];
+      setSuccess({
+        title: kind === "request" ? copy.requestedTitle : copy.confirmedTitle,
+        reference: payload.reference,
+        when: formatMadrid(new Date(startsAt), locale),
+        price: plainEuros(payload.priceCents, locale),
+        where: payload.venueLabel || copy.pendingPlace,
+        path: payload.confirmationPath,
+        kind,
+        startsAt,
+        durationMinutes: payload.durationMinutes,
+        replayed: payload.replayed === true,
+      });
+    } catch {
+      setError("network");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   function downloadCalendar(item: Success) {
     if (item.kind === "request") return;
@@ -234,92 +502,7 @@ export default function TechPublicApp({
     URL.revokeObjectURL(url);
   }
 
-  async function onSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    if (saving) return;
-    setError(null);
-    setSaving(true);
-    const endpoint = kind === "request" ? "/api/tech/request" : "/api/tech/book";
-    let requestedStart: string | undefined;
-    if (kind === "request") {
-      try {
-        requestedStart = madridLocalToUtc(date, time).toISOString();
-      } catch {
-        setSaving(false);
-        setError("tech_failed");
-        return;
-      }
-    }
-    try {
-      const bookPayload =
-        kind === "request"
-          ? { requestedStart }
-          : selection?.mode === "join"
-            ? { sessionId: selection.session.id }
-            : selection?.mode === "create"
-              ? {
-                  startsAt: selection.startsAt,
-                  kind: selection.kind,
-                  durationMinutes: selection.durationMinutes,
-                }
-              : null;
-      if (kind !== "request" && !bookPayload) {
-        setSaving(false);
-        setError("tech_failed");
-        return;
-      }
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...bookPayload,
-          idempotencyKey: idempotency.current,
-          contactName,
-          attendeeName,
-          bookingForOther: forOther,
-          phone,
-          email,
-          question,
-          acceptTerms,
-          company,
-          source,
-          locale,
-          sessionLanguage,
-        }),
-      });
-      const payload = await response.json().catch(() => null);
-      if (payload?.ignored) {
-        setSaving(false);
-        return;
-      }
-      if (!response.ok || !payload?.ok) {
-        setError(payload?.error || "tech_failed");
-        setSaving(false);
-        return;
-      }
-      const startsAt = payload.startsAt as string;
-      const when = formatMadrid(new Date(startsAt), locale);
-      const where = payload.venueLabel || copy.pendingPlace;
-      setSuccess({
-        title: kind === "request" ? copy.requestedTitle : copy.confirmedTitle,
-        reference: payload.reference,
-        when,
-        price: euros(payload.priceCents, locale),
-        where,
-        path: payload.confirmationPath,
-        kind: payload.kind,
-        startsAt,
-        durationMinutes: payload.durationMinutes,
-        replayed: payload.replayed === true,
-      });
-    } catch {
-      setError("network");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  const whatsappMessage = success
+  const enquiryMessage = success
     ? customerWhatsAppText({
         locale,
         reference: success.reference,
@@ -331,740 +514,523 @@ export default function TechPublicApp({
       : locale === "nl"
         ? "Hallo Ainhoa, ik zou graag technische hulp in Guardamar willen."
         : "Hola Ainhoa, me gustaría una sesión de ayuda tecnológica en Guardamar.";
+  const enquiryHref = siteWhatsAppEnquiryHref(enquiryMessage);
 
-  const enquiryHref = siteWhatsAppEnquiryHref(whatsappMessage);
-  const successMailHref = success
-    ? `mailto:${site.email}?subject=${encodeURIComponent(`${copy.reference} ${success.reference}`)}&body=${encodeURIComponent(
-        `${copy.reference} ${success.reference}\n${copy.when}: ${success.when}\n\n${whatsappMessage}`
-      )}`
-    : "";
-  const navAria =
-    locale === "en" ? "Primary" : locale === "nl" ? "Hoofdmenu" : "Principal";
+  function chipLabel(item: PublicOffer): string {
+    const place = seats(item);
+    const note = languageNote(item.sessionLanguage);
+    return [place, note].filter(Boolean).join(" · ");
+  }
 
-  const utilities = (
-    <>
-      <nav id="tme-primary-nav" className="tme-nav" aria-label={navAria}>
-        <a href="#ayuda" onClick={closeNav}>
-          {copy.navHelp}
-        </a>
-        <a href="#ainhoa" onClick={closeNav}>
-          {copy.navAbout}
-        </a>
-        <a href="#precios" onClick={closeNav}>
-          {copy.navPrices}
-        </a>
-        <a
-          href="#reservar"
-          onClick={(event) => {
-            event.preventDefault();
-            closeNav();
-            openBooking("group");
-          }}
-        >
-          {copy.navBook}
-        </a>
-      </nav>
-      <div className="tme-right">
-        <a className="tme-tel-header" href={telHref()}>
+  function personFields(submitLabel: string) {
+    return (
+      <>
+        <label htmlFor="tme-name">{copy.contactName}</label>
+        <input
+          id="tme-name"
+          type="text"
+          name="name"
+          autoComplete="name"
+          autoCapitalize="words"
+          value={contactName}
+          onChange={(event) => setContactName(event.target.value)}
+          required
+        />
+        <label htmlFor="tme-phone">{copy.phone}</label>
+        <input
+          id="tme-phone"
+          type="tel"
+          name="tel"
+          autoComplete="tel"
+          inputMode="tel"
+          value={phone}
+          onChange={(event) => setPhone(event.target.value)}
+          required
+        />
+        <label className="tme-check">
+          <input
+            type="checkbox"
+            checked={acceptTerms}
+            onChange={(event) => setAcceptTerms(event.target.checked)}
+          />
+          <span>
+            {copy.termsAcceptBefore}
+            <Link className="tme-inline-link" href={techConditionsHref(locale)}>
+              {copy.termsLinkLabel}
+            </Link>
+            {copy.termsAcceptAfter}
+          </span>
+        </label>
+        <div className="tme-hp" aria-hidden="true">
+          <label htmlFor="tme-company">Company</label>
+          <input
+            id="tme-company"
+            tabIndex={-1}
+            autoComplete="off"
+            value={company}
+            onChange={(event) => setCompany(event.target.value)}
+          />
+        </div>
+        {error ? (
+          <p className="tme-alert" role="alert">
+            {copy.errors[error] || copy.errors.tech_failed}
+          </p>
+        ) : null}
+        <button className="tme-book" type="submit" disabled={saving}>
+          {saving ? copy.saving : submitLabel}
+        </button>
+      </>
+    );
+  }
+
+  const bar = (
+    <header className="tme-bar">
+      <div className="tme-lockup">
+        <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
+        <span className="tme-wordmark">{copy.brandName}</span>
+      </div>
+      <div className="tme-bar-tools">
+        <a className="tme-call" href={telHref()} aria-label={`${copy.callNow} ${phoneDisplay}`}>
           <IconPhone />
-          {phoneDisplay}
+          <span className="tme-call-word">{copy.callNow}</span>
+          <span className="tme-call-num">{phoneDisplay}</span>
         </a>
         <nav className="tme-lang" aria-label={copy.langLabel}>
-          <Link
-            href={langHref("es")}
-            hrefLang="es"
-            lang="es"
-            aria-current={locale === "es" ? "page" : undefined}
-            prefetch={false}
-          >
+          <Link href={langHref("es")} hrefLang="es" lang="es" aria-current={locale === "es" ? "page" : undefined} prefetch={false}>
             ES
           </Link>
-          <span className="tme-lang-sep" aria-hidden="true">
-            /
-          </span>
-          <Link
-            href={langHref("en")}
-            hrefLang="en"
-            lang="en"
-            aria-current={locale === "en" ? "page" : undefined}
-            prefetch={false}
-          >
+          <span className="tme-lang-sep" aria-hidden="true">/</span>
+          <Link href={langHref("en")} hrefLang="en" lang="en" aria-current={locale === "en" ? "page" : undefined} prefetch={false}>
             EN
           </Link>
-          <span className="tme-lang-sep" aria-hidden="true">
-            /
-          </span>
-          <Link
-            href={langHref("nl")}
-            hrefLang="nl"
-            lang="nl"
-            aria-current={locale === "nl" ? "page" : undefined}
-            prefetch={false}
-          >
+          <span className="tme-lang-sep" aria-hidden="true">/</span>
+          <Link href={langHref("nl")} hrefLang="nl" lang="nl" aria-current={locale === "nl" ? "page" : undefined} prefetch={false}>
             NL
           </Link>
         </nav>
-        <button
-          type="button"
-          className="tme-menu-btn"
-          aria-expanded={navOpen}
-          aria-controls="tme-primary-nav"
-          aria-label={navOpen ? copy.navMenuClose : copy.navMenuOpen}
-          onClick={() => setNavOpen((open) => !open)}
-        >
-          <svg className="tme-menu-icon" viewBox="0 0 28 28" aria-hidden="true" fill="none">
-            {navOpen ? (
-              <>
-                <rect x="0" y="12.5" width="28" height="3" fill="currentColor" transform="rotate(45 14 14)" />
-                <rect x="0" y="12.5" width="28" height="3" fill="currentColor" transform="rotate(-45 14 14)" />
-              </>
-            ) : (
-              <>
-                <rect x="0" y="5" width="28" height="3" fill="currentColor" />
-                <rect x="0" y="12.5" width="28" height="3" fill="currentColor" />
-                <rect x="0" y="20" width="28" height="3" fill="currentColor" />
-              </>
-            )}
-          </svg>
-        </button>
       </div>
-    </>
-  );
-
-  const brandUnit = (
-    <div className="tme-brand-block">
-      <div className="tme-brand-text">
-        <p className="tme-eyebrow">{copy.kicker}</p>
-        <h1>
-          {copy.headlineBefore} <em>{copy.headlineEm}</em> {copy.headlineAfter}
-        </h1>
-        <div className="tme-meta">
-          {copy.metaChips.map((chip) => (
-            <span key={chip}>{chip}</span>
-          ))}
-        </div>
-      </div>
-    </div>
+    </header>
   );
 
   if (success) {
+    const reserved = success.kind !== "request";
     return (
-      <div className="tme">
-        <div className="tme-wrap">
-          <header className="tme-top tme-top-success">
-            <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
-          </header>
-          <section className="tme-section">
+      <div className="tme tme-home">
+        <div className="tme-home-wrap">
+          {bar}
+          <section className="tme-confirm">
             <h1 ref={successRef} tabIndex={-1}>
               {success.title}
             </h1>
-            <p className="tme-eyebrow">{copy.reference}</p>
-            <p className="tme-ref">{success.reference}</p>
-            <div className="tme-card">
-              <p>
-                <strong>{copy.when}:</strong> {success.when}
-              </p>
-              <p>
-                <strong>{copy.price}:</strong> {success.price}
-              </p>
-              <p>
-                <strong>{copy.where}:</strong> {success.where}
-              </p>
-            </div>
-            <p>{copy.keepScreen}</p>
-            {success.path ? (
-              <p>
-                <a href={`${site.url}${success.path}`}>{`${site.url}${success.path}`}</a>
-              </p>
-            ) : (
-              <p>{copy.replayed}</p>
-            )}
-            <p>{success.kind === "request" ? copy.requestPending : copy.cancelHelp}</p>
-            <div className="tme-success-actions">
-              {success.kind !== "request" ? (
-                <button type="button" className="tme-secondary" onClick={() => downloadCalendar(success)}>
-                  {copy.calendar}
-                </button>
+            {reserved ? null : <p className="tme-lede">{copy.requestPending}</p>}
+            <dl className="tme-confirm-facts">
+              <div>
+                <dt>{copy.when}</dt>
+                <dd>{sentenceCase(success.when)}</dd>
+              </div>
+              {reserved ? (
+                <div>
+                  <dt>{copy.price}</dt>
+                  <dd>{success.price}</dd>
+                </div>
               ) : null}
-              <button
-                type="button"
-                className="tme-secondary"
-                onClick={() => {
-                  void navigator.clipboard.writeText(whatsappMessage).catch(() => undefined);
-                }}
-              >
-                {copy.copyWhatsApp}
+              <div>
+                <dt>{copy.where}</dt>
+                <dd>{success.where}</dd>
+              </div>
+              <div>
+                <dt>{copy.reference}</dt>
+                <dd>{success.reference}</dd>
+              </div>
+            </dl>
+            {success.path ? <p><a href={success.path}>{copy.manageLink}</a></p> : <p>{copy.replayed}</p>}
+            {reserved ? <p>{copy.keepScreen}</p> : null}
+            {reserved ? <p>{copy.cancelHelp}</p> : null}
+            <TechContactLinks
+              copy={copy}
+              message={enquiryMessage}
+              preferCallLabel={`${copy.callNow} ${phoneDisplay}`}
+              className="tme-home-actions"
+            />
+            {reserved ? (
+              <button type="button" className="tme-linkish" onClick={() => downloadCalendar(success)}>
+                {copy.calendar}
               </button>
-              <a className="tme-secondary" href={successMailHref}>
-                {copy.copyEmail}
-              </a>
-              <a className="tme-btn tme-btn-wa" href={enquiryHref} {...externalAnchorProps(enquiryHref)}>
-                <WhatsAppMark />
-                {copy.writeWhatsApp}
-              </a>
-              <TechContactLinks copy={copy} message={whatsappMessage} showWhatsApp={false} />
-              <button
-                type="button"
-                className="tme-secondary"
-                onClick={() => {
-                  idempotency.current = newIdempotencyKey();
-                  setSuccess(null);
-                }}
-              >
-                {copy.back}
-              </button>
-            </div>
+            ) : null}
+            <button
+              type="button"
+              className="tme-linkish"
+              onClick={() => {
+                idempotency.current = newIdempotencyKey();
+                setSuccess(null);
+                setOffer(null);
+                setSelection(null);
+                setView("groups");
+                setAcceptTerms(false);
+                reloadRef.current();
+              }}
+            >
+              {copy.back}
+            </button>
           </section>
+          <footer className="tme-foot">
+            <SiteCopyright style={{ color: "inherit", fontSize: "0.85rem", textAlign: "center" }} />
+          </footer>
         </div>
       </div>
     );
   }
 
+  const listMode: "groups" | "private" = view === "private" ? "private" : "groups";
+
   return (
-    <div className="tme">
-      <div className="tme-wrap">
-        <header className={`tme-top${navOpen ? " is-nav-open" : ""}`}>
-          <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
-          {utilities}
+    <div className="tme tme-home">
+      <div className="tme-home-wrap">
+        {bar}
+        <header className="tme-intro">
+          <div className="tme-intro-copy">
+            <h1>{copy.heroTitle}</h1>
+            <p className="tme-lede">{copy.heroLede}</p>
+            <p className="tme-reassure">{copy.heroReassure}</p>
+            <p className="tme-price">
+              <span>{copy.priceFrom.split("{price}")[0]?.trim()}</span>
+              <strong>{priceLabel}</strong>
+            </p>
+          </div>
+          <ul className="tme-bubbles" aria-label={copy.heroBubblesLabel}>
+            {copy.heroBubbles.map((line, index) => (
+              <li key={line}>
+                <span className="tme-bubble-icon" aria-hidden="true">
+                  <HeroBubbleIcon index={index} />
+                </span>
+                <span className="tme-bubble-text">{line}</span>
+              </li>
+            ))}
+          </ul>
         </header>
 
-        <div className="tme-hero">
-          <div className="tme-hero-copy">
-            {brandUnit}
-            <p className="tme-lead">{copy.lede}</p>
-            <div className="tme-ctas">
-              <a
-                className="tme-btn tme-btn-sun"
-                href="#reservar"
-                onClick={(event) => {
-                  event.preventDefault();
-                  openBooking("group");
-                }}
-              >
-                <IconCalendar />
-                {copy.reserveCta}
-              </a>
-              <a className="tme-btn tme-btn-ghost" href={telHref()}>
-                <IconPhone />
-                {copy.callCta}
-              </a>
-            </div>
-            <p className="tme-hero-price">
-              <a href="#precios">
-                {copy.heroPriceFrom.replace("{price}", euros(GROUP_PRICE_CENTS, locale))}
-              </a>
-            </p>
-          </div>
-          <div className="tme-art">
-            <Image
-              src={HERO_FAQ_ART[locale]}
-              alt={copy.heroArtAlt}
-              width={841}
-              height={1024}
-              sizes="(max-width: 720px) 90vw, 420px"
-              className="tme-art-img"
-              priority
-            />
-          </div>
-        </div>
-      </div>
-
-      <section className="tme-section" id="ayuda">
-        <div className="tme-wrap">
-          <div className="tme-eyebrow">{copy.topicsKicker}</div>
-          <h2>
-            {copy.topicsTitleBefore} <em>{copy.topicsTitleEm}</em>
-          </h2>
-          <div className="tme-asks">
-            {copy.topics.map((topic, index) => (
-              <div className="tme-ask" key={topic.title}>
-                <span className="tme-ask-icon" aria-hidden="true">
-                  <TopicIcon index={index} />
-                </span>
-                <div>
-                  <b>{topic.title}</b>
-                  <q>{topic.quote}</q>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="tme-about" id="ainhoa">
-        <div className="tme-wrap tme-about-grid">
-          <div className="tme-por">
-            <Image
-              src="/images/tech/ainhoa-portrait-v3.jpg"
-              alt={copy.portraitLabel}
-              width={960}
-              height={960}
-              sizes="300px"
-              className="tme-por-img"
-              priority
-            />
-          </div>
-          <div>
-            <div className="tme-eyebrow">{copy.aboutKicker}</div>
-            <h2>
-              {copy.aboutTitleBefore} <em>{copy.aboutTitleEm}</em>
-            </h2>
-            <p>{copy.aboutBody}</p>
-            <p>{copy.aboutLanguages}</p>
-            <div className="tme-sign">{copy.aboutSign}</div>
-          </div>
-        </div>
-      </section>
-
-      <section className="tme-section" id="precios">
-        <div className="tme-wrap">
-          <div className="tme-eyebrow">{copy.pricesKicker}</div>
-          <h2>
-            {copy.pricesTitleBefore} <em>{copy.pricesTitleEm}</em>
-          </h2>
-          <div className="tme-plans">
-            <div className="tme-plan tme-plan-g">
-              <span className="tme-plan-k">{copy.groupKicker}</span>
-              <h3>{copy.groupTitle}</h3>
-              <div className="tme-amt">
-                {euros(GROUP_PRICE_CENTS, locale)}
-                <small>{copy.groupAmtNote}</small>
-              </div>
-              <div className="tme-dur">
-                <IconClock />
-                {copy.groupDuration}
-              </div>
-              <div className="tme-dots" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-                <span />
-                <span />
-              </div>
-              <ul>
-                {copy.groupPoints.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-              <button type="button" className="tme-btn tme-btn-sun" onClick={() => openBooking("group")}>
-                {copy.bookGroup}
-              </button>
-            </div>
-            <div className="tme-plan tme-plan-i">
-              <span className="tme-plan-k">{copy.individualKicker}</span>
-              <h3>{copy.individualTitle}</h3>
-              <div className="tme-amt">
-                {euros(INDIVIDUAL_PRICE_CENTS, locale)}
-                <small>{copy.individualAmtNote}</small>
-              </div>
-              <div className="tme-dur">
-                <IconClock />
-                {copy.individualDuration}
-              </div>
-              <div className="tme-dots" aria-hidden="true">
-                <span />
-              </div>
-              <ul>
-                {copy.individualPoints.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-              <button type="button" className="tme-btn tme-btn-teal" onClick={() => openBooking("individual60")}>
-                {copy.bookIndividual}
-              </button>
-            </div>
-            <div className="tme-plan tme-plan-i tme-plan-short">
-              <span className="tme-plan-k">{copy.individualKicker}</span>
-              <h3>{copy.individualTitle}</h3>
-              <div className="tme-amt">
-                {euros(INDIVIDUAL_SHORT_PRICE_CENTS, locale)}
-                <small>{copy.individualAmtNote}</small>
-              </div>
-              <div className="tme-dur">
-                <IconClock />
-                {copy.individualShortDuration}
-              </div>
-              <div className="tme-dots" aria-hidden="true">
-                <span />
-              </div>
-              <ul>
-                {copy.individualPoints.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-              <button type="button" className="tme-btn tme-btn-teal" onClick={() => openBooking("individual30")}>
-                {copy.bookIndividual}
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="tme-section" id="reservar" ref={bookingRef} style={{ paddingTop: 0 }}>
-        <div className="tme-wrap tme-book">
-          <div>
-            <div className="tme-eyebrow">{copy.stepsKicker}</div>
-            <h2>
-              {copy.stepsTitleBefore} <em>{copy.stepsTitleEm}</em>
-            </h2>
-            <ol className="tme-steps">
-              {copy.steps.map((step) => (
-                <li key={step.title}>
-                  <p>
-                    <b>{step.title}</b>
-                    <span>{step.body}</span>
-                  </p>
-                </li>
-              ))}
-            </ol>
-            <div className="tme-ctas">
-              <TechContactLinks
-                copy={copy}
-                message={whatsappMessage}
-                preferCallLabel={copy.preferCallBtn}
-                className="tme-ctas"
-              />
-            </div>
-            <p className="tme-note" style={{ marginTop: 18 }}>
-              {copy.placeBody}
-            </p>
-            <p className="tme-note">{copy.pay}</p>
-          </div>
-
-          <div className="tme-panel">
-            <div className="tme-choice" role="group" aria-label={copy.choose}>
-              <button
-                type="button"
-                aria-pressed={kind === "group"}
-                onClick={() => {
-                  setKind("group");
-                  setSelection(null);
-                }}
-              >
-                {copy.groupOption}
-              </button>
-              <button
-                type="button"
-                aria-pressed={kind === "individual60"}
-                onClick={() => {
-                  setKind("individual60");
-                  setSelection(null);
-                }}
-              >
-                {copy.individualOption}
-              </button>
-              <button
-                type="button"
-                aria-pressed={kind === "individual30"}
-                onClick={() => {
-                  setKind("individual30");
-                  setSelection(null);
-                }}
-              >
-                {copy.individualShortOption}
-              </button>
-              <button
-                type="button"
-                aria-pressed={kind === "request"}
-                onClick={() => {
-                  setKind("request");
-                  setSelection(null);
-                }}
-              >
-                {copy.otherTime}
-              </button>
+        <section className="tme-panel" aria-labelledby="tme-choose" ref={pickRef}>
+            <div className="tme-panel-head">
+              <h2 id="tme-choose">
+                {view === "private"
+                  ? copy.privateHeading
+                  : view === "request"
+                    ? copy.otherTime
+                    : view === "details"
+                      ? copy.formLead
+                      : copy.chooseHeading}
+              </h2>
+              {view === "groups" || view === "private" ? <p>{copy.dateThenTime}</p> : null}
             </div>
 
-            <fieldset className="tme-session-lang">
-              <legend>{copy.sessionLanguageLabel}</legend>
-              <p className="tme-hint">{copy.sessionLanguageHelp}</p>
-              <div className="tme-choice" role="group" aria-label={copy.sessionLanguageLabel}>
-                <button
-                  type="button"
-                  aria-pressed={sessionLanguage === "es"}
-                  onClick={() => {
-                    setSessionLanguage("es");
-                    setSelection(null);
-                  }}
-                >
-                  {copy.sessionLanguageEs}
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={sessionLanguage === "en"}
-                  onClick={() => {
-                    setSessionLanguage("en");
-                    setSelection(null);
-                  }}
-                >
-                  {copy.sessionLanguageEn}
-                </button>
-              </div>
-            </fieldset>
+            {loadState === "loading" ? <p role="status">{copy.loading}</p> : null}
 
-            {kind === "request" ? <p className="tme-note">{copy.otherTimeHelp}</p> : null}
-
-            {kind !== "request" ? (
-              <div aria-busy={loadState === "loading"}>
-                {loadState === "loading" ? <p>{copy.loading}</p> : null}
-                {loadState === "error" ? (
-                  <p className="tme-alert" role="alert">
-                    {copy.loadError}
-                  </p>
-                ) : null}
-                {loadState === "off" ? (
-                  <p className="tme-alert" role="status">
-                    {copy.notConfigured}
-                  </p>
-                ) : null}
-                {loadState === "ready" && bookingProduct ? (
-                  <TechBookingCalendar
-                    copy={copy}
-                    locale={locale}
-                    templateReady={templateReady}
-                    sessions={sessions.filter(
-                      (session) => !session.sessionLanguage || session.sessionLanguage === sessionLanguage
-                    )}
-                    bookableStarts={activeBookableStarts}
-                    nextJoinableGroup={
-                      nextJoinableGroup &&
-                      (!nextJoinableGroup.sessionLanguage ||
-                        nextJoinableGroup.sessionLanguage === sessionLanguage)
-                        ? nextJoinableGroup
-                        : null
-                    }
-                    weekSlotCounts={weekSlotCounts}
-                    dayOpenMinute={dayOpenMinute}
-                    dayCloseMinute={dayCloseMinute}
-                    selection={selection}
-                    onSelect={setSelection}
-                    preferredProduct={bookingProduct}
-                    onPreferredProduct={(next) => {
-                      setKind(next);
-                      setSelection(null);
-                    }}
-                  />
-                ) : null}
+            {loadState === "error" || loadState === "off" ? (
+              <div className="tme-empty">
+                <p className={loadState === "error" ? "tme-alert" : "tme-note"} role={loadState === "error" ? "alert" : "status"}>
+                  {loadState === "error" ? copy.loadError : copy.notConfigured}
+                </p>
+                <a className="tme-book" href={telHref()}>
+                  {copy.callNow} {phoneDisplay}
+                </a>
               </div>
             ) : null}
 
-            {kind === "request" || selection ? (
+            {loadState === "ready" && view === "details" && offer ? (
               <form onSubmit={onSubmit} noValidate>
-                <h3 style={{ fontSize: 22 }}>{kind === "request" ? copy.requestTitle : copy.formTitle}</h3>
-                {selection?.mode === "join" ? (
-                  <p className="tme-card">
-                    <strong>{formatMadrid(new Date(selection.session.startsAt), locale)}</strong>
-                    <br />
-                    {selection.session.venueLabel}
-                    <br />
-                    {euros(selection.session.priceCents, locale)}
-                  </p>
-                ) : null}
-                {selection?.mode === "create" ? (
-                  <p className="tme-card">
-                    <strong>{formatMadrid(new Date(selection.startsAt), locale)}</strong>
-                    <br />
-                    {selection.kind === "group"
-                      ? copy.groupOption
-                      : selection.durationMinutes === INDIVIDUAL_SHORT_MINUTES
-                        ? copy.individualShortOption
-                        : copy.individualOption}
-                    <br />
-                    {euros(priceCentsForCreate(selection.kind, selection.durationMinutes), locale)}
-                  </p>
-                ) : null}
-                {kind === "request" ? (
-                  <>
-                    <label htmlFor="tme-date">{copy.date}</label>
-                    <input
-                      id="tme-date"
-                      type="date"
-                      value={date}
-                      min={todayMadrid()}
-                      onChange={(event) => setDate(event.target.value)}
-                      required
-                    />
-                    <label htmlFor="tme-time">{copy.time}</label>
-                    <select id="tme-time" value={time} onChange={(event) => setTime(event.target.value)}>
-                      {TIMES.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </>
-                ) : null}
-                <label htmlFor="tme-name">{copy.contactName}</label>
+                <p className="tme-chosen">
+                  {sentenceCase(formatMadrid(new Date(offer.startsAt), locale))}
+                  {" · "}
+                  {minutes(offer.durationMinutes)}
+                  {" · "}
+                  {plainEuros(offer.priceCents, locale)}
+                  {seats(offer) ? ` · ${seats(offer)}` : ""}
+                </p>
+                <p className="tme-where">{offer.venueLabel || copy.placeBody}</p>
+                {languageNote(offer.sessionLanguage) ? <p className="tme-where">{languageNote(offer.sessionLanguage)}</p> : null}
+                <button type="button" className="tme-linkish" onClick={backToList}>
+                  {copy.changeTime}
+                </button>
+                {personFields(copy.submitBook)}
+              </form>
+            ) : null}
+
+            {loadState === "ready" && view === "request" ? (
+              <form onSubmit={onSubmit} noValidate>
+                <p className="tme-note">{copy.otherTimeHelp}</p>
+                <label htmlFor="tme-date">{copy.date}</label>
                 <input
-                  id="tme-name"
-                  type="text"
-                  autoComplete="given-name"
-                  value={contactName}
-                  onChange={(event) => setContactName(event.target.value)}
+                  id="tme-date"
+                  type="date"
+                  value={date}
+                  min={madridDayKey(new Date())}
+                  onChange={(event) => setDate(event.target.value)}
                   required
                 />
-                <label className="tme-check">
-                  <input type="checkbox" checked={forOther} onChange={(event) => setForOther(event.target.checked)} />
-                  <span>{copy.forOther}</span>
-                </label>
-                {forOther ? (
-                  <>
-                    <label htmlFor="tme-attendee">{copy.attendeeName}</label>
-                    <input
-                      id="tme-attendee"
-                      type="text"
-                      value={attendeeName}
-                      onChange={(event) => setAttendeeName(event.target.value)}
-                      required
-                    />
-                  </>
-                ) : null}
-                <label htmlFor="tme-phone">{copy.phone}</label>
-                <input
-                  id="tme-phone"
-                  type="tel"
-                  autoComplete="tel"
-                  inputMode="tel"
-                  value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
-                  required
-                />
-                <label htmlFor="tme-email">{copy.email}</label>
-                <input
-                  id="tme-email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                />
-                <p className="tme-hint">{copy.emailHint}</p>
-                <label htmlFor="tme-question">{copy.question}</label>
-                <textarea
-                  id="tme-question"
-                  maxLength={400}
-                  rows={4}
-                  value={question}
-                  onChange={(event) => setQuestion(event.target.value)}
-                />
-                <p className="tme-hint">{copy.questionHint}</p>
-                <label className="tme-check">
-                  <input
-                    type="checkbox"
-                    checked={acceptTerms}
-                    onChange={(event) => setAcceptTerms(event.target.checked)}
-                  />
-                  <span>
-                    {copy.termsAcceptBefore}
-                    <a
-                      className="tme-inline-link"
-                      href={techConditionsHref(locale)}
-                      onClick={(event) => event.stopPropagation()}
+                <label htmlFor="tme-time">{copy.time}</label>
+                <select id="tme-time" value={time} onChange={(event) => setTime(event.target.value)}>
+                  {TIMES.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="tme-linkish"
+                  onClick={() => {
+                    setView("groups");
+                    setError(null);
+                  }}
+                >
+                  {copy.requestBack}
+                </button>
+                {personFields(copy.submitRequest)}
+              </form>
+            ) : null}
+
+            {loadState === "ready" && (view === "groups" || view === "private") ? (
+              <>
+                {view === "private" ? (
+                  <div className="tme-seg" role="group" aria-label={copy.privateHeading}>
+                    <button
+                      type="button"
+                      aria-pressed={privateMinutes === 30}
+                      onClick={() => {
+                        setPrivateMinutes(30);
+                        setSelection(null);
+                        setDayKey(null);
+                      }}
                     >
-                      {copy.termsLinkLabel}
-                    </a>
-                    {copy.termsAcceptAfter}
-                  </span>
-                </label>
-                <div className="tme-hp" aria-hidden="true">
-                  <label htmlFor="tme-company">Company</label>
-                  <input
-                    id="tme-company"
-                    tabIndex={-1}
-                    autoComplete="off"
-                    value={company}
-                    onChange={(event) => setCompany(event.target.value)}
-                  />
-                </div>
+                      {minutes(INDIVIDUAL_SHORT_MINUTES)} · {plainEuros(priceCentsForCreate("individual", INDIVIDUAL_SHORT_MINUTES), locale)}
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={privateMinutes === 60}
+                      onClick={() => {
+                        setPrivateMinutes(60);
+                        setSelection(null);
+                        setDayKey(null);
+                      }}
+                    >
+                      {minutes(INDIVIDUAL_MINUTES)} · {plainEuros(priceCentsForCreate("individual", INDIVIDUAL_MINUTES), locale)}
+                    </button>
+                  </div>
+                ) : null}
+
                 {error ? (
                   <p className="tme-alert" role="alert">
                     {copy.errors[error] || copy.errors.tech_failed}
                   </p>
                 ) : null}
-                <button className="tme-submit" type="submit" disabled={saving}>
-                  {saving ? copy.saving : kind === "request" ? copy.submitRequest : copy.submitBook}
+
+                <div className="tme-week-nav">
+                  <button
+                    type="button"
+                    className="tme-nudge"
+                    aria-label={weeksExpanded ? copy.prevFourWeeks : copy.prevWeek}
+                    disabled={!canPrev}
+                    onClick={() => shiftWeek(-1)}
+                  >
+                    <ChevronLeft className="tme-nudge-icon" aria-hidden="true" />
+                  </button>
+                  <p className="tme-week-label">{weekTitle(weekStart, locale, weekCount)}</p>
+                  <button
+                    type="button"
+                    className="tme-nudge"
+                    aria-label={weeksExpanded ? copy.nextFourWeeks : copy.nextWeek}
+                    disabled={!canNext}
+                    onClick={() => shiftWeek(1)}
+                  >
+                    <ChevronRight className="tme-nudge-icon" aria-hidden="true" />
+                  </button>
+                </div>
+
+                <div className={`tme-weeks${weeksExpanded ? " is-expanded" : ""}`}>
+                  {visibleWeeks.map((start) => {
+                    const days = Array.from({ length: 7 }, (_, index) => shiftDay(start, index));
+                    return (
+                      <div key={start} className="tme-week" role="group" aria-label={weekTitle(start, locale)}>
+                        {days.map((day) => {
+                          const bits = dayBits(day, locale);
+                          const offers = offerMap.get(day) ?? [];
+                          const open = offers.length > 0;
+                          const hasJoin = offers.some((item) => item.mode === "join");
+                          return (
+                            <button
+                              key={day}
+                              type="button"
+                              className={`tme-date${open ? (hasJoin ? " is-group" : " is-free") : " is-closed"}`}
+                              aria-pressed={open && day === selectedDay}
+                              disabled={!open}
+                              aria-label={
+                                open
+                                  ? `${bits.weekday} ${bits.dayNum}`
+                                  : `${bits.weekday} ${bits.dayNum}, ${copy.dayUnavailable}`
+                              }
+                              onClick={() => chooseDay(day)}
+                            >
+                              <span className="tme-date-w">{bits.weekday}</span>
+                              <span className="tme-date-n">{bits.dayNum}</span>
+                              <span className={`tme-date-mark${hasJoin ? " is-group" : open ? " is-free" : ""}`} />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  className="tme-weeks-toggle"
+                  aria-expanded={weeksExpanded}
+                  onClick={toggleWeeksExpanded}
+                >
+                  {weeksExpanded ? copy.fewerDates : copy.moreDates}
                 </button>
-              </form>
+
+                {view === "groups" ? (
+                  <p className="tme-key">
+                    <span><i className="is-group" />{copy.legendGroup}</span>
+                    <span><i className="is-free" />{copy.openSeat}</span>
+                    <span><i className="is-closed" />{copy.dayUnavailable}</span>
+                  </p>
+                ) : null}
+
+                {selectedDay && dayOffers.length > 0 ? (
+                  <div className="tme-slot">
+                    <p className="tme-day-name">{dayTitle(selectedDay, locale)}</p>
+                    <div className="tme-times" role="group" aria-label={copy.time}>
+                      {dayOffers.map((item) => (
+                        <button
+                          key={item.key}
+                          type="button"
+                          className={`tme-time${item.mode === "join" ? " is-group" : " is-free"}`}
+                          aria-pressed={selection?.key === item.key}
+                          onClick={() => {
+                            setSelection(item);
+                            setError(null);
+                          }}
+                        >
+                          <strong>{clock(item.startsAt, locale)}</strong>
+                          <small>{chipLabel(item)}</small>
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      className="tme-book"
+                      disabled={!selection || madridDayKey(new Date(selection.startsAt)) !== selectedDay}
+                      onClick={() => {
+                        if (selection && madridDayKey(new Date(selection.startsAt)) === selectedDay) {
+                          openOffer(selection, listMode);
+                        }
+                      }}
+                    >
+                      {selection && madridDayKey(new Date(selection.startsAt)) === selectedDay
+                        ? `${copy.reserve} · ${clock(selection.startsAt, locale)}`
+                        : copy.chooseHeading}
+                      </button>
+                  </div>
+                ) : (
+                  <div className="tme-empty">
+                    <p role="status">{copy.noTimesWeek}</p>
+                    <a className="tme-book" href={telHref()}>
+                      {copy.callNow} {phoneDisplay}
+                    </a>
+                  </div>
+                )}
+
+                <div className="tme-panel-links">
+                  {view === "groups" && hasPrivate ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        listView.current = "private";
+                        setSelection(null);
+                        setDayKey(null);
+                        setError(null);
+                        setView("private");
+                      }}
+                    >
+                      {copy.privateOpen}
+                    </button>
+                  ) : null}
+                  {view === "private" ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        listView.current = "groups";
+                        setSelection(null);
+                        setDayKey(null);
+                        setError(null);
+                        setView("groups");
+                      }}
+                    >
+                      {copy.privateClose}
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOffer(null);
+                      setSelection(null);
+                      setError(null);
+                      setView("request");
+                    }}
+                  >
+                    {copy.otherTime}
+                  </button>
+                </div>
+              </>
             ) : null}
-          </div>
-        </div>
-      </section>
+          </section>
 
-      <section style={{ paddingTop: 0, paddingBottom: 40 }}>
-        <div className="tme-wrap">
-          <div className="tme-en">
-            <h3>
-              {copy.englishTitle} <em>{copy.englishTitleEm}</em>
-            </h3>
-            <p>{copy.englishBody}</p>
-          </div>
-        </div>
-      </section>
+        <section className="tme-teacher" aria-labelledby="tme-teacher">
+          <p className="tme-teacher-kicker">{copy.teacherKicker}</p>
 
-      <footer className="tme-contact">
-        <div className="tme-wrap tme-contact-inner">
-          <div className="tme-contact-lead">
-            <div className="tme-eyebrow">{copy.contactKicker}</div>
-            <h2>
-              {copy.contactTitleBefore} <em>{copy.contactTitleEm}</em>
-            </h2>
-            <a className="tme-big" href={telHref()}>
-              {phoneDisplay}
-            </a>
-            <p>{copy.contactSub}</p>
-          </div>
-          <div className="tme-ctas">
-            <a className="tme-btn tme-btn-wa" href={enquiryHref} {...externalAnchorProps(enquiryHref)}>
-              <WhatsAppMark />
-              {copy.writeWhatsApp}
-            </a>
-            <a
-              className="tme-btn tme-btn-ghost"
-              href="#reservar"
-              onClick={(event) => {
-                event.preventDefault();
-                openBooking("group");
-              }}
-            >
-              {copy.reserveCta}
-            </a>
-          </div>
-          <div className="tme-contact-meta">
-            <span className="tme-place">{copy.placeFooter}</span>
-            <span className="tme-contact-sep" aria-hidden="true">
-              ·
-            </span>
-            <Link href={techConditionsHref(locale)} className="tme-contact-legal">
-              {copy.footerLegalLabel}
-            </Link>
-            <span className="tme-contact-sep" aria-hidden="true">
-              ·
-            </span>
-            <SiteCopyright className="tme-contact-copy" />
-          </div>
-        </div>
-      </footer>
+          <aside className="tme-teacher-aside" tabIndex={0}>
+            <p className="tme-teacher-name">{copy.teacherName}</p>
+            <figure className="tme-teacher-photo">
+              <Image
+                src="/images/tech/ainhoa-portrait-v3.jpg"
+                alt={copy.portraitLabel}
+                fill
+                sizes="280px"
+              />
+            </figure>
+            <p className="tme-teacher-tags">{copy.teacherTags}</p>
+          </aside>
 
-      <nav className={barHidden ? "tme-dock is-hidden" : "tme-dock"} aria-label={copy.barReserve}>
-        <a className="tme-dock-c" href={telHref()}>
-          <IconPhone />
-          {copy.barCall}
-        </a>
-        <a className="tme-dock-w" href={enquiryHref} {...externalAnchorProps(enquiryHref)} aria-label={copy.whatsapp}>
-          <WhatsAppMark />
-          {copy.whatsapp}
-        </a>
-        <a
-          className="tme-dock-b"
-          href="#reservar"
-          onClick={(event) => {
-            event.preventDefault();
-            bookingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-        >
-          <IconCalendar />
-          {copy.barReserve}
-        </a>
-      </nav>
+          <h2 id="tme-teacher">{copy.teacherHello}</h2>
+          <p className="tme-teacher-lead-main">{copy.teacherLead}</p>
+          <p className="tme-teacher-lead-more">{copy.teacherLeadMore}</p>
+
+          <div className="tme-teacher-experience">
+            <p className="tme-teacher-experience-title">{copy.teacherExperienceTitle}</p>
+            <p>{copy.teacherStory}</p>
+          </div>
+
+          <div className="tme-teacher-close">
+            <p className="tme-teacher-close-line">{copy.teacherClose}</p>
+            <p className="tme-teacher-close-lead">{copy.teacherCloseLead}</p>
+          </div>
+        </section>
+
+        <footer className="tme-foot">
+          <p>{copy.placeBody}</p>
+          <p className="tme-foot-pay">{copy.payShort}</p>
+          <p className="tme-foot-links">
+            <a href={telHref()}>{copy.callNow} {phoneDisplay}</a>
+            <span aria-hidden="true">·</span>
+            <a href={enquiryHref} {...externalAnchorProps(enquiryHref)}>{copy.whatsapp}</a>
+            <span aria-hidden="true">·</span>
+            <Link href={techConditionsHref(locale)}>{copy.footerLegalLabel}</Link>
+          </p>
+          <SiteCopyright style={{ color: "inherit", fontSize: "0.85rem", textAlign: "center" }} />
+        </footer>
+      </div>
     </div>
   );
 }

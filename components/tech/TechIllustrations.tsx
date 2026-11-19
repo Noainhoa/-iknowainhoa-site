@@ -53,6 +53,18 @@ export function IconCloud() {
   );
 }
 
+/** iCloud-style filled cloud mark. */
+export function IconICloud() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M18.7 18.75H7.55a4.55 4.55 0 0 1-.35-9.08 6.05 6.05 0 0 1 11.35.85 3.7 3.7 0 0 1 .15 8.23z"
+      />
+    </svg>
+  );
+}
+
 export function IconSpark() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -66,6 +78,27 @@ export function IconVideo() {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="3" y="6" width="12" height="12" rx="3" />
       <path d="M15 10.5l6-3.5v10l-6-3.5" />
+    </svg>
+  );
+}
+
+/** Warning / “something broke” mark. */
+export function IconError() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7.5v5.5" />
+      <path d="M12 16.5h.01" />
+    </svg>
+  );
+}
+
+/** Clean FaceTime / video-call camera. */
+export function IconFaceTime() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2.5" y="6.5" width="13" height="11" rx="2.8" />
+      <path d="M15.5 10l5.5-3v10l-5.5-3z" />
     </svg>
   );
 }
@@ -115,5 +148,19 @@ const TOPIC_ICONS = [IconWhatsApp, IconPhotos, IconCloud, IconChatGPT, IconVideo
 
 export function TopicIcon({ index }: { index: number }) {
   const Icon = TOPIC_ICONS[index % TOPIC_ICONS.length];
+  return <Icon />;
+}
+
+/** Hero complaint bubbles: WhatsApp, photos, error, FaceTime, iCloud. */
+const HERO_BUBBLE_ICONS = [
+  IconWhatsApp,
+  IconPhotos,
+  IconError,
+  IconFaceTime,
+  IconICloud,
+] as const;
+
+export function HeroBubbleIcon({ index }: { index: number }) {
+  const Icon = HERO_BUBBLE_ICONS[index % HERO_BUBBLE_ICONS.length];
   return <Icon />;
 }

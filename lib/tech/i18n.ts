@@ -24,6 +24,53 @@ export type TechCopy = {
   callCta: string;
   /** Hero price cue; `{price}` is replaced with the formatted group price. */
   heroPriceFrom: string;
+  heroTitle: string;
+  heroLede: string;
+  heroReassure: string;
+  heroBubblesLabel: string;
+  heroBubbles: string[];
+  teacherKicker: string;
+  teacherHello: string;
+  teacherLead: string;
+  teacherLeadMore: string;
+  teacherName: string;
+  teacherTags: string;
+  teacherExperienceTitle: string;
+  teacherStory: string;
+  teacherClose: string;
+  teacherCloseLead: string;
+  /** `{price}` is the formatted group price. */
+  priceFrom: string;
+  trustLine: string;
+  chooseHeading: string;
+  dateThenTime: string;
+  earlierDates: string;
+  laterDates: string;
+  prevWeek: string;
+  nextWeek: string;
+  prevFourWeeks: string;
+  nextFourWeeks: string;
+  noTimesWeek: string;
+  dayUnavailable: string;
+  reserve: string;
+  moreDates: string;
+  fewerDates: string;
+  privateOpen: string;
+  privateClose: string;
+  privateHeading: string;
+  alone: string;
+  openSeat: string;
+  /** `{n}` is the length in minutes. */
+  minutesLong: string;
+  changeTime: string;
+  requestBack: string;
+  formLead: string;
+  payShort: string;
+  inEnglish: string;
+  inSpanish: string;
+  callNow: string;
+  emptyBook: string;
+  manageLink: string;
   heroArtAlt: string;
   topicsKicker: string;
   topicsTitleBefore: string;
@@ -172,7 +219,7 @@ export type TechCopy = {
 const es: TechCopy = {
   metaTitle: TECH_BRAND,
   metaDescription:
-    "Ayuda digital cercana en Guardamar del Segura: móvil, tablet y ordenador (Windows o Mac). Grupos pequeños desde 10 € o cita individual. Sesiones en español e inglés.",
+    "Ainhoa te enseña a usar tu móvil, tablet u ordenador en Guardamar, paso a paso y sin prisas. Sesiones desde 10 €.",
   brandName: TECH_BRAND,
   brandPlace: "GUARDAMAR",
   navHelp: "Cómo te ayudo",
@@ -192,6 +239,61 @@ const es: TechCopy = {
   reserveCta: "Reservar sesión",
   callCta: "Llamar 636 67 01 03",
   heroPriceFrom: "Desde {price} en grupo",
+  heroTitle: "El móvil debería hacerte la vida más fácil, no más difícil.",
+  heroLede: "¿Te trabas con WhatsApp, las fotos, las aplicaciones o los ajustes?",
+  heroReassure:
+    "Soy Ainhoa. Te ayudo a entender tu propio móvil, tablet u ordenador, paso a paso y a tu ritmo, sin tecnicismos, sin prisas y sin que te sientas mal por preguntar.",
+  heroBubblesLabel: "Lo que me suelen decir",
+  heroBubbles: [
+    "No sé mandar fotos por WhatsApp",
+    "No encuentro mis fotos",
+    "He tocado algo y ya no funciona",
+    "Quiero videollamar y no me sale",
+    "Se me ha llenado el móvil… ¿de qué?",
+  ],
+  teacherKicker: "Quién está detrás de Guardamar Click",
+  teacherHello: "Hola, soy Ainhoa.",
+  teacherLead:
+    "Mi trayectoria combina la gestión internacional de productos, el diseño, la tecnología y la enseñanza.",
+  teacherLeadMore:
+    "He trabajado en entornos internacionales, desarrollado soluciones digitales y aprendido a moverme entre distintas disciplinas.",
+  teacherName: "Ainhoa Ferrandis",
+  teacherTags: "Tecnología · Diseño · Enseñanza",
+  teacherExperienceTitle: "Experiencia aplicada a las personas",
+  teacherStory:
+    "Siempre he estado cerca de la tecnología. Desde mis primeras experiencias adaptando herramientas de reconocimiento de voz a necesidades de accesibilidad, mi enfoque ha sido comprender cada problema y encontrar soluciones prácticas.",
+  teacherClose: "Más autonomía. Más confianza. Menos frustración.",
+  teacherCloseLead: "Te escucho, busco la solución más sencilla y te enseño a utilizarla por ti mismo.",
+  priceFrom: "Desde {price}",
+  trustLine: "Con Ainhoa · Sin prisas · En Guardamar",
+  chooseHeading: "Elige una hora",
+  dateThenTime: "Primero el día. Luego la hora.",
+  earlierDates: "Fechas anteriores",
+  laterDates: "Fechas siguientes",
+  prevWeek: "Semana anterior",
+  nextWeek: "Semana siguiente",
+  prevFourWeeks: "4 semanas anteriores",
+  nextFourWeeks: "4 semanas siguientes",
+  noTimesWeek: "Esta semana no hay horas libres.",
+  dayUnavailable: "Sin horas",
+  reserve: "Reservar",
+  moreDates: "Ver 4 semanas",
+  fewerDates: "Ver una semana",
+  privateOpen: "Prefiero una cita a solas",
+  privateClose: "Volver a las sesiones en grupo",
+  privateHeading: "Cita a solas",
+  alone: "A solas",
+  openSeat: "Hora libre",
+  minutesLong: "{n} minutos",
+  changeTime: "Elegir otra hora",
+  requestBack: "Volver a las horas",
+  formLead: "Tu nombre y tu teléfono.",
+  payShort: "Pagas en la sesión: efectivo, transferencia, tarjeta o Bizum. No hay pago por internet.",
+  inEnglish: "En inglés",
+  inSpanish: "En español",
+  callNow: "Llamar",
+  emptyBook: "Ahora no hay horas libres. Llama o escribe por WhatsApp y lo vemos juntos.",
+  manageLink: "Ver o cancelar esta reserva",
   heroArtAlt:
     "Preguntas habituales en notas: qué hago con un aviso, dónde están las fotos, cómo envío una foto, qué pasa si borro algo y si un mensaje es de verdad.",
   topicsKicker: "Preguntas que oigo cada semana",
@@ -372,7 +474,7 @@ const es: TechCopy = {
       "En este entorno la reserva online aún no está configurada. Llama o escribe por WhatsApp.",
     network: "No ha llegado la respuesta. Si no ves la confirmación, no vuelvas a enviar: llama a Ainhoa.",
   },
-  confirmedTitle: "Reserva guardada",
+  confirmedTitle: "¡Tu plaza está reservada!",
   requestedTitle: "Solicitud enviada",
   reference: "Referencia",
   when: "Cuándo",
@@ -404,7 +506,7 @@ const es: TechCopy = {
 const en: TechCopy = {
   metaTitle: TECH_BRAND,
   metaDescription:
-    "Friendly digital help in Guardamar del Segura: phone, tablet and computer (Windows or Mac). Small groups from €10, or one-to-one. Sessions in Spanish and English.",
+    "Ainhoa helps you use your phone, tablet or computer in Guardamar, step by step and without rushing. Sessions from €10.",
   brandName: TECH_BRAND,
   brandPlace: "GUARDAMAR",
   navHelp: "How I help",
@@ -424,6 +526,61 @@ const en: TechCopy = {
   reserveCta: "Book a session",
   callCta: "Call 636 67 01 03",
   heroPriceFrom: "From {price} in a group",
+  heroTitle: "Your phone should make life easier, not harder.",
+  heroLede: "Struggling with WhatsApp, photos, apps or your phone's settings?",
+  heroReassure:
+    "I'm Ainhoa. I'll help you understand your own device, step by step, at your pace — without jargon, pressure or feeling silly for asking.",
+  heroBubblesLabel: "What people often say",
+  heroBubbles: [
+    "I can't send photos on WhatsApp",
+    "I can't find my photos",
+    "I tapped something and now it doesn't work",
+    "I want to video call and it won't start",
+    "My phone is full… with what?",
+  ],
+  teacherKicker: "Who is behind Guardamar Click",
+  teacherHello: "Hello, I'm Ainhoa.",
+  teacherLead:
+    "My background brings together international product management, design, technology and teaching.",
+  teacherLeadMore:
+    "I have worked in international settings, built digital solutions and learnt to move between different disciplines.",
+  teacherName: "Ainhoa Ferrandis",
+  teacherTags: "Technology · Design · Teaching",
+  teacherExperienceTitle: "Experience applied to people",
+  teacherStory:
+    "I have always been close to technology. From my earliest experiences adapting voice-recognition tools for accessibility needs, my focus has been to understand each problem and find practical solutions.",
+  teacherClose: "More independence. More confidence. Less frustration.",
+  teacherCloseLead: "I listen, look for the simplest solution and teach you to use it yourself.",
+  priceFrom: "From {price}",
+  trustLine: "With Ainhoa · No rush · In Guardamar",
+  chooseHeading: "Choose a time",
+  dateThenTime: "First the day. Then the time.",
+  earlierDates: "Earlier dates",
+  laterDates: "Later dates",
+  prevWeek: "Previous week",
+  nextWeek: "Next week",
+  prevFourWeeks: "Previous 4 weeks",
+  nextFourWeeks: "Next 4 weeks",
+  noTimesWeek: "No free times this week.",
+  dayUnavailable: "No times",
+  reserve: "Book",
+  moreDates: "Show 4 weeks",
+  fewerDates: "Show one week",
+  privateOpen: "I prefer a private session",
+  privateClose: "Back to group sessions",
+  privateHeading: "Private session",
+  alone: "Just you",
+  openSeat: "Free time",
+  minutesLong: "{n} minutes",
+  changeTime: "Choose another time",
+  requestBack: "Back to the times",
+  formLead: "Your name and phone number.",
+  payShort: "You pay at the session: cash, bank transfer, card or Bizum. There is no online payment.",
+  inEnglish: "In English",
+  inSpanish: "In Spanish",
+  callNow: "Call",
+  emptyBook: "There are no free times right now. Call or send a WhatsApp and we'll sort it out.",
+  manageLink: "View or cancel this booking",
   heroArtAlt:
     "Everyday phone questions on notes: what to do with an alert, where photos are, how to send a photo, deleting by mistake, and whether a message is real.",
   topicsKicker: "Questions I hear every week",
@@ -604,7 +761,7 @@ const en: TechCopy = {
       "Online booking is not set up in this environment. Please call or use WhatsApp.",
     network: "The answer did not arrive. If you do not see a confirmation, do not send it again: call Ainhoa.",
   },
-  confirmedTitle: "Booking saved",
+  confirmedTitle: "Your place is reserved!",
   requestedTitle: "Request sent",
   reference: "Reference",
   when: "When",
@@ -636,7 +793,7 @@ const en: TechCopy = {
 const nl: TechCopy = {
   metaTitle: TECH_BRAND,
   metaDescription:
-    "Vriendelijke digitale hulp in Guardamar del Segura: telefoon, tablet en computer (Windows of Mac). Kleine groepen vanaf €10, of een-op-een. Sessies in het Spaans en Engels.",
+    "Ainhoa leert je je telefoon, tablet of computer gebruiken in Guardamar, stap voor stap en zonder haast. Sessies vanaf € 10.",
   brandName: TECH_BRAND,
   brandPlace: "GUARDAMAR",
   navHelp: "Hoe ik help",
@@ -656,6 +813,61 @@ const nl: TechCopy = {
   reserveCta: "Sessie reserveren",
   callCta: "Bel 636 67 01 03",
   heroPriceFrom: "Vanaf {price} in een groep",
+  heroTitle: "Je telefoon hoort het leven makkelijker te maken, niet moeilijker.",
+  heroLede: "Lukt WhatsApp, foto's, apps of de instellingen niet?",
+  heroReassure:
+    "Ik ben Ainhoa. Ik help je je eigen telefoon, tablet of computer te begrijpen, stap voor stap en op jouw tempo — zonder vaktaal, zonder druk, en zonder dat een vraag dom aanvoelt.",
+  heroBubblesLabel: "Wat mensen vaak zeggen",
+  heroBubbles: [
+    "Ik kan geen foto's sturen via WhatsApp",
+    "Ik vind mijn foto's niet",
+    "Ik heb iets aangeraakt en nu werkt het niet",
+    "Ik wil videobellen, maar het lukt niet",
+    "Mijn telefoon zit vol… maar waarmee?",
+  ],
+  teacherKicker: "Wie zit er achter Guardamar Click",
+  teacherHello: "Hallo, ik ben Ainhoa.",
+  teacherLead:
+    "Mijn achtergrond brengt internationaal productmanagement, ontwerp, technologie en lesgeven samen.",
+  teacherLeadMore:
+    "Ik heb in internationale omgevingen gewerkt, digitale oplossingen ontwikkeld en me tussen verschillende disciplines bewogen.",
+  teacherName: "Ainhoa Ferrandis",
+  teacherTags: "Technologie · Ontwerp · Lesgeven",
+  teacherExperienceTitle: "Ervaring toegepast op mensen",
+  teacherStory:
+    "Ik ben altijd dicht bij technologie gebleven. Vanaf mijn eerste ervaringen met spraakherkenning voor toegankelijkheid is mijn aanpak geweest: elk probleem begrijpen en praktische oplossingen vinden.",
+  teacherClose: "Meer zelfstandigheid. Meer vertrouwen. Minder frustratie.",
+  teacherCloseLead: "Ik luister, zoek de eenvoudigste oplossing en leer je die zelf te gebruiken.",
+  priceFrom: "Vanaf {price}",
+  trustLine: "Met Ainhoa · Zonder haast · In Guardamar",
+  chooseHeading: "Kies een tijd",
+  dateThenTime: "Eerst de dag. Dan de tijd.",
+  earlierDates: "Eerdere datums",
+  laterDates: "Latere datums",
+  prevWeek: "Vorige week",
+  nextWeek: "Volgende week",
+  prevFourWeeks: "Vorige 4 weken",
+  nextFourWeeks: "Volgende 4 weken",
+  noTimesWeek: "Deze week zijn er geen vrije tijden.",
+  dayUnavailable: "Geen tijden",
+  reserve: "Reserveren",
+  moreDates: "Toon 4 weken",
+  fewerDates: "Toon één week",
+  privateOpen: "Ik wil liever alleen",
+  privateClose: "Terug naar de groepssessies",
+  privateHeading: "Sessie alleen",
+  alone: "Alleen jij",
+  openSeat: "Vrije tijd",
+  minutesLong: "{n} minuten",
+  changeTime: "Kies een andere tijd",
+  requestBack: "Terug naar de tijden",
+  formLead: "Je naam en telefoonnummer.",
+  payShort: "Je betaalt tijdens de sessie: contant, overschrijving, kaart of Bizum. Er is geen online betaling.",
+  inEnglish: "In het Engels",
+  inSpanish: "In het Spaans",
+  callNow: "Bellen",
+  emptyBook: "Er zijn nu geen vrije tijden. Bel of stuur een WhatsApp, dan kijken we samen.",
+  manageLink: "Bekijk of annuleer deze reservering",
   heroArtAlt:
     "Alledaagse telefoonvragen op briefjes: wat te doen bij een melding, waar foto’s zijn, hoe je een foto stuurt, per ongeluk wissen, en of een bericht echt is.",
   topicsKicker: "Vragen die ik elke week hoor",
@@ -837,7 +1049,7 @@ const nl: TechCopy = {
     network:
       "Het antwoord is niet aangekomen. Als je geen bevestiging ziet, verstuur het dan niet opnieuw: bel Ainhoa.",
   },
-  confirmedTitle: "Reservering opgeslagen",
+  confirmedTitle: "Je plek is gereserveerd!",
   requestedTitle: "Aanvraag verstuurd",
   reference: "Referentie",
   when: "Wanneer",

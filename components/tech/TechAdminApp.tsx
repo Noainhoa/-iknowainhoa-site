@@ -1211,7 +1211,7 @@ export default function TechAdminApp() {
             <div className="tme-admin-panel-head">
               <div>
                 <h2 id="admin-resumen">Resumen</h2>
-                <p>Lo urgente de hoy, sin el ruido del resto.</p>
+                <p>Horario del calendario público y lo urgente de hoy.</p>
               </div>
               <button type="button" className="tme-primary" onClick={() => go("sesiones", { newSession: true })}>
                 {copy.newSession}
@@ -1246,6 +1246,163 @@ export default function TechAdminApp() {
 
             {pending.length ? <p className="tme-admin-banner tme-admin-banner-attention">{copy.pendingBanner(pending.length)}</p> : null}
             {fresh.length ? <p className="tme-admin-banner">{copy.freshBanner(fresh.length)}</p> : null}
+
+            <form className="tme-admin-form tme-admin-card" onSubmit={saveCalendarSettings}>
+              <h3>Horario y calendario público</h3>
+              <p className="tme-hint">
+                La web solo muestra citas cuando activas el calendario. La plantilla semanal cubre de 08:00 a 20:00; las celdas ocupadas (y su margen) no se ofrecen.
+              </p>
+              <label className="tme-check">
+                <input
+                  type="checkbox"
+                  checked={calendarSettings.enabled}
+                  onChange={(event) => setCalendarSettings((current) => ({ ...current, enabled: event.target.checked }))}
+                />
+                <span>Calendario público activo (reservas en la web)</span>
+              </label>
+              <div className="tme-admin-form-grid">
+                <div>
+                  <span className="tme-admin-field-label">Ventana diaria</span>
+                  <p className="tme-admin-muted-line">08:00 – 20:00 (fija con la plantilla)</p>
+                </div>
+                <div>
+                  <label htmlFor="cal-buffer">Margen alrededor de ocupado (min)</label>
+                  <input
+                    id="cal-buffer"
+                    type="number"
+                    min={0}
+                    max={60}
+                    value={calendarSettings.buffer_minutes}
+                    onChange={(event) =>
+                      setCalendarSettings((current) => ({
+                        ...current,
+                        buffer_minutes: Number(event.target.value),
+                      }))
+                    }
+                  />
+                </div>
+                <div className="tme-admin-span-2">
+                  <label htmlFor="cal-venue">Lugar por defecto en reservas web</label>
+                  <input
+                    id="cal-venue"
+                    value={calendarSettings.default_venue_label}
+                    onChange={(event) =>
+                      setCalendarSettings((current) => ({ ...current, default_venue_label: event.target.value }))
+                    }
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" className="tme-primary">
+                Guardar horario
+              </button>
+
+              <h3>Plantilla semanal</h3>
+              <p className="tme-hint">
+                Pulsa una celda para marcarla libre u ocupada. Libre = se puede reservar; ocupada = bloqueada cada semana (más el margen).
+              </p>
+              <div className="tme-admin-legend" aria-hidden="true">
+                <span className="tme-admin-legend-item">
+                  <span className="tme-admin-swatch tme-admin-swatch-free" /> Libre
+                </span>
+                <span className="tme-admin-legend-item">
+                  <span className="tme-admin-swatch tme-admin-swatch-busy" /> Ocupada
+                </span>
+              </div>
+              <div className="tme-admin-sheet" role="region" aria-label="Plantilla semanal de disponibilidad">
+                <table className="tme-admin-week-grid">
+                  <thead>
+                    <tr>
+                      <th scope="col">Hora</th>
+                      {WEEKDAY_SHORT.map((label) => (
+                        <th key={label} scope="col">
+                          {label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {TEMPLATE_HOURS.map((hourStart) => (
+                      <tr key={hourStart}>
+                        <th scope="row">{minuteToHhMm(hourStart)}</th>
+                        {WEEKDAY_SHORT.map((_, index) => {
+                          const weekday = index + 1;
+                          const busy = hourIsWeeklyBusy(busyLikes, weekday, hourStart);
+                          return (
+                            <td key={`${weekday}-${hourStart}`}>
+                              <button
+                                type="button"
+                                className={busy ? "tme-admin-cell tme-admin-cell-busy" : "tme-admin-cell tme-admin-cell-free"}
+                                aria-pressed={busy}
+                                aria-label={`${WEEKDAY_SHORT[index]} ${minuteToHhMm(hourStart)} ${busy ? "ocupada" : "libre"}`}
+                                disabled={scheduleBusy}
+                                onClick={() => toggleWeeklyBusyHour(weekday, hourStart)}
+                              />
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </form>
+
+            <div className="tme-admin-card tme-admin-form">
+              <h3>Días cerrados</h3>
+              <p className="tme-hint">Pulsa un día para abrirlo o cerrarlo por completo. Cerrado = no se ofrecen citas ese día.</p>
+              <div className="tme-admin-legend" aria-hidden="true">
+                <span className="tme-admin-legend-item">
+                  <span className="tme-admin-swatch tme-admin-swatch-free" /> Abierto
+                </span>
+                <span className="tme-admin-legend-item">
+                  <span className="tme-admin-swatch tme-admin-swatch-closed" /> Cerrado
+                </span>
+              </div>
+              <div className="tme-admin-month-nav">
+                <button type="button" className="tme-secondary" onClick={() => shiftClosedMonth(-1)}>
+                  Anterior
+                </button>
+                <strong className="tme-admin-month-label">{monthTitle(closedView.year, closedView.month)}</strong>
+                <button type="button" className="tme-secondary" onClick={() => shiftClosedMonth(1)}>
+                  Siguiente
+                </button>
+              </div>
+              <div className="tme-admin-month-grid" role="grid" aria-label="Días cerrados del mes">
+                {WEEKDAY_SHORT.map((label) => (
+                  <div key={label} className="tme-admin-month-head" role="columnheader">
+                    {label}
+                  </div>
+                ))}
+                {closedMonthCells.map((cell, index) => {
+                  if (!cell.iso) {
+                    return <div key={`empty-${index}`} className="tme-admin-month-cell tme-admin-month-empty" />;
+                  }
+                  const closed = isClosedDay(cell.iso, closedRanges);
+                  const past = cell.iso < todayMadridIso();
+                  return (
+                    <button
+                      key={cell.iso}
+                      type="button"
+                      role="gridcell"
+                      className={[
+                        "tme-admin-month-cell",
+                        closed ? "tme-admin-month-closed" : "tme-admin-month-open",
+                        past ? "is-past" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      aria-pressed={closed}
+                      aria-label={`${cell.iso} ${closed ? "cerrado" : "abierto"}`}
+                      disabled={scheduleBusy}
+                      onClick={() => toggleClosedDay(cell.iso!)}
+                    >
+                      {Number(cell.iso.slice(-2))}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             <div className="tme-admin-grid">
               <div className="tme-admin-block">
@@ -1640,185 +1797,26 @@ export default function TechAdminApp() {
           <section className="tme-admin-panel" aria-labelledby="admin-mas">
             <div className="tme-admin-panel-head">
               <h2 id="admin-mas">Más</h2>
-              <p>Horario del calendario público, bloqueos, avisos y herramientas.</p>
+              <p>Avisos y herramientas.</p>
             </div>
 
-            <form className="tme-admin-form tme-admin-card" onSubmit={saveCalendarSettings}>
-              <h3>Horario y calendario público</h3>
-              <p className="tme-hint">
-                La web solo muestra citas cuando activas el calendario. La plantilla semanal cubre de 08:00 a 20:00; las celdas ocupadas (y su margen) no se ofrecen.
-              </p>
-              <label className="tme-check">
-                <input
-                  type="checkbox"
-                  checked={calendarSettings.enabled}
-                  onChange={(event) => setCalendarSettings((current) => ({ ...current, enabled: event.target.checked }))}
-                />
-                <span>Calendario público activo (reservas en la web)</span>
-              </label>
-              <div className="tme-admin-form-grid">
-                <div>
-                  <span className="tme-admin-field-label">Ventana diaria</span>
-                  <p className="tme-admin-muted-line">08:00 – 20:00 (fija con la plantilla)</p>
-                </div>
-                <div>
-                  <label htmlFor="cal-buffer">Margen alrededor de ocupado (min)</label>
-                  <input
-                    id="cal-buffer"
-                    type="number"
-                    min={0}
-                    max={60}
-                    value={calendarSettings.buffer_minutes}
-                    onChange={(event) =>
-                      setCalendarSettings((current) => ({
-                        ...current,
-                        buffer_minutes: Number(event.target.value),
-                      }))
-                    }
-                  />
-                </div>
-                <div className="tme-admin-span-2">
-                  <label htmlFor="cal-venue">Lugar por defecto en reservas web</label>
-                  <input
-                    id="cal-venue"
-                    value={calendarSettings.default_venue_label}
-                    onChange={(event) =>
-                      setCalendarSettings((current) => ({ ...current, default_venue_label: event.target.value }))
-                    }
-                    required
-                  />
-                </div>
-              </div>
-              <button type="submit" className="tme-primary">
-                Guardar horario
-              </button>
-
-              <h3>Plantilla semanal</h3>
-              <p className="tme-hint">
-                Pulsa una celda para marcarla libre u ocupada. Libre = se puede reservar; ocupada = bloqueada cada semana (más el margen).
-              </p>
-              <div className="tme-admin-legend" aria-hidden="true">
-                <span className="tme-admin-legend-item">
-                  <span className="tme-admin-swatch tme-admin-swatch-free" /> Libre
-                </span>
-                <span className="tme-admin-legend-item">
-                  <span className="tme-admin-swatch tme-admin-swatch-busy" /> Ocupada
-                </span>
-              </div>
-              <div className="tme-admin-sheet" role="region" aria-label="Plantilla semanal de disponibilidad">
-                <table className="tme-admin-week-grid">
-                  <thead>
-                    <tr>
-                      <th scope="col">Hora</th>
-                      {WEEKDAY_SHORT.map((label) => (
-                        <th key={label} scope="col">
-                          {label}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {TEMPLATE_HOURS.map((hourStart) => (
-                      <tr key={hourStart}>
-                        <th scope="row">{minuteToHhMm(hourStart)}</th>
-                        {WEEKDAY_SHORT.map((_, index) => {
-                          const weekday = index + 1;
-                          const busy = hourIsWeeklyBusy(busyLikes, weekday, hourStart);
-                          return (
-                            <td key={`${weekday}-${hourStart}`}>
-                              <button
-                                type="button"
-                                className={busy ? "tme-admin-cell tme-admin-cell-busy" : "tme-admin-cell tme-admin-cell-free"}
-                                aria-pressed={busy}
-                                aria-label={`${WEEKDAY_SHORT[index]} ${minuteToHhMm(hourStart)} ${busy ? "ocupada" : "libre"}`}
-                                disabled={scheduleBusy}
-                                onClick={() => toggleWeeklyBusyHour(weekday, hourStart)}
-                              />
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </form>
-
-            <div className="tme-admin-grid">
-              <div className="tme-admin-card tme-admin-form">
-                <h3>Días cerrados</h3>
-                <p className="tme-hint">Pulsa un día para abrirlo o cerrarlo por completo. Cerrado = no se ofrecen citas ese día.</p>
-                <div className="tme-admin-legend" aria-hidden="true">
-                  <span className="tme-admin-legend-item">
-                    <span className="tme-admin-swatch tme-admin-swatch-free" /> Abierto
-                  </span>
-                  <span className="tme-admin-legend-item">
-                    <span className="tme-admin-swatch tme-admin-swatch-closed" /> Cerrado
-                  </span>
-                </div>
-                <div className="tme-admin-month-nav">
-                  <button type="button" className="tme-secondary" onClick={() => shiftClosedMonth(-1)}>
-                    Anterior
+            <div className="tme-admin-card">
+              <h3>Avisos</h3>
+              {failedNotes.length === 0 ? <EmptyState>No hay avisos pendientes.</EmptyState> : null}
+              {failedNotes.map((note) => (
+                <article key={note.id} className="tme-admin-item">
+                  <div className="tme-admin-item-main">
+                    <strong>{note.subject}</strong>
+                    <p>
+                      {statusLabel(note.status)} · intentos {note.attempts}
+                      {note.last_error ? ` · ${note.last_error}` : ""}
+                    </p>
+                  </div>
+                  <button type="button" className="tme-secondary" onClick={() => retry(note.id)}>
+                    Reintentar
                   </button>
-                  <strong className="tme-admin-month-label">{monthTitle(closedView.year, closedView.month)}</strong>
-                  <button type="button" className="tme-secondary" onClick={() => shiftClosedMonth(1)}>
-                    Siguiente
-                  </button>
-                </div>
-                <div className="tme-admin-month-grid" role="grid" aria-label="Días cerrados del mes">
-                  {WEEKDAY_SHORT.map((label) => (
-                    <div key={label} className="tme-admin-month-head" role="columnheader">
-                      {label}
-                    </div>
-                  ))}
-                  {closedMonthCells.map((cell, index) => {
-                    if (!cell.iso) {
-                      return <div key={`empty-${index}`} className="tme-admin-month-cell tme-admin-month-empty" />;
-                    }
-                    const closed = isClosedDay(cell.iso, closedRanges);
-                    const past = cell.iso < todayMadridIso();
-                    return (
-                      <button
-                        key={cell.iso}
-                        type="button"
-                        role="gridcell"
-                        className={[
-                          "tme-admin-month-cell",
-                          closed ? "tme-admin-month-closed" : "tme-admin-month-open",
-                          past ? "is-past" : "",
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                        aria-pressed={closed}
-                        aria-label={`${cell.iso} ${closed ? "cerrado" : "abierto"}`}
-                        disabled={scheduleBusy}
-                        onClick={() => toggleClosedDay(cell.iso!)}
-                      >
-                        {Number(cell.iso.slice(-2))}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="tme-admin-card">
-                <h3>Avisos</h3>
-                {failedNotes.length === 0 ? <EmptyState>No hay avisos pendientes.</EmptyState> : null}
-                {failedNotes.map((note) => (
-                  <article key={note.id} className="tme-admin-item">
-                    <div className="tme-admin-item-main">
-                      <strong>{note.subject}</strong>
-                      <p>
-                        {statusLabel(note.status)} · intentos {note.attempts}
-                        {note.last_error ? ` · ${note.last_error}` : ""}
-                      </p>
-                    </div>
-                    <button type="button" className="tme-secondary" onClick={() => retry(note.id)}>
-                      Reintentar
-                    </button>
-                  </article>
-                ))}
-              </div>
+                </article>
+              ))}
             </div>
 
             <div className="tme-admin-card tme-admin-tools">
