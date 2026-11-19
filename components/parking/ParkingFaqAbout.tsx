@@ -18,24 +18,28 @@ export default function ParkingFaqAbout({
 }: ParkingFaqAboutProps) {
   return (
     <section className="pk-seo" aria-label={aboutTitle}>
-      <div className="pk-faq">
-        <h2 className="pk-seo-heading">{faqTitle}</h2>
-        {faqItems.map((item) => (
-          <details key={item.question} className="pk-faq-item">
-            <summary>{item.question}</summary>
-            <p>{item.answer}</p>
+      <details className="pk-faq">
+        <summary className="pk-faq-toggle">
+          <h2 className="pk-seo-heading">{faqTitle}</h2>
+        </summary>
+        <div className="pk-faq-body">
+          {faqItems.map((item) => (
+            <details key={item.question} className="pk-faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+          <details className="pk-faq-item pk-about-item">
+            <summary>{aboutTitle}</summary>
+            <p className="pk-about-intro">{intro}</p>
+            <ul>
+              {aboutItems.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </details>
-        ))}
-        <details className="pk-faq-item pk-about-item">
-          <summary>{aboutTitle}</summary>
-          <p className="pk-about-intro">{intro}</p>
-          <ul>
-            {aboutItems.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </details>
-      </div>
+        </div>
+      </details>
     </section>
   );
 }

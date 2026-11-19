@@ -8,6 +8,10 @@ import {
   type PublicSessionSlot,
   type WeeklyBusyBlock,
 } from "@/lib/tech/calendar";
+import {
+  HOME_BLOCK_MINUTES,
+  HOME_SHORT_BLOCK_MINUTES,
+} from "@/lib/tech/assistance";
 import { INDIVIDUAL_SHORT_MINUTES, SESSION_MINUTES } from "@/lib/tech/constants";
 import { getTechServiceClient } from "@/lib/tech/server";
 import { madridDayKey } from "@/lib/tech/time";
@@ -145,6 +149,17 @@ export async function GET(request: Request) {
     durationMinutes: INDIVIDUAL_SHORT_MINUTES,
     stepMinutes: INDIVIDUAL_SHORT_MINUTES,
   });
+  /** Block starts for home visits (arrival = start + 30). */
+  const bookableStartsHome = computeBookableStarts({
+    ...bookableArgs,
+    durationMinutes: HOME_BLOCK_MINUTES,
+    stepMinutes: INDIVIDUAL_SHORT_MINUTES,
+  });
+  const bookableStartsHomeShort = computeBookableStarts({
+    ...bookableArgs,
+    durationMinutes: HOME_SHORT_BLOCK_MINUTES,
+    stepMinutes: INDIVIDUAL_SHORT_MINUTES,
+  });
 
   const weekCounts: Record<string, number> = {};
   for (const [key, value] of slotsByWeek) weekCounts[key] = value;
@@ -163,6 +178,8 @@ export async function GET(request: Request) {
       sessions,
       bookableStarts,
       bookableStartsShort,
+      bookableStartsHome,
+      bookableStartsHomeShort,
       nextJoinableGroup: nextJoinableGroup(sessions, now),
       weekSlotCounts: weekCounts,
     },

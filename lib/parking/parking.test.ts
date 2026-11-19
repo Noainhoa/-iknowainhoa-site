@@ -319,7 +319,7 @@ describe("parking availability rules", () => {
 });
 
 describe("WhatsApp message", () => {
-  it("builds Spanish message with estimate after duration", () => {
+  it("builds a compact Spanish message with estimate on the date line", () => {
     const msg = buildWhatsAppMessage({
       locale: "es",
       periods: [{ arrival: "2026-07-25", departure: "2026-07-27" }],
@@ -327,13 +327,13 @@ describe("WhatsApp message", () => {
       name: "Ana",
       pageUrl: "https://iknowainhoa.com/parking-guardamar-centro",
     });
-    assert.match(msg, /Hola, Ainhoa/);
-    assert.match(msg, /Entrada:.*25.*julio.*2026/i);
-    assert.match(msg, /Duración: 3 días/);
-    assert.match(msg, /Estimación: €30/);
-    assert.match(msg, /Matrícula: No indicada/);
-    assert.match(msg, /Página: https:\/\/iknowainhoa\.com\/parking-guardamar-centro/);
-    assert.match(msg, /no queda confirmada/);
+    assert.match(msg, /Hola Ainhoa — parking Guardamar/);
+    assert.match(msg, /25.*jul.*2026.*→.*27.*jul.*2026/i);
+    assert.match(msg, /3d · €30/);
+    assert.match(msg, /^Ana$/m);
+    assert.doesNotMatch(msg, /No indicada/);
+    assert.match(msg, /https:\/\/iknowainhoa\.com\/parking-guardamar-centro/);
+    assert.match(msg, /Sin confirmar/);
   });
 
   it("maps registration and vehicle model into the English message", () => {
@@ -346,11 +346,11 @@ describe("WhatsApp message", () => {
       vehicle: "Golf",
       comments: "Evening arrival",
     });
-    assert.match(msg, /Hello Ainhoa/);
-    assert.match(msg, /Duration: 2 days/);
-    assert.match(msg, /Estimate: €20/);
-    assert.match(msg, /Vehicle registration: ABC 123/);
-    assert.match(msg, /Vehicle: Golf/);
+    assert.match(msg, /Hi Ainhoa — Guardamar parking/);
+    assert.match(msg, /2d · €20/);
+    assert.match(msg, /ABC 123/);
+    assert.match(msg, /Golf/);
+    assert.match(msg, /Notes: Evening arrival/);
   });
 
   it("builds OR alternatives with per-option estimates", () => {
@@ -363,11 +363,11 @@ describe("WhatsApp message", () => {
       ],
       name: "Ana",
     });
-    assert.match(msg, /Opciones alternativas/);
-    assert.match(msg, /1\) Entrada:/);
-    assert.match(msg, /Estimación: €30/);
-    assert.match(msg, /Estimación: €60/);
-    assert.doesNotMatch(msg, /Estimación total/);
+    assert.match(msg, /Alternativas/);
+    assert.match(msg, /1\) /);
+    assert.match(msg, /3d · €30/);
+    assert.match(msg, /6d · €60/);
+    assert.doesNotMatch(msg, /Total:/);
   });
 
   it("builds AND message with total days and total estimate", () => {
@@ -380,9 +380,8 @@ describe("WhatsApp message", () => {
       ],
       name: "Sam",
     });
-    assert.match(msg, /I need all of these stays/);
-    assert.match(msg, /Total: 9 days/);
-    assert.match(msg, /Total estimate: €90/);
+    assert.match(msg, /All stays/);
+    assert.match(msg, /Total: 9d · €90/);
   });
 
   it("URL-encodes WhatsApp href", () => {

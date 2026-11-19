@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import {
+  isAssistanceMode,
+  resolveCreateTiming,
+  venueLabelForMode,
+  type AssistanceMode,
+} from "@/lib/tech/assistance";
+import {
   GROUP_MINUTES,
   GROUP_PRICE_CENTS,
   INDIVIDUAL_MINUTES,
@@ -80,6 +86,13 @@ export async function POST(request: Request) {
   }
 
   let createDurationMinutes = GROUP_MINUTES;
+  let createHelpMinutes = GROUP_MINUTES;
+  let createStartsAt = startsAtRaw;
+  let createArrivalAt = startsAtRaw;
+  let createMode: AssistanceMode = "onsite";
+  let createPriceCents = GROUP_PRICE_CENTS;
+  let createVenueLabel = "";
+
   if (isCreate) {
     const starts = new Date(startsAtRaw);
     if (Number.isNaN(starts.getTime())) {
@@ -87,15 +100,43 @@ export async function POST(request: Request) {
     }
     if (createKind === "group") {
       createDurationMinutes = GROUP_MINUTES;
+      createHelpMinutes = GROUP_MINUTES;
+      createMode = "onsite";
+      createPriceCents = GROUP_PRICE_CENTS;
       if (durationRaw != null && durationRaw !== GROUP_MINUTES) {
         return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
       }
-    } else if (durationRaw == null) {
-      createDurationMinutes = INDIVIDUAL_MINUTES;
-    } else if (isIndividualDuration(durationRaw)) {
-      createDurationMinutes = durationRaw;
+      if (text(body.assistanceMode) && text(body.assistanceMode) !== "onsite") {
+        return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+      }
     } else {
-      return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+      const help =
+        durationRaw == null
+          ? INDIVIDUAL_MINUTES
+          : isIndividualDuration(durationRaw)
+            ? durationRaw
+            : null;
+      if (help == null) {
+        return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+      }
+      const modeRaw = text(body.assistanceMode) || "onsite";
+      if (!isAssistanceMode(modeRaw)) {
+        return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+      }
+      const timing = resolveCreateTiming({
+        mode: modeRaw,
+        arrivalAt: startsAtRaw,
+        helpMinutes: help,
+      });
+      if (!timing) {
+        return NextResponse.json({ ok: false, error: "tech_failed" }, { status: 400 });
+      }
+      createMode = timing.assistanceMode;
+      createDurationMinutes = timing.durationMinutes;
+      createHelpMinutes = timing.helpMinutes;
+      createStartsAt = timing.startsAt;
+      createArrivalAt = timing.arrivalAt;
+      createPriceCents = timing.priceCents;
     }
   }
 
@@ -136,13 +177,15 @@ export async function POST(request: Request) {
     venueForMail = sessionRow.venue_label;
   } else {
     kindForMail = createKind as "group" | "individual";
-    startsForMail = new Date(startsAtRaw);
+    startsForMail = new Date(createArrivalAt || startsAtRaw);
     const { data: settings } = await client
       .from("tech_calendar_settings")
       .select("default_venue_label")
       .eq("id", 1)
       .maybeSingle();
-    venueForMail = settings?.default_venue_label || "Guardamar del Segura";
+    const onsiteVenue = settings?.default_venue_label || "Guardamar del Segura";
+    createVenueLabel = venueLabelForMode(createMode, onsiteVenue);
+    venueForMail = createVenueLabel;
   }
 
   const mail = ownerBookingEmail({
@@ -182,8 +225,11 @@ export async function POST(request: Request) {
     : await client.rpc("tech_create_and_book", {
         payload: {
           kind: createKind,
-          starts_at: new Date(startsAtRaw).toISOString(),
+          starts_at: new Date(createStartsAt).toISOString(),
+          arrival_at: new Date(createArrivalAt).toISOString(),
           duration_minutes: createDurationMinutes,
+          help_minutes: createHelpMinutes,
+          assistance_mode: createMode,
           idempotency_key: idempotencyKey,
           reference,
           token_hash: hashToken(token),
@@ -197,7 +243,7 @@ export async function POST(request: Request) {
           locale: validated.value.locale,
           session_language: validated.value.sessionLanguage,
           source: validated.value.source,
-          venue_label: venueForMail,
+          venue_label: createVenueLabel || venueForMail,
           subject: mail.subject,
           body: mail.body,
         },
@@ -290,6 +336,7 @@ export async function POST(request: Request) {
     priceCents,
     venueLabel,
     kind,
+    assistanceMode: data.assistance_mode ?? (isJoin ? "onsite" : createMode),
     notification,
     customerNotification,
   });

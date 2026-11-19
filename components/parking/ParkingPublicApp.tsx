@@ -43,7 +43,6 @@ import {
 } from "@/lib/parking/pricing";
 import { PARKING_GOOGLE_MAPS_URL } from "@/lib/parking/googleReviews";
 import {
-  parkingCanonicalUrl,
   parkingConditionsHref,
   parkingPrivacyHref,
 } from "@/lib/parking/seo";
@@ -141,7 +140,12 @@ function readWaStatus(): { status: WaStatus; href: string | null } {
     const raw = sessionStorage.getItem(WA_STATUS_KEY);
     if (!raw) return { status: "idle", href: null };
     const parsed = JSON.parse(raw) as { status?: string; href?: string | null };
-    if (parsed.status === "opened" || parsed.status === "sent") {
+    // "sent" is a one-shot confirmation — do not restore it after refresh.
+    if (parsed.status === "sent") {
+      sessionStorage.removeItem(WA_STATUS_KEY);
+      return { status: "idle", href: null };
+    }
+    if (parsed.status === "opened") {
       return { status: parsed.status, href: parsed.href ?? null };
     }
   } catch {
@@ -165,6 +169,24 @@ function writeWaStatus(status: WaStatus, href: string | null) {
 function startOfToday() {
   const n = new Date();
   return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+}
+
+/** First calendar month that should show a restored or in-progress selection. */
+function calendarMonthForSelection(
+  periods: EnquiryPeriod[],
+  arrival: string | null,
+  today: Date
+): Date | null {
+  const anchors = [
+    ...periods.map((p) => p.arrival),
+    ...(arrival ? [arrival] : []),
+  ];
+  if (anchors.length === 0) return null;
+  const earliest = anchors.reduce((a, b) => (a < b ? a : b));
+  const d = parseISODate(earliest);
+  const month = new Date(d.getFullYear(), d.getMonth(), 1);
+  const minMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  return month < minMonth ? minMonth : month;
 }
 
 function buildMonthCells(view: Date): (Date | null)[] {
@@ -330,7 +352,7 @@ export default function ParkingPublicApp({
 
   const nameRef = useRef<HTMLInputElement>(null);
   const acceptHeightRef = useRef<HTMLInputElement>(null);
-  const arrivalSummaryRef = useRef<HTMLDivElement>(null);
+  const periodsRef = useRef<HTMLDivElement>(null);
   const formErrorRef = useRef<HTMLParagraphElement>(null);
   const waStatusRef = useRef<HTMLDivElement>(null);
 
@@ -346,9 +368,28 @@ export default function ParkingPublicApp({
   useEffect(() => {
     const draft = readPersisted();
     if (draft) {
-      setArrival(draft.arrival);
-      setDeparture(draft.departure);
-      setPeriods(draft.periods);
+      let nextPeriods = draft.periods;
+      let nextArrival = draft.arrival;
+      let nextDeparture = draft.departure;
+      if (
+        draft.arrival &&
+        draft.departure &&
+        draft.departure >= draft.arrival &&
+        draft.periods.length < MAX_ENQUIRY_PERIODS &&
+        !draft.periods.some(
+          (p) => p.arrival === draft.arrival && p.departure === draft.departure
+        )
+      ) {
+        nextPeriods = [
+          ...draft.periods,
+          { arrival: draft.arrival, departure: draft.departure },
+        ];
+        nextArrival = null;
+        nextDeparture = null;
+      }
+      setArrival(nextArrival);
+      setDeparture(nextDeparture);
+      setPeriods(nextPeriods);
       setMultiMode(draft.multiMode);
       setName(draft.name);
       setRegistration(draft.registration);
@@ -358,6 +399,12 @@ export default function ParkingPublicApp({
       setAcceptBooking(draft.acceptBooking);
       setAcceptPrivacy(draft.acceptPrivacy);
       setAcceptPolicy(draft.acceptPolicy);
+      const focusMonth = calendarMonthForSelection(
+        nextPeriods,
+        nextArrival,
+        startOfToday()
+      );
+      if (focusMonth) setView(focusMonth);
     }
     const wa = readWaStatus();
     setWaStatus(wa.status);
@@ -384,22 +431,6 @@ export default function ParkingPublicApp({
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
-
-  useEffect(() => {
-    if (!arrival || !departure || departure < arrival) return;
-    const stayDays = countInclusiveDays(arrival, departure);
-    const startSeason = seasonForMonth(parseISODate(arrival).getMonth());
-    const endSeason = seasonForMonth(parseISODate(departure).getMonth());
-    const season: ParkingSeason | "mixed" =
-      startSeason === endSeason ? startSeason : "mixed";
-    trackParkingEvent({
-      name: "parking_dates_selected",
-      language: locale,
-      stayDays,
-      season,
-      hasQuote: estimateParkingPrice(arrival, departure, rates) > 0,
-    });
-  }, [arrival, departure, locale, rates]);
 
   function updateWaStatus(status: WaStatus, nextHref?: string | null) {
     if (status === "idle") {
@@ -564,11 +595,6 @@ export default function ParkingPublicApp({
       view.getMonth() > currentMonth.getMonth());
 
   const previewEnd = departure || (arrival && hover ? hover : null);
-  const bothDatesSelected = Boolean(arrival && departure);
-  const durationDays =
-    arrival && departure ? countInclusiveDays(arrival, departure) : 0;
-  const draftEstimate =
-    arrival && departure ? estimateParkingPrice(arrival, departure, rates) : 0;
 
   function effectivePeriods(): EnquiryPeriod[] {
     if (periods.length > 0) return periods;
@@ -606,6 +632,32 @@ export default function ParkingPublicApp({
     return "available";
   }
 
+  /** If arrival is in the last visible month, shift forward so later months appear. */
+  function revealMonthsAfterSelection(iso: string) {
+    const selected = parseISODate(iso);
+    const lastVisible = new Date(
+      view.getFullYear(),
+      view.getMonth() + visibleMonthCount - 1,
+      1
+    );
+    const inLastVisibleMonth =
+      selected.getFullYear() === lastVisible.getFullYear() &&
+      selected.getMonth() === lastVisible.getMonth();
+    if (!inLastVisibleMonth) return;
+
+    // One-month layout: only nudge when the selected day is the month’s last day.
+    if (visibleMonthCount === 1) {
+      const lastDayOfMonth = new Date(
+        selected.getFullYear(),
+        selected.getMonth() + 1,
+        0
+      );
+      if (toISODate(selected) !== toISODate(lastDayOfMonth)) return;
+    }
+
+    setView(new Date(view.getFullYear(), view.getMonth() + 1, 1));
+  }
+
   function selectArrivalOnly(iso: string) {
     setArrival(iso);
     setDeparture(null);
@@ -617,6 +669,7 @@ export default function ParkingPublicApp({
       departure: undefined,
       periods: undefined,
     }));
+    revealMonthsAfterSelection(iso);
     announce(t.announceArrival);
   }
 
@@ -631,12 +684,69 @@ export default function ParkingPublicApp({
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function commitPeriod(start: string, end: string) {
+    if (periods.length >= MAX_ENQUIRY_PERIODS) {
+      setFieldErrors((prev) => ({ ...prev, periods: t.errMaxPeriods }));
+      setFormError(t.errMaxPeriods);
+      setArrival(null);
+      setDeparture(null);
+      setHover(null);
+      return;
+    }
+    const next: EnquiryPeriod = { arrival: start, departure: end };
+    if (rangeContainsUnavailable(next.arrival, next.departure, ranges)) {
+      setFieldErrors({ arrival: t.errRangeUnavailable });
+      setFormError(t.errRangeUnavailable);
+      setArrival(null);
+      setDeparture(null);
+      setHover(null);
+      announce(t.announceInvalidRange);
+      return;
+    }
+    for (const p of periods) {
+      if (enquiryPeriodsOverlap(p, next)) {
+        setFieldErrors((prev) => ({ ...prev, periods: t.errPeriodsOverlap }));
+        setFormError(t.errPeriodsOverlap);
+        setArrival(null);
+        setDeparture(null);
+        setHover(null);
+        return;
+      }
+    }
+
+    const stayDays = countInclusiveDays(start, end);
+    const startSeason = seasonForMonth(parseISODate(start).getMonth());
+    const endSeason = seasonForMonth(parseISODate(end).getMonth());
+    const season: ParkingSeason | "mixed" =
+      startSeason === endSeason ? startSeason : "mixed";
+    trackParkingEvent({
+      name: "parking_dates_selected",
+      language: locale,
+      stayDays,
+      season,
+      hasQuote: estimateParkingPrice(start, end, rates) > 0,
+    });
+
+    setPeriods((prev) => [...prev, next]);
+    setArrival(null);
+    setDeparture(null);
+    setHover(null);
+    setFormError(null);
+    setFieldErrors((prev) => ({
+      ...prev,
+      arrival: undefined,
+      departure: undefined,
+      periods: undefined,
+    }));
+    announce(t.announceDeparture);
+  }
+
   function onSelectDay(iso: string) {
     if (loadingAvailability) return;
     const state = dayState(iso);
     if (state === "past" || state === "unavailable") return;
 
-    if (!arrival || (arrival && departure)) {
+    if (!arrival || departure) {
       selectArrivalOnly(iso);
       return;
     }
@@ -654,80 +764,11 @@ export default function ParkingPublicApp({
       setArrival(iso);
       setDeparture(null);
       setHover(null);
+      revealMonthsAfterSelection(iso);
       announce(t.announceInvalidRange);
       return;
     }
-    setFormError(null);
-    setFieldErrors((prev) => ({
-      ...prev,
-      arrival: undefined,
-      departure: undefined,
-      periods: undefined,
-    }));
-    setArrival(start);
-    setDeparture(end);
-    setHover(null);
-    announce(t.announceDeparture);
-  }
-
-  function clearDates() {
-    setArrival(null);
-    setDeparture(null);
-    setHover(null);
-    setFormError(null);
-    setFieldErrors((prev) => ({
-      ...prev,
-      arrival: undefined,
-      departure: undefined,
-      periods: undefined,
-    }));
-    announce(t.announceCleared);
-  }
-
-  function changeDates() {
-    clearDates();
-    const cal = document.getElementById("pk-availability");
-    cal?.scrollIntoView({ behavior: "smooth", block: "start" });
-    window.setTimeout(() => {
-      const firstAvailable = cal?.querySelector<HTMLButtonElement>(
-        "button.pk-cell.day:not([disabled])"
-      );
-      firstAvailable?.focus();
-    }, 50);
-  }
-
-  function addCurrentPeriod() {
-    if (!arrival || !departure) return;
-    if (periods.length >= MAX_ENQUIRY_PERIODS) {
-      setFieldErrors((prev) => ({ ...prev, periods: t.errMaxPeriods }));
-      setFormError(t.errMaxPeriods);
-      return;
-    }
-    const next: EnquiryPeriod = { arrival, departure };
-    if (rangeContainsUnavailable(next.arrival, next.departure, ranges)) {
-      setFieldErrors({ arrival: t.errRangeUnavailable });
-      setFormError(t.errRangeUnavailable);
-      return;
-    }
-    for (const p of periods) {
-      if (enquiryPeriodsOverlap(p, next)) {
-        setFieldErrors((prev) => ({ ...prev, periods: t.errPeriodsOverlap }));
-        setFormError(t.errPeriodsOverlap);
-        return;
-      }
-    }
-    setPeriods((prev) => [...prev, next]);
-    setArrival(null);
-    setDeparture(null);
-    setHover(null);
-    setFormError(null);
-    setFieldErrors((prev) => ({
-      ...prev,
-      arrival: undefined,
-      departure: undefined,
-      periods: undefined,
-    }));
-    announce(t.addPeriod);
+    commitPeriod(start, end);
   }
 
   function removePeriodAt(index: number) {
@@ -830,7 +871,7 @@ export default function ParkingPublicApp({
       return;
     }
     if (errors.arrival || errors.departure || errors.periods) {
-      arrivalSummaryRef.current?.focus();
+      periodsRef.current?.focus();
       const cal = document.getElementById("pk-availability");
       cal?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
@@ -907,7 +948,6 @@ export default function ParkingPublicApp({
       registration,
       vehicle,
       comments,
-      pageUrl: parkingCanonicalUrl(locale),
       rates,
     });
     const href = whatsAppHref(message);
@@ -921,6 +961,13 @@ export default function ParkingPublicApp({
     if (!waHref) return;
     updateWaStatus("opened", waHref);
     window.location.assign(waHref);
+  }
+
+  function goToEnquiryForm() {
+    document
+      .getElementById("pk-enquiry-form")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => nameRef.current?.focus(), 280);
   }
 
   const priceCols = [
@@ -1214,170 +1261,153 @@ export default function ParkingPublicApp({
           </span>
         </div>
 
-        {bothDatesSelected && arrival && departure ? (
-          <div
-            className="pk-selected"
-            ref={arrivalSummaryRef}
-            tabIndex={-1}
-            aria-labelledby="pk-selected-heading"
-          >
-            <div className="pk-selected-head">
-              <h3 id="pk-selected-heading">{t.selectedDatesTitle}</h3>
-              <button
-                type="button"
-                className="pk-reset-dates"
-                onClick={changeDates}
-                aria-label={t.clearDates}
-                title={t.clearDates}
-              >
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  width="18"
-                  height="18"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M3 6h18" />
-                  <path d="M8 6V4h8v2" />
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                  <path d="M10 11v6" />
-                  <path d="M14 11v6" />
-                </svg>
-              </button>
-            </div>
-            <dl className="pk-selected-list">
-              <div>
-                <dt>{t.labelArrival}</dt>
-                <dd>{formatShortParkingDate(arrival, locale)}</dd>
-              </div>
-              <div>
-                <dt>{t.labelDeparture}</dt>
-                <dd>{formatShortParkingDate(departure, locale)}</dd>
-              </div>
-              <div>
-                <dt>{t.labelDuration}</dt>
-                <dd>{t.duration(durationDays)}</dd>
-              </div>
-              <div>
-                <dt>{t.labelEstimate}</dt>
-                <dd>{formatEuroEstimate(draftEstimate)}</dd>
-              </div>
-            </dl>
-            {periods.length < MAX_ENQUIRY_PERIODS ? (
-              <button
-                type="button"
-                className="pk-add-period"
-                onClick={addCurrentPeriod}
-              >
-                {t.addPeriod}
-              </button>
-            ) : null}
-            {(fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods) && (
-              <p className="pk-field-error" id="pk-dates-error" role="alert">
-                {fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods}
-              </p>
-            )}
-          </div>
-        ) : (fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods) ? (
+        {(fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods) ? (
           <p className="pk-field-error pk-field-error-alone" id="pk-dates-error" role="alert">
             {fieldErrors.arrival || fieldErrors.departure || fieldErrors.periods}
           </p>
         ) : null}
 
         {periods.length > 0 ? (
-          <div className="pk-periods" aria-labelledby="pk-periods-heading">
-            <h3 id="pk-periods-heading">{t.periodsTitle}</h3>
-            <ul className="pk-periods-list">
-              {periods.map((p, index) => {
-                const days = countInclusiveDays(p.arrival, p.departure);
-                const estimate = estimateParkingPrice(p.arrival, p.departure, rates);
-                return (
-                  <li key={`${p.arrival}-${p.departure}-${index}`}>
-                    <div className="pk-period-main">
-                      <span className="pk-period-index">{index + 1}.</span>
-                      <span>
-                        {formatShortParkingDate(p.arrival, locale)}
-                        {" → "}
-                        {formatShortParkingDate(p.departure, locale)}
-                      </span>
-                      <button
-                        type="button"
-                        className="pk-period-remove"
-                        onClick={() => removePeriodAt(index)}
-                        aria-label={t.removePeriod}
-                      >
-                        ×
-                      </button>
-                    </div>
-                    <div className="pk-period-meta">
-                      {t.duration(days)} · {t.labelEstimate}:{" "}
-                      {formatEuroEstimate(estimate)}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+          <div
+            className="pk-periods"
+            ref={periodsRef}
+            tabIndex={-1}
+            aria-label={t.periodsTitle}
+          >
+            <div className="pk-periods-lead">
+              <ul className="pk-periods-list">
+                {periods.map((p, index) => {
+                  const days = countInclusiveDays(p.arrival, p.departure);
+                  const estimate = estimateParkingPrice(p.arrival, p.departure, rates);
+                  return (
+                    <li className="pk-period" key={`${p.arrival}-${p.departure}-${index}`}>
+                      <div className="pk-period-main">
+                        <span className="pk-period-index" aria-hidden="true">
+                          {index + 1}
+                        </span>
+                        <dl className="pk-period-dates">
+                          <div>
+                            <dt>{t.labelArrival}</dt>
+                            <dd>{formatShortParkingDate(p.arrival, locale)}</dd>
+                          </div>
+                          <span className="pk-period-arrow" aria-hidden="true">
+                            →
+                          </span>
+                          <div>
+                            <dt>{t.labelDeparture}</dt>
+                            <dd>{formatShortParkingDate(p.departure, locale)}</dd>
+                          </div>
+                        </dl>
+                        <div className="pk-period-meta">
+                          <span className="pk-period-chip">{t.duration(days)}</span>
+                          <span className="pk-period-chip pk-period-chip--price">
+                            {formatEuroEstimate(estimate)}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          className="pk-period-remove"
+                          onClick={() => removePeriodAt(index)}
+                          aria-label={t.removePeriod}
+                        >
+                          <svg
+                            aria-hidden="true"
+                            viewBox="0 0 24 24"
+                            width="18"
+                            height="18"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.25"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M3 6h18" />
+                            <path d="M8 6V4h8v2" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                            <path d="M10 11v6" />
+                            <path d="M14 11v6" />
+                          </svg>
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              <button
+                type="button"
+                className="pk-continue-form"
+                onClick={goToEnquiryForm}
+              >
+                {t.continueToForm}
+              </button>
+            </div>
+
+            {periods.length < MAX_ENQUIRY_PERIODS ? (
+              <p className="pk-more-dates-hint">{t.moreDatesHint}</p>
+            ) : null}
 
             {periods.length >= 2 ? (
               <fieldset className="pk-multi-mode">
                 <legend>{t.multiModeLegend}</legend>
-                <label className="pk-mode-option">
-                  <input
-                    type="radio"
-                    name="multiMode"
-                    checked={multiMode === "or"}
-                    onChange={() => setMultiMode("or")}
-                  />
-                  <span>{t.multiModeOr}</span>
-                </label>
-                <label className="pk-mode-option">
-                  <input
-                    type="radio"
-                    name="multiMode"
-                    checked={multiMode === "and"}
-                    onChange={() => setMultiMode("and")}
-                  />
-                  <span>{t.multiModeAnd}</span>
-                </label>
-                {multiMode === "and" ? (
-                  <p className="pk-multi-summary">
-                    {t.labelTotalDuration}:{" "}
-                    {t.duration(
-                      periods.reduce(
-                        (sum, p) =>
-                          sum + countInclusiveDays(p.arrival, p.departure),
-                        0
-                      )
-                    )}
-                    {" · "}
-                    {t.labelTotalEstimate}:{" "}
-                    {formatEuroEstimate(
-                      periods.reduce(
-                        (sum, p) =>
-                          sum + estimateParkingPrice(p.arrival, p.departure, rates),
-                        0
-                      )
-                    )}
-                  </p>
-                ) : (
-                  <p className="pk-multi-summary">
-                    {periods
-                      .map((p, i) => {
-                        const days = countInclusiveDays(p.arrival, p.departure);
-                        const estimate = estimateParkingPrice(
-                          p.arrival,
-                          p.departure,
-                          rates
-                        );
-                        return `${i + 1}: ${t.duration(days)} / ${formatEuroEstimate(estimate)}`;
-                      })
-                      .join(" · ")}
-                  </p>
-                )}
+                <div className="pk-mode-options">
+                  <div
+                    className={`pk-mode-card${multiMode === "or" ? " is-active" : ""}`}
+                  >
+                    <label className="pk-mode-option">
+                      <input
+                        type="radio"
+                        name="multiMode"
+                        checked={multiMode === "or"}
+                        onChange={() => setMultiMode("or")}
+                      />
+                      <span>{t.multiModeOr}</span>
+                    </label>
+                  </div>
+                  <div
+                    className={`pk-mode-card${multiMode === "and" ? " is-active" : ""}`}
+                  >
+                    <label className="pk-mode-option">
+                      <input
+                        type="radio"
+                        name="multiMode"
+                        checked={multiMode === "and"}
+                        onChange={() => setMultiMode("and")}
+                      />
+                      <span>{t.multiModeAnd}</span>
+                    </label>
+                    {multiMode === "and" ? (
+                      <p className="pk-multi-summary">
+                        {t.labelTotalDuration}:{" "}
+                        <strong>
+                          {t.duration(
+                            periods.reduce(
+                              (sum, p) =>
+                                sum +
+                                countInclusiveDays(p.arrival, p.departure),
+                              0
+                            )
+                          )}
+                        </strong>
+                        {" · "}
+                        {t.labelTotalEstimate}:{" "}
+                        <strong>
+                          {formatEuroEstimate(
+                            periods.reduce(
+                              (sum, p) =>
+                                sum +
+                                estimateParkingPrice(
+                                  p.arrival,
+                                  p.departure,
+                                  rates
+                                ),
+                              0
+                            )
+                          )}
+                        </strong>
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
               </fieldset>
             ) : null}
           </div>
@@ -1385,6 +1415,7 @@ export default function ParkingPublicApp({
       </section>
 
       <section
+        id="pk-enquiry-form"
         className="pk-form-section"
         aria-labelledby="pk-form-heading"
         onFocusCapture={() => setFabHidden(true)}
@@ -1406,37 +1437,37 @@ export default function ParkingPublicApp({
             openWhatsApp();
           }}
         >
-          <label className={fieldErrors.name ? "has-error" : undefined}>
-            <span className="pk-lab">
-              {t.name} <span className="req">*</span>
-            </span>
-            <input
-              ref={nameRef}
-              id="pk-name"
-              required
-              name="name"
-              autoComplete="name"
-              enterKeyHint="next"
-              autoCapitalize="words"
-              value={name}
-              aria-invalid={fieldErrors.name ? true : undefined}
-              aria-describedby={fieldErrors.name ? "pk-name-error" : undefined}
-              onChange={(e) => {
-                setName(e.target.value);
-                if (fieldErrors.name) {
-                  setFieldErrors((prev) => ({ ...prev, name: undefined }));
-                }
-              }}
-              placeholder={t.namePlaceholder}
-            />
-            {fieldErrors.name ? (
-              <span className="pk-field-error" id="pk-name-error" role="alert">
-                {fieldErrors.name}
+          <div className="pk-form-row pk-form-row--identity">
+            <label className={fieldErrors.name ? "has-error" : undefined}>
+              <span className="pk-lab">
+                {t.name} <span className="req">*</span>
               </span>
-            ) : null}
-          </label>
+              <input
+                ref={nameRef}
+                id="pk-name"
+                required
+                name="name"
+                autoComplete="name"
+                enterKeyHint="next"
+                autoCapitalize="words"
+                value={name}
+                aria-invalid={fieldErrors.name ? true : undefined}
+                aria-describedby={fieldErrors.name ? "pk-name-error" : undefined}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (fieldErrors.name) {
+                    setFieldErrors((prev) => ({ ...prev, name: undefined }));
+                  }
+                }}
+                placeholder={t.namePlaceholder}
+              />
+              {fieldErrors.name ? (
+                <span className="pk-field-error" id="pk-name-error" role="alert">
+                  {fieldErrors.name}
+                </span>
+              ) : null}
+            </label>
 
-          <div className="pk-form-row">
             <label>
               <span className="pk-lab">{t.registration}</span>
               <input
@@ -1525,7 +1556,16 @@ export default function ParkingPublicApp({
                   }
                 }}
               />
-              <span>{t.bookingDisclaimer}</span>
+              <span>
+                {t.bookingDisclaimer}{" "}
+                <Link
+                  href={parkingConditionsHref(locale)}
+                  className="pk-inline-link"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {t.conditionsLinkLabel}
+                </Link>
+              </span>
             </label>
 
             <label className="pk-check-label">
@@ -1574,19 +1614,6 @@ export default function ParkingPublicApp({
               </p>
             ) : null}
           </fieldset>
-
-          <aside className="pk-conditions-note" aria-label={t.conditionsLinkLabel}>
-            <p>{t.conditionsNoticeHold}</p>
-            <p>{t.conditionsNoticeVehicle}</p>
-            <p>
-              <Link
-                href={parkingConditionsHref(locale)}
-                className="pk-inline-link"
-              >
-                {t.conditionsLinkLabel}
-              </Link>
-            </p>
-          </aside>
 
           <button type="submit" className="pk-wa" disabled={preparing} aria-busy={preparing}>
             <span className="pk-wa-inner">

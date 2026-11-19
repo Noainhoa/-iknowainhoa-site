@@ -34,7 +34,8 @@ const es: TechConditionsCopy = {
       heading: "Asistencia",
       paragraphs: [
         "Confirmas que estarás en la sesión reservada (o la persona para quien reserves).",
-        "Las sesiones son presenciales en Guardamar del Segura, junto a la Escuela de Música Auditorio, salvo que Ainhoa te indique otro lugar al confirmar.",
+        "El negocio es presencial en Guardamar del Segura, junto a la Escuela de Música Auditorio. También puedes reservar asistencia telefónica (incluida la ayuda en remoto al dispositivo) o una visita a domicilio dentro de Guardamar.",
+        "En las visitas a domicilio reservas la hora de llegada; en la agenda se incluyen 30 minutos antes y 30 minutos después para el desplazamiento, y eso cuenta en la duración y el precio.",
       ],
     },
     {
@@ -47,8 +48,8 @@ const es: TechConditionsCopy = {
     {
       heading: "Pago",
       paragraphs: [
-        "El pago se hace en la sesión, como prefieras: efectivo, transferencia, tarjeta o Bizum. No hay checkout online.",
-        "Reservar por la web guarda tu plaza o tu solicitud; no implica un cobro anticipado.",
+        "Puedes pagar con tarjeta en la sesión, o en efectivo, por transferencia o Bizum. No hace falta escribir ningún dato de la tarjeta ni del banco en esta web.",
+        "Reservar el hueco y dejar un contacto es lo que importa. La web guarda tu plaza o tu solicitud; no cobra por adelantado.",
       ],
     },
     {
@@ -157,7 +158,8 @@ const en: TechConditionsCopy = {
       heading: "Attendance",
       paragraphs: [
         "You confirm that you will be at the booked session (or the person you are booking for).",
-        "Sessions are in person in Guardamar del Segura, next to the Music School Auditorium, unless Ainhoa tells you another place when confirming.",
+        "This is an in-person business in Guardamar del Segura, next to the Music School Auditorium. You can also book phone assistance (including remote help on your device) or a home visit within Guardamar.",
+        "For home visits you book the arrival time; the calendar includes 30 minutes before and 30 minutes after for travel, and that counts toward duration and price.",
       ],
     },
     {
@@ -170,8 +172,8 @@ const en: TechConditionsCopy = {
     {
       heading: "Payment",
       paragraphs: [
-        "You pay at the session in whatever way suits you: cash, bank transfer, card or Bizum. There is no online checkout.",
-        "Booking on the website holds your place or request; it does not take payment in advance.",
+        "You can pay by card at the session, or by cash, bank transfer or Bizum. You do not enter any card or bank details on this website.",
+        "Booking the slot and leaving a contact is what matters. The site holds your place or request; it does not charge you in advance.",
       ],
     },
     {
@@ -280,7 +282,8 @@ const nl: TechConditionsCopy = {
       heading: "Aanwezigheid",
       paragraphs: [
         "Je bevestigt dat je bij de gereserveerde sessie bent (of de persoon voor wie je reserveert).",
-        "Sessies zijn fysiek in Guardamar del Segura, naast de Escuela de Música Auditorio, tenzij Ainhoa bij bevestiging een andere plek aangeeft.",
+        "Dit is een fysieke dienst in Guardamar del Segura, naast de Escuela de Música Auditorio. Je kunt ook telefonische hulp (inclusief hulp op afstand op je toestel) of een huisbezoek binnen Guardamar boeken.",
+        "Bij huisbezoeken boeken jij het aankomsttijdstip; in de agenda zitten 30 minuten voor en 30 minuten na voor reizen, en dat telt mee in duur en prijs.",
       ],
     },
     {
@@ -293,8 +296,8 @@ const nl: TechConditionsCopy = {
     {
       heading: "Betaling",
       paragraphs: [
-        "Je betaalt tijdens de sessie zoals jij wilt: contant, via overschrijving, met kaart of met Bizum. Er is geen online checkout.",
-        "Reserveren via de website houdt je plek of aanvraag vast; er wordt niet vooraf online betaald.",
+        "Je kunt met kaart betalen tijdens de sessie, of contant, via overschrijving of met Bizum. Je vult op deze website geen kaart- of bankgegevens in.",
+        "Het tijdstip reserveren en een contact achterlaten is wat telt. De site houdt je plek of aanvraag vast; er wordt niet vooraf betaald.",
       ],
     },
     {

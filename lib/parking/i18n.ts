@@ -72,6 +72,10 @@ export type ParkingCopy = {
   multiModeLegend: string;
   multiModeOr: string;
   multiModeAnd: string;
+  /** CTA after a period is selected — scrolls to the enquiry form. */
+  continueToForm: string;
+  /** Hint under the first period: more stays via calendar selection. */
+  moreDatesHint: string;
   labelEstimate: string;
   labelTotalEstimate: string;
   labelTotalDuration: string;
@@ -123,8 +127,6 @@ export type ParkingCopy = {
   feedbackSuccess: string;
   feedbackError: string;
   feedbackPrivacy: string;
-  conditionsNoticeHold: string;
-  conditionsNoticeVehicle: string;
   conditionsLinkLabel: string;
   whatsappCta: string;
   whatsappPreparing: string;
@@ -256,6 +258,9 @@ const es: ParkingCopySource = {
   multiModeLegend: "¿Cómo quieres consultar estas fechas?",
   multiModeOr: "Cualquiera de estas opciones (alternativas)",
   multiModeAnd: "Necesito todas estas estancias",
+  continueToForm: "Siguiente",
+  moreDatesHint:
+    "Si quieres consultar más fechas a la vez, añádelas seleccionándolas en el calendario.",
   labelEstimate: "Estimación",
   labelTotalEstimate: "Estimación total",
   labelTotalDuration: "Total",
@@ -311,10 +316,6 @@ const es: ParkingCopySource = {
   feedbackError: "No se ha podido enviar. Inténtalo de nuevo o escríbeme por WhatsApp.",
   feedbackPrivacy:
     "Uso este mensaje solo para operaciones. No aparece en la página ni en Google.",
-  conditionsNoticeHold:
-    "La solicitud no bloquea las fechas. La reserva se confirma tras aceptar las condiciones y realizar el pago.",
-  conditionsNoticeVehicle:
-    "Plaza para turismos convencionales. Altura máxima de acceso: 1,79 m.",
   conditionsLinkLabel: "Ver condiciones de reserva",
   whatsappCta: "Solicitar por WhatsApp",
   whatsappPreparing: "Preparando solicitud…",
@@ -448,6 +449,9 @@ const en: ParkingCopySource = {
   multiModeLegend: "How should these dates be checked?",
   multiModeOr: "Any of these options (alternatives)",
   multiModeAnd: "I need all of these stays",
+  continueToForm: "Next",
+  moreDatesHint:
+    "To check more dates at the same time, add them by selecting them on the calendar.",
   labelEstimate: "Estimate",
   labelTotalEstimate: "Total estimate",
   labelTotalDuration: "Total",
@@ -503,10 +507,6 @@ const en: ParkingCopySource = {
   feedbackError: "Could not send. Try again or message me on WhatsApp.",
   feedbackPrivacy:
     "I use this message for operations only. It does not appear on the page or on Google.",
-  conditionsNoticeHold:
-    "Sending an enquiry does not hold the dates. The booking is confirmed after accepting the conditions and completing payment.",
-  conditionsNoticeVehicle:
-    "Space for conventional passenger cars. Maximum access height: 1.79 m.",
   conditionsLinkLabel: "View booking conditions",
   whatsappCta: "Enquire through WhatsApp",
   whatsappPreparing: "Preparing enquiry…",
@@ -639,6 +639,9 @@ const fr: ParkingCopySource = {
   multiModeLegend: "Comment souhaitez-vous vérifier ces dates ?",
   multiModeOr: "N’importe laquelle de ces options (alternatives)",
   multiModeAnd: "J’ai besoin de tous ces séjours",
+  continueToForm: "Suivant",
+  moreDatesHint:
+    "Pour consulter d’autres dates en même temps, ajoutez-les en les sélectionnant sur le calendrier.",
   labelEstimate: "Estimation",
   labelTotalEstimate: "Estimation totale",
   labelTotalDuration: "Total",
@@ -694,10 +697,6 @@ const fr: ParkingCopySource = {
   feedbackError: "Envoi impossible. Réessayez ou écrivez-moi sur WhatsApp.",
   feedbackPrivacy:
     "J’utilise ce message uniquement pour améliorer le service. Il n’apparaît pas sur la page ni sur Google.",
-  conditionsNoticeHold:
-    "La demande ne bloque pas les dates. La réservation est confirmée après acceptation des conditions et paiement.",
-  conditionsNoticeVehicle:
-    "Place destinée aux voitures particulières conventionnelles. Hauteur maximale d’accès : 1,79 m.",
   conditionsLinkLabel: "Voir les conditions de réservation",
   whatsappCta: "Demander via WhatsApp",
   whatsappPreparing: "Préparation de la demande…",

@@ -42,6 +42,19 @@ export type TechCopy = {
   /** `{price}` is the formatted group price. */
   priceFrom: string;
   trustLine: string;
+  /** How you get help: onsite / phone / home visit. */
+  assistanceHeading: string;
+  assistanceLead: string;
+  assistanceOnsiteTitle: string;
+  assistanceOnsiteBody: string;
+  assistancePhoneTitle: string;
+  assistancePhoneBody: string;
+  assistanceHomeTitle: string;
+  assistanceHomeBody: string;
+  /** `{help}` help minutes, `{total}` blocked minutes, `{price}` formatted. */
+  assistanceHomeTravel: string;
+  assistancePick: string;
+  homeVisitUnavailable: string;
   chooseHeading: string;
   dateThenTime: string;
   earlierDates: string;
@@ -65,6 +78,8 @@ export type TechCopy = {
   changeTime: string;
   requestBack: string;
   formLead: string;
+  /** Shown on the booking form: card is fine later; no payment details on the site. */
+  paySafe: string;
   payShort: string;
   inEnglish: string;
   inSpanish: string;
@@ -252,7 +267,7 @@ const es: TechCopy = {
   heroTitle: "El móvil debería hacerte la vida más fácil, no más difícil.",
   heroLede: "¿Te trabas con WhatsApp, las fotos, las aplicaciones o los ajustes?",
   heroReassure:
-    "Soy Ainhoa. Te ayudo a entender tu propio móvil, tablet u ordenador, paso a paso y a tu ritmo, sin tecnicismos, sin prisas y sin que te sientas mal por preguntar.",
+    "Soy Ainhoa. Te ayudo a entender tu propio móvil, tablet u ordenador — en persona en Guardamar, por teléfono o en tu casa dentro del pueblo — paso a paso y a tu ritmo, sin tecnicismos ni prisas.",
   heroBubblesLabel: "Lo que me suelen decir",
   heroBubbles: [
     "No sé mandar fotos por WhatsApp",
@@ -275,9 +290,23 @@ const es: TechCopy = {
   teacherClose: "Más autonomía. Más confianza. Menos frustración.",
   teacherCloseLead: "Te escucho, busco la solución más sencilla y te enseño a utilizarla por ti mismo.",
   priceFrom: "Desde {price}",
-  trustLine: "Con Ainhoa · Sin prisas · En Guardamar",
+  trustLine: "Presencial en Guardamar · También por teléfono · Visita a domicilio",
+  assistanceHeading: "Cómo te ayudo",
+  assistanceLead:
+    "El negocio es presencial en Guardamar. También puedes reservar asistencia telefónica o una visita a domicilio dentro del pueblo.",
+  assistanceOnsiteTitle: "Presencial aquí",
+  assistanceOnsiteBody: "Vienes tú a Guardamar, junto a la Escuela de Música Auditorio, con tu móvil, tablet u ordenador.",
+  assistancePhoneTitle: "Asistencia telefónica",
+  assistancePhoneBody: "Te guío por teléfono: te voy diciendo los pasos y, si hace falta, conectamos en remoto a tu dispositivo.",
+  assistanceHomeTitle: "Visita a domicilio",
+  assistanceHomeBody: "Voy a tu casa dentro de Guardamar. Reservas la hora de llegada.",
+  assistanceHomeTravel:
+    "Ayuda {help} min + 30 min antes y 30 min después de desplazamiento = {total} min en agenda · {price}",
+  assistancePick: "¿Cómo quieres la sesión?",
+  homeVisitUnavailable:
+    "A esa hora no cabe el desplazamiento (±30 min). Elige otra hora o otro tipo de ayuda.",
   chooseHeading: "Elige una hora",
-  dateThenTime: "Primero el día. Luego la hora.",
+  dateThenTime: "Primero el día y la hora. Luego cómo te ayudo.",
   earlierDates: "Fechas anteriores",
   laterDates: "Fechas siguientes",
   prevWeek: "Semana anterior",
@@ -298,7 +327,10 @@ const es: TechCopy = {
   changeTime: "Elegir otra hora",
   requestBack: "Calendario",
   formLead: "Tu nombre y tu teléfono.",
-  payShort: "Pagas en la sesión: efectivo, transferencia, tarjeta o Bizum. No hay pago por internet.",
+  paySafe:
+    "Puedes pagar con tarjeta en la sesión. Aquí no hace falta escribir ningún dato de la tarjeta ni del banco: reserva el hueco y deja un contacto. En esta web estás a salvo.",
+  payShort:
+    "Puedes pagar con tarjeta en la sesión (también efectivo, transferencia o Bizum). Aquí no escribas datos de pago: reserva el hueco y deja un contacto.",
   inEnglish: "En inglés",
   inSpanish: "En español",
   callNow: "Llamar",
@@ -397,7 +429,7 @@ const es: TechCopy = {
   preferCall: "También puedes llamar. No hace falta reservar por internet.",
   talkTitle: "¿Prefieres hablar?",
   talkBody: "No hace falta reservar por internet. Llama al 636 67 01 03, o escribe por WhatsApp.",
-  pay: "Paga en la sesión como prefieras: efectivo, transferencia, tarjeta o Bizum. Lo importante es que vengas tranquila; no hay pago por internet.",
+  pay: "Puedes pagar con tarjeta cuando nos veamos, o en efectivo, por transferencia o Bizum. Aquí no pongas ningún dato de pago. Lo que importa es reservar el hueco y dejar un contacto: en esta web estás a salvo.",
   placeTitle: "Dónde",
   placeBody: "Guardamar del Segura. Junto a la Escuela de Música Auditorio",
   choose: "Elige el día y la hora",
@@ -474,6 +506,7 @@ const es: TechCopy = {
     tech_outside_hours: "Esa hora está fuera del horario disponible.",
     tech_week_full: "Esa semana ya está completa.",
     tech_overlap: "Esa hora coincide con otra sesión.",
+    tech_home_unavailable: "A esa hora no cabe el desplazamiento (±30 min). Elige otra hora u otro tipo de ayuda.",
     tech_calendar_off: "El calendario no acepta reservas ahora.",
     tech_language_mismatch:
       "Esa sesión no está disponible en ese idioma. Elige otra hora o cambia el idioma.",
@@ -551,7 +584,7 @@ const en: TechCopy = {
   heroTitle: "Your phone should make life easier, not harder.",
   heroLede: "Struggling with WhatsApp, photos, apps or your phone's settings?",
   heroReassure:
-    "I'm Ainhoa. I'll help you understand your own device, step by step, at your pace — without jargon, pressure or feeling silly for asking.",
+    "I'm Ainhoa. I help you understand your own phone, tablet or computer — in person in Guardamar, by phone, or at your home in town — step by step, at your pace, without jargon or pressure.",
   heroBubblesLabel: "What people often say",
   heroBubbles: [
     "I can't send photos on WhatsApp",
@@ -574,9 +607,23 @@ const en: TechCopy = {
   teacherClose: "More independence. More confidence. Less frustration.",
   teacherCloseLead: "I listen, look for the simplest solution and teach you to use it yourself.",
   priceFrom: "From {price}",
-  trustLine: "With Ainhoa · No rush · In Guardamar",
+  trustLine: "In person in Guardamar · Also by phone · Home visit",
+  assistanceHeading: "How I help you",
+  assistanceLead:
+    "This is an in-person business in Guardamar. You can also book phone assistance or a home visit within town.",
+  assistanceOnsiteTitle: "In person here",
+  assistanceOnsiteBody: "You come to Guardamar, next to the Music School Auditorium, with your phone, tablet or computer.",
+  assistancePhoneTitle: "Phone assistance",
+  assistancePhoneBody: "I guide you by phone: step by step, and we can connect remotely to your device if needed.",
+  assistanceHomeTitle: "Home visit",
+  assistanceHomeBody: "I come to your home within Guardamar. You book the arrival time.",
+  assistanceHomeTravel:
+    "{help} min help + 30 min before and 30 min after for travel = {total} min on the calendar · {price}",
+  assistancePick: "How do you want the session?",
+  homeVisitUnavailable:
+    "That time does not leave room for travel (±30 min). Pick another time or another type of help.",
   chooseHeading: "Choose a time",
-  dateThenTime: "First the day. Then the time.",
+  dateThenTime: "First the day and time. Then how I help you.",
   earlierDates: "Earlier dates",
   laterDates: "Later dates",
   prevWeek: "Previous week",
@@ -597,7 +644,10 @@ const en: TechCopy = {
   changeTime: "Choose another time",
   requestBack: "Calendar",
   formLead: "Your name and phone number.",
-  payShort: "You pay at the session: cash, bank transfer, card or Bizum. There is no online payment.",
+  paySafe:
+    "You can pay by card at the session. You do not enter any card or bank details here: just book the slot and leave a contact. You are safe on this page.",
+  payShort:
+    "You can pay by card at the session (also cash, bank transfer or Bizum). Do not enter payment details here: just book the slot and leave a contact.",
   inEnglish: "In English",
   inSpanish: "In Spanish",
   callNow: "Call",
@@ -696,7 +746,7 @@ const en: TechCopy = {
   preferCall: "You can also call. You do not have to book online.",
   talkTitle: "Would you rather talk?",
   talkBody: "You do not have to book online. Call 636 67 01 03, or message on WhatsApp.",
-  pay: "Pay at the session in whatever way suits you: cash, bank transfer, card or Bizum. Money should not be the stressful part; there is no online checkout.",
+  pay: "You can pay by card when we meet, or by cash, bank transfer or Bizum. Do not enter any payment details here. What matters is booking the slot and leaving a contact: you are safe on this page.",
   placeTitle: "Where",
   placeBody: "Guardamar del Segura. Next to the Music School Auditorium",
   choose: "Choose the day and time",
@@ -773,6 +823,7 @@ const en: TechCopy = {
     tech_outside_hours: "That time is outside the available hours.",
     tech_week_full: "That week is already full.",
     tech_overlap: "That time overlaps with another session.",
+    tech_home_unavailable: "That time does not leave room for travel (±30 min). Pick another time or another type of help.",
     tech_calendar_off: "The calendar is not accepting bookings right now.",
     tech_language_mismatch:
       "That session is not available in that language. Please choose another time or change the language.",
@@ -850,7 +901,7 @@ const nl: TechCopy = {
   heroTitle: "Je telefoon hoort het leven makkelijker te maken, niet moeilijker.",
   heroLede: "Lukt WhatsApp, foto's, apps of de instellingen niet?",
   heroReassure:
-    "Ik ben Ainhoa. Ik help je je eigen telefoon, tablet of computer te begrijpen, stap voor stap en op jouw tempo — zonder vaktaal, zonder druk, en zonder dat een vraag dom aanvoelt.",
+    "Ik ben Ainhoa. Ik help je je eigen telefoon, tablet of computer te begrijpen — ter plaatse in Guardamar, telefonisch of bij je thuis in het dorp — stap voor stap en op jouw tempo, zonder vaktaal of druk.",
   heroBubblesLabel: "Wat mensen vaak zeggen",
   heroBubbles: [
     "Ik kan geen foto's sturen via WhatsApp",
@@ -873,9 +924,23 @@ const nl: TechCopy = {
   teacherClose: "Meer zelfstandigheid. Meer vertrouwen. Minder frustratie.",
   teacherCloseLead: "Ik luister, zoek de eenvoudigste oplossing en leer je die zelf te gebruiken.",
   priceFrom: "Vanaf {price}",
-  trustLine: "Met Ainhoa · Zonder haast · In Guardamar",
+  trustLine: "Ter plaatse in Guardamar · Ook telefonisch · Huisbezoek",
+  assistanceHeading: "Hoe ik je help",
+  assistanceLead:
+    "Dit is een fysieke dienst in Guardamar. Je kunt ook telefonische hulp of een huisbezoek in het dorp boeken.",
+  assistanceOnsiteTitle: "Hier ter plaatse",
+  assistanceOnsiteBody: "Jij komt naar Guardamar, naast de Escuela de Música Auditorio, met je telefoon, tablet of computer.",
+  assistancePhoneTitle: "Telefonische hulp",
+  assistancePhoneBody: "Ik begeleid je telefonisch: stap voor stap, en zo nodig verbinden we op afstand met je toestel.",
+  assistanceHomeTitle: "Huisbezoek",
+  assistanceHomeBody: "Ik kom bij je thuis in Guardamar. Jij boekt het aankomsttijdstip.",
+  assistanceHomeTravel:
+    "{help} min hulp + 30 min voor en 30 min na voor reizen = {total} min in de agenda · {price}",
+  assistancePick: "Hoe wil je de sessie?",
+  homeVisitUnavailable:
+    "Op dat tijdstip past de reistijd (±30 min) niet. Kies een ander uur of een andere vorm van hulp.",
   chooseHeading: "Kies een tijd",
-  dateThenTime: "Eerst de dag. Dan de tijd.",
+  dateThenTime: "Eerst de dag en de tijd. Daarna hoe ik je help.",
   earlierDates: "Eerdere datums",
   laterDates: "Latere datums",
   prevWeek: "Vorige week",
@@ -896,7 +961,10 @@ const nl: TechCopy = {
   changeTime: "Kies een andere tijd",
   requestBack: "Agenda",
   formLead: "Je naam en telefoonnummer.",
-  payShort: "Je betaalt tijdens de sessie: contant, overschrijving, kaart of Bizum. Er is geen online betaling.",
+  paySafe:
+    "Je kunt met kaart betalen tijdens de sessie. Hier hoef je geen kaart- of bankgegevens in te vullen: reserveer alleen het tijdstip en laat een contact achter. Op deze pagina ben je veilig.",
+  payShort:
+    "Je kunt met kaart betalen tijdens de sessie (ook contant, via overschrijving of Bizum). Vul hier geen betaalgegevens in: reserveer het tijdstip en laat een contact achter.",
   inEnglish: "In het Engels",
   inSpanish: "In het Spaans",
   callNow: "Bellen",
@@ -995,7 +1063,7 @@ const nl: TechCopy = {
   preferCall: "Je kunt ook bellen. Online reserveren hoeft niet.",
   talkTitle: "Praat je liever even?",
   talkBody: "Online reserveren hoeft niet. Bel naar 636 67 01 03, of schrijf via WhatsApp.",
-  pay: "Betaal tijdens de sessie zoals jij wilt: contant, via overschrijving, met kaart of met Bizum. Geld hoeft geen stress te geven; er is geen online betaling.",
+  pay: "Je kunt met kaart betalen als we elkaar zien, of contant, via overschrijving of met Bizum. Vul hier geen betaalgegevens in. Het gaat erom dat je het tijdstip reserveert en een contact achterlaat: op deze pagina ben je veilig.",
   placeTitle: "Waar",
   placeBody: "Guardamar del Segura. Naast de Escuela de Música Auditorio",
   choose: "Kies de dag en tijd",
@@ -1072,6 +1140,7 @@ const nl: TechCopy = {
     tech_outside_hours: "Die tijd valt buiten de beschikbare uren.",
     tech_week_full: "Die week is al vol.",
     tech_overlap: "Die tijd overlapt met een andere sessie.",
+    tech_home_unavailable: "Op dat tijdstip past de reistijd (±30 min) niet. Kies een ander uur of een andere vorm van hulp.",
     tech_calendar_off: "De agenda accepteert nu geen reserveringen.",
     tech_language_mismatch:
       "Die sessie is niet beschikbaar in die taal. Kies een andere tijd of verander de taal.",

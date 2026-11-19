@@ -211,6 +211,23 @@ export function enquiryPeriodsOverlap(
   return a.arrival <= b.departure && b.arrival <= a.departure;
 }
 
+/** Compact date for WhatsApp prefills (keeps Safari’s open-link prompt shorter). */
+function formatWaDate(iso: string, locale: Locale): string {
+  return parseISODate(iso)
+    .toLocaleDateString(localeTag(locale), {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    })
+    .replace(/\./g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Keep this message short: Safari rewrites the https link to whatsapp:// and
+ * shows the full encoded URL in the “Open this link?” sheet.
+ */
 export function buildWhatsAppMessage(input: {
   locale: Locale;
   periods: EnquiryPeriod[];
@@ -219,6 +236,7 @@ export function buildWhatsAppMessage(input: {
   registration?: string;
   vehicle?: string;
   comments?: string;
+  /** Optional; omitted from the default enquiry to keep the URL short. */
   pageUrl?: string;
   rates?: import("@/lib/parking/pricing").ParkingRatesMap;
 }): string {
@@ -230,62 +248,16 @@ export function buildWhatsAppMessage(input: {
   const mode: EnquiryMultiMode =
     periods.length <= 1 ? "single" : input.mode === "and" ? "and" : "or";
 
-  const emptyReg =
-    locale === "es"
-      ? "No indicada"
-      : locale === "fr"
-        ? "Non indiquée"
-        : "Not provided";
-  const emptyVehicle =
-    locale === "es"
-      ? "No indicado"
-      : locale === "fr"
-        ? "Non indiqué"
-        : "Not provided";
-  const emptyComments =
-    locale === "es"
-      ? "Sin comentarios"
-      : locale === "fr"
-        ? "Aucun commentaire"
-        : "No additional comments";
+  const durationLabel = (days: number) =>
+    locale === "fr" ? `${days}j` : `${days}d`;
 
-  const registration = normalizeParkingPlate(input.registration || "") || emptyReg;
-  const vehicle = input.vehicle?.trim()
-    ? input.vehicle.trim()
-    : emptyVehicle;
-  const comments = input.comments?.trim()
-    ? input.comments.trim()
-    : emptyComments;
-
-  const durationLabel = (days: number) => {
-    if (locale === "es") return `${days} ${days === 1 ? "día" : "días"}`;
-    if (locale === "fr") return `${days} ${days === 1 ? "jour" : "jours"}`;
-    return `${days} ${days === 1 ? "day" : "days"}`;
-  };
-
-  const periodBlock = (p: EnquiryPeriod, index: number, numbered: boolean) => {
+  const periodLine = (p: EnquiryPeriod, index: number, numbered: boolean) => {
     const days = countInclusiveDays(p.arrival, p.departure);
     const estimate = formatEuroEstimate(
       estimateParkingPrice(p.arrival, p.departure, rates)
     );
     const prefix = numbered ? `${index + 1}) ` : "";
-    const pad = numbered ? "   " : "";
-    if (locale === "es") {
-      return `${prefix}Entrada: ${formatLocaleDate(p.arrival, "es")}
-${pad}Salida: ${formatLocaleDate(p.departure, "es")}
-${pad}Duración: ${durationLabel(days)}
-${pad}Estimación: ${estimate}`;
-    }
-    if (locale === "fr") {
-      return `${prefix}Arrivée : ${formatLocaleDate(p.arrival, "fr")}
-${pad}Départ : ${formatLocaleDate(p.departure, "fr")}
-${pad}Durée : ${durationLabel(days)}
-${pad}Estimation : ${estimate}`;
-    }
-    return `${prefix}Arrival: ${formatLocaleDate(p.arrival, "en")}
-${pad}Departure: ${formatLocaleDate(p.departure, "en")}
-${pad}Duration: ${durationLabel(days)}
-${pad}Estimate: ${estimate}`;
+    return `${prefix}${formatWaDate(p.arrival, locale)} → ${formatWaDate(p.departure, locale)} · ${durationLabel(days)} · ${estimate}`;
   };
 
   let datesSection: string;
@@ -297,25 +269,24 @@ ${pad}Estimate: ${estimate}`;
           ? "(Aucune date)"
           : "(No dates)";
   } else if (mode === "single" || periods.length === 1) {
-    const p = periods[0];
-    datesSection = periodBlock(p, 0, false);
+    datesSection = periodLine(periods[0], 0, false);
   } else if (mode === "or") {
     const header =
       locale === "es"
-        ? "Opciones alternativas (¿alguna disponible?):"
+        ? "Alternativas (¿alguna?):"
         : locale === "fr"
-          ? "Options alternatives (l’une est-elle disponible ?) :"
-          : "Alternative options (is either available?):";
+          ? "Alternatives (l’une ?) :"
+          : "Alternatives (any?):";
     datesSection = `${header}\n${periods
-      .map((p, i) => periodBlock(p, i, true))
+      .map((p, i) => periodLine(p, i, true))
       .join("\n")}`;
   } else {
     const header =
       locale === "es"
-        ? "Necesito todas estas estancias (¿todas disponibles?):"
+        ? "Todas (¿disponibles?):"
         : locale === "fr"
-          ? "J’ai besoin de tous ces séjours (sont-ils tous disponibles ?) :"
-          : "I need all of these stays (are all available?):";
+          ? "Toutes (disponibles ?) :"
+          : "All stays (available?):";
     const totalDays = periods.reduce(
       (sum, p) => sum + countInclusiveDays(p.arrival, p.departure),
       0
@@ -328,51 +299,50 @@ ${pad}Estimate: ${estimate}`;
     );
     const totals =
       locale === "es"
-        ? `Total: ${durationLabel(totalDays)}\nEstimación total: ${totalEstimate}`
+        ? `Total: ${durationLabel(totalDays)} · ${totalEstimate}`
         : locale === "fr"
-          ? `Total : ${durationLabel(totalDays)}\nEstimation totale : ${totalEstimate}`
-          : `Total: ${durationLabel(totalDays)}\nTotal estimate: ${totalEstimate}`;
+          ? `Total : ${durationLabel(totalDays)} · ${totalEstimate}`
+          : `Total: ${durationLabel(totalDays)} · ${totalEstimate}`;
     datesSection = `${header}\n${periods
-      .map((p, i) => periodBlock(p, i, true))
+      .map((p, i) => periodLine(p, i, true))
       .join("\n")}\n${totals}`;
   }
 
-  if (locale === "es") {
-    return `Hola, Ainhoa. Quisiera consultar la disponibilidad de la plaza de garaje de Guardamar.
-
-${datesSection}
-Nombre: ${input.name.trim()}
-Matrícula: ${registration}
-Vehículo: ${vehicle}
-Comentarios: ${comments}
-${input.pageUrl ? `\nPágina: ${input.pageUrl}` : ""}
-
-Entiendo que la reserva no queda confirmada hasta recibir tu respuesta.`;
+  const details: string[] = [input.name.trim()];
+  const registration = normalizeParkingPlate(input.registration || "");
+  if (registration) details.push(registration);
+  const vehicle = input.vehicle?.trim();
+  if (vehicle) details.push(vehicle);
+  const comments = input.comments?.trim();
+  if (comments) {
+    details.push(
+      locale === "es"
+        ? `Notas: ${comments}`
+        : locale === "fr"
+          ? `Notes : ${comments}`
+          : `Notes: ${comments}`
+    );
   }
 
-  if (locale === "fr") {
-    return `Bonjour Ainhoa, je souhaiterais vérifier la disponibilité de la place de parking à Guardamar.
+  const closing =
+    locale === "es"
+      ? "(Sin confirmar hasta tu respuesta)"
+      : locale === "fr"
+        ? "(Non confirmé avant votre réponse)"
+        : "(Not confirmed until you reply)";
 
-${datesSection}
-Nom : ${input.name.trim()}
-Immatriculation : ${registration}
-Véhicule : ${vehicle}
-Commentaires : ${comments}
-${input.pageUrl ? `\nPage : ${input.pageUrl}` : ""}
+  const intro =
+    locale === "es"
+      ? "Hola Ainhoa — parking Guardamar"
+      : locale === "fr"
+        ? "Bonjour Ainhoa — parking Guardamar"
+        : "Hi Ainhoa — Guardamar parking";
 
-Je comprends que la réservation n’est confirmée qu’après votre réponse.`;
+  const parts = [intro, "", datesSection, "", details.join(" · "), closing];
+  if (input.pageUrl) {
+    parts.splice(parts.length - 1, 0, input.pageUrl, "");
   }
-
-  return `Hello Ainhoa, I would like to enquire about the parking space in Guardamar.
-
-${datesSection}
-Name: ${input.name.trim()}
-Vehicle registration: ${registration}
-Vehicle: ${vehicle}
-Comments: ${comments}
-${input.pageUrl ? `\nPage: ${input.pageUrl}` : ""}
-
-I understand that the booking is not confirmed until you reply.`;
+  return parts.join("\n");
 }
 
 export function whatsAppHref(message: string): string {

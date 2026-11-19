@@ -13,6 +13,16 @@ import SiteCopyright from "@/components/SiteCopyright";
 import { externalAnchorProps } from "@/lib/links";
 import { madridMinuteOfDay, minuteToHhMm, type SessionLanguage } from "@/lib/tech/calendar";
 import {
+  HOME_BLOCK_MINUTES,
+  HOME_SHORT_BLOCK_MINUTES,
+  homeArrivalsFromBlockStarts,
+  homeBlockMinutes,
+  isAssistanceMode,
+  resolveCreateTiming,
+  venueLabelForMode,
+  type AssistanceMode,
+} from "@/lib/tech/assistance";
+import {
   GROUP_MINUTES,
   GROUP_PRICE_CENTS,
   INDIVIDUAL_MINUTES,
@@ -181,10 +191,13 @@ export default function TechPublicApp({
   const [templateReady, setTemplateReady] = useState(false);
   const [bookableStarts, setBookableStarts] = useState<string[]>([]);
   const [bookableStartsShort, setBookableStartsShort] = useState<string[]>([]);
+  const [bookableStartsHome, setBookableStartsHome] = useState<string[]>([]);
+  const [bookableStartsHomeShort, setBookableStartsHomeShort] = useState<string[]>([]);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error" | "off">("loading");
   const [view, setView] = useState<View>("groups");
   const [offer, setOffer] = useState<PublicOffer | null>(null);
   const [selection, setSelection] = useState<PublicOffer | null>(null);
+  const [assistanceMode, setAssistanceMode] = useState<AssistanceMode>("onsite");
   const [dayKey, setDayKey] = useState<string | null>(null);
   const [weekStart, setWeekStart] = useState(() => weekMonday(madridDayKey(new Date())));
   const [weeksExpanded, setWeeksExpanded] = useState(false);
@@ -232,6 +245,8 @@ export default function TechPublicApp({
           sessions?: OfferSession[];
           bookableStarts?: string[];
           bookableStartsShort?: string[];
+          bookableStartsHome?: string[];
+          bookableStartsHomeShort?: string[];
           error?: string;
         } | null;
         if (!response.ok || !payload?.ok) throw new Error(payload?.error || "tech_failed");
@@ -246,6 +261,8 @@ export default function TechPublicApp({
         );
         setBookableStarts(payload.bookableStarts ?? []);
         setBookableStartsShort(payload.bookableStartsShort ?? []);
+        setBookableStartsHome(payload.bookableStartsHome ?? []);
+        setBookableStartsHomeShort(payload.bookableStartsHomeShort ?? []);
         setLoadState("ready");
       } catch {
         if (!cancelled) setLoadState("error");
@@ -316,6 +333,13 @@ export default function TechPublicApp({
       }),
     [calendarBookableStarts, calendarBookableStartsShort, privateDuration, privateMinutes, templateReady, spoken]
   );
+
+  const homeArrivalTimes = useMemo(() => {
+    const blockMinutes = privateMinutes === 30 ? HOME_SHORT_BLOCK_MINUTES : HOME_BLOCK_MINUTES;
+    const raw = privateMinutes === 30 ? bookableStartsHomeShort : bookableStartsHome;
+    const blocks = filterStartsToPublicWindows(raw, blockMinutes);
+    return new Set(homeArrivalsFromBlockStarts(blocks).map((iso) => new Date(iso).getTime()));
+  }, [bookableStartsHome, bookableStartsHomeShort, privateMinutes]);
 
   // Request flow: any real admin free start (30 or 60 grid), not tied to private duration toggle.
   const requestAdminStarts = useMemo(() => {
@@ -397,14 +421,43 @@ export default function TechPublicApp({
     setError(null);
     setSelection(next);
     setOffer(next);
+    setAssistanceMode("onsite");
     setView("details");
   }
 
   function backToList() {
     setOffer(null);
+    setAssistanceMode("onsite");
     setView(listView.current);
     setError(null);
   }
+
+  const offerHomeOk =
+    !!offer &&
+    offer.kind === "individual" &&
+    offer.mode === "create" &&
+    homeArrivalTimes.has(new Date(offer.startsAt).getTime());
+
+  const detailsTiming =
+    offer?.kind === "individual" && offer.mode === "create"
+      ? resolveCreateTiming({
+          mode: assistanceMode,
+          arrivalAt: offer.startsAt,
+          helpMinutes: offer.durationMinutes,
+        })
+      : null;
+
+  const detailsPriceCents =
+    detailsTiming?.priceCents ??
+    offer?.priceCents ??
+    (offer ? priceCentsForCreate(offer.kind, offer.durationMinutes) : 0);
+
+  const detailsVenue =
+    offer?.kind === "group"
+      ? offer.venueLabel || copy.placeBody
+      : venueLabelForMode(assistanceMode, offer?.venueLabel || copy.placeBody);
+
+  const detailsHelpMinutes = detailsTiming?.helpMinutes ?? offer?.durationMinutes ?? GROUP_MINUTES;
 
   function chooseDay(key: string) {
     setDayKey(key);
@@ -472,11 +525,22 @@ export default function TechPublicApp({
               startsAt: offer.startsAt,
               kind: offer.kind,
               durationMinutes: offer.durationMinutes,
+              assistanceMode: offer.kind === "group" ? "onsite" : assistanceMode,
             }
           : null;
     if (!bookPayload) {
       setSaving(false);
       setError("tech_failed");
+      return;
+    }
+    if (
+      !requesting &&
+      offer?.kind === "individual" &&
+      assistanceMode === "home_visit" &&
+      !offerHomeOk
+    ) {
+      setSaving(false);
+      setError("tech_home_unavailable");
       return;
     }
     const sessionLanguage = offer?.sessionLanguage ?? spoken;
@@ -708,6 +772,7 @@ export default function TechPublicApp({
               </div>
             </dl>
             {success.path ? <p><a href={success.path}>{copy.manageLink}</a></p> : <p>{copy.replayed}</p>}
+            {reserved ? <p className="tme-note">{copy.paySafe}</p> : null}
             {reserved ? <p>{copy.keepScreen}</p> : null}
             {reserved ? <p>{copy.cancelHelp}</p> : null}
             <TechContactLinks
@@ -773,7 +838,12 @@ export default function TechPublicApp({
           </ul>
         </header>
 
-        <section className="tme-panel" aria-labelledby="tme-choose" ref={pickRef}>
+        <section
+          className="tme-panel"
+          aria-labelledby={view === "request" ? undefined : "tme-choose"}
+          aria-label={view === "request" ? copy.otherTime : undefined}
+          ref={pickRef}
+        >
             <div className={`tme-panel-head${view === "request" ? " is-request" : ""}`}>
               {view === "request" ? (
                 <button
@@ -788,17 +858,21 @@ export default function TechPublicApp({
                   <IconCalendar />
                   <span>{copy.requestBack}</span>
                 </button>
-              ) : null}
-              <h2 id="tme-choose" className={view === "request" ? "tme-panel-title-accent" : undefined}>
-                {view === "private"
-                  ? copy.privateHeading
-                  : view === "request"
-                    ? copy.otherTime
+              ) : (
+                <h2 id="tme-choose">
+                  {view === "private"
+                    ? copy.privateHeading
                     : view === "details"
                       ? copy.formLead
                       : copy.chooseHeading}
-              </h2>
-              {view === "groups" || view === "private" ? <p>{copy.dateThenTime}</p> : null}
+                </h2>
+              )}
+              {view === "groups" || view === "private" ? (
+                <>
+                  <p>{copy.dateThenTime}</p>
+                  <p className="tme-assist-lead">{copy.assistanceLead}</p>
+                </>
+              ) : null}
             </div>
 
             {loadState === "loading" ? <p role="status">{copy.loading}</p> : null}
@@ -819,16 +893,67 @@ export default function TechPublicApp({
                 <p className="tme-chosen">
                   {sentenceCase(formatMadrid(new Date(offer.startsAt), locale))}
                   {" · "}
-                  {minutes(offer.durationMinutes)}
+                  {minutes(detailsHelpMinutes)}
                   {" · "}
-                  {plainEuros(offer.priceCents, locale)}
+                  {plainEuros(detailsPriceCents, locale)}
                   {seats(offer) ? ` · ${seats(offer)}` : ""}
                 </p>
-                <p className="tme-where">{offer.venueLabel || copy.placeBody}</p>
+                {offer.kind === "individual" && offer.mode === "create" ? (
+                  <fieldset className="tme-assist">
+                    <legend>{copy.assistancePick}</legend>
+                    {(
+                      [
+                        ["onsite", copy.assistanceOnsiteTitle, copy.assistanceOnsiteBody],
+                        ["phone", copy.assistancePhoneTitle, copy.assistancePhoneBody],
+                        ["home_visit", copy.assistanceHomeTitle, copy.assistanceHomeBody],
+                      ] as const
+                    ).map(([mode, title, body]) => {
+                      const homeBlocked = mode === "home_visit" && !offerHomeOk;
+                      return (
+                        <label
+                          key={mode}
+                          className={`tme-assist-option${assistanceMode === mode ? " is-on" : ""}${homeBlocked ? " is-disabled" : ""}`}
+                        >
+                          <input
+                            type="radio"
+                            name="tme-assist"
+                            value={mode}
+                            checked={assistanceMode === mode}
+                            disabled={homeBlocked}
+                            onChange={() => {
+                              if (!isAssistanceMode(mode) || homeBlocked) return;
+                              setAssistanceMode(mode);
+                              setError(null);
+                            }}
+                          />
+                          <span>
+                            <strong>{title}</strong>
+                            <em>{body}</em>
+                          </span>
+                        </label>
+                      );
+                    })}
+                    {assistanceMode === "home_visit" && offerHomeOk && detailsTiming ? (
+                      <p className="tme-assist-travel">
+                        {copy.assistanceHomeTravel
+                          .replace("{help}", String(detailsTiming.helpMinutes))
+                          .replace("{total}", String(homeBlockMinutes(detailsTiming.helpMinutes)))
+                          .replace("{price}", plainEuros(detailsTiming.priceCents, locale))}
+                      </p>
+                    ) : null}
+                    {!offerHomeOk ? (
+                      <p className="tme-assist-travel">{copy.homeVisitUnavailable}</p>
+                    ) : null}
+                  </fieldset>
+                ) : (
+                  <p className="tme-where">{copy.assistanceOnsiteBody}</p>
+                )}
+                <p className="tme-where">{detailsVenue}</p>
                 {languageNote(offer.sessionLanguage) ? <p className="tme-where">{languageNote(offer.sessionLanguage)}</p> : null}
                 <button type="button" className="tme-linkish" onClick={backToList}>
                   {copy.changeTime}
                 </button>
+                <p className="tme-note">{copy.paySafe}</p>
                 {personFields(copy.submitBook)}
               </form>
             ) : null}

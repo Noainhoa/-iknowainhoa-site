@@ -1177,126 +1177,25 @@
           opacity: 1;
         }
 
-.parking-root .pk-selected {
-          margin-top: 10px;
-          padding: 10px 12px;
-          background: var(--card);
-          border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
-          border-radius: var(--radius);
+.parking-root .pk-periods {
+          margin-top: 12px;
         }
 
-.parking-root .pk-selected:focus {
+.parking-root .pk-periods:focus {
           outline: none;
         }
 
-.parking-root .pk-selected:focus-visible {
+.parking-root .pk-periods:focus-visible {
           outline: 2px solid var(--pk-navy);
           outline-offset: 2px;
-        }
-
-.parking-root .pk-selected-head {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 8px;
-          margin-bottom: 10px;
-        }
-
-.parking-root .pk-selected-head h3 {
-          margin: 0;
-          font-size: 0.95rem;
-          font-weight: 700;
-          color: var(--pk-navy);
-        }
-
-.parking-root .pk-reset-dates {
-          width: 44px;
-          height: 44px;
-          margin: -6px -8px -6px 0;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border: 0;
-          border-radius: 10px;
-          background: transparent;
-          color: var(--pk-navy);
-          cursor: pointer;
-        }
-
-.parking-root .pk-reset-dates:hover {
-          background: color-mix(in srgb, var(--pk-navy) 8%, transparent);
-        }
-
-.parking-root .pk-reset-dates:focus-visible {
-          outline: 2px solid var(--pk-navy);
-          outline-offset: 2px;
-        }
-
-.parking-root .pk-selected-list {
-          margin: 0;
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 8px 12px;
-        }
-
-@media (min-width: 480px) {
-          .parking-root .pk-selected-list {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-          }
-        }
-
-.parking-root .pk-selected-list > div {
-          display: grid;
-          gap: 2px;
-          min-width: 0;
-        }
-
-.parking-root .pk-selected-list dt {
-          margin: 0;
-          font-size: 0.72rem;
-          font-weight: 650;
-          color: var(--muted);
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-        }
-
-.parking-root .pk-selected-list dd {
-          margin: 0;
-          font-size: 0.92rem;
-          font-weight: 650;
-          line-height: 1.25;
-        }
-
-.parking-root .pk-add-period {
-          margin-top: 12px;
-          width: 100%;
-          min-height: 44px;
-          border: 1px solid color-mix(in srgb, var(--pk-navy) 22%, transparent);
-          border-radius: 10px;
-          background: color-mix(in srgb, var(--pk-navy) 6%, #fff);
-          color: var(--pk-navy);
-          font: inherit;
-          font-weight: 700;
-          cursor: pointer;
-        }
-
-.parking-root .pk-add-period:hover {
-          background: color-mix(in srgb, var(--pk-navy) 12%, #fff);
-        }
-
-.parking-root .pk-periods {
-          margin-top: 14px;
-          padding: 12px 14px;
-          background: var(--card);
-          border: 1px solid color-mix(in srgb, var(--pk-navy) 12%, transparent);
           border-radius: var(--radius);
         }
 
-.parking-root .pk-periods h3 {
-          margin: 0 0 10px;
-          font-size: 0.95rem;
-          font-weight: 700;
-          color: var(--pk-navy);
+.parking-root .pk-periods-lead {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 10px;
+          align-items: start;
         }
 
 .parking-root .pk-periods-list {
@@ -1305,42 +1204,94 @@
           padding: 0;
           display: grid;
           gap: 10px;
+          min-width: 0;
         }
 
-.parking-root .pk-periods-list li {
+.parking-root .pk-period {
           margin: 0;
-          padding-bottom: 10px;
-          border-bottom: 1px solid color-mix(in srgb, var(--pk-navy) 10%, transparent);
-        }
-
-.parking-root .pk-periods-list li:last-child {
-          padding-bottom: 0;
-          border-bottom: 0;
+          padding: 10px 10px 10px 12px;
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 26%, transparent);
+          border-radius: 10px;
+          background: var(--selected);
+          color: var(--selected-ink);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pk-navy) 10%, transparent);
         }
 
 .parking-root .pk-period-main {
-          display: flex;
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr) auto auto;
           align-items: center;
-          gap: 8px;
-          font-size: 0.92rem;
-          font-weight: 600;
+          gap: 10px;
         }
 
 .parking-root .pk-period-index {
+          width: 28px;
+          height: 28px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 999px;
+          background: #fff;
           color: var(--pk-navy);
+          font-size: 0.82rem;
+          font-weight: 750;
           font-variant-numeric: tabular-nums;
+          line-height: 1;
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pk-navy) 18%, transparent);
+        }
+
+.parking-root .pk-period-dates {
+          margin: 0;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+          align-items: end;
+          gap: 6px 8px;
+          min-width: 0;
+        }
+
+.parking-root .pk-period-dates > div {
+          display: grid;
+          gap: 2px;
+          min-width: 0;
+        }
+
+.parking-root .pk-period-dates dt {
+          margin: 0;
+          font-size: 0.68rem;
+          font-weight: 650;
+          color: var(--muted);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+
+.parking-root .pk-period-dates dd {
+          margin: 0;
+          font-size: 0.92rem;
+          font-weight: 700;
+          line-height: 1.25;
+          color: var(--selected-ink);
+          overflow-wrap: anywhere;
+        }
+
+.parking-root .pk-period-arrow {
+          padding-bottom: 2px;
+          color: color-mix(in srgb, var(--pk-navy) 55%, var(--muted));
+          font-size: 1rem;
+          font-weight: 600;
+          line-height: 1;
         }
 
 .parking-root .pk-period-remove {
-          margin-left: auto;
           width: 44px;
           height: 44px;
+          margin: -4px -4px -4px 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           border: 0;
-          border-radius: 8px;
+          border-radius: 10px;
           background: transparent;
           color: var(--muted);
-          font-size: 1.35rem;
-          line-height: 1;
           cursor: pointer;
           touch-action: manipulation;
         }
@@ -1350,27 +1301,83 @@
           color: #7a2e2e;
         }
 
+.parking-root .pk-period-remove:focus-visible {
+          outline: 2px solid var(--pk-navy);
+          outline-offset: 2px;
+        }
+
 .parking-root .pk-period-meta {
-          margin: 4px 0 0 1.35rem;
-          font-size: 0.84rem;
-          color: var(--muted);
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 6px;
+        }
+
+.parking-root .pk-period-chip {
+          display: inline-flex;
+          align-items: center;
+          min-height: 26px;
+          padding: 2px 9px;
+          border-radius: 999px;
+          background: #fff;
+          color: var(--pk-navy);
+          font-size: 0.78rem;
+          font-weight: 650;
+          line-height: 1.2;
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pk-navy) 14%, transparent);
+        }
+
+.parking-root .pk-period-chip--price {
+          background: color-mix(in srgb, var(--available) 70%, #fff);
+          color: var(--available-ink);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--available-ink) 18%, transparent);
         }
 
 .parking-root .pk-multi-mode {
-          margin: 12px 0 0;
-          padding: 10px 0 0;
+          margin: 14px 0 0;
+          padding: 12px 0 0;
           border: 0;
           border-top: 1px solid color-mix(in srgb, var(--pk-navy) 10%, transparent);
           display: grid;
-          gap: 8px;
+          gap: 10px;
         }
 
 .parking-root .pk-multi-mode legend {
           padding: 0;
-          margin: 0 0 4px;
+          margin: 0 0 2px;
           font-size: 0.86rem;
           font-weight: 700;
           color: var(--pk-navy);
+        }
+
+.parking-root .pk-mode-options {
+          display: grid;
+          gap: 8px;
+        }
+
+@media (min-width: 560px) {
+          .parking-root .pk-mode-options {
+            grid-template-columns: 1fr 1fr;
+            align-items: stretch;
+          }
+        }
+
+.parking-root .pk-mode-card {
+          display: grid;
+          gap: 8px;
+          align-content: start;
+          margin: 0;
+          padding: 10px 12px;
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 14%, transparent);
+          border-radius: 10px;
+          background: #fff;
+          transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+.parking-root .pk-mode-card.is-active {
+          border-color: color-mix(in srgb, var(--pk-navy) 40%, transparent);
+          background: color-mix(in srgb, var(--pk-navy) 7%, #fff);
         }
 
 .parking-root .pk-mode-option {
@@ -1378,6 +1385,10 @@
           grid-template-columns: 18px minmax(0, 1fr);
           gap: 8px;
           align-items: start;
+          margin: 0;
+          padding: 0;
+          border: 0;
+          background: transparent;
           font-size: 0.88rem !important;
           font-weight: 450 !important;
           color: var(--ink);
@@ -1390,15 +1401,88 @@
         }
 
 .parking-root .pk-multi-summary {
-          margin: 4px 0 0;
+          margin: 0;
+          padding: 8px 10px;
+          border-radius: 8px;
+          background: #fff;
           font-size: 0.84rem;
           color: var(--muted);
           line-height: 1.4;
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pk-navy) 12%, transparent);
         }
 
-@media (max-width: 380px) {
-          .parking-root .pk-selected-list {
-            grid-template-columns: 1fr 1fr;
+.parking-root .pk-multi-summary strong {
+          color: var(--ink);
+          font-weight: 700;
+        }
+
+.parking-root .pk-more-dates-hint {
+          margin: 8px 0 0;
+          font-size: 0.84rem;
+          font-weight: 450;
+          line-height: 1.4;
+          color: var(--muted);
+        }
+
+.parking-root .pk-continue-form {
+          width: auto;
+          min-width: 4.5rem;
+          min-height: 58px;
+          margin: 0;
+          padding: 8px 12px;
+          border: 1px solid color-mix(in srgb, var(--pk-navy) 28%, transparent);
+          border-radius: 10px;
+          background: var(--pk-navy);
+          color: #fff;
+          font: inherit;
+          font-size: 0.9rem;
+          font-weight: 700;
+          line-height: 1.2;
+          text-align: center;
+          cursor: pointer;
+          align-self: start;
+          box-sizing: border-box;
+        }
+
+.parking-root .pk-continue-form:hover {
+          background: color-mix(in srgb, var(--pk-navy) 88%, #000);
+        }
+
+.parking-root .pk-continue-form:focus-visible {
+          outline: 2px solid var(--pk-navy);
+          outline-offset: 2px;
+        }
+
+@media (max-width: 560px) {
+          .parking-root .pk-periods-lead {
+            grid-template-columns: 1fr;
+          }
+
+          .parking-root .pk-continue-form {
+            width: 100%;
+            min-height: 44px;
+          }
+
+          .parking-root .pk-period-main {
+            grid-template-columns: auto minmax(0, 1fr) auto;
+          }
+
+          .parking-root .pk-period-dates {
+            grid-column: 2;
+            grid-row: 1;
+          }
+
+          .parking-root .pk-period-remove {
+            grid-column: 3;
+            grid-row: 1;
+            justify-self: end;
+            margin: -6px -2px 0 0;
+          }
+
+          .parking-root .pk-period-meta {
+            grid-column: 2 / 3;
+            grid-row: 2;
+            justify-content: flex-start;
           }
         }
 
@@ -1437,13 +1521,32 @@
           gap: 12px;
         }
 
+.parking-root .pk-form-row--identity {
+          grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.75fr) minmax(0, 1fr);
+        }
+
 .parking-root .pk-form-row > * {
           min-width: 0;
         }
 
+@media (max-width: 640px) {
+          .parking-root .pk-form-row--identity {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          .parking-root .pk-form-row--identity > :first-child {
+            grid-column: 1 / -1;
+          }
+        }
+
 @media (max-width: 340px) {
-          .parking-root .pk-form-row {
+          .parking-root .pk-form-row,
+          .parking-root .pk-form-row--identity {
             grid-template-columns: 1fr;
+          }
+
+          .parking-root .pk-form-row--identity > :first-child {
+            grid-column: auto;
           }
         }
 
@@ -1554,32 +1657,6 @@
           font-weight: 600;
         }
 
-.parking-root .pk-conditions-note {
-          margin: 0 0 var(--space-group);
-          padding: 10px 12px;
-          border: 1px solid var(--line);
-          border-radius: 8px;
-          background: #f3f6f8;
-        }
-
-.parking-root .pk-conditions-note p {
-          margin: 0 0 6px;
-          color: var(--muted);
-          font-size: 0.84rem;
-          line-height: 1.4;
-        }
-
-.parking-root .pk-conditions-note p:last-child {
-          margin-bottom: 0;
-        }
-
-.parking-root .pk-conditions-note .pk-inline-link {
-          color: var(--pk-navy);
-          font-weight: 650;
-          text-decoration: underline;
-          text-underline-offset: 2px;
-        }
-
 .parking-root .pk-wa {
           min-height: 52px;
           border: 0;
@@ -1668,15 +1745,25 @@
 
 .parking-root .pk-wa-status-actions {
           display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 8px;
+        }
+
+@media (max-width: 560px) {
+          .parking-root .pk-wa-status-actions {
+            grid-template-columns: 1fr;
+          }
         }
 
 .parking-root .pk-wa-status-primary,
 .parking-root .pk-wa-status-secondary {
           min-height: 44px;
+          padding: 8px 10px;
           border-radius: 10px;
           font: inherit;
+          font-size: 0.88rem;
           font-weight: 650;
+          line-height: 1.25;
           cursor: pointer;
         }
 
@@ -2121,7 +2208,7 @@
         }
 
 .parking-root .pk-seo-heading {
-          margin: 0 0 8px;
+          margin: 0;
           font-size: 1rem;
           font-weight: 700;
           color: var(--ink);
@@ -2130,6 +2217,47 @@
 .parking-root .pk-faq {
           display: grid;
           gap: 6px;
+        }
+
+.parking-root .pk-faq-toggle {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 0 0 2px;
+          list-style: none;
+          cursor: pointer;
+          user-select: none;
+        }
+
+.parking-root .pk-faq-toggle::-webkit-details-marker {
+          display: none;
+        }
+
+.parking-root .pk-faq-toggle::before {
+          content: "";
+          width: 0;
+          height: 0;
+          border-top: 5px solid transparent;
+          border-bottom: 5px solid transparent;
+          border-left: 7px solid var(--pk-navy);
+          flex-shrink: 0;
+          transition: transform 0.15s ease;
+        }
+
+.parking-root .pk-faq[open] > .pk-faq-toggle::before {
+          transform: rotate(90deg);
+        }
+
+.parking-root .pk-faq-toggle:focus-visible {
+          outline: 2px solid var(--pk-navy);
+          outline-offset: 2px;
+          border-radius: 6px;
+        }
+
+.parking-root .pk-faq-body {
+          display: grid;
+          gap: 6px;
+          margin-top: 6px;
         }
 
 .parking-root .pk-faq-item {
