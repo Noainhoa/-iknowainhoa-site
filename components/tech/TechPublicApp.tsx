@@ -4,7 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, House, Phone, UserRound, UsersRound } from "lucide-react";
+import {
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Code2,
+  House,
+  Laptop,
+  MessagesSquare,
+  PenLine,
+  Phone,
+  UserRound,
+  UsersRound,
+  type LucideIcon,
+} from "lucide-react";
 import { TechBrandLink } from "@/components/tech/TechBrandLink";
 import TechContactLinks from "@/components/tech/TechContactLinks";
 import { HeroBubbleIcon, IconCalendar, IconPhone } from "@/components/tech/TechIllustrations";
@@ -83,6 +96,41 @@ function assistanceForPath(path: BookingPath): AssistanceMode {
 
 function listViewForPath(path: BookingPath): "groups" | "private" {
   return path === "group" ? "groups" : "private";
+}
+
+/** Shared geometry for the teacher identity mark (viewBox 0 0 320 320). */
+const TEACHER_MARK = 320;
+const TEACHER_CX = 160;
+const TEACHER_CY = 160;
+/** Icon badge centres. */
+const TEACHER_ICON_R = 130;
+/** Outer face of the portrait ring. */
+const TEACHER_HUB_R = 99;
+/**
+ * Badge radius in viewBox units (~34–36px badges on 248–280px mark).
+ * Spokes end here so they meet the badge perimeter exactly.
+ */
+const TEACHER_BADGE_R = 21.5;
+const TEACHER_SPOKE_END_R = TEACHER_ICON_R - TEACHER_BADGE_R;
+/** Five skills, evenly spaced from top, clockwise. */
+const TEACHER_NODES: {
+  key: string;
+  Icon: LucideIcon;
+  deg: number;
+}[] = [
+  { key: "tech", Icon: Laptop, deg: -90 },
+  { key: "teach", Icon: BookOpen, deg: -18 },
+  { key: "talk", Icon: MessagesSquare, deg: 54 },
+  { key: "code", Icon: Code2, deg: 126 },
+  { key: "design", Icon: PenLine, deg: 198 },
+];
+
+function teacherPolar(deg: number, radius: number) {
+  const rad = (deg * Math.PI) / 180;
+  return {
+    x: TEACHER_CX + radius * Math.cos(rad),
+    y: TEACHER_CY + radius * Math.sin(rad),
+  };
 }
 
 type Success = {
@@ -479,6 +527,7 @@ export default function TechPublicApp({
     setAssistanceMode(assistanceForPath(path));
     listView.current = listViewForPath(path);
     setView(listViewForPath(path));
+    if (path === "home") setPrivateMinutes(60);
     setOffer(null);
     setSelection(null);
     setDayKey(null);
@@ -580,7 +629,7 @@ export default function TechPublicApp({
         ? {
             startsAt: homeStartsAt,
             kind: "individual" as const,
-            durationMinutes: privateDuration,
+            durationMinutes: INDIVIDUAL_MINUTES,
             assistanceMode: "home_visit" as const,
           }
       : offer?.mode === "join" && offer.sessionId
@@ -881,23 +930,24 @@ export default function TechPublicApp({
   const listMode: "groups" | "private" = view === "private" ? "private" : "groups";
   const pathLabel =
     bookingPath === "group"
-      ? copy.groupOption
+      ? copy.forkGroupTitle
       : bookingPath === "private"
-        ? copy.assistanceOnsiteTitle
+        ? copy.forkPrivateTitle
         : bookingPath === "remote"
-          ? copy.assistancePhoneTitle
+          ? copy.forkRemoteTitle
           : bookingPath === "home"
-            ? copy.assistanceHomeTitle
+            ? copy.forkHomeTitle
             : null;
   const forkOptions: {
     path: BookingPath;
-    label: string;
+    title: string;
+    body: string;
     Icon: typeof UsersRound;
   }[] = [
-    { path: "group", label: copy.groupOption, Icon: UsersRound },
-    { path: "private", label: copy.assistanceOnsiteTitle, Icon: UserRound },
-    { path: "remote", label: copy.assistancePhoneTitle, Icon: Phone },
-    { path: "home", label: copy.assistanceHomeTitle, Icon: House },
+    { path: "group", title: copy.forkGroupTitle, body: copy.forkGroupBody, Icon: UsersRound },
+    { path: "private", title: copy.forkPrivateTitle, body: copy.forkPrivateBody, Icon: UserRound },
+    { path: "remote", title: copy.forkRemoteTitle, body: copy.forkRemoteBody, Icon: Phone },
+    { path: "home", title: copy.forkHomeTitle, body: copy.forkHomeBody, Icon: House },
   ];
 
   return (
@@ -1102,16 +1152,18 @@ export default function TechPublicApp({
                 </div>
 
                 <div className="tme-fork" role="group" aria-label={copy.forkHeading}>
-                  {forkOptions.map(({ path, label, Icon }) => (
+                  {forkOptions.map(({ path, title, body, Icon }) => (
                     <button
                       key={path}
                       type="button"
                       className="tme-fork-option"
                       aria-pressed={bookingPath === path}
+                      aria-label={`${title}. ${body}`}
                       onClick={() => choosePath(path)}
                     >
                       <Icon className="tme-fork-icon" aria-hidden="true" />
-                      <span>{label}</span>
+                      <strong className="tme-fork-title">{title}</strong>
+                      <span className="tme-fork-body">{body}</span>
                     </button>
                   ))}
                 </div>
@@ -1119,33 +1171,12 @@ export default function TechPublicApp({
                 {bookingPath === "home" ? (
                   <>
                     <div className="tme-fork-head">
-                      <h3 className="tme-fork-step">{copy.assistanceHomeTitle}</h3>
+                      <h3 className="tme-fork-step">{copy.forkHomeTitle}</h3>
                       <p className="tme-assist-lead">{copy.homePickLead}</p>
-                    </div>
-
-                    <div className="tme-seg" role="group" aria-label={copy.privateHeading}>
-                      <button
-                        type="button"
-                        aria-pressed={privateMinutes === 30}
-                        onClick={() => {
-                          setPrivateMinutes(30);
-                          setError(null);
-                        }}
-                      >
-                        {minutes(INDIVIDUAL_SHORT_MINUTES)} ·{" "}
-                        {plainEuros(homePriceCents(INDIVIDUAL_SHORT_MINUTES), locale)}
-                      </button>
-                      <button
-                        type="button"
-                        aria-pressed={privateMinutes === 60}
-                        onClick={() => {
-                          setPrivateMinutes(60);
-                          setError(null);
-                        }}
-                      >
+                      <p className="tme-assist-lead">
                         {minutes(INDIVIDUAL_MINUTES)} ·{" "}
                         {plainEuros(homePriceCents(INDIVIDUAL_MINUTES), locale)}
-                      </button>
+                      </p>
                     </div>
 
                     <form onSubmit={onSubmit} noValidate>
@@ -1433,35 +1464,53 @@ export default function TechPublicApp({
             aria-label={`${copy.teacherName}. ${copy.teacherTags}`}
           >
             <div className="tme-teacher-medal" aria-hidden="true">
-              <svg className="tme-teacher-ring-text" viewBox="0 0 200 200">
-                <defs>
-                  <path
-                    id="tme-teacher-arc"
-                    d="M 16,100 A 84,84 0 0,0 184,100"
-                  />
-                </defs>
-                <text textAnchor="middle">
-                  <textPath href="#tme-teacher-arc" startOffset="50%">
-                    {copy.teacherTags}
-                  </textPath>
-                </text>
+              <svg
+                className="tme-teacher-network"
+                viewBox={`0 0 ${TEACHER_MARK} ${TEACHER_MARK}`}
+                preserveAspectRatio="xMidYMid meet"
+              >
+                {TEACHER_NODES.map(({ key, deg }) => {
+                  const hub = teacherPolar(deg, TEACHER_HUB_R);
+                  const tip = teacherPolar(deg, TEACHER_SPOKE_END_R);
+                  return (
+                    <line
+                      key={`spoke-${key}`}
+                      className="tme-teacher-network-spoke"
+                      x1={hub.x}
+                      y1={hub.y}
+                      x2={tip.x}
+                      y2={tip.y}
+                    />
+                  );
+                })}
               </svg>
-              <span className="tme-teacher-bloom tme-teacher-bloom-1" />
-              <span className="tme-teacher-bloom tme-teacher-bloom-2" />
-              <span className="tme-teacher-bloom tme-teacher-bloom-3" />
-              <span className="tme-teacher-bloom tme-teacher-bloom-4" />
+              {TEACHER_NODES.map(({ key, Icon, deg }) => {
+                const point = teacherPolar(deg, TEACHER_ICON_R);
+                return (
+                  <span
+                    key={key}
+                    className={`tme-teacher-orbit tme-teacher-orbit-${key}`}
+                    style={{
+                      left: `${(point.x / TEACHER_MARK) * 100}%`,
+                      top: `${(point.y / TEACHER_MARK) * 100}%`,
+                    }}
+                  >
+                    <Icon aria-hidden="true" strokeWidth={1.65} absoluteStrokeWidth />
+                  </span>
+                );
+              })}
               <div className="tme-teacher-photo">
                 <Image
                   src="/images/tech/ainhoa-portrait-v4.jpg"
                   alt=""
                   fill
-                  sizes="(min-width: 920px) 168px, 112px"
+                  sizes="(min-width: 920px) 168px, 140px"
                 />
               </div>
             </div>
             <figcaption>
-              <p className="tme-teacher-name">{copy.teacherName}</p>
               <p className="tme-teacher-tags">{copy.teacherTags}</p>
+              <p className="tme-teacher-name">{copy.teacherName}</p>
             </figcaption>
           </figure>
 

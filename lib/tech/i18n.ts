@@ -55,6 +55,14 @@ export type TechCopy = {
   /** Step 1: choose group / private / remote / home. */
   forkHeading: string;
   forkLead: string;
+  forkGroupTitle: string;
+  forkGroupBody: string;
+  forkPrivateTitle: string;
+  forkPrivateBody: string;
+  forkRemoteTitle: string;
+  forkRemoteBody: string;
+  forkHomeTitle: string;
+  forkHomeBody: string;
   /** Home-visit path: pick arrival day/time (Pedir-cita style). */
   homePickLead: string;
   homePickNote: string;
@@ -307,8 +315,16 @@ const es: TechCopy = {
   assistancePick: "¿Cómo quieres la sesión?",
   homeVisitUnavailable:
     "A esa hora no cabe el desplazamiento (±30 min). Elige otra hora o otro tipo de ayuda.",
-  forkHeading: "¿Qué necesitas?",
-  forkLead: "Grupo, a solas aquí, por teléfono o a domicilio.",
+  forkHeading: "¿Cómo prefieres que te ayude?",
+  forkLead: "Elige la opción que mejor se adapte a ti.",
+  forkGroupTitle: "Aprende en grupo",
+  forkGroupBody: "Aprende con otras personas, paso a paso.",
+  forkPrivateTitle: "Atención individual",
+  forkPrivateBody: "Te ayudo personalmente, aquí en mi espacio.",
+  forkRemoteTitle: "Ayuda por teléfono",
+  forkRemoteBody: "Resuelve tus dudas sin desplazarte.",
+  forkHomeTitle: "Voy a tu domicilio",
+  forkHomeBody: "Te ayudo con tus dispositivos en tu propia casa.",
   homePickLead: "Elige el día y la hora de llegada a tu casa en Guardamar.",
   homePickNote:
     "La visita es a tu domicilio. Eliges la hora de llegada; el desplazamiento va incluido en el bloque de la agenda.",
@@ -606,7 +622,7 @@ const en: TechCopy = {
   teacherLead:
     "My background combines international product management, design, technology and teaching. Having worked across different disciplines and developed digital solutions, I’ve always been driven by curiosity, practical problem-solving and a desire to make technology more accessible.",
   teacherName: "Ainhoa Ferrandis",
-  teacherTags: "Design · Teaching · Technology",
+  teacherTags: "DESIGN · TEACHING · TECHNOLOGY",
   teacherStory:
     "One of my earliest experiences involved adapting voice-recognition technology to help someone with a visual impairment use their computer. That experience reflects the approach I still take today: understanding each person’s needs, finding the simplest solution and explaining it in a clear, patient and practical way.",
   teacherClose:
@@ -627,8 +643,16 @@ const en: TechCopy = {
   assistancePick: "How do you want the session?",
   homeVisitUnavailable:
     "That time does not leave room for travel (±30 min). Pick another time or another type of help.",
-  forkHeading: "What do you need?",
-  forkLead: "Group, private here, by phone, or a home visit.",
+  forkHeading: "How would you like me to help?",
+  forkLead: "Choose the option that suits you best.",
+  forkGroupTitle: "Learn in a group",
+  forkGroupBody: "Learn together with others, step by step.",
+  forkPrivateTitle: "One-to-one help",
+  forkPrivateBody: "Personal help, just for you, at my location.",
+  forkRemoteTitle: "Help over the phone",
+  forkRemoteBody: "Get answers and guidance without travelling.",
+  forkHomeTitle: "I'll come to you",
+  forkHomeBody: "Personal help with your devices in your own home.",
   homePickLead: "Pick the day and arrival time at your home in Guardamar.",
   homePickNote:
     "This visit is at your home. You choose the arrival time; travel is included in the calendar block.",
@@ -947,8 +971,16 @@ const nl: TechCopy = {
   assistancePick: "Hoe wil je de sessie?",
   homeVisitUnavailable:
     "Op dat tijdstip past de reistijd (±30 min) niet. Kies een ander uur of een andere vorm van hulp.",
-  forkHeading: "Wat heb je nodig?",
-  forkLead: "Groep, alleen hier, telefonisch of bij je thuis.",
+  forkHeading: "Hoe kan ik je het beste helpen?",
+  forkLead: "Kies wat het beste bij je past.",
+  forkGroupTitle: "Leren in een groep",
+  forkGroupBody: "Leer samen met anderen, stap voor stap.",
+  forkPrivateTitle: "Individuele hulp",
+  forkPrivateBody: "Persoonlijke hulp op mijn locatie.",
+  forkRemoteTitle: "Hulp via de telefoon",
+  forkRemoteBody: "Krijg antwoord en uitleg zonder de deur uit te hoeven.",
+  forkHomeTitle: "Ik kom bij je thuis",
+  forkHomeBody: "Persoonlijke hulp met je apparaten bij jou thuis.",
   homePickLead: "Kies de dag en aankomsttijd bij jou thuis in Guardamar.",
   homePickNote:
     "Dit is een huisbezoek. Jij kiest de aankomsttijd; de reistijd zit in het agenda-blok.",
