@@ -1725,11 +1725,9 @@ export default function ParkingPublicApp({
             locale={locale}
             copy={{
               summary: t.feedbackSummary,
-              lead: t.feedbackLead,
               moodLabel: t.feedbackMoodLabel,
-              moodGood: t.feedbackMoodGood,
-              moodOk: t.feedbackMoodOk,
-              moodProblem: t.feedbackMoodProblem,
+              moodUp: t.feedbackMoodUp,
+              moodDown: t.feedbackMoodDown,
               messageLabel: t.feedbackMessageLabel,
               messagePlaceholder: t.feedbackMessagePlaceholder,
               referenceLabel: t.feedbackReferenceLabel,
@@ -1738,7 +1736,17 @@ export default function ParkingPublicApp({
               submitting: t.feedbackSubmitting,
               success: t.feedbackSuccess,
               error: t.feedbackError,
-              privacy: t.feedbackPrivacy,
+              privacyBefore: t.feedbackPrivacyBefore,
+              privacyLink: t.feedbackPrivacyLink,
+              privacyAfter: t.feedbackPrivacyAfter,
+              contactAsk: t.feedbackContactAsk,
+              contactName: t.feedbackContactName,
+              contactNamePlaceholder: t.feedbackContactNamePlaceholder,
+              contactEmail: t.feedbackContactEmail,
+              contactEmailPlaceholder: t.feedbackContactEmailPlaceholder,
+              contactPhone: t.feedbackContactPhone,
+              contactPhonePlaceholder: t.feedbackContactPhonePlaceholder,
+              contactNeed: t.feedbackContactNeed,
             }}
           />
         </div>

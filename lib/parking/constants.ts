@@ -10,6 +10,10 @@ export const PARKING_BAY_WIDTH_M = 2.4;
 /** Display asset for the circular header / admin logo (56–128 CSS px). */
 export const PARKING_BADGE_SRC = "/images/parking/guardamar-parking-badge-128.png";
 
+/** Public Google review form for this parking space. */
+export const PARKING_GOOGLE_REVIEW_URL =
+  "https://g.page/r/CWMLfcyI2aHKEBI/review";
+
 export function parkingAccessHeightLabel(locale: Locale): string {
   const n =
     locale === "en"

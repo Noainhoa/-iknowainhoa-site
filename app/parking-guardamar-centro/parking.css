@@ -2014,23 +2014,37 @@
 }
 
 .parking-root .pk-feedback-form {
+          box-sizing: border-box;
+          width: 100%;
           display: grid;
-          gap: 12px;
+          justify-items: stretch;
+          gap: 14px;
           margin-top: 14px;
-          padding: 14px 14px 16px;
+          padding: 16px;
           border-radius: 14px;
           border: 1px solid color-mix(in srgb, var(--pk-contact-ink) 22%, transparent);
           background: color-mix(in srgb, #003a63 55%, transparent);
+          text-align: start;
 }
 
-.parking-root .pk-feedback-lead,
 .parking-root .pk-feedback-privacy {
           margin: 0;
-          color: var(--pk-contact-muted);
-          font-size: 0.85rem;
-          line-height: 1.45;
+          color: color-mix(in srgb, var(--pk-contact-muted) 88%, transparent);
+          font-size: 0.78rem;
+          line-height: 1.4;
+          text-align: start;
           text-wrap: pretty;
-          max-width: none;
+}
+
+.parking-root .pk-feedback-privacy a {
+          color: #fff;
+          font-weight: 650;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+}
+
+.parking-root .pk-feedback-privacy a:hover {
+          color: var(--pk-contact-accent);
 }
 
 .parking-root .pk-feedback-mood {
@@ -2038,34 +2052,61 @@
           padding: 0;
           border: 0;
           min-inline-size: 0;
+          display: flex;
+          align-items: center;
+          flex-wrap: nowrap;
+          gap: 10px;
 }
 
 .parking-root .pk-feedback-lab {
           display: block;
-          margin-bottom: 6px;
+          margin: 0;
+          padding: 0;
           color: var(--pk-contact-accent);
           font-size: 0.72rem;
           font-weight: 700;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
+          letter-spacing: 0;
+          text-align: start;
+}
+
+.parking-root .pk-feedback-mood > .pk-feedback-lab {
+          flex: 1 1 auto;
+          min-width: 0;
+          white-space: normal;
+          text-wrap: balance;
+          font-size: clamp(1.05rem, 1.6vw + 0.85rem, 1.5rem);
+          line-height: 1.15;
+          letter-spacing: 0;
 }
 
 .parking-root .pk-feedback-mood-row {
-          display: flex;
-          flex-wrap: wrap;
+          flex: 0 1 11.5rem;
+          min-width: 6rem;
+          width: auto;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 8px;
 }
 
 .parking-root .pk-feedback-mood-btn {
-          min-height: 36px;
-          padding: 0 12px;
-          border-radius: 999px;
+          box-sizing: border-box;
+          width: 100%;
+          min-height: 44px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          border-radius: 10px;
           border: 1.5px solid color-mix(in srgb, var(--pk-contact-ink) 40%, transparent);
           background: transparent;
           color: var(--pk-contact-ink);
-          font-size: 0.85rem;
-          font-weight: 600;
           cursor: pointer;
+}
+
+.parking-root .pk-feedback-mood-icon {
+          display: block;
+          width: 22px;
+          height: 22px;
 }
 
 .parking-root .pk-feedback-mood-btn.is-on,
@@ -2078,6 +2119,32 @@
 .parking-root .pk-feedback-field {
           display: grid;
           gap: 6px;
+}
+
+.parking-root .pk-feedback-plate-row {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 10px;
+}
+
+.parking-root .pk-feedback-plate {
+          flex: 1 1 0;
+          min-width: min(100%, 17rem);
+          max-width: calc(100% - 6.25rem);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+}
+
+.parking-root .pk-feedback-plate .pk-feedback-lab {
+          flex: 1 1 auto;
+          min-width: 0;
+          overflow-wrap: break-word;
+          font-size: clamp(1rem, 1.1vw + 0.75rem, 1.25rem);
+          line-height: 22px;
+          letter-spacing: 0;
 }
 
 .parking-root .pk-feedback-form textarea,
@@ -2099,21 +2166,76 @@
           color: color-mix(in srgb, var(--pk-contact-muted) 75%, transparent);
 }
 
-.parking-root .pk-feedback-submit {
-          justify-self: start;
-          min-height: 40px;
-          padding: 0 16px;
-          border-radius: 999px;
-          border: 0;
-          background: var(--pk-contact-accent);
-          color: #003a63;
-          font-size: 0.9rem;
-          font-weight: 700;
+.parking-root .pk-feedback-plate input {
+          flex: 0 1 8.75rem;
+          width: 8.75rem;
+          min-width: 6.5rem;
+          max-width: 46%;
+}
+
+.parking-root .pk-feedback-plate-row .pk-feedback-submit {
+          flex: none;
+          margin-left: auto;
+}
+
+.parking-root .pk-feedback-ask {
+          display: grid;
+          grid-template-columns: 22px minmax(0, 1fr);
+          gap: 10px;
+          align-items: center;
+          margin: 0;
+          color: var(--pk-contact-ink);
+          font-size: 0.88rem;
+          line-height: 1.35;
           cursor: pointer;
 }
 
+.parking-root .pk-feedback-ask input {
+          width: 18px;
+          height: 18px;
+          margin: 0;
+          accent-color: var(--pk-contact-accent);
+          cursor: pointer;
+}
+
+.parking-root .pk-feedback-contact {
+          display: grid;
+          gap: 10px;
+}
+
+.parking-root .pk-feedback-contact input {
+          width: 100%;
+          max-width: none;
+}
+
+.parking-root .pk-feedback-submit {
+          box-sizing: border-box;
+          flex: none;
+          justify-self: end;
+          width: 5.5rem;
+          height: 44px;
+          min-height: 44px;
+          padding: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 10px;
+          border: 1.5px solid color-mix(in srgb, var(--pk-contact-ink) 40%, transparent);
+          background: transparent;
+          color: var(--pk-contact-ink);
+          cursor: pointer;
+}
+
+.parking-root .pk-feedback-send-icon {
+          display: block;
+          width: 22px;
+          height: 22px;
+}
+
 .parking-root .pk-feedback-submit:hover:not(:disabled) {
-          background: #fff;
+          border-color: var(--pk-contact-accent);
+          background: color-mix(in srgb, var(--pk-contact-accent) 16%, transparent);
+          color: #fff;
 }
 
 .parking-root .pk-feedback-submit:disabled {

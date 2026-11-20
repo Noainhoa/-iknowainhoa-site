@@ -12,9 +12,18 @@ type FeedbackBody = {
   reference?: unknown;
   locale?: unknown;
   pageUrl?: unknown;
+  contactName?: unknown;
+  contactEmail?: unknown;
+  contactPhone?: unknown;
 };
 
-const MOODS = new Set(["good", "ok", "problem"]);
+const MOOD_TO_STORED: Record<string, "good" | "ok" | "problem"> = {
+  up: "good",
+  down: "problem",
+  good: "good",
+  ok: "ok",
+  problem: "problem",
+};
 
 function asTrimmedString(value: unknown, max: number): string {
   if (typeof value !== "string") return "";
@@ -22,9 +31,9 @@ function asTrimmedString(value: unknown, max: number): string {
 }
 
 function moodLabel(mood: string | null): string {
-  if (mood === "good") return "Bien / Good";
+  if (mood === "good") return "Thumbs up";
   if (mood === "ok") return "Regular / OK";
-  if (mood === "problem") return "Problema / Problem";
+  if (mood === "problem") return "Thumbs down";
   return "—";
 }
 
@@ -40,7 +49,10 @@ export async function POST(request: Request) {
   const locale = asTrimmedString(body.locale, 8) || null;
   const pageUrl = asTrimmedString(body.pageUrl, 500) || null;
   const moodRaw = asTrimmedString(body.mood, 16).toLowerCase();
-  const mood = moodRaw && MOODS.has(moodRaw) ? moodRaw : null;
+  const mood = MOOD_TO_STORED[moodRaw] ?? null;
+  const contactName = asTrimmedString(body.contactName, 80) || null;
+  const contactEmail = asTrimmedString(body.contactEmail, 120) || null;
+  const contactPhone = asTrimmedString(body.contactPhone, 40) || null;
 
   if (message.length < 3) {
     return NextResponse.json({ error: "invalid_message" }, { status: 400 });
@@ -53,6 +65,9 @@ export async function POST(request: Request) {
     p_reference: reference,
     p_locale: locale,
     p_page_url: pageUrl,
+    p_contact_name: contactName,
+    p_contact_email: contactEmail,
+    p_contact_phone: contactPhone,
   });
 
   if (error) {
@@ -69,6 +84,9 @@ export async function POST(request: Request) {
           "",
           `Mood: ${moodLabel(mood)}`,
           `Reference: ${reference || "—"}`,
+          `Contact name: ${contactName || "—"}`,
+          `Contact email: ${contactEmail || "—"}`,
+          `Contact phone: ${contactPhone || "—"}`,
           `Locale: ${locale || "—"}`,
           `Page: ${pageUrl || "—"}`,
           `Id: ${id ?? "—"}`,

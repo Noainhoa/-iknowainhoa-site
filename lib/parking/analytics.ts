@@ -33,6 +33,7 @@ export type ParkingAnalyticsEvent =
       language: Locale;
       hasMood: boolean;
       hasReference: boolean;
+      hasContact: boolean;
     }
   | { name: "parking_feedback_error"; language: Locale };
 

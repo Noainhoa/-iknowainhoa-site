@@ -39,9 +39,9 @@ import {
 } from "@/lib/parking/types";
 
 const FEEDBACK_MOOD_ES: Record<NonNullable<ParkingFeedback["mood"]>, string> = {
-  good: "Bien",
+  good: "Pulgar arriba",
   ok: "Regular",
-  problem: "Problema",
+  problem: "Pulgar abajo",
 };
 
 const FEEDBACK_STATUS_ES: Record<ParkingFeedbackStatus, string> = {
@@ -306,7 +306,9 @@ export default function ParkingAdminApp() {
     if (!supabase || !sessionEmail) return;
     const { data, error } = await supabase
       .from("parking_feedback")
-      .select("id, created_at, locale, mood, message, reference, page_url, status")
+      .select(
+        "id, created_at, locale, mood, message, reference, page_url, status, contact_name, contact_email, contact_phone"
+      )
       .neq("status", "archived")
       .order("created_at", { ascending: false })
       .limit(40);
@@ -1204,6 +1206,13 @@ export default function ParkingAdminApp() {
                   ) : null}
                 </div>
                 <p className="feedback-message">{item.message}</p>
+                {item.contact_name || item.contact_email || item.contact_phone ? (
+                  <p className="feedback-contact">
+                    {[item.contact_name, item.contact_email, item.contact_phone]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                ) : null}
                 <div className="feedback-actions">
                   {item.status === "new" ? (
                     <button
@@ -2077,6 +2086,12 @@ const styles = `
     white-space: pre-wrap;
     line-height: 1.45;
     text-wrap: pretty;
+  }
+  .feedback-contact {
+    margin: -4px 0 10px;
+    color: #0b3a5b;
+    font-size: 0.86rem;
+    font-weight: 600;
   }
   .feedback-actions { display: flex; flex-wrap: wrap; gap: 8px; }
   .feedback-actions .ghost { min-height: 36px; font-size: 0.82rem; }

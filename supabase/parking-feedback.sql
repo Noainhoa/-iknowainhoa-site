@@ -21,6 +21,9 @@ CREATE TABLE IF NOT EXISTS parking_feedback (
   message TEXT NOT NULL,
   reference TEXT,
   page_url TEXT,
+  contact_name TEXT,
+  contact_email TEXT,
+  contact_phone TEXT,
   status parking_feedback_status NOT NULL DEFAULT 'new',
   CONSTRAINT parking_feedback_message_len CHECK (
     char_length(btrim(message)) BETWEEN 3 AND 1000
@@ -59,12 +62,17 @@ CREATE POLICY parking_feedback_admin_update
   USING (public.is_parking_admin())
   WITH CHECK (public.is_parking_admin());
 
+DROP FUNCTION IF EXISTS public.parking_submit_feedback(TEXT, TEXT, TEXT, TEXT, TEXT);
+
 CREATE OR REPLACE FUNCTION public.parking_submit_feedback(
   p_message TEXT,
   p_mood TEXT DEFAULT NULL,
   p_reference TEXT DEFAULT NULL,
   p_locale TEXT DEFAULT NULL,
-  p_page_url TEXT DEFAULT NULL
+  p_page_url TEXT DEFAULT NULL,
+  p_contact_name TEXT DEFAULT NULL,
+  p_contact_email TEXT DEFAULT NULL,
+  p_contact_phone TEXT DEFAULT NULL
 )
 RETURNS UUID
 LANGUAGE plpgsql
@@ -99,13 +107,19 @@ BEGIN
     mood,
     reference,
     locale,
-    page_url
+    page_url,
+    contact_name,
+    contact_email,
+    contact_phone
   ) VALUES (
     msg,
     mood_val,
     ref,
     NULLIF(left(btrim(coalesce(p_locale, '')), 8), ''),
-    NULLIF(left(btrim(coalesce(p_page_url, '')), 500), '')
+    NULLIF(left(btrim(coalesce(p_page_url, '')), 500), ''),
+    NULLIF(left(btrim(coalesce(p_contact_name, '')), 80), ''),
+    NULLIF(left(btrim(coalesce(p_contact_email, '')), 120), ''),
+    NULLIF(left(btrim(coalesce(p_contact_phone, '')), 40), '')
   )
   RETURNING id INTO new_id;
 
@@ -113,7 +127,7 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.parking_submit_feedback(TEXT, TEXT, TEXT, TEXT, TEXT) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.parking_submit_feedback(TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
+REVOKE ALL ON FUNCTION public.parking_submit_feedback(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.parking_submit_feedback(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
 
 NOTIFY pgrst, 'reload schema';

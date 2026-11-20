@@ -111,11 +111,9 @@ export type ParkingCopy = {
   contactPlace: string;
   contactWhatsAppMessage: string;
   feedbackSummary: string;
-  feedbackLead: string;
   feedbackMoodLabel: string;
-  feedbackMoodGood: string;
-  feedbackMoodOk: string;
-  feedbackMoodProblem: string;
+  feedbackMoodUp: string;
+  feedbackMoodDown: string;
   feedbackMessageLabel: string;
   feedbackMessagePlaceholder: string;
   feedbackReferenceLabel: string;
@@ -124,7 +122,17 @@ export type ParkingCopy = {
   feedbackSubmitting: string;
   feedbackSuccess: string;
   feedbackError: string;
-  feedbackPrivacy: string;
+  feedbackPrivacyBefore: string;
+  feedbackPrivacyLink: string;
+  feedbackPrivacyAfter: string;
+  feedbackContactAsk: string;
+  feedbackContactName: string;
+  feedbackContactNamePlaceholder: string;
+  feedbackContactEmail: string;
+  feedbackContactEmailPlaceholder: string;
+  feedbackContactPhone: string;
+  feedbackContactPhonePlaceholder: string;
+  feedbackContactNeed: string;
   conditionsLinkLabel: string;
   whatsappCta: string;
   whatsappPreparing: string;
@@ -294,22 +302,29 @@ const es: ParkingCopySource = {
   contactWhatsAppMessage:
     "Hola, me interesa la plaza de parking en Guardamar Centro.",
   feedbackSummary: "¿Ya usaste la plaza? Enviar feedback privado",
-  feedbackLead:
-    "Solo lo leo yo, para mejorar el acceso y el servicio. No se publica.",
-  feedbackMoodLabel: "¿Cómo fue?",
-  feedbackMoodGood: "Bien",
-  feedbackMoodOk: "Regular",
-  feedbackMoodProblem: "Problema",
+  feedbackMoodLabel: "¿Cómo fue tu experiencia?",
+  feedbackMoodUp: "Pulgar arriba",
+  feedbackMoodDown: "Pulgar abajo",
   feedbackMessageLabel: "Tu mensaje",
-  feedbackMessagePlaceholder: "Acceso, tamaño, limpieza, comunicación…",
+  feedbackMessagePlaceholder: "Dinos más sobre tu experiencia…",
   feedbackReferenceLabel: "Matrícula (opcional)",
   feedbackReferencePlaceholder: "1234 ABC",
   feedbackSubmit: "Enviar feedback",
   feedbackSubmitting: "Enviando…",
   feedbackSuccess: "Gracias. He recibido tu feedback.",
   feedbackError: "No se ha podido enviar. Inténtalo de nuevo o escríbeme por WhatsApp.",
-  feedbackPrivacy:
-    "Uso este mensaje solo para operaciones. No aparece en la página ni en Google.",
+  feedbackPrivacyBefore:
+    "Esto es solo para uso interno. Si quieres dejar una reseña en Google, ",
+  feedbackPrivacyLink: "sigue este enlace",
+  feedbackPrivacyAfter: ".",
+  feedbackContactAsk: "Sí, quiero que me contactéis sobre este feedback",
+  feedbackContactName: "Nombre",
+  feedbackContactNamePlaceholder: "Tu nombre",
+  feedbackContactEmail: "Email",
+  feedbackContactEmailPlaceholder: "tu@email.com",
+  feedbackContactPhone: "Teléfono",
+  feedbackContactPhonePlaceholder: "600 000 000",
+  feedbackContactNeed: "Deja un email o un teléfono para poder contactarte.",
   conditionsLinkLabel: "Ver condiciones de reserva",
   whatsappCta: "Solicitar por WhatsApp",
   whatsappPreparing: "Preparando solicitud…",
@@ -481,22 +496,29 @@ const en: ParkingCopySource = {
   contactWhatsAppMessage:
     "Hi, I’m interested in the parking space in Guardamar Centro.",
   feedbackSummary: "Already used the space? Send private feedback",
-  feedbackLead:
-    "I read this myself, to improve access and the service. It is not published.",
-  feedbackMoodLabel: "How was it?",
-  feedbackMoodGood: "Good",
-  feedbackMoodOk: "OK",
-  feedbackMoodProblem: "Problem",
+  feedbackMoodLabel: "How was your experience?",
+  feedbackMoodUp: "Thumbs up",
+  feedbackMoodDown: "Thumbs down",
   feedbackMessageLabel: "Your message",
-  feedbackMessagePlaceholder: "Access, size, cleanliness, communication…",
+  feedbackMessagePlaceholder: "Tell us more about your experience…",
   feedbackReferenceLabel: "Registration plate (optional)",
   feedbackReferencePlaceholder: "1234 ABC",
   feedbackSubmit: "Send feedback",
   feedbackSubmitting: "Sending…",
   feedbackSuccess: "Thank you. I’ve received your feedback.",
   feedbackError: "Could not send. Try again or message me on WhatsApp.",
-  feedbackPrivacy:
-    "I use this message for operations only. It does not appear on the page or on Google.",
+  feedbackPrivacyBefore:
+    "This is for internal use only. If you would like to leave a Google review, ",
+  feedbackPrivacyLink: "follow this link",
+  feedbackPrivacyAfter: ".",
+  feedbackContactAsk: "Yes, please contact me about this feedback",
+  feedbackContactName: "Name",
+  feedbackContactNamePlaceholder: "Your name",
+  feedbackContactEmail: "Email",
+  feedbackContactEmailPlaceholder: "you@email.com",
+  feedbackContactPhone: "Phone",
+  feedbackContactPhonePlaceholder: "600 000 000",
+  feedbackContactNeed: "Leave an email or a phone number so I can contact you.",
   conditionsLinkLabel: "View booking conditions",
   whatsappCta: "Enquire through WhatsApp",
   whatsappPreparing: "Preparing enquiry…",
@@ -667,22 +689,30 @@ const fr: ParkingCopySource = {
   contactWhatsAppMessage:
     "Bonjour, je suis intéressé(e) par la place de parking à Guardamar Centro.",
   feedbackSummary: "Déjà utilisé la place ? Envoyez un retour privé",
-  feedbackLead:
-    "Je le lis moi-même, pour améliorer l’accès et le service. Ce n’est pas publié.",
-  feedbackMoodLabel: "Comment c’était ?",
-  feedbackMoodGood: "Bien",
-  feedbackMoodOk: "Moyen",
-  feedbackMoodProblem: "Problème",
+  feedbackMoodLabel: "Comment était votre expérience ?",
+  feedbackMoodUp: "Pouce vers le haut",
+  feedbackMoodDown: "Pouce vers le bas",
   feedbackMessageLabel: "Votre message",
-  feedbackMessagePlaceholder: "Accès, taille, propreté, communication…",
+  feedbackMessagePlaceholder: "Dites-nous en plus sur votre expérience…",
   feedbackReferenceLabel: "Immatriculation (facultatif)",
   feedbackReferencePlaceholder: "1234 ABC",
   feedbackSubmit: "Envoyer le retour",
   feedbackSubmitting: "Envoi…",
   feedbackSuccess: "Merci. J’ai bien reçu votre retour.",
   feedbackError: "Envoi impossible. Réessayez ou écrivez-moi sur WhatsApp.",
-  feedbackPrivacy:
-    "J’utilise ce message uniquement pour améliorer le service. Il n’apparaît pas sur la page ni sur Google.",
+  feedbackPrivacyBefore:
+    "Ceci est réservé à un usage interne. Si vous souhaitez laisser un avis Google, ",
+  feedbackPrivacyLink: "suivez ce lien",
+  feedbackPrivacyAfter: ".",
+  feedbackContactAsk: "Oui, contactez-moi au sujet de ce retour",
+  feedbackContactName: "Nom",
+  feedbackContactNamePlaceholder: "Votre nom",
+  feedbackContactEmail: "E-mail",
+  feedbackContactEmailPlaceholder: "vous@email.com",
+  feedbackContactPhone: "Téléphone",
+  feedbackContactPhonePlaceholder: "600 000 000",
+  feedbackContactNeed:
+    "Indiquez un e-mail ou un téléphone pour que je puisse vous contacter.",
   conditionsLinkLabel: "Voir les conditions de réservation",
   whatsappCta: "Demander via WhatsApp",
   whatsappPreparing: "Préparation de la demande…",

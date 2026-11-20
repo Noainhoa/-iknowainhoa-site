@@ -84,6 +84,9 @@ export type ParkingFeedback = {
   message: string;
   reference: string | null;
   page_url: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
   status: ParkingFeedbackStatus;
 };
 
