@@ -301,7 +301,7 @@ const es: ParkingCopySource = {
   contactPlace: "Parking Guardamar Centro",
   contactWhatsAppMessage:
     "Hola, me interesa la plaza de parking en Guardamar Centro.",
-  feedbackSummary: "¿Ya usaste la plaza? Enviar feedback privado",
+  feedbackSummary: "Envíanos tu opinión, nos interesa.",
   feedbackMoodLabel: "¿Cómo fue tu experiencia?",
   feedbackMoodUp: "Pulgar arriba",
   feedbackMoodDown: "Pulgar abajo",
