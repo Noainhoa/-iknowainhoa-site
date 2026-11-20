@@ -2960,6 +2960,15 @@ body:has(.tme-home) {
     0 16px 36px color-mix(in srgb, var(--tme-ink) 7%, transparent);
 }
 
+/* Booking panel sits on the page plane — no card around the fork cards. */
+.tme.tme-home .tme-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 8px 0 0;
+}
+
 .tme.tme-home h2 {
   margin: 0;
   font-size: 1.28rem;
@@ -3162,25 +3171,26 @@ body:has(.tme-home) {
   visibility: hidden;
 }
 
-.tme-date.is-today:not([aria-pressed="true"]) {
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tme-sea) 75%, white);
+.tme-date.is-today .tme-date-w {
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+  text-transform: none;
   color: var(--tme-ink);
 }
 
-.tme-date.is-today.is-closed:not([aria-pressed="true"]) {
-  background: color-mix(in srgb, var(--tme-tint) 55%, var(--tme-card));
-}
-
-.tme-date.is-today.is-group:not([aria-pressed="true"]),
-.tme-date.is-today.is-free:not([aria-pressed="true"]) {
-  box-shadow:
-    inset 0 0 0 2px color-mix(in srgb, var(--tme-sea) 80%, white),
-    0 0 0 1px color-mix(in srgb, var(--tme-sea) 25%, transparent);
+.tme-date.is-today .tme-date-n {
+  opacity: 0.72;
 }
 
 .tme-date[aria-pressed="true"] {
   background: var(--tme-ink);
   color: var(--tme-bg);
+}
+
+.tme-date.is-today[aria-pressed="true"] .tme-date-w {
+  color: inherit;
 }
 
 .tme-urgent-fab {
@@ -3379,6 +3389,78 @@ body:has(.tme-home) {
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
+}
+
+.tme-fork {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tme-fork-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin-top: 0;
+}
+
+.tme-fork-head + .tme-fork-head,
+.tme-fork + .tme-fork-head {
+  margin-top: 18px;
+}
+
+.tme-fork-head .tme-assist-lead {
+  margin: 0;
+}
+
+.tme-fork-step {
+  margin: 0;
+  font: 700 1.05rem / 1.25 var(--tme-sans);
+  color: var(--tme-ink);
+}
+
+.tme-fork-option {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  min-height: 76px;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--tme-sand);
+  color: var(--tme-ink);
+  font: 700 0.78rem / 1.2 var(--tme-sans);
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tme-fork-icon {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.25;
+}
+
+.tme-fork-option[aria-pressed="true"] {
+  border-color: transparent;
+  background: var(--tme-ink);
+  color: var(--tme-bg);
+}
+
+@media (max-width: 520px) {
+  .tme-fork-option {
+    min-height: 72px;
+    padding: 8px 4px;
+    font-size: 0.7rem;
+  }
+
+  .tme-fork-icon {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .tme-seg {
@@ -3711,14 +3793,13 @@ body:has(.tme-home) {
   border-top: 1px solid color-mix(in srgb, var(--tme-line) 80%, transparent);
 }
 
-.tme-teacher::after {
-  content: "";
-  display: table;
-  clear: both;
+.tme-teacher-intro {
+  display: grid;
+  gap: 14px;
 }
 
 .tme-teacher-kicker {
-  margin: 0 0 14px;
+  margin: 0;
   font-size: 0.75rem;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -3729,128 +3810,146 @@ body:has(.tme-home) {
 .tme.tme-home .tme-teacher h2 {
   margin: 0;
   max-width: 14ch;
-  font-size: 1.5rem;
-  line-height: 1.12;
+  font-family: var(--tme-serif);
+  font-size: 1.85rem;
+  font-weight: 560;
+  line-height: 1.08;
   letter-spacing: -0.02em;
 }
 
-.tme-teacher-lead-main {
-  margin: 10px 0 0;
-  font-size: 1.02rem;
-  line-height: 1.45;
-  font-weight: 650;
+.tme-teacher-body {
+  display: grid;
+  gap: 1.15rem;
+  margin-top: 1.25rem;
+}
+
+.tme-teacher-copy {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  font-weight: 400;
   color: var(--tme-ink);
 }
 
-.tme-teacher-lead-more {
-  margin: 8px 0 0;
-  font-size: 0.95rem;
-  line-height: 1.45;
-  color: var(--tme-muted);
+.tme-teacher-copy.is-goal {
+  font-weight: 700;
 }
 
-.tme-teacher-aside {
+.tme-teacher-portrait {
   box-sizing: border-box;
-  float: right;
-  position: relative;
-  z-index: 2;
   display: grid;
   justify-items: center;
-  align-content: start;
-  gap: 0;
-  width: 138px;
-  margin: 2px 0 16px 16px;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 18px auto 4px;
   padding: 0;
-  border-radius: 22px;
-  border: 1px solid color-mix(in srgb, var(--tme-line) 78%, white);
-  background:
-    linear-gradient(
-      165deg,
-      color-mix(in srgb, var(--tme-card) 90%, var(--tme-sun) 10%),
-      var(--tme-card) 40%,
-      color-mix(in srgb, var(--tme-card) 94%, var(--tme-sand))
-    );
-  box-shadow:
-    0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
-    0 10px 24px color-mix(in srgb, var(--tme-ink) 7%, transparent);
-  text-align: center;
-  overflow: hidden;
-  transform: scale(1);
-  transform-origin: top right;
-  transition:
-    transform 220ms ease,
-    box-shadow 220ms ease,
-    z-index 0s;
-  cursor: zoom-in;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
   outline: none;
+  text-align: center;
 }
 
-.tme-teacher-aside:focus-visible {
+.tme-teacher-portrait:focus-visible {
   outline: 3px solid var(--tme-focus);
-  outline-offset: 3px;
+  outline-offset: 6px;
+}
+
+.tme-teacher-medal {
+  position: relative;
+  width: 168px;
+  height: 168px;
+}
+
+.tme-teacher-ring-text {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tme-teacher-ring-text text {
+  fill: var(--tme-sea);
+  font-family: var(--tme-sans);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .tme-teacher-photo {
-  position: relative;
-  width: 92px;
-  height: 92px;
-  margin: 8px 0;
-  border-radius: 50%;
+  position: absolute;
+  inset: 18%;
   overflow: hidden;
+  border-radius: 50%;
   background: var(--tme-sand);
-  border: 3px solid color-mix(in srgb, var(--tme-sun) 58%, white);
+  border: 7px solid var(--tme-sun);
   box-shadow:
-    0 0 0 4px color-mix(in srgb, var(--tme-card) 88%, var(--tme-sun) 12%),
-    0 0 0 5px color-mix(in srgb, var(--tme-line) 55%, transparent);
+    0 0 0 2px color-mix(in srgb, var(--tme-card) 70%, white),
+    0 8px 20px color-mix(in srgb, var(--tme-ink) 10%, transparent);
 }
 
 .tme-teacher-photo img {
   object-fit: cover;
-  object-position: 32% 18%;
-  transform: scale(1);
-  transform-origin: 36% 22%;
-  transition:
-    transform 220ms ease,
-    object-position 220ms ease;
+  object-position: 50% 28%;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .tme-teacher-aside:hover {
-    z-index: 8;
-    transform: scale(1.62);
-    box-shadow:
-      0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
-      0 18px 40px color-mix(in srgb, var(--tme-ink) 16%, transparent);
-  }
-
-  .tme-teacher-aside:hover .tme-teacher-photo img {
-    transform: scale(1.42);
-    object-position: 30% 12%;
-  }
+.tme-teacher-bloom {
+  position: absolute;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--tme-sun);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tme-bg) 55%, var(--tme-sand));
 }
 
-.tme-teacher-aside:focus-within {
-  z-index: 8;
-  transform: scale(1.62);
-  box-shadow:
-    0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
-    0 18px 40px color-mix(in srgb, var(--tme-ink) 16%, transparent);
+.tme-teacher-bloom-1 {
+  top: 8%;
+  right: 12%;
+  width: 12px;
+  height: 12px;
 }
 
-.tme-teacher-aside:focus-within .tme-teacher-photo img {
-  transform: scale(1.42);
-  object-position: 30% 12%;
+.tme-teacher-bloom-2 {
+  top: 42%;
+  right: -2%;
+  width: 9px;
+  height: 9px;
+  background: color-mix(in srgb, var(--tme-sea) 72%, white);
+}
+
+.tme-teacher-bloom-3 {
+  bottom: 10%;
+  left: 14%;
+  width: 11px;
+  height: 11px;
+  background: color-mix(in srgb, var(--tme-sun) 70%, var(--tme-sea));
+}
+
+.tme-teacher-bloom-4 {
+  top: 18%;
+  left: 2%;
+  width: 8px;
+  height: 8px;
+  background: color-mix(in srgb, var(--tme-sea) 55%, var(--tme-sand));
+}
+
+.tme-teacher-portrait figcaption {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  min-width: 0;
 }
 
 .tme-teacher-name {
-  box-sizing: border-box;
-  width: 100%;
   margin: 0;
-  padding: 11px 10px 9px;
-  border-bottom: 1px solid color-mix(in srgb, var(--tme-line) 65%, transparent);
-  background: color-mix(in srgb, var(--tme-card) 70%, var(--tme-sun) 30%);
   font-family: var(--tme-serif);
-  font-size: 0.9rem;
+  font-size: 1.08rem;
   font-weight: 560;
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -3858,63 +3957,90 @@ body:has(.tme-home) {
 }
 
 .tme-teacher-tags {
-  box-sizing: border-box;
-  width: 100%;
-  margin: 0;
-  padding: 9px 10px 11px;
-  border-top: 1px solid color-mix(in srgb, var(--tme-line) 65%, transparent);
-  background: color-mix(in srgb, var(--tme-card) 88%, var(--tme-sand));
-  font-size: 0.66rem;
-  line-height: 1.35;
-  letter-spacing: 0.02em;
-  color: var(--tme-muted);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-.tme-teacher-experience {
-  display: grid;
-  gap: 6px;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid color-mix(in srgb, var(--tme-line) 72%, transparent);
-}
+@media (min-width: 920px) {
+  .tme-teacher {
+    display: grid;
+    grid-template-columns: minmax(0, 44rem) 220px;
+    grid-template-rows: auto 1fr;
+    column-gap: 36px;
+    align-items: stretch;
+    justify-content: start;
+    max-width: none;
+  }
 
-.tme-teacher-experience-title {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 750;
-  color: var(--tme-ink);
-}
+  .tme-teacher-intro {
+    grid-column: 1;
+    grid-row: 1;
+  }
 
-.tme-teacher-experience p:last-child {
-  margin: 0;
-  font-size: 0.94rem;
-  line-height: 1.45;
-  color: var(--tme-muted);
-}
+  .tme.tme-home .tme-teacher h2 {
+    font-size: 2.1rem;
+  }
 
-.tme-teacher-close {
-  display: grid;
-  gap: 4px;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid color-mix(in srgb, var(--tme-line) 72%, transparent);
-}
+  .tme-teacher-body {
+    grid-column: 1;
+    grid-row: 2;
+    gap: 1.25rem;
+    margin-top: 1.35rem;
+  }
 
-.tme-teacher-close-line {
-  margin: 10px 0 0;
-  font-family: var(--tme-serif);
-  font-size: 1.22rem;
-  font-weight: 560;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--tme-ink);
-}
+  .tme-teacher-copy {
+    font-size: 1.02rem;
+    line-height: 1.58;
+  }
 
-.tme-teacher-close-lead {
-  margin: 0;
-  font-size: 0.94rem;
-  line-height: 1.4;
-  color: var(--tme-muted);
+  .tme-teacher-portrait {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    justify-self: end;
+    gap: 12px;
+    width: 220px;
+    margin: 0;
+  }
+
+  .tme-teacher-medal {
+    width: 200px;
+    height: 200px;
+  }
+
+  .tme-teacher-ring-text text {
+    font-size: 8.2px;
+  }
+
+  .tme-teacher-photo {
+    border-width: 9px;
+  }
+
+  .tme-teacher-bloom {
+    width: 16px;
+    height: 16px;
+  }
+
+  .tme-teacher-bloom-1 {
+    width: 14px;
+    height: 14px;
+  }
+
+  .tme-teacher-bloom-2 {
+    width: 10px;
+    height: 10px;
+  }
+
+  .tme-teacher-name {
+    font-size: 1.14rem;
+  }
 }
 
 .tme-foot {
@@ -4079,40 +4205,6 @@ body:has(.tme-home) {
   .tme-teacher {
     margin-top: 30px;
     padding-top: 24px;
-  }
-
-  .tme.tme-home .tme-teacher h2 {
-    font-size: 1.85rem;
-  }
-
-  .tme-teacher-lead-main {
-    font-size: 1.08rem;
-  }
-
-  .tme-teacher-aside {
-    width: 168px;
-    margin: 0 0 18px 28px;
-    border-radius: 26px;
-  }
-
-  .tme-teacher-photo {
-    width: 112px;
-    height: 112px;
-    margin: 10px 0;
-  }
-
-  .tme-teacher-name {
-    padding: 13px 12px 10px;
-    font-size: 1.02rem;
-  }
-
-  .tme-teacher-tags {
-    padding: 10px 12px 13px;
-    font-size: 0.72rem;
-  }
-
-  .tme-teacher-close-line {
-    font-size: 1.35rem;
   }
 
   .tme-panel {

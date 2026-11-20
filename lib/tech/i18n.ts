@@ -32,13 +32,10 @@ export type TechCopy = {
   teacherKicker: string;
   teacherHello: string;
   teacherLead: string;
-  teacherLeadMore: string;
   teacherName: string;
   teacherTags: string;
-  teacherExperienceTitle: string;
   teacherStory: string;
   teacherClose: string;
-  teacherCloseLead: string;
   /** `{price}` is the formatted group price. */
   priceFrom: string;
   trustLine: string;
@@ -55,6 +52,12 @@ export type TechCopy = {
   assistanceHomeTravel: string;
   assistancePick: string;
   homeVisitUnavailable: string;
+  /** Step 1: choose group / private / remote / home. */
+  forkHeading: string;
+  forkLead: string;
+  /** Home-visit path: pick arrival day/time (Pedir-cita style). */
+  homePickLead: string;
+  homePickNote: string;
   chooseHeading: string;
   dateThenTime: string;
   earlierDates: string;
@@ -65,6 +68,8 @@ export type TechCopy = {
   nextFourWeeks: string;
   noTimesWeek: string;
   dayUnavailable: string;
+  /** Short label on the calendar chip for the current day. */
+  today: string;
   reserve: string;
   moreDates: string;
   fewerDates: string;
@@ -279,16 +284,13 @@ const es: TechCopy = {
   teacherKicker: "Quién está detrás de Guardamar Click",
   teacherHello: "Hola, soy Ainhoa.",
   teacherLead:
-    "Mi trayectoria combina la gestión internacional de productos, el diseño, la tecnología y la enseñanza.",
-  teacherLeadMore:
-    "He trabajado en entornos internacionales, desarrollado soluciones digitales y aprendido a moverme entre distintas disciplinas.",
+    "Mi trayectoria combina la gestión internacional de productos, el diseño, la tecnología y la enseñanza. Tras trabajar entre distintas disciplinas y desarrollar soluciones digitales, siempre me ha movido la curiosidad, la resolución práctica de problemas y el deseo de hacer la tecnología más accesible.",
   teacherName: "Ainhoa Ferrandis",
-  teacherTags: "Tecnología · Diseño · Enseñanza",
-  teacherExperienceTitle: "Experiencia aplicada a las personas",
+  teacherTags: "Diseño · Enseñanza · Tecnología",
   teacherStory:
-    "Siempre he estado cerca de la tecnología. Desde mis primeras experiencias adaptando herramientas de reconocimiento de voz a necesidades de accesibilidad, mi enfoque ha sido comprender cada problema y encontrar soluciones prácticas.",
-  teacherClose: "Más autonomía. Más confianza. Menos frustración.",
-  teacherCloseLead: "Te escucho, busco la solución más sencilla y te enseño a utilizarla por ti mismo.",
+    "Una de mis primeras experiencias fue adaptar tecnología de reconocimiento de voz para ayudar a alguien con discapacidad visual a usar el ordenador. Esa experiencia refleja el enfoque que sigo hoy: entender las necesidades de cada persona, encontrar la solución más sencilla y explicarla con claridad, paciencia y sentido práctico.",
+  teacherClose:
+    "Mi objetivo es sencillo: ayudarte a ganar autonomía y confianza con la tecnología, para que las tareas del día a día sean más fáciles y menos frustrantes.",
   priceFrom: "Desde {price}",
   trustLine: "Presencial en Guardamar · También por teléfono · Visita a domicilio",
   assistanceHeading: "Cómo te ayudo",
@@ -305,8 +307,13 @@ const es: TechCopy = {
   assistancePick: "¿Cómo quieres la sesión?",
   homeVisitUnavailable:
     "A esa hora no cabe el desplazamiento (±30 min). Elige otra hora o otro tipo de ayuda.",
+  forkHeading: "¿Qué necesitas?",
+  forkLead: "Grupo, a solas aquí, por teléfono o a domicilio.",
+  homePickLead: "Elige el día y la hora de llegada a tu casa en Guardamar.",
+  homePickNote:
+    "La visita es a tu domicilio. Eliges la hora de llegada; el desplazamiento va incluido en el bloque de la agenda.",
   chooseHeading: "Elige una hora",
-  dateThenTime: "Primero el día y la hora. Luego cómo te ayudo.",
+  dateThenTime: "Ahora elige el día y la hora.",
   earlierDates: "Fechas anteriores",
   laterDates: "Fechas siguientes",
   prevWeek: "Semana anterior",
@@ -315,6 +322,7 @@ const es: TechCopy = {
   nextFourWeeks: "4 semanas siguientes",
   noTimesWeek: "Esta semana no hay horas libres.",
   dayUnavailable: "Sin horas",
+  today: "Hoy",
   reserve: "Reservar",
   moreDates: "Ver 4 semanas",
   fewerDates: "Ver una semana",
@@ -357,7 +365,7 @@ const es: TechCopy = {
   aboutLanguages:
     "Trabajamos con tu propio móvil, tablet u ordenador y tus propias dudas, en español o inglés, al ritmo que necesites.",
   aboutSign: "— Ainhoa",
-  portraitLabel: "Retrato ilustrado de Ainhoa",
+  portraitLabel: "Retrato de Ainhoa",
   pricesKicker: "Precios claros",
   pricesTitleBefore: "Elige cómo te sientes",
   pricesTitleEm: "más cómodo",
@@ -596,16 +604,13 @@ const en: TechCopy = {
   teacherKicker: "Who is behind Guardamar Click",
   teacherHello: "Hello, I'm Ainhoa.",
   teacherLead:
-    "My background brings together international product management, design, technology and teaching.",
-  teacherLeadMore:
-    "I have worked in international settings, built digital solutions and learnt to move between different disciplines.",
+    "My background combines international product management, design, technology and teaching. Having worked across different disciplines and developed digital solutions, I’ve always been driven by curiosity, practical problem-solving and a desire to make technology more accessible.",
   teacherName: "Ainhoa Ferrandis",
-  teacherTags: "Technology · Design · Teaching",
-  teacherExperienceTitle: "Experience applied to people",
+  teacherTags: "Design · Teaching · Technology",
   teacherStory:
-    "I have always been close to technology. From my earliest experiences adapting voice-recognition tools for accessibility needs, my focus has been to understand each problem and find practical solutions.",
-  teacherClose: "More independence. More confidence. Less frustration.",
-  teacherCloseLead: "I listen, look for the simplest solution and teach you to use it yourself.",
+    "One of my earliest experiences involved adapting voice-recognition technology to help someone with a visual impairment use their computer. That experience reflects the approach I still take today: understanding each person’s needs, finding the simplest solution and explaining it in a clear, patient and practical way.",
+  teacherClose:
+    "My goal is simple: to help you become more independent and confident with technology, making everyday tasks easier and less frustrating.",
   priceFrom: "From {price}",
   trustLine: "In person in Guardamar · Also by phone · Home visit",
   assistanceHeading: "How I help you",
@@ -622,8 +627,13 @@ const en: TechCopy = {
   assistancePick: "How do you want the session?",
   homeVisitUnavailable:
     "That time does not leave room for travel (±30 min). Pick another time or another type of help.",
+  forkHeading: "What do you need?",
+  forkLead: "Group, private here, by phone, or a home visit.",
+  homePickLead: "Pick the day and arrival time at your home in Guardamar.",
+  homePickNote:
+    "This visit is at your home. You choose the arrival time; travel is included in the calendar block.",
   chooseHeading: "Choose a time",
-  dateThenTime: "First the day and time. Then how I help you.",
+  dateThenTime: "Now pick the day and time.",
   earlierDates: "Earlier dates",
   laterDates: "Later dates",
   prevWeek: "Previous week",
@@ -632,6 +642,7 @@ const en: TechCopy = {
   nextFourWeeks: "Next 4 weeks",
   noTimesWeek: "No free times this week.",
   dayUnavailable: "No times",
+  today: "Today",
   reserve: "Book",
   moreDates: "Show 4 weeks",
   fewerDates: "Show one week",
@@ -674,7 +685,7 @@ const en: TechCopy = {
   aboutLanguages:
     "We work with your own phone, tablet or computer and your own questions, in Spanish or English, at your pace.",
   aboutSign: "— Ainhoa",
-  portraitLabel: "Illustrated portrait of Ainhoa",
+  portraitLabel: "Portrait of Ainhoa",
   storiesKicker: "From people who came",
   storiesTitleBefore: "In their",
   storiesTitleEm: "words",
@@ -913,16 +924,13 @@ const nl: TechCopy = {
   teacherKicker: "Wie zit er achter Guardamar Click",
   teacherHello: "Hallo, ik ben Ainhoa.",
   teacherLead:
-    "Mijn achtergrond brengt internationaal productmanagement, ontwerp, technologie en lesgeven samen.",
-  teacherLeadMore:
-    "Ik heb in internationale omgevingen gewerkt, digitale oplossingen ontwikkeld en me tussen verschillende disciplines bewogen.",
+    "Mijn achtergrond combineert internationaal productmanagement, ontwerp, technologie en lesgeven. Door over disciplines heen te werken en digitale oplossingen te ontwikkelen, word ik gedreven door nieuwsgierigheid, praktisch probleemoplossen en de wens om technologie toegankelijker te maken.",
   teacherName: "Ainhoa Ferrandis",
-  teacherTags: "Technologie · Ontwerp · Lesgeven",
-  teacherExperienceTitle: "Ervaring toegepast op mensen",
+  teacherTags: "Ontwerp · Lesgeven · Technologie",
   teacherStory:
-    "Ik ben altijd dicht bij technologie gebleven. Vanaf mijn eerste ervaringen met spraakherkenning voor toegankelijkheid is mijn aanpak geweest: elk probleem begrijpen en praktische oplossingen vinden.",
-  teacherClose: "Meer zelfstandigheid. Meer vertrouwen. Minder frustratie.",
-  teacherCloseLead: "Ik luister, zoek de eenvoudigste oplossing en leer je die zelf te gebruiken.",
+    "Een van mijn eerste ervaringen was spraakherkenningstechnologie aanpassen zodat iemand met een visuele beperking de computer kon gebruiken. Die ervaring weerspiegelt mijn aanpak vandaag: de behoeften van elke persoon begrijpen, de eenvoudigste oplossing vinden en die helder, geduldig en praktisch uitleggen.",
+  teacherClose:
+    "Mijn doel is eenvoudig: je helpen zelfstandiger en zekerder met technologie te worden, zodat alledaagse taken makkelijker en minder frustrerend worden.",
   priceFrom: "Vanaf {price}",
   trustLine: "Ter plaatse in Guardamar · Ook telefonisch · Huisbezoek",
   assistanceHeading: "Hoe ik je help",
@@ -939,8 +947,13 @@ const nl: TechCopy = {
   assistancePick: "Hoe wil je de sessie?",
   homeVisitUnavailable:
     "Op dat tijdstip past de reistijd (±30 min) niet. Kies een ander uur of een andere vorm van hulp.",
+  forkHeading: "Wat heb je nodig?",
+  forkLead: "Groep, alleen hier, telefonisch of bij je thuis.",
+  homePickLead: "Kies de dag en aankomsttijd bij jou thuis in Guardamar.",
+  homePickNote:
+    "Dit is een huisbezoek. Jij kiest de aankomsttijd; de reistijd zit in het agenda-blok.",
   chooseHeading: "Kies een tijd",
-  dateThenTime: "Eerst de dag en de tijd. Daarna hoe ik je help.",
+  dateThenTime: "Kies nu de dag en de tijd.",
   earlierDates: "Eerdere datums",
   laterDates: "Latere datums",
   prevWeek: "Vorige week",
@@ -949,6 +962,7 @@ const nl: TechCopy = {
   nextFourWeeks: "Volgende 4 weken",
   noTimesWeek: "Deze week zijn er geen vrije tijden.",
   dayUnavailable: "Geen tijden",
+  today: "Vandaag",
   reserve: "Reserveren",
   moreDates: "Toon 4 weken",
   fewerDates: "Toon één week",
@@ -991,7 +1005,7 @@ const nl: TechCopy = {
   aboutLanguages:
     "We werken met je eigen telefoon, tablet of computer en je eigen vragen, in het Spaans of Engels, in jouw tempo.",
   aboutSign: "— Ainhoa",
-  portraitLabel: "Geïllustreerd portret van Ainhoa",
+  portraitLabel: "Portret van Ainhoa",
   pricesKicker: "Duidelijke prijzen",
   pricesTitleBefore: "Kies wat voor jou",
   pricesTitleEm: "het prettigst voelt",
