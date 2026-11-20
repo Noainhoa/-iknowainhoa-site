@@ -260,7 +260,7 @@ export default function ParkingFeedbackForm({ locale, copy }: Props) {
               <button
                 key={value}
                 type="button"
-                className={`pk-feedback-mood-btn${mood === value ? " is-on" : ""}`}
+                className={`pk-feedback-mood-btn pk-feedback-mood-${value}${mood === value ? " is-on" : ""}`}
                 aria-pressed={mood === value}
                 aria-label={label}
                 onClick={() => setMood((current) => (current === value ? "" : value))}
