@@ -1522,11 +1522,11 @@ export default function TechPublicApp({
         </section>
 
         <footer className="tme-foot">
-          <p>{copy.placeBody}</p>
+          <p>
+            {copy.placeTitle}: {copy.placeBody}
+          </p>
           <p className="tme-foot-pay">{copy.payShort}</p>
           <div className="tme-foot-links">
-            <a href={telHref()}>{copy.callNow} {phoneDisplay}</a>
-            <span aria-hidden="true">·</span>
             <Link href={techConditionsHref(locale)}>{copy.footerLegalLabel}</Link>
             <span aria-hidden="true">·</span>
             <SiteCopyright style={{ margin: 0, color: "inherit", fontSize: "0.85rem", textAlign: "inherit" }} />

@@ -354,7 +354,7 @@ const es: TechCopy = {
   paySafe:
     "Puedes pagar con tarjeta en la sesión. Aquí no hace falta escribir ningún dato de la tarjeta ni del banco: reserva el hueco y deja un contacto. En esta web estás a salvo.",
   payShort:
-    "Puedes pagar con tarjeta en la sesión (también efectivo, transferencia o Bizum). Aquí no escribas datos de pago: reserva el hueco y deja un contacto.",
+    "Puedes pagar con tarjeta en la sesión (también efectivo, transferencia o Bizum).",
   inEnglish: "En inglés",
   inSpanish: "En español",
   callNow: "Llamar",
@@ -454,7 +454,7 @@ const es: TechCopy = {
   talkTitle: "¿Prefieres hablar?",
   talkBody: "No hace falta reservar por internet. Llama al 636 67 01 03, o escribe por WhatsApp.",
   pay: "Puedes pagar con tarjeta cuando nos veamos, o en efectivo, por transferencia o Bizum. Aquí no pongas ningún dato de pago. Lo que importa es reservar el hueco y dejar un contacto: en esta web estás a salvo.",
-  placeTitle: "Dónde",
+  placeTitle: "Ubicación",
   placeBody: "Guardamar del Segura. Junto a la Escuela de Música Auditorio",
   choose: "Elige el día y la hora",
   groupOption: "En grupo",
@@ -682,7 +682,7 @@ const en: TechCopy = {
   paySafe:
     "You can pay by card at the session. You do not enter any card or bank details here: just book the slot and leave a contact. You are safe on this page.",
   payShort:
-    "You can pay by card at the session (also cash, bank transfer or Bizum). Do not enter payment details here: just book the slot and leave a contact.",
+    "You can pay by card at the session (also cash, bank transfer or Bizum).",
   inEnglish: "In English",
   inSpanish: "In Spanish",
   callNow: "Call",
@@ -782,7 +782,7 @@ const en: TechCopy = {
   talkTitle: "Would you rather talk?",
   talkBody: "You do not have to book online. Call 636 67 01 03, or message on WhatsApp.",
   pay: "You can pay by card when we meet, or by cash, bank transfer or Bizum. Do not enter any payment details here. What matters is booking the slot and leaving a contact: you are safe on this page.",
-  placeTitle: "Where",
+  placeTitle: "Location",
   placeBody: "Guardamar del Segura. Next to the Music School Auditorium",
   choose: "Choose the day and time",
   groupOption: "In a group",
@@ -1010,7 +1010,7 @@ const nl: TechCopy = {
   paySafe:
     "Je kunt met kaart betalen tijdens de sessie. Hier hoef je geen kaart- of bankgegevens in te vullen: reserveer alleen het tijdstip en laat een contact achter. Op deze pagina ben je veilig.",
   payShort:
-    "Je kunt met kaart betalen tijdens de sessie (ook contant, via overschrijving of Bizum). Vul hier geen betaalgegevens in: reserveer het tijdstip en laat een contact achter.",
+    "Je kunt met kaart betalen tijdens de sessie (ook contant, via overschrijving of Bizum).",
   inEnglish: "In het Engels",
   inSpanish: "In het Spaans",
   callNow: "Bellen",
@@ -1110,7 +1110,7 @@ const nl: TechCopy = {
   talkTitle: "Praat je liever even?",
   talkBody: "Online reserveren hoeft niet. Bel naar 636 67 01 03, of schrijf via WhatsApp.",
   pay: "Je kunt met kaart betalen als we elkaar zien, of contant, via overschrijving of met Bizum. Vul hier geen betaalgegevens in. Het gaat erom dat je het tijdstip reserveert en een contact achterlaat: op deze pagina ben je veilig.",
-  placeTitle: "Waar",
+  placeTitle: "Locatie",
   placeBody: "Guardamar del Segura. Naast de Escuela de Música Auditorio",
   choose: "Kies de dag en tijd",
   groupOption: "In een groep",
