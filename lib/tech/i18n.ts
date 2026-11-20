@@ -27,8 +27,13 @@ export type TechCopy = {
   heroTitle: string;
   heroLede: string;
   heroReassure: string;
+  /** Primary CTA under the hero copy — scrolls to the learn-path fork. */
+  heroCta: string;
   heroBubblesLabel: string;
-  heroBubbles: string[];
+  /** Hero complaint stickers; optional mark styles echo the reference art. */
+  heroBubbles: {
+    parts: { text: string; mark?: "underline" | "pill" }[];
+  }[];
   teacherKicker: string;
   teacherHello: string;
   teacherLead: string;
@@ -68,6 +73,14 @@ export type TechCopy = {
   homePickNote: string;
   chooseHeading: string;
   dateThenTime: string;
+  /** After type fork: morning / evening (then calendar). */
+  slotPartHeading: string;
+  slotPartLead: string;
+  morningLabel: string;
+  eveningLabel: string;
+  /** Phone path: urgent call instead of scheduling. */
+  rightNowLabel: string;
+  rightNowBody: string;
   earlierDates: string;
   laterDates: string;
   prevWeek: string;
@@ -276,18 +289,35 @@ const es: TechCopy = {
   metaChips: ["Tu propio dispositivo", "Sin prisas", "Español · English"],
   reserveCta: "Reservar sesión",
   callCta: "Llamar 636 67 01 03",
-  heroPriceFrom: "Desde {price} en grupo",
-  heroTitle: "El móvil debería hacerte la vida más fácil, no más difícil.",
-  heroLede: "¿Te trabas con WhatsApp, las fotos, las aplicaciones o los ajustes?",
+  heroPriceFrom: "Clases en grupo desde {price}",
+  heroTitle: "Tu móvil debería hacerte la vida más fácil, no más difícil.",
+  heroLede:
+    "¿Te cuesta usar WhatsApp, encontrar tus fotos, instalar aplicaciones o entender los ajustes del móvil? Soy Ainhoa y te ayudo a resolver tus dudas y aprender a utilizar tu móvil, tablet u ordenador con confianza. Sin tecnicismos, sin prisas y siempre a tu ritmo. Podemos hacerlo en grupo, de forma individual en Guardamar, por teléfono o en tu propia casa.",
   heroReassure:
-    "Soy Ainhoa. Te ayudo a entender tu propio móvil, tablet u ordenador — en persona en Guardamar, por teléfono o en tu casa dentro del pueblo — paso a paso y a tu ritmo, sin tecnicismos ni prisas.",
+    "Mi objetivo es que entiendas cómo funciona y puedas hacerlo por tu cuenta la próxima vez.",
+  heroCta: "Elige cómo prefieres aprender →",
   heroBubblesLabel: "Lo que me suelen decir",
   heroBubbles: [
-    "No sé mandar fotos por WhatsApp",
-    "No encuentro mis fotos",
-    "He tocado algo y ya no funciona",
-    "Quiero videollamar y no me sale",
-    "Se me ha llenado el móvil… ¿de qué?",
+    {
+      parts: [
+        { text: "No sé mandar fotos por " },
+        { text: "WhatsApp", mark: "underline" },
+      ],
+    },
+    {
+      parts: [
+        { text: "No encuentro mis " },
+        { text: "fotos", mark: "pill" },
+      ],
+    },
+    {
+      parts: [
+        { text: "He tocado algo y ya " },
+        { text: "no funciona", mark: "pill" },
+      ],
+    },
+    { parts: [{ text: "Quiero videollamar y no me sale" }] },
+    { parts: [{ text: "Se me ha llenado el móvil… ¿de qué?" }] },
   ],
   teacherKicker: "Quién está detrás de Guardamar Click",
   teacherHello: "Hola, soy Ainhoa.",
@@ -315,21 +345,27 @@ const es: TechCopy = {
   assistancePick: "¿Cómo quieres la sesión?",
   homeVisitUnavailable:
     "A esa hora no cabe el desplazamiento (±30 min). Elige otra hora o otro tipo de ayuda.",
-  forkHeading: "¿Cómo prefieres que te ayude?",
-  forkLead: "Elige la opción que mejor se adapte a ti.",
-  forkGroupTitle: "Aprende en grupo",
-  forkGroupBody: "Aprende con otras personas, paso a paso.",
-  forkPrivateTitle: "Atención individual",
-  forkPrivateBody: "Te ayudo personalmente, aquí en mi espacio.",
-  forkRemoteTitle: "Ayuda por teléfono",
-  forkRemoteBody: "Resuelve tus dudas sin desplazarte.",
-  forkHomeTitle: "Voy a tu domicilio",
-  forkHomeBody: "Te ayudo con tus dispositivos en tu propia casa.",
+  forkHeading: "¿Cómo prefieres aprender?",
+  forkLead: "Elige la forma que mejor se adapte a ti.",
+  forkGroupTitle: "En grupo",
+  forkGroupBody: "Con otras personas, paso a paso.",
+  forkPrivateTitle: "Individual",
+  forkPrivateBody: "Sesión personal, aquí en mi espacio, a tu ritmo.",
+  forkRemoteTitle: "Por teléfono",
+  forkRemoteBody: "Resuelve dudas y gana confianza sin desplazarte.",
+  forkHomeTitle: "En tu casa",
+  forkHomeBody: "Sesión con tus dispositivos, en tu propio domicilio.",
   homePickLead: "Elige el día y la hora de llegada a tu casa en Guardamar.",
   homePickNote:
     "La visita es a tu domicilio. Eliges la hora de llegada; el desplazamiento va incluido en el bloque de la agenda.",
   chooseHeading: "Elige una hora",
   dateThenTime: "Ahora elige el día y la hora.",
+  slotPartHeading: "Elige huecos disponibles",
+  slotPartLead: "Primero mañana o tarde. Luego verás los días con horas libres.",
+  morningLabel: "Mañana",
+  eveningLabel: "Tarde",
+  rightNowLabel: "Ahora mismo",
+  rightNowBody: "Si necesitas ayuda ya, llama y lo vemos hoy si puedo.",
   earlierDates: "Fechas anteriores",
   laterDates: "Fechas siguientes",
   prevWeek: "Semana anterior",
@@ -604,18 +640,35 @@ const en: TechCopy = {
   metaChips: ["Your own device", "No rush", "Spanish · English"],
   reserveCta: "Book a session",
   callCta: "Call 636 67 01 03",
-  heroPriceFrom: "From {price} in a group",
+  heroPriceFrom: "Group classes from {price}",
   heroTitle: "Your phone should make life easier, not harder.",
-  heroLede: "Struggling with WhatsApp, photos, apps or your phone's settings?",
+  heroLede:
+    "Do you struggle with WhatsApp, finding your photos, installing apps or understanding your phone’s settings? I’m Ainhoa and I help you solve those questions and learn to use your phone, tablet or computer with confidence. No jargon, no rush — always at your pace. We can do it in a group, one-to-one in Guardamar, by phone or at your home.",
   heroReassure:
-    "I'm Ainhoa. I help you understand your own phone, tablet or computer — in person in Guardamar, by phone, or at your home in town — step by step, at your pace, without jargon or pressure.",
+    "My goal is that you understand how it works and can do it yourself next time.",
+  heroCta: "Choose how you’d like to learn →",
   heroBubblesLabel: "What people often say",
   heroBubbles: [
-    "I can't send photos on WhatsApp",
-    "I can't find my photos",
-    "I tapped something and now it doesn't work",
-    "I want to video call and it won't start",
-    "My phone is full… with what?",
+    {
+      parts: [
+        { text: "I can't send photos on " },
+        { text: "WhatsApp", mark: "underline" },
+      ],
+    },
+    {
+      parts: [
+        { text: "I can't find my " },
+        { text: "photos", mark: "pill" },
+      ],
+    },
+    {
+      parts: [
+        { text: "I tapped something and now it " },
+        { text: "won't work", mark: "pill" },
+      ],
+    },
+    { parts: [{ text: "I want to video call and it won't start" }] },
+    { parts: [{ text: "My phone is full… with what?" }] },
   ],
   teacherKicker: "Who is behind Guardamar Click",
   teacherHello: "Hello, I'm Ainhoa.",
@@ -643,21 +696,27 @@ const en: TechCopy = {
   assistancePick: "How do you want the session?",
   homeVisitUnavailable:
     "That time does not leave room for travel (±30 min). Pick another time or another type of help.",
-  forkHeading: "How would you like me to help?",
-  forkLead: "Choose the option that suits you best.",
-  forkGroupTitle: "Learn in a group",
-  forkGroupBody: "Learn together with others, step by step.",
-  forkPrivateTitle: "One-to-one help",
-  forkPrivateBody: "Personal help, just for you, at my location.",
-  forkRemoteTitle: "Help over the phone",
-  forkRemoteBody: "Get answers and guidance without travelling.",
-  forkHomeTitle: "I'll come to you",
-  forkHomeBody: "Personal help with your devices in your own home.",
+  forkHeading: "How would you like to learn?",
+  forkLead: "Choose the format that suits you best.",
+  forkGroupTitle: "In a group",
+  forkGroupBody: "Together with others, step by step.",
+  forkPrivateTitle: "One-to-one",
+  forkPrivateBody: "A personal session at my place, at your pace.",
+  forkRemoteTitle: "By phone",
+  forkRemoteBody: "Clear guidance without travelling.",
+  forkHomeTitle: "At your home",
+  forkHomeBody: "A session with your own devices, at your door.",
   homePickLead: "Pick the day and arrival time at your home in Guardamar.",
   homePickNote:
     "This visit is at your home. You choose the arrival time; travel is included in the calendar block.",
   chooseHeading: "Choose a time",
   dateThenTime: "Now pick the day and time.",
+  slotPartHeading: "Pick available time slots",
+  slotPartLead: "First morning or evening. Then you’ll see the days with free times.",
+  morningLabel: "Morning",
+  eveningLabel: "Evening",
+  rightNowLabel: "Right now",
+  rightNowBody: "If you need help now, call and we’ll see if we can help today.",
   earlierDates: "Earlier dates",
   laterDates: "Later dates",
   prevWeek: "Previous week",
@@ -932,18 +991,36 @@ const nl: TechCopy = {
   metaChips: ["Je eigen apparaat", "Zonder haast", "Español · English"],
   reserveCta: "Sessie reserveren",
   callCta: "Bel 636 67 01 03",
-  heroPriceFrom: "Vanaf {price} in een groep",
+  heroPriceFrom: "Groepslessen vanaf {price}",
   heroTitle: "Je telefoon hoort het leven makkelijker te maken, niet moeilijker.",
-  heroLede: "Lukt WhatsApp, foto's, apps of de instellingen niet?",
+  heroLede:
+    "Lukt WhatsApp niet, vind je je foto’s niet, of snap je apps en instellingen niet? Ik ben Ainhoa en ik help je je vragen op te lossen en met vertrouwen je telefoon, tablet of computer te gebruiken. Zonder vaktaal, zonder haast — op jouw tempo. Dat kan in een groep, individueel in Guardamar, telefonisch of bij jou thuis.",
   heroReassure:
-    "Ik ben Ainhoa. Ik help je je eigen telefoon, tablet of computer te begrijpen — ter plaatse in Guardamar, telefonisch of bij je thuis in het dorp — stap voor stap en op jouw tempo, zonder vaktaal of druk.",
+    "Mijn doel is dat jij snapt hoe het werkt en het de volgende keer zelf kunt.",
+  heroCta: "Kies hoe je wilt leren →",
   heroBubblesLabel: "Wat mensen vaak zeggen",
   heroBubbles: [
-    "Ik kan geen foto's sturen via WhatsApp",
-    "Ik vind mijn foto's niet",
-    "Ik heb iets aangeraakt en nu werkt het niet",
-    "Ik wil videobellen, maar het lukt niet",
-    "Mijn telefoon zit vol… maar waarmee?",
+    {
+      parts: [
+        { text: "Ik kan geen foto's sturen via " },
+        { text: "WhatsApp", mark: "underline" },
+      ],
+    },
+    {
+      parts: [
+        { text: "Ik vind mijn " },
+        { text: "foto's", mark: "pill" },
+        { text: " niet" },
+      ],
+    },
+    {
+      parts: [
+        { text: "Ik heb iets aangeraakt en nu " },
+        { text: "werkt het niet", mark: "pill" },
+      ],
+    },
+    { parts: [{ text: "Ik wil videobellen, maar het lukt niet" }] },
+    { parts: [{ text: "Mijn telefoon zit vol… maar waarmee?" }] },
   ],
   teacherKicker: "Wie zit er achter Guardamar Click",
   teacherHello: "Hallo, ik ben Ainhoa.",
@@ -971,21 +1048,27 @@ const nl: TechCopy = {
   assistancePick: "Hoe wil je de sessie?",
   homeVisitUnavailable:
     "Op dat tijdstip past de reistijd (±30 min) niet. Kies een ander uur of een andere vorm van hulp.",
-  forkHeading: "Hoe kan ik je het beste helpen?",
-  forkLead: "Kies wat het beste bij je past.",
-  forkGroupTitle: "Leren in een groep",
-  forkGroupBody: "Leer samen met anderen, stap voor stap.",
-  forkPrivateTitle: "Individuele hulp",
-  forkPrivateBody: "Persoonlijke hulp op mijn locatie.",
-  forkRemoteTitle: "Hulp via de telefoon",
-  forkRemoteBody: "Krijg antwoord en uitleg zonder de deur uit te hoeven.",
-  forkHomeTitle: "Ik kom bij je thuis",
-  forkHomeBody: "Persoonlijke hulp met je apparaten bij jou thuis.",
+  forkHeading: "Hoe wil je leren?",
+  forkLead: "Kies de vorm die het beste bij je past.",
+  forkGroupTitle: "In een groep",
+  forkGroupBody: "Samen met anderen, stap voor stap.",
+  forkPrivateTitle: "Individueel",
+  forkPrivateBody: "Een persoonlijke sessie op mijn locatie, op jouw tempo.",
+  forkRemoteTitle: "Via de telefoon",
+  forkRemoteBody: "Duidelijke uitleg zonder de deur uit te hoeven.",
+  forkHomeTitle: "Bij jou thuis",
+  forkHomeBody: "Een sessie met jouw apparaten, bij jou thuis.",
   homePickLead: "Kies de dag en aankomsttijd bij jou thuis in Guardamar.",
   homePickNote:
     "Dit is een huisbezoek. Jij kiest de aankomsttijd; de reistijd zit in het agenda-blok.",
   chooseHeading: "Kies een tijd",
   dateThenTime: "Kies nu de dag en de tijd.",
+  slotPartHeading: "Kies beschikbare tijden",
+  slotPartLead: "Eerst ochtend of avond. Daarna zie je de dagen met vrije uren.",
+  morningLabel: "Ochtend",
+  eveningLabel: "Avond",
+  rightNowLabel: "Nu meteen",
+  rightNowBody: "Als je nu hulp nodig hebt, bel dan — dan kijken we of het vandaag kan.",
   earlierDates: "Eerdere datums",
   laterDates: "Latere datums",
   prevWeek: "Vorige week",

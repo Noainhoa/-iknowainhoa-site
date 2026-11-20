@@ -164,3 +164,39 @@ export function HeroBubbleIcon({ index }: { index: number }) {
   const Icon = HERO_BUBBLE_ICONS[index % HERO_BUBBLE_ICONS.length];
   return <Icon />;
 }
+
+/**
+ * Needle comma: modest rounded base → sharp tip, slight curve.
+ * Aspect ~1:8 so it reads as a stroke, never a leaf or droplet.
+ */
+const EMPHASIS_STROKE =
+  "M-0.72 0 Q-1.05 -4.8 -0.45 -9.2 L0.12 -13.6 Q0.55 -9.4 0.82 -4.9 L0.68 0 Q0 0.42 -0.72 0 Z";
+
+/**
+ * Three commas on a tight arc at the bubble edge (−30° / 0° / +30°).
+ * Shared burst origin with clear gaps — premium comic emphasis.
+ */
+export function BubbleEmphasisBurst() {
+  return (
+    <svg
+      className="tme-bubble-rays-svg"
+      viewBox="0 0 30 24"
+      width="30"
+      height="24"
+      focusable="false"
+      aria-hidden="true"
+    >
+      <g transform="translate(15 21.5)">
+        <g transform="translate(-5.8 -1.2) rotate(-30)">
+          <path className="tme-ray" d={EMPHASIS_STROKE} />
+        </g>
+        <g transform="translate(0 -2.8) rotate(0)">
+          <path className="tme-ray" d={EMPHASIS_STROKE} />
+        </g>
+        <g transform="translate(5.8 -1.2) rotate(30)">
+          <path className="tme-ray" d={EMPHASIS_STROKE} />
+        </g>
+      </g>
+    </svg>
+  );
+}

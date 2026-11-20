@@ -16,6 +16,19 @@ export const PUBLIC_OFFER_WINDOWS = [
 
 export type PublicOfferWindow = (typeof PUBLIC_OFFER_WINDOWS)[number];
 
+/**
+ * Day-part split for the public calendar fork (morning vs evening).
+ * Matches the published windows: daytime Tue/Sat vs evening Thu (18:00–20:00).
+ */
+export const PUBLIC_EVENING_FROM_MINUTE = 17 * 60;
+
+export type PublicDayPart = "morning" | "evening";
+
+export function dayPartForStart(startsAt: string | Date): PublicDayPart {
+  const instant = typeof startsAt === "string" ? new Date(startsAt) : startsAt;
+  return madridMinuteOfDay(instant) >= PUBLIC_EVENING_FROM_MINUTE ? "evening" : "morning";
+}
+
 export function isWithinPublicOfferWindow(startsAt: string | Date, durationMinutes = 60): boolean {
   const instant = typeof startsAt === "string" ? new Date(startsAt) : startsAt;
   if (!Number.isFinite(instant.getTime())) return false;
