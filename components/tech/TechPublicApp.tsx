@@ -808,39 +808,60 @@ export default function TechPublicApp({
         : "Hola Ainhoa, me gustaría una sesión de ayuda tecnológica en Guardamar.";
   const fabWhatsAppHref = siteWhatsAppEnquiryHref(copy.fabWhatsAppMessage);
 
-  function personFields(submitLabel: string) {
+  function contactFields() {
+    return (
+      <div className="tme-request-when">
+        <div className="tme-request-field">
+          <input
+            id="tme-name"
+            type="text"
+            name="name"
+            autoComplete="name"
+            autoCapitalize="words"
+            aria-label={copy.contactName}
+            placeholder={copy.contactName}
+            value={contactName}
+            onChange={(event) => setContactName(event.target.value)}
+            required
+          />
+        </div>
+        <div className="tme-request-field">
+          <input
+            id="tme-phone"
+            type="tel"
+            name="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            aria-label={copy.phone}
+            placeholder={copy.phone}
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            required
+          />
+        </div>
+      </div>
+    );
+  }
+
+  function placeCheck(label: string) {
+    return (
+      <label className="tme-check tme-place-check">
+        <input
+          type="checkbox"
+          checked={acceptPlace}
+          onChange={(event) => {
+            setAcceptPlace(event.target.checked);
+            if (error === "placeConfirm") setError(null);
+          }}
+        />
+        <span>{label}</span>
+      </label>
+    );
+  }
+
+  function consentSubmit(submitLabel: string) {
     return (
       <>
-        <div className="tme-request-when">
-          <div className="tme-request-field">
-            <input
-              id="tme-name"
-              type="text"
-              name="name"
-              autoComplete="name"
-              autoCapitalize="words"
-              aria-label={copy.contactName}
-              placeholder={copy.contactName}
-              value={contactName}
-              onChange={(event) => setContactName(event.target.value)}
-              required
-            />
-          </div>
-          <div className="tme-request-field">
-            <input
-              id="tme-phone"
-              type="tel"
-              name="tel"
-              autoComplete="tel"
-              inputMode="tel"
-              aria-label={copy.phone}
-              placeholder={copy.phone}
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-              required
-            />
-          </div>
-        </div>
         <label className="tme-check">
           <input
             type="checkbox"
@@ -885,6 +906,15 @@ export default function TechPublicApp({
           {saving ? copy.saving : submitLabel}
         </button>
         <p className="tme-note tme-pay-aside">{copy.payShort}</p>
+      </>
+    );
+  }
+
+  function personFields(submitLabel: string) {
+    return (
+      <>
+        {contactFields()}
+        {consentSubmit(submitLabel)}
       </>
     );
   }
@@ -1366,20 +1396,13 @@ export default function TechPublicApp({
                     </a>
                   </p>
                 ) : null}
-                <label className="tme-check tme-place-check">
-                  <input
-                    type="checkbox"
-                    checked={acceptPlace}
-                    onChange={(event) => {
-                      setAcceptPlace(event.target.checked);
-                      if (error === "placeConfirm") setError(null);
-                    }}
-                  />
-                  <span>{copy.assistanceHomeBody}</span>
-                </label>
-                {homeTimesForDate.length > 0 && !homeNeedsCall && homeSlotOk
-                  ? personFields(copy.submitBook)
-                  : null}
+                {homeTimesForDate.length > 0 && !homeNeedsCall && homeSlotOk ? (
+                  <>
+                    {contactFields()}
+                    {placeCheck(copy.assistanceHomeBody)}
+                    {consentSubmit(copy.submitBook)}
+                  </>
+                ) : null}
                 <p className="tme-request-footnote">
                   <span aria-hidden="true">*</span>
                   <strong>{copy.otherTimeNoteLabel}:</strong> {copy.homePickNote}
@@ -1498,21 +1521,12 @@ export default function TechPublicApp({
                       {plainEuros(detailsPriceCents, locale)}
                       {seats(offer) ? ` · ${seats(offer)}` : ""}
                     </p>
-                    <label className="tme-check tme-place-check">
-                      <input
-                        type="checkbox"
-                        checked={acceptPlace}
-                        onChange={(event) => {
-                          setAcceptPlace(event.target.checked);
-                          if (error === "placeConfirm") setError(null);
-                        }}
-                      />
-                      <span>{placeConfirmText}</span>
-                    </label>
+                    {contactFields()}
+                    {placeCheck(placeConfirmText)}
                     {languageNote(offer.sessionLanguage) ? (
                       <p className="tme-where">{languageNote(offer.sessionLanguage)}</p>
                     ) : null}
-                    {personFields(copy.submitBook)}
+                    {consentSubmit(copy.submitBook)}
                   </form>
                 </div>
               ) : partOffers.length === 0 ? (
