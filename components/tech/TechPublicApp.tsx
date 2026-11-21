@@ -98,17 +98,18 @@ type BubbleRayAnchor = "tl" | "tr" | "mr" | "br";
 type BubbleRayTone = "sun" | "ink";
 
 /** Comic emphasis bursts — placement matches the sticker reference. */
+/** One cluster per bubble — timed sequentially in CSS so only one bursts at a time. */
 const HERO_BUBBLE_RAYS: ReadonlyArray<
   ReadonlyArray<{ anchor: BubbleRayAnchor; tone: BubbleRayTone }>
 > = [
-  [
-    { anchor: "tl", tone: "sun" },
-    { anchor: "mr", tone: "ink" },
-  ],
-  [{ anchor: "tr", tone: "ink" }],
-  [{ anchor: "tl", tone: "ink" }],
+  [{ anchor: "tl", tone: "sun" }],
   [{ anchor: "tr", tone: "sun" }],
-  [{ anchor: "br", tone: "ink" }],
+  [{ anchor: "tl", tone: "sun" }],
+  [{ anchor: "tr", tone: "sun" }],
+  [{ anchor: "br", tone: "sun" }],
+  [{ anchor: "mr", tone: "sun" }],
+  [{ anchor: "tl", tone: "sun" }],
+  [{ anchor: "tr", tone: "sun" }],
 ];
 
 function assistanceForPath(path: BookingPath): AssistanceMode {
@@ -869,31 +870,48 @@ export default function TechPublicApp({
     );
   }
 
+  const barTools = (
+    <div className="tme-bar-tools">
+      <a className="tme-call" href={telHref()} aria-label={`${copy.callNow} ${phoneDisplay}`}>
+        <IconPhone />
+        <span className="tme-call-word">{copy.callNow}</span>
+        <span className="tme-call-num">{phoneDisplay}</span>
+      </a>
+      <nav className="tme-lang" aria-label={copy.langLabel}>
+        <Link href={langHref("es")} hrefLang="es" lang="es" aria-current={locale === "es" ? "page" : undefined} prefetch={false}>
+          ES
+        </Link>
+        <span className="tme-lang-sep" aria-hidden="true">/</span>
+        <Link href={langHref("en")} hrefLang="en" lang="en" aria-current={locale === "en" ? "page" : undefined} prefetch={false}>
+          EN
+        </Link>
+        <span className="tme-lang-sep" aria-hidden="true">/</span>
+        <Link href={langHref("nl")} hrefLang="nl" lang="nl" aria-current={locale === "nl" ? "page" : undefined} prefetch={false}>
+          NL
+        </Link>
+      </nav>
+    </div>
+  );
+
   const bar = (
     <header className="tme-bar">
       <div className="tme-lockup">
         <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
         <span className="tme-wordmark">{copy.brandName}</span>
       </div>
-      <div className="tme-bar-tools">
-        <a className="tme-call" href={telHref()} aria-label={`${copy.callNow} ${phoneDisplay}`}>
-          <IconPhone />
-          <span className="tme-call-word">{copy.callNow}</span>
-          <span className="tme-call-num">{phoneDisplay}</span>
-        </a>
-        <nav className="tme-lang" aria-label={copy.langLabel}>
-          <Link href={langHref("es")} hrefLang="es" lang="es" aria-current={locale === "es" ? "page" : undefined} prefetch={false}>
-            ES
-          </Link>
-          <span className="tme-lang-sep" aria-hidden="true">/</span>
-          <Link href={langHref("en")} hrefLang="en" lang="en" aria-current={locale === "en" ? "page" : undefined} prefetch={false}>
-            EN
-          </Link>
-          <span className="tme-lang-sep" aria-hidden="true">/</span>
-          <Link href={langHref("nl")} hrefLang="nl" lang="nl" aria-current={locale === "nl" ? "page" : undefined} prefetch={false}>
-            NL
-          </Link>
-        </nav>
+      {barTools}
+    </header>
+  );
+
+  const heroBar = (
+    <header className="tme-bar tme-bar-hero">
+      {barTools}
+      <div className="tme-lockup">
+        <TechBrandLink href={techPageHref(locale)} name={copy.brandName} />
+        <div className="tme-lockup-text">
+          <span className="tme-wordmark">{copy.brandName}</span>
+          <h1 className="tme-lockup-title">{copy.heroTitle}</h1>
+        </div>
       </div>
     </header>
   );
@@ -997,10 +1015,10 @@ export default function TechPublicApp({
   return (
     <div className="tme tme-home">
       <div className="tme-home-wrap">
-        {bar}
+        {heroBar}
+        <div className="tme-lead">
         <header className="tme-intro">
           <div className="tme-intro-copy">
-            <h1>{copy.heroTitle}</h1>
             <p className="tme-lede">{copy.heroLede}</p>
             <p className="tme-reassure">
               <strong>{copy.heroReassure}</strong>
@@ -1012,21 +1030,41 @@ export default function TechPublicApp({
               type="button"
               className="tme-intro-cta"
               onClick={() => {
-                pickRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                const target =
-                  pickRef.current?.querySelector<HTMLElement>("#tme-choose") ??
-                  pickRef.current?.querySelector<HTMLElement>(".tme-fork-option");
+                const target = document.querySelector<HTMLElement>(
+                  ".tme-intro-fork .tme-fork-option",
+                );
                 target?.focus({ preventScroll: true });
+                target?.scrollIntoView({ behavior: "smooth", block: "nearest" });
               }}
             >
               {copy.heroCta}
             </button>
+            <div className="tme-intro-fork" role="group" aria-label={copy.forkHeading}>
+              {forkOptions.map(({ path, title, body, Icon }) => (
+                <button
+                  key={path}
+                  type="button"
+                  className="tme-fork-option"
+                  aria-pressed={bookingPath === path}
+                  aria-label={`${title}. ${body}`}
+                  onClick={() => {
+                    choosePath(path);
+                    pickRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  <Icon className="tme-fork-icon" aria-hidden="true" />
+                  <strong className="tme-fork-title">{title}</strong>
+                  <span className="tme-fork-body">{body}</span>
+                </button>
+              ))}
+            </div>
           </div>
           <ul className="tme-bubbles" aria-label={copy.heroBubblesLabel}>
             {copy.heroBubbles.map((bubble, index) => {
               const label = bubble.parts.map((part) => part.text).join("");
               return (
                 <li key={label}>
+                  <span className="tme-bubble-shape" aria-hidden="true" />
                   {(HERO_BUBBLE_RAYS[index] ?? []).map((group, groupIndex) => (
                     <span
                       key={`${label}-rays-${group.anchor}-${groupIndex}`}
@@ -1235,23 +1273,6 @@ export default function TechPublicApp({
 
             {loadState === "ready" && (view === "groups" || view === "private") ? (
               <>
-                <div className="tme-fork" role="group" aria-label={copy.forkHeading}>
-                  {forkOptions.map(({ path, title, body, Icon }) => (
-                    <button
-                      key={path}
-                      type="button"
-                      className="tme-fork-option"
-                      aria-pressed={bookingPath === path}
-                      aria-label={`${title}. ${body}`}
-                      onClick={() => choosePath(path)}
-                    >
-                      <Icon className="tme-fork-icon" aria-hidden="true" />
-                      <strong className="tme-fork-title">{title}</strong>
-                      <span className="tme-fork-body">{body}</span>
-                    </button>
-                  ))}
-                </div>
-
                 {bookingPath === "home" ? (
                   <>
                     <div className="tme-fork-head">
@@ -1373,43 +1394,43 @@ export default function TechPublicApp({
                       ) : null}
                     </div>
 
-                    {dayPart ? (
-                      <>
-                        {bookingPath !== "group" ? (
-                          <div className="tme-seg" role="group" aria-label={copy.privateHeading}>
-                            <button
-                              type="button"
-                              aria-pressed={privateMinutes === 30}
-                              onClick={() => {
-                                setPrivateMinutes(30);
-                                setSelection(null);
-                                setDayKey(null);
-                              }}
-                            >
-                              {minutes(INDIVIDUAL_SHORT_MINUTES)} ·{" "}
-                              {plainEuros(
-                                priceCentsForCreate("individual", INDIVIDUAL_SHORT_MINUTES),
-                                locale
-                              )}
-                            </button>
-                            <button
-                              type="button"
-                              aria-pressed={privateMinutes === 60}
-                              onClick={() => {
-                                setPrivateMinutes(60);
-                                setSelection(null);
-                                setDayKey(null);
-                              }}
-                            >
-                              {minutes(INDIVIDUAL_MINUTES)} ·{" "}
-                              {plainEuros(
-                                priceCentsForCreate("individual", INDIVIDUAL_MINUTES),
-                                locale
-                              )}
-                            </button>
-                          </div>
-                        ) : null}
+                    {dayPart && bookingPath !== "group" ? (
+                      <div className="tme-seg" role="group" aria-label={copy.privateHeading}>
+                        <button
+                          type="button"
+                          aria-pressed={privateMinutes === 30}
+                          onClick={() => {
+                            setPrivateMinutes(30);
+                            setSelection(null);
+                            setDayKey(null);
+                          }}
+                        >
+                          {minutes(INDIVIDUAL_SHORT_MINUTES)} ·{" "}
+                          {plainEuros(
+                            priceCentsForCreate("individual", INDIVIDUAL_SHORT_MINUTES),
+                            locale
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          aria-pressed={privateMinutes === 60}
+                          onClick={() => {
+                            setPrivateMinutes(60);
+                            setSelection(null);
+                            setDayKey(null);
+                          }}
+                        >
+                          {minutes(INDIVIDUAL_MINUTES)} ·{" "}
+                          {plainEuros(
+                            priceCentsForCreate("individual", INDIVIDUAL_MINUTES),
+                            locale
+                          )}
+                        </button>
+                      </div>
+                    ) : null}
 
+                    {dayPart ? (
+                      <div className="tme-calendar-block">
                         {error ? (
                           <p className="tme-alert" role="alert">
                             {copy.errors[error] || copy.errors.tech_failed}
@@ -1521,13 +1542,14 @@ export default function TechPublicApp({
                             <p role="status">{copy.noTimesWeek}</p>
                           </div>
                         ) : null}
-                      </>
+                      </div>
                     ) : null}
                   </>
                 ) : null}
               </>
             ) : null}
           </section>
+        </div>
 
         <section className="tme-teacher" aria-labelledby="tme-teacher">
           <div className="tme-teacher-intro">

@@ -45,6 +45,41 @@ export function IconPhotos() {
   );
 }
 
+/**
+ * Apple Photos flower (iOS “Fotos” mark) — eight radial petals.
+ * Overlapping ellipses match the system app icon; tuned for ~24px on the white hero badge.
+ */
+export function IconApplePhotos() {
+  const petals: ReadonlyArray<{ fill: string; rot: number }> = [
+    { fill: "#FF8F44", rot: 0 },
+    { fill: "#FFD426", rot: 45 },
+    { fill: "#A8D948", rot: 90 },
+    { fill: "#5EC6B8", rot: 135 },
+    { fill: "#5DAEE8", rot: 180 },
+    { fill: "#9B84C8", rot: 225 },
+    { fill: "#D67AAD", rot: 270 },
+    { fill: "#F26B4E", rot: 315 },
+  ];
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <g transform="translate(12 12)">
+        {petals.map(({ fill, rot }) => (
+          <ellipse
+            key={rot}
+            cx="0"
+            cy="-5.35"
+            rx="3.45"
+            ry="6.15"
+            fill={fill}
+            fillOpacity={0.94}
+            transform={`rotate(${rot})`}
+          />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
 export function IconCloud() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -53,14 +88,33 @@ export function IconCloud() {
   );
 }
 
-/** iCloud-style filled cloud mark. */
+/** Storage-full warning — gauge + exclamation. */
+export function IconStorageFull() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4.5 16.5a8.5 8.5 0 1 1 15 0" />
+      <path d="M7.2 16.5a5.8 5.8 0 0 1 9.7-4.1" />
+      <path d="M12 16.5V11.2" />
+      <circle cx="12" cy="16.5" r="1.15" fill="currentColor" stroke="none" />
+      <path d="M17.6 6.2v3.2" />
+      <circle cx="17.6" cy="11.2" r="0.7" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** iCloud-style filled cloud with “storage full” exclamation badge. */
 export function IconICloud() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       <path
         fill="currentColor"
-        d="M18.7 18.75H7.55a4.55 4.55 0 0 1-.35-9.08 6.05 6.05 0 0 1 11.35.85 3.7 3.7 0 0 1 .15 8.23z"
+        d="M16.85 17.85H7.55a4.55 4.55 0 0 1-.35-9.08 6.05 6.05 0 0 1 11.35.85 3.7 3.7 0 0 1 1.55 7.05 5.6 5.6 0 0 0-3.25 1.18z"
       />
+      {/* Full-storage warning badge (cloud + !). */}
+      <circle cx="17.6" cy="17.35" r="5.45" fill="currentColor" />
+      <circle cx="17.6" cy="17.35" r="4.2" fill="#fff" />
+      <rect x="16.85" y="14.2" width="1.5" height="3.55" rx="0.75" fill="currentColor" />
+      <circle cx="17.6" cy="19.55" r="0.85" fill="currentColor" />
     </svg>
   );
 }
@@ -93,12 +147,30 @@ export function IconError() {
   );
 }
 
-/** Clean FaceTime / video-call camera. */
-export function IconFaceTime() {
+/** Settings / gear wheel (tapped something in Settings). */
+export function IconSettings() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="2.5" y="6.5" width="13" height="11" rx="2.8" />
-      <path d="M15.5 10l5.5-3v10l-5.5-3z" />
+      <circle cx="12" cy="12" r="3.1" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
+/**
+ * FaceTime camera glyph from Wikimedia Commons (FaceTime_iOS.svg, public domain).
+ * @see https://commons.wikimedia.org/wiki/File:FaceTime_iOS.svg
+ * White glyph paths only (no app-icon gradient); `currentColor` for the green badge.
+ */
+export function IconFaceTime() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <g transform="scale(0.04)">
+        <path
+          fill="currentColor"
+          d="M91.5 227.3v146.1c0 31.9 25.9 57.7 57.7 57.7H325c31.9 0 57.7-25.9 57.7-57.7V227.3c0-31.9-25.9-57.7-57.7-57.7H149.3c-31.9-.1-57.8 25.8-57.8 57.7zm379.3-39.1-66.2 54.6c-5.9 4.9-9.3 12.1-9.3 19.7v75.6c0 7.6 3.3 14.7 9.1 19.6l66.2 55.6c15.1 12.6 38 1.9 38-17.7V206c.1-19.5-22.7-30.3-37.8-17.8z"
+        />
+      </g>
     </svg>
   );
 }
@@ -108,6 +180,38 @@ export function IconShield() {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 3l8 3v6c0 4.5-3.3 7.8-8 9-4.7-1.2-8-4.5-8-9V6z" />
       <path d="M9 12l2.2 2.2L15.5 10" />
+    </svg>
+  );
+}
+
+/**
+ * Official Cl@ve orange mark (corporate @ + keyhole) from the brand SVG.
+ * Drawn on a white badge so the orange identity reads clearly.
+ */
+export function IconClave() {
+  return (
+    <svg viewBox="0 0 293 293" aria-hidden="true" focusable="false">
+      <path
+        fill="#FF5A00"
+        fillRule="evenodd"
+        d="M146.5,0 C226.600619,0 291.686662,64.2850375 292.980373,144.077355 L293,146.5 L270.80303,146.5 C270.80303,77.849332 215.150668,22.1969697 146.5,22.1969697 C77.849332,22.1969697 22.1969697,77.849332 22.1969697,146.5 C22.1969697,214.464161 76.74185,269.688683 144.444422,270.786377 L146.5,270.80303 L146.5,293 C65.5902842,293 0,227.409716 0,146.5 C0,65.5902842 65.5902842,0 146.5,0 Z M142.060606,77.6893939 C162.561588,77.6893939 180.898789,87.2624499 193.114137,102.318555 L193.113636,95.4469697 L215.310606,95.4469697 L215.310606,197.55303 L193.113636,197.55303 L193.113929,190.681702 C180.89858,205.737659 162.561471,215.310606 142.060606,215.310606 C105.283462,215.310606 75.469697,184.503048 75.469697,146.5 C75.469697,108.496952 105.283462,77.6893939 142.060606,77.6893939 Z M142.060606,126.522727 C134.705177,126.522727 128.742424,132.48548 128.742424,139.840909 C128.742424,144.655855 131.297558,148.874018 135.125868,151.213438 L135.401467,151.377327 L135.401515,166.477273 L140.950758,173.136364 L145.390152,173.136364 L145.390152,166.477273 L146.5,166.477273 L146.5,164.257576 L145.390152,164.257576 L145.390152,160.92803 L147.609848,160.92803 L147.610039,151.951395 C152.194787,149.847065 155.378788,145.215819 155.378788,139.840909 C155.378788,132.48548 149.416035,126.522727 142.060606,126.522727 Z M142.060606,137.621212 C143.286511,137.621212 144.280303,138.615004 144.280303,139.840909 C144.280303,141.066814 143.286511,142.060606 142.060606,142.060606 C140.834701,142.060606 139.840909,141.066814 139.840909,139.840909 C139.840909,138.615004 140.834701,137.621212 142.060606,137.621212 Z"
+      />
+    </svg>
+  );
+}
+
+/** @deprecated Prefer IconClave for the Cl@ve bubble. */
+export function IconKey() {
+  return <IconClave />;
+}
+
+/** Suspicious / scam message warning. */
+export function IconScamAlert() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 19l1.2-4A8 8 0 1 1 9 18.8z" />
+      <path d="M12 8.2v4.2" />
+      <circle cx="12" cy="15.2" r="0.85" fill="currentColor" stroke="none" />
     </svg>
   );
 }
@@ -151,13 +255,20 @@ export function TopicIcon({ index }: { index: number }) {
   return <Icon />;
 }
 
-/** Hero complaint bubbles: WhatsApp, photos, error, FaceTime, iCloud. */
+/**
+ * Hero icons: real app marks only where recognition helps
+ * (WhatsApp, FaceTime); photos uses a simple picture glyph; others use clear symbols.
+ */
 const HERO_BUBBLE_ICONS = [
   IconWhatsApp,
   IconPhotos,
-  IconError,
+  IconSettings,
   IconFaceTime,
+  // Slot 4 / li:nth-child(5) (“no space” bubble) — user-approved final; do not swap without design review.
   IconICloud,
+  IconCalendar,
+  IconClave,
+  IconScamAlert,
 ] as const;
 
 export function HeroBubbleIcon({ index }: { index: number }) {
@@ -166,35 +277,29 @@ export function HeroBubbleIcon({ index }: { index: number }) {
 }
 
 /**
- * Needle comma: modest rounded base → sharp tip, slight curve.
- * Aspect ~1:8 so it reads as a stroke, never a leaf or droplet.
- */
-const EMPHASIS_STROKE =
-  "M-0.72 0 Q-1.05 -4.8 -0.45 -9.2 L0.12 -13.6 Q0.55 -9.4 0.82 -4.9 L0.68 0 Q0 0.42 -0.72 0 Z";
-
-/**
- * Three commas on a tight arc at the bubble edge (−30° / 0° / +30°).
- * Shared burst origin with clear gaps — premium comic emphasis.
+ * Three rounded comic strips (“–”) from one origin (−28° / 0° / +28°).
+ * Capsule bars with fully rounded ends — not needles or commas.
  */
 export function BubbleEmphasisBurst() {
   return (
     <svg
       className="tme-bubble-rays-svg"
-      viewBox="0 0 30 24"
-      width="30"
-      height="24"
+      viewBox="0 0 28 22"
+      width="28"
+      height="22"
       focusable="false"
       aria-hidden="true"
     >
-      <g transform="translate(15 21.5)">
-        <g transform="translate(-5.8 -1.2) rotate(-30)">
-          <path className="tme-ray" d={EMPHASIS_STROKE} />
+      {/* Origin ~30% closer to the viewBox bottom so strokes sit nearer the pill edge. */}
+      <g transform="translate(14 20.95)">
+        <g transform="translate(-4 -0.28) rotate(-28)">
+          <rect className="tme-ray" x="-1.2" y="-11.5" width="2.4" height="10.5" rx="1.2" />
         </g>
-        <g transform="translate(0 -2.8) rotate(0)">
-          <path className="tme-ray" d={EMPHASIS_STROKE} />
+        <g transform="translate(0 -0.56) rotate(0)">
+          <rect className="tme-ray" x="-1.35" y="-12.5" width="2.7" height="11.5" rx="1.35" />
         </g>
-        <g transform="translate(5.8 -1.2) rotate(30)">
-          <path className="tme-ray" d={EMPHASIS_STROKE} />
+        <g transform="translate(4 -0.28) rotate(28)">
+          <rect className="tme-ray" x="-1.2" y="-11.5" width="2.4" height="10.5" rx="1.2" />
         </g>
       </g>
     </svg>

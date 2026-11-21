@@ -31,16 +31,22 @@
   --tme-eyebrow-soft: #9cc8e4;
 
   /* Hero bubbles — sunny Guardamar (sky / sun / mint / peach) */
-  --tme-bubble-1-fill: #d9f0ff;
-  --tme-bubble-1-ink: #1a6f9a;
+  --tme-bubble-1-fill: #d8f5e4;
+  --tme-bubble-1-ink: #075e54;
   --tme-bubble-2-fill: #ffe9a8;
   --tme-bubble-2-ink: #8a5a00;
-  --tme-bubble-3-fill: #dff8c9;
-  --tme-bubble-3-ink: #2f7a28;
-  --tme-bubble-4-fill: #d4f7e4;
-  --tme-bubble-4-ink: #0e8f52;
+  --tme-bubble-3-fill: #ffe0c2;
+  --tme-bubble-3-ink: #c45a00;
+  --tme-bubble-4-fill: #c6f7d4;
+  --tme-bubble-4-ink: #0b7a38;
   --tme-bubble-5-fill: #ffd9c8;
   --tme-bubble-5-ink: #b04a2a;
+  --tme-bubble-6-fill: #dce8ff;
+  --tme-bubble-6-ink: #2a4f9a;
+  --tme-bubble-7-fill: #d2e8f2;
+  --tme-bubble-7-ink: #1a4a5e;
+  --tme-bubble-8-fill: #ffe0e4;
+  --tme-bubble-8-ink: #a8324a;
   --tme-bubble-shine: color-mix(in srgb, white 62%, transparent);
   --tme-bubble-shadow: color-mix(in srgb, var(--tme-ink) 8%, transparent);
   --tme-bubble-icon-tint: 18%;
@@ -48,7 +54,7 @@
   --tme-serif: var(--font-tme-serif), "Fraunces", Georgia, "Times New Roman", serif;
   --tme-sans: var(--font-tme-sans), "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --tme-wrap: 1120px;
+  --tme-wrap: 1100px;
   --tme-radius-pill: 99px;
   --tme-radius-card: 28px;
   --tme-radius-plan: 30px;
@@ -2557,9 +2563,9 @@ body:has(.tme-home) {
 }
 
 .tme-home-wrap {
-  width: min(1080px, calc(100% - 20px));
+  width: min(var(--tme-wrap), calc(100% - 20px));
   margin: 0 auto;
-  padding: 12px 0 28px;
+  padding: 10px 0 28px;
 }
 
 .tme-bar {
@@ -2570,11 +2576,32 @@ body:has(.tme-home) {
   margin-bottom: 18px;
 }
 
+.tme-bar-hero {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tme-bar-hero .tme-lockup {
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+}
+
+/* Call + lang on their own top row; lockup sits below. */
+.tme-bar-hero .tme-bar-tools {
+  align-self: flex-end;
+  padding-top: 0;
+  margin-top: 0;
+}
+
 .tme-lockup {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .tme-home .tme-brand-logo {
@@ -2592,45 +2619,90 @@ body:has(.tme-home) {
   color: var(--tme-ink);
 }
 
+/* Logo + wordmark + headline as one top lockup. */
+.tme-lockup-text {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.tme-bar-hero .tme-wordmark {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.05;
+}
+
+.tme-lockup-title {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  font-family: var(--tme-serif);
+  /* One line within the wrap; sized for a typical 13″ viewport. */
+  font-size: clamp(0.92rem, 1.35vw, 1.12rem);
+  font-weight: 560;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--tme-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .tme-bar-tools {
   display: flex;
-  align-items: center;
-  gap: 22px;
+  align-items: flex-start;
+  gap: 12px;
   flex: none;
+  align-self: flex-start;
 }
 
 .tme.tme-home a.tme-call,
 .tme.tme-home a.tme-call:hover {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 0 14px;
+  gap: 6px;
+  min-height: 0;
+  height: 20px;
+  padding: 0 8px;
   border-radius: 999px;
   border: 1.5px solid color-mix(in srgb, var(--tme-ink) 28%, transparent);
   background: color-mix(in srgb, var(--tme-card) 80%, transparent);
   color: var(--tme-ink);
-  font: 700 0.92rem / 1 var(--tme-sans);
+  font: 700 0.72rem / 1 var(--tme-sans);
   text-decoration: none;
   white-space: nowrap;
 }
 
 .tme-call svg {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
 }
 
+/* Compact lang switcher — same density/top as parking (ES / EN / NL). */
 .tme-home .tme-lang {
-  padding-left: 18px;
-  border-left: 1px solid color-mix(in srgb, var(--tme-line) 88%, transparent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 0;
+  border-left: 0;
+  font-size: 12px;
+  line-height: 1.2;
+  height: 20px;
 }
 
 .tme-home .tme-lang a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 42px;
-  padding: 0 3px;
-  font-size: 13px;
+  min-height: 0;
+  padding: 0 0 1px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+/* Intro + booking panel share one lead flow (panel sits under the fork). */
+.tme-lead {
+  width: 100%;
+  margin: 0 0 26px;
 }
 
 .tme-intro {
@@ -2642,8 +2714,8 @@ body:has(.tme-home) {
   row-gap: 22px;
   align-items: start;
   width: 100%;
-  margin: 6px 0 26px;
-  padding: 4px 0 8px;
+  margin: 0;
+  padding: 0 0 8px;
 }
 
 .tme-intro-copy {
@@ -2653,7 +2725,8 @@ body:has(.tme-home) {
   align-items: flex-start;
   gap: 0.75rem;
   min-width: 0;
-  max-width: 58ch;
+  width: 100%;
+  max-width: none;
 }
 
 .tme.tme-home h1 {
@@ -2664,11 +2737,6 @@ body:has(.tme-home) {
   font-weight: 560;
   line-height: 1.08;
   letter-spacing: -0.03em;
-}
-
-/* Keep headline → lede as one tight pair; same rhythm after that. */
-.tme.tme-home h1 + .tme-lede {
-  margin-top: 0.15rem;
 }
 
 .tme-lede,
@@ -2728,12 +2796,71 @@ body:has(.tme-home) {
   outline-offset: 3px;
 }
 
+/* Path choices stacked under the hero CTA. */
+.tme-intro-fork {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 28rem;
+  margin-top: 0.15rem;
+}
+
+.tme-intro-fork .tme-fork-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "icon title"
+    ". body";
+  column-gap: 12px;
+  row-gap: 2px;
+  align-items: center;
+  text-align: left;
+  padding: 12px 14px;
+  min-height: 0;
+}
+
+.tme-intro-fork .tme-fork-icon {
+  grid-area: icon;
+  margin-inline: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.tme-intro-fork .tme-fork-title {
+  grid-area: title;
+}
+
+.tme-intro-fork .tme-fork-body {
+  grid-area: body;
+}
+
+/* Once a path is chosen, mute the others so the selection carries the weight. */
+.tme-intro-fork:has(.tme-fork-option[aria-pressed="true"]) .tme-fork-option:not([aria-pressed="true"]) {
+  opacity: 0.48;
+  background: color-mix(in srgb, var(--tme-sand) 70%, transparent);
+  color: color-mix(in srgb, var(--tme-ink) 72%, transparent);
+}
+
+.tme-intro-fork:has(.tme-fork-option[aria-pressed="true"])
+  .tme-fork-option:not([aria-pressed="true"])
+  .tme-fork-body {
+  color: color-mix(in srgb, var(--tme-ink) 55%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tme-intro-fork:has(.tme-fork-option[aria-pressed="true"])
+    .tme-fork-option:not([aria-pressed="true"]):hover {
+    opacity: 0.78;
+  }
+}
+
 .tme-bubbles {
   grid-area: bubbles;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 14px;
+  gap: 22px;
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
@@ -2747,6 +2874,8 @@ body:has(.tme-home) {
   --bubble-ink: var(--tme-ink);
   --bubble-tilt: 0deg;
   --bubble-scale: 1;
+  --bubble-nudge-x: 0%;
+  --bubble-nudge-y: 0%;
   --bubble-side: start;
   --bubble-mark: color-mix(in srgb, var(--bubble-ink) 22%, white);
   position: relative;
@@ -2756,46 +2885,72 @@ body:has(.tme-home) {
   gap: 10px;
   width: max-content;
   max-width: 100%;
+  /* Hug content (~56px) — trim vertical padding only; keep icon/text size. */
+  height: auto;
+  min-height: 0;
   margin: 0;
-  padding: 10px 16px 12px 10px;
+  padding: 4px 16px 4px 10px;
   border-radius: 999px;
   border: 0;
-  background:
-    radial-gradient(120% 90% at 18% 12%, color-mix(in srgb, white 62%, transparent), transparent 46%),
-    radial-gradient(90% 70% at 82% 90%, color-mix(in srgb, var(--bubble-ink) 7%, transparent), transparent 58%),
-    var(--bubble-fill);
+  background: transparent;
   color: var(--tme-ink);
-  font-size: 0.94rem;
+  font-size: 1rem;
   font-weight: 650;
   letter-spacing: -0.01em;
-  line-height: 1.28;
-  box-shadow:
-    0 1px 0 color-mix(in srgb, white 78%, transparent) inset,
-    0 -1px 0 color-mix(in srgb, var(--bubble-ink) 5%, transparent) inset,
-    0 14px 28px var(--tme-bubble-shadow),
-    0 3px 8px color-mix(in srgb, var(--tme-ink) 5%, transparent);
-  transform: rotate(var(--bubble-tilt)) scale(var(--bubble-scale));
+  line-height: 1.3;
+  box-shadow: none;
+  transform: translate(var(--bubble-nudge-x), var(--bubble-nudge-y))
+    rotate(var(--bubble-tilt)) scale(var(--bubble-scale));
   transform-origin: left bottom;
-  /* Idle: still. Motion only on hover (and emphasis rays). */
-  animation: none;
+  /* Idle float bob; pause on hover so the lift transform can take over. */
+  animation: tme-bubble-float 4.6s ease-in-out var(--bubble-delay, 0ms) infinite;
   transition:
     transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.22s ease,
     filter 0.22s ease;
   align-self: flex-start;
 }
 
+/* Pill + tail as one silhouette; soft edge follows the combined shape. */
+.tme-bubble-shape {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 90% at 18% 12%, color-mix(in srgb, white 38%, transparent), transparent 48%),
+    var(--bubble-fill);
+  box-shadow: 0 1px 0 color-mix(in srgb, white 55%, transparent) inset;
+  pointer-events: none;
+  filter:
+    drop-shadow(0 0 0.55px color-mix(in srgb, var(--bubble-ink) 34%, transparent))
+    drop-shadow(0 0 0.55px color-mix(in srgb, var(--bubble-ink) 26%, transparent))
+    drop-shadow(0 5px 12px var(--tme-bubble-shadow))
+    drop-shadow(0 1px 3px color-mix(in srgb, var(--tme-ink) 5%, transparent));
+  transition: filter 0.22s ease;
+}
+
+.tme-bubbles li > .tme-bubble-icon,
+.tme-bubbles li > .tme-bubble-text {
+  position: relative;
+  z-index: 1;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .tme-bubbles li:hover {
-    transform: rotate(var(--bubble-tilt))
-      scale(calc(var(--bubble-scale) * 1.05))
-      translateY(-4px);
-    filter: brightness(1.03);
-    box-shadow:
-      0 1px 0 color-mix(in srgb, white 78%, transparent) inset,
-      0 -1px 0 color-mix(in srgb, var(--bubble-ink) 5%, transparent) inset,
-      0 18px 34px color-mix(in srgb, var(--tme-ink) 12%, transparent),
-      0 6px 12px color-mix(in srgb, var(--tme-ink) 7%, transparent);
+    animation-play-state: paused;
+    transform: translate(
+        var(--bubble-nudge-x),
+        calc(var(--bubble-nudge-y) - 3px)
+      )
+      rotate(var(--bubble-tilt)) scale(calc(var(--bubble-scale) * 1.03));
+  }
+
+  .tme-bubbles li:hover .tme-bubble-shape {
+    filter:
+      drop-shadow(0 0 0.55px color-mix(in srgb, var(--bubble-ink) 38%, transparent))
+      drop-shadow(0 0 0.55px color-mix(in srgb, var(--bubble-ink) 28%, transparent))
+      drop-shadow(0 8px 16px color-mix(in srgb, var(--tme-ink) 10%, transparent))
+      drop-shadow(0 2px 6px color-mix(in srgb, var(--tme-ink) 6%, transparent));
   }
 }
 
@@ -2803,8 +2958,8 @@ body:has(.tme-home) {
   flex: none;
   display: grid;
   place-items: center;
-  width: 2.35rem;
-  height: 2.35rem;
+  width: 40px; /* reference badge size */
+  height: 40px;
   border-radius: 999px;
   background:
     radial-gradient(circle at 30% 28%, color-mix(in srgb, white 50%, transparent), transparent 55%),
@@ -2815,16 +2970,59 @@ body:has(.tme-home) {
     0 2px 6px color-mix(in srgb, var(--bubble-ink) 12%, transparent);
 }
 
+/* Fill the 40px badge; keep ~4px air so the glyph doesn’t clip the rim. */
 .tme-bubble-icon svg {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 32px;
+  height: 32px;
   display: block;
+}
+
+/* WhatsApp: no badge — green glyph on the bubble. */
+.tme-bubbles li:nth-child(1) .tme-bubble-icon {
+  color: #25d366;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Photos: no badge — picture glyph tinted to the bubble ink. */
+.tme-bubbles li:nth-child(2) .tme-bubble-icon {
+  color: var(--bubble-ink);
+  background: transparent;
+  box-shadow: none;
+}
+
+/*
+ * Icon after the text on every bubble (DOM is icon then text → row-reverse).
+ * Odd rows stay left-aligned; even rows stay right-aligned.
+ */
+.tme-bubbles li {
+  flex-direction: row-reverse;
+  padding: 4px 10px 4px 16px;
+}
+
+.tme-bubbles li:nth-child(odd) {
+  align-self: flex-start;
+  transform-origin: left bottom;
+}
+
+.tme-bubbles li:nth-child(even) {
+  align-self: flex-end;
+  transform-origin: right bottom;
+}
+
+/* Even bubbles (2, 4, 6, 8): icon before the text. Odd keep icon after. */
+.tme-bubbles li:nth-child(2),
+.tme-bubbles li:nth-child(4),
+.tme-bubbles li:nth-child(6),
+.tme-bubbles li:nth-child(8) {
+  flex-direction: row;
+  padding: 4px 16px 4px 10px;
 }
 
 .tme-bubble-text {
   flex: 0 0 auto;
   min-width: 0;
-  padding-right: 2px;
+  padding-left: 2px;
   white-space: nowrap;
 }
 
@@ -2853,54 +3051,63 @@ body:has(.tme-home) {
 /* Comic emphasis burst — 3 slim commas from one origin at the bubble edge. */
 .tme-bubble-rays {
   --ray-color: #184a5a;
-  --ray-cycle: 3.4s;
+  /* Long cycle: one cluster at a time across 8 bubbles, then a quiet pause. */
+  --ray-cycle: 20s;
   --ray-stagger: 55ms;
   --ray-group-delay: 0ms;
-  --ray-scale: 1;
+  --ray-scale: 1.2;
+  --ray-w: calc(28px * var(--ray-scale));
+  --ray-h: calc(22px * var(--ray-scale));
+  /* Air gap outside the pill edge (30% tighter than prior 0.125 / 0.375). */
+  --ray-gap-sm: 0.0875px;
+  --ray-gap: 0.2625px;
   position: absolute;
   z-index: 2;
-  width: calc(30px * var(--ray-scale));
-  height: calc(24px * var(--ray-scale));
+  width: var(--ray-w);
+  height: var(--ray-h);
   color: var(--ray-color);
   pointer-events: none;
+  /* Bottom-center = burst origin (bases sit on the bubble edge). */
   transform-origin: 50% 100%;
 }
 
 .tme-bubble-rays.is-sun {
   --ray-color: #f5b800;
-  /* Yellow: smaller + sharper so it doesn’t dominate. */
-  --ray-scale: 0.72;
+  --ray-scale: 1.2;
 }
 
 .tme-bubble-rays.is-ink {
   --ray-color: #184a5a;
-  --ray-scale: 1;
+  --ray-scale: 1.2;
 }
 
-/* Origin tucked to the bubble edge; strokes radiate away. */
+/*
+ * Bottom-center of the SVG = burst origin. Sit just outside the pill
+ * with a small air gap, then fan outward.
+ */
 .tme-bubble-rays.is-tl {
-  top: -6px;
-  left: -10px;
-  transform: rotate(-38deg);
+  top: calc(0px - var(--ray-h) - var(--ray-gap-sm));
+  left: calc(9px - (var(--ray-w) / 2));
+  transform: rotate(-40deg);
 }
 
 .tme-bubble-rays.is-tr {
-  top: -6px;
-  right: -10px;
-  transform: scaleX(-1) rotate(-38deg);
+  top: calc(0px - var(--ray-h) - var(--ray-gap-sm));
+  right: calc(9px - (var(--ray-w) / 2));
+  transform: scaleX(-1) rotate(-40deg);
 }
 
 .tme-bubble-rays.is-mr {
-  top: 44%;
-  right: -8px;
-  margin-top: -10px;
-  transform: scaleX(-1) rotate(-4deg);
+  top: calc(50% - var(--ray-h));
+  right: calc(0px - (var(--ray-w) / 2) - var(--ray-gap));
+  transform: rotate(90deg);
 }
 
 .tme-bubble-rays.is-br {
-  right: -8px;
-  bottom: -4px;
-  transform: scaleX(-1) rotate(36deg);
+  /* Origin just outside bottom-right; strokes fan down-right. */
+  bottom: calc(0px - var(--ray-gap));
+  right: calc(9.5px - (var(--ray-w) / 2));
+  transform: rotate(140deg);
 }
 
 .tme-bubble-rays-svg {
@@ -2938,21 +3145,24 @@ body:has(.tme-home) {
   --ray-i: 2;
 }
 
-/* Extend → hold → retract → pause (~2.5s). */
+/*
+ * One short burst (~0.9s) then rest of the 20s cycle is quiet.
+ * Staggered group delays make clusters fire one-at-a-time.
+ */
 @keyframes tme-ray-burst {
   0% {
     opacity: 0;
     transform: scale(0.22);
   }
-  6.5% {
+  1.2% {
     opacity: 1;
     transform: scale(1);
   }
-  12.5% {
+  3% {
     opacity: 1;
     transform: scale(1);
   }
-  22% {
+  4.5% {
     opacity: 0;
     transform: scale(0.26);
   }
@@ -2965,116 +3175,200 @@ body:has(.tme-home) {
 .tme-bubbles li:nth-child(1) {
   --bubble-fill: var(--tme-bubble-1-fill);
   --bubble-ink: var(--tme-bubble-1-ink);
-  --bubble-tilt: -2.8deg;
-  --bubble-scale: 1.02;
+  --bubble-tilt: -1.2deg;
+  --bubble-scale: 1;
   --bubble-delay: 40ms;
-  --bubble-mark: #9fe8df;
-  align-self: flex-start;
+  --bubble-mark: #9aefb8;
+  --bubble-nudge-x: 0%;
   overflow: visible;
 }
 
-.tme-bubbles li:nth-child(1) .tme-bubble-rays.is-tl {
-  --ray-group-delay: 0ms;
+.tme-bubbles li:nth-child(1) .tme-bubble-rays {
+  --ray-group-delay: 0s;
 }
 
-.tme-bubbles li:nth-child(1) .tme-bubble-rays.is-mr {
-  --ray-group-delay: 220ms;
-}
+/* ~2.4s slots × 8 bubbles inside the 20s cycle. */
 
 .tme-bubbles li:nth-child(2) {
   --bubble-fill: var(--tme-bubble-2-fill);
   --bubble-ink: var(--tme-bubble-2-ink);
-  --bubble-tilt: 3.6deg;
-  --bubble-scale: 0.97;
+  --bubble-tilt: 1.8deg;
+  --bubble-scale: 1;
   --bubble-delay: 110ms;
   --bubble-mark: #ffe27a;
   align-self: flex-end;
-  transform-origin: right bottom;
-  flex-direction: row-reverse;
-  padding: 10px 10px 12px 16px;
-  border-radius: 999px;
+  margin-left: auto;
   overflow: visible;
 }
 
 .tme-bubbles li:nth-child(2) .tme-bubble-rays {
-  --ray-group-delay: 420ms;
+  --ray-group-delay: 2.4s;
 }
 
 .tme-bubbles li:nth-child(3) {
   --bubble-fill: var(--tme-bubble-3-fill);
   --bubble-ink: var(--tme-bubble-3-ink);
-  --bubble-tilt: -2.2deg;
-  --bubble-scale: 1.04;
+  --bubble-tilt: -1.4deg;
+  --bubble-scale: 1;
   --bubble-delay: 180ms;
-  --bubble-mark: #b8ef9a;
-  align-self: flex-start;
+  --bubble-mark: #ffc078;
+  --bubble-nudge-x: -33.333%;
   margin-left: 0.45rem;
   overflow: visible;
 }
 
 .tme-bubbles li:nth-child(3) .tme-bubble-rays {
-  --ray-group-delay: 680ms;
+  --ray-group-delay: 4.8s;
 }
 
 .tme-bubbles li:nth-child(4) {
   --bubble-fill: var(--tme-bubble-4-fill);
   --bubble-ink: var(--tme-bubble-4-ink);
-  --bubble-tilt: 3deg;
-  --bubble-scale: 0.98;
+  --bubble-tilt: 1.5deg;
+  --bubble-scale: 1;
   --bubble-delay: 250ms;
-  --bubble-mark: #9af0c4;
-  align-self: flex-end;
-  transform-origin: right bottom;
-  flex-direction: row-reverse;
-  padding: 10px 10px 12px 16px;
-  border-radius: 999px;
+  --bubble-mark: #86f0a8;
+  --bubble-nudge-y: 8.333%;
   overflow: visible;
 }
 
+/* FaceTime system green (#30D158) badge, white glyph. */
+.tme-bubbles li:nth-child(4) .tme-bubble-icon {
+  color: #fff;
+  background:
+    radial-gradient(circle at 30% 28%, color-mix(in srgb, white 28%, transparent), transparent 55%),
+    #30d158;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #0b7a38 30%, transparent),
+    0 2px 8px color-mix(in srgb, #30d158 40%, transparent);
+}
+
 .tme-bubbles li:nth-child(4) .tme-bubble-rays {
-  --ray-group-delay: 900ms;
+  --ray-group-delay: 7.2s;
+}
+
+/* 4th bubble: flatter fan + nudge marks ~20% of ray width to the right. */
+.tme-bubbles li:nth-child(4) .tme-bubble-rays.is-tr {
+  right: calc(9px - (var(--ray-w) / 2) - (var(--ray-w) * 0.2));
+  transform: scaleX(-1) rotate(-24deg);
 }
 
 .tme-bubbles li:nth-child(5) {
   --bubble-fill: var(--tme-bubble-5-fill);
   --bubble-ink: var(--tme-bubble-5-ink);
-  --bubble-tilt: -3.4deg;
-  --bubble-scale: 1.02;
+  --bubble-tilt: -1.8deg;
+  --bubble-scale: 1;
   --bubble-delay: 320ms;
-  align-self: flex-start;
-  margin-left: 0.2rem;
+  /* Was -50%; shift 2/4 (half width) to the right. */
+  --bubble-nudge-x: 0%;
+  margin-top: 10px;
+  margin-left: 0.45rem;
   overflow: visible;
 }
 
 .tme-bubbles li:nth-child(5) .tme-bubble-rays {
-  --ray-group-delay: 1100ms;
+  --ray-group-delay: 9.6s;
 }
 
-/* Soft speech tails. */
-.tme-bubbles li::after {
+/* 5th bubble: shift br marks right by 1/4 of ray width. */
+.tme-bubbles li:nth-child(5) .tme-bubble-rays.is-br {
+  right: calc(9.5px - (var(--ray-w) / 2) - (var(--ray-w) * 0.25));
+}
+
+.tme-bubbles li:nth-child(6) {
+  --bubble-fill: var(--tme-bubble-6-fill);
+  --bubble-ink: var(--tme-bubble-6-ink);
+  --bubble-tilt: 1.4deg;
+  --bubble-scale: 1;
+  --bubble-delay: 380ms;
+  --bubble-mark: #b8c9f5;
+  overflow: visible;
+}
+
+.tme-bubbles li:nth-child(6) .tme-bubble-rays {
+  --ray-group-delay: 12s;
+}
+
+.tme-bubbles li:nth-child(7) {
+  --bubble-fill: var(--tme-bubble-7-fill);
+  --bubble-ink: var(--tme-bubble-7-ink);
+  --bubble-tilt: -1.5deg;
+  --bubble-scale: 1;
+  --bubble-delay: 440ms;
+  --bubble-mark: #8ec4db;
+  --bubble-nudge-x: -20%;
+  margin-left: 0.35rem;
+  overflow: visible;
+}
+
+/* Cl@ve corporate mark: orange glyph (#FF5A00) on complementary blue badge. */
+.tme-bubbles li:nth-child(7) .tme-bubble-icon {
+  color: #ff5a00;
+  background: #c5dff0;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #1a4a5e 14%, transparent),
+    0 2px 8px color-mix(in srgb, #3f86ae 24%, transparent);
+}
+
+.tme-bubbles li:nth-child(7) .tme-bubble-rays {
+  --ray-group-delay: 14.4s;
+}
+
+.tme-bubbles li:nth-child(8) {
+  --bubble-fill: var(--tme-bubble-8-fill);
+  --bubble-ink: var(--tme-bubble-8-ink);
+  --bubble-tilt: 1.6deg;
+  --bubble-scale: 1;
+  --bubble-delay: 500ms;
+  --bubble-mark: #f5b8c2;
+  overflow: visible;
+}
+
+.tme-bubbles li:nth-child(8) .tme-bubble-rays {
+  --ray-group-delay: 16.8s;
+}
+
+/*
+ * Comic speech tail — melts into the pill as one silhouette.
+ * Overlaps upward into the body so the join is seamless; soft outline
+ * comes from the shape’s drop-shadow (odds left, evens right).
+ */
+.tme-bubble-shape::after {
   content: "";
   position: absolute;
-  left: 18px;
-  bottom: -7px;
-  width: 16px;
-  height: 16px;
+  left: 16px;
+  bottom: -14px;
+  width: 32px;
+  height: 26px;
   background: var(--bubble-fill);
-  border-radius: 3px 0 10px 0;
-  transform: rotate(48deg);
-  box-shadow: 3px 3px 10px color-mix(in srgb, var(--tme-ink) 6%, transparent);
   pointer-events: none;
+  /* Circular arcs; top edge buried under the pill so body + tail read as one. */
+  clip-path: path(
+    "M 1 0 C 10 -1 20 -1 31 0 C 26 6.5 20.5 13 13 18.5 C 10.5 20.2 8 20 6.8 18.5 C 11.5 13 14 6.5 1 0 Z"
+  );
 }
 
-.tme-bubbles li:nth-child(2)::after,
-.tme-bubbles li:nth-child(4)::after {
+.tme-bubbles li:nth-child(even) .tme-bubble-shape::after {
   left: auto;
-  right: 18px;
-  border-radius: 0 3px 0 10px;
-  transform: rotate(-48deg);
-  box-shadow: -3px 3px 10px color-mix(in srgb, var(--tme-ink) 6%, transparent);
+  right: 16px;
+  transform: scaleX(-1);
+  transform-origin: 50% 0%;
 }
 
-
+@keyframes tme-bubble-float {
+  0%,
+  100% {
+    transform: translate(var(--bubble-nudge-x), var(--bubble-nudge-y))
+      rotate(var(--bubble-tilt)) scale(var(--bubble-scale));
+  }
+  50% {
+    transform: translate(
+        var(--bubble-nudge-x),
+        calc(var(--bubble-nudge-y) - 4px)
+      )
+      rotate(var(--bubble-tilt)) scale(var(--bubble-scale));
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .tme-bubbles li {
@@ -3083,7 +3377,8 @@ body:has(.tme-home) {
   }
 
   .tme-bubbles li:hover {
-    transform: rotate(var(--bubble-tilt)) scale(var(--bubble-scale));
+    transform: translate(var(--bubble-nudge-x), var(--bubble-nudge-y))
+      rotate(var(--bubble-tilt)) scale(var(--bubble-scale));
     filter: none;
   }
 
@@ -3109,7 +3404,8 @@ body:has(.tme-home) {
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  padding: 8px 0 0;
+  padding: 4px 0 0;
+  margin: 0;
 }
 
 .tme.tme-home h2 {
@@ -3258,7 +3554,30 @@ body:has(.tme-home) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  width: 100%;
+  max-width: 28rem; /* match .tme-intro-fork / path options */
   margin-top: 12px;
+}
+
+/* Calendar sits as its own block under Mañana/Tarde — not glued to the part fork. */
+.tme-calendar-block {
+  width: 100%;
+  max-width: none;
+  margin-top: 1.5rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid color-mix(in srgb, var(--tme-line) 85%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tme-calendar-block .tme-seg,
+.tme-calendar-block .tme-week-nav,
+.tme-calendar-block .tme-weeks,
+.tme-calendar-block .tme-slot,
+.tme-calendar-block .tme-empty,
+.tme-calendar-block .tme-alert {
+  margin-top: 0;
 }
 
 .tme-part-fork:has(.tme-part-now) {
@@ -3673,6 +3992,8 @@ body:has(.tme-home) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  width: 100%;
+  max-width: 28rem; /* match path options + Mañana/Tarde */
   margin-top: 12px;
 }
 
@@ -3993,7 +4314,8 @@ body:has(.tme-home) {
 }
 
 .tme-teacher {
-  max-width: 44rem;
+  width: 100%;
+  max-width: none; /* span the home wrap (outer max) */
   margin-top: 26px;
   padding: 22px 0 6px;
   border-top: 1px solid color-mix(in srgb, var(--tme-line) 80%, transparent);
@@ -4354,8 +4676,8 @@ body:has(.tme-home) {
 
 @media (min-width: 760px) {
   .tme-home-wrap {
-    width: min(1080px, calc(100% - 48px));
-    padding-top: 18px;
+    width: min(var(--tme-wrap), calc(100% - 48px));
+    padding-top: 12px;
   }
 
   .tme-home .tme-brand-logo {
@@ -4372,19 +4694,19 @@ body:has(.tme-home) {
   }
 
   .tme-bar-tools {
-    gap: 28px;
+    gap: 14px;
   }
 
   .tme-home .tme-lang {
-    padding-left: 22px;
+    padding-left: 0;
   }
 
-  .tme-intro {
+  .tme-lead {
     margin-bottom: 28px;
   }
 
   .tme-intro-copy {
-    max-width: 58ch;
+    max-width: 44rem;
     gap: 0.8rem;
   }
 
@@ -4465,34 +4787,75 @@ body:has(.tme-home) {
   }
 }
 
-/* Mirror teacher rhythm: copy left | visual right, full page width */
+/*
+ * Lede (+ reassure) span the full lead width.
+ * Price / CTA / fork / panel stay left; bubbles fill the right column.
+ */
 @media (min-width: 920px) {
-  .tme-intro {
-    grid-template-columns: minmax(0, 1fr) max-content;
-    grid-template-areas: "copy bubbles";
-    column-gap: clamp(24px, 3.5vw, 40px);
-    row-gap: 0;
-    align-items: center;
-    justify-content: space-between;
+  .tme-lead {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
+    column-gap: clamp(20px, 2.5vw, 36px);
+    row-gap: 0.75rem;
+    align-items: start;
+    justify-content: stretch;
     width: 100%;
     max-width: none;
     margin-inline: 0;
-    padding: 8px 0 12px;
+    padding: 0 0 12px;
+    overflow: visible;
   }
 
+  /* Flatten intro so fork + panel share the left column under the lede. */
+  .tme-intro,
   .tme-intro-copy {
-    max-width: none;
+    display: contents;
+  }
+
+  .tme-lead .tme-lede,
+  .tme-lead .tme-reassure {
+    grid-column: 1 / -1;
     width: 100%;
+    max-width: none;
+  }
+
+  .tme-lead .tme-price,
+  .tme-lead .tme-intro-cta,
+  .tme-lead .tme-intro-fork {
+    grid-column: 1;
+    width: 100%;
+    max-width: 28rem;
+  }
+
+  /* Mañana/Tarde under the fork; calendar spans the full lead width. */
+  .tme-lead .tme-panel {
+    grid-column: 1;
+    width: 100%;
+    max-width: none;
+  }
+
+  .tme-lead .tme-panel:has(.tme-calendar-block),
+  .tme-lead .tme-panel:has(.tme-seg) {
+    display: contents;
+  }
+
+  .tme-lead .tme-part-fork,
+  .tme-lead .tme-seg {
+    grid-column: 1;
+    width: 100%;
+    max-width: 28rem;
+  }
+
+  .tme-lead .tme-calendar-block {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
   }
 
   .tme.tme-home h1 {
     font-size: clamp(2.6rem, 3.2vw, 3.05rem);
     max-width: none;
     line-height: 1.05;
-  }
-
-  .tme.tme-home h1 + .tme-lede {
-    margin-top: 0.25rem;
   }
 
   .tme-lede,
@@ -4502,14 +4865,18 @@ body:has(.tme-home) {
   }
 
   .tme-bubbles {
-    align-self: center;
-    justify-self: end;
+    grid-column: 2;
+    grid-row: 3 / span 20;
+    align-self: start;
+    justify-self: stretch;
+    align-items: flex-end;
     flex-direction: column;
     flex-wrap: nowrap;
-    width: max-content;
-    max-width: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     justify-content: flex-start;
-    gap: 12px;
+    gap: 14px;
     padding: 0;
     margin: 0;
   }
@@ -4519,60 +4886,91 @@ body:has(.tme-home) {
   .tme-bubbles li:nth-child(2),
   .tme-bubbles li:nth-child(3),
   .tme-bubbles li:nth-child(4),
-  .tme-bubbles li:nth-child(5) {
+  .tme-bubbles li:nth-child(5),
+  .tme-bubbles li:nth-child(6),
+  .tme-bubbles li:nth-child(7),
+  .tme-bubbles li:nth-child(8) {
     flex: none;
     width: max-content;
-    max-width: none;
+    max-width: 100%;
     min-width: 0;
     margin-left: 0;
     border-radius: 999px;
   }
 
-  .tme-bubbles li:nth-child(1),
-  .tme-bubbles li:nth-child(3),
-  .tme-bubbles li:nth-child(5) {
+  .tme-bubbles li:nth-child(odd) {
     align-self: flex-start;
-    transform-origin: left bottom;
   }
 
-  .tme-bubbles li:nth-child(3) {
-    margin-left: 1.25rem;
-  }
-
-  .tme-bubbles li:nth-child(5) {
-    margin-left: 0.5rem;
-  }
-
-  .tme-bubbles li:nth-child(2),
-  .tme-bubbles li:nth-child(4) {
+  .tme-bubbles li:nth-child(even) {
     align-self: flex-end;
-    transform-origin: right bottom;
-    flex-direction: row-reverse;
-    padding: 10px 10px 12px 16px;
   }
 
-  .tme-bubbles li:nth-child(2)::after,
-  .tme-bubbles li:nth-child(4)::after {
-    left: auto;
-    right: 18px;
+  .tme-bubbles li .tme-bubble-text {
+    white-space: normal;
   }
+
+  .tme-bubbles li:nth-child(3),
+  .tme-bubbles li:nth-child(5),
+  .tme-bubbles li:nth-child(7) {
+    margin-left: 0.75rem;
+  }
+
 }
 
-/* Narrow phones only: allow wrap so long locales don’t overflow */
+/* Narrow phones: readable type, less tilt, no clip dependence on motion */
 @media (max-width: 520px) {
   .tme-bubble-text {
     white-space: normal;
   }
 
+  .tme-bubbles {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 4px;
+    overflow: visible;
+  }
+
   .tme-bubbles li {
-    max-width: min(100%, 22rem);
+    max-width: 100%;
+    width: auto;
+    font-size: 1rem; /* ≥16px */
+    line-height: 1.35;
+    --bubble-tilt: 0deg;
+    --bubble-nudge-x: 0%;
+    --bubble-nudge-y: 0%;
+    margin-left: 0 !important;
     border-radius: 22px;
+    animation: none;
+  }
+
+  .tme-bubbles li:nth-child(1),
+  .tme-bubbles li:nth-child(2),
+  .tme-bubbles li:nth-child(3),
+  .tme-bubbles li:nth-child(4),
+  .tme-bubbles li:nth-child(5),
+  .tme-bubbles li:nth-child(6),
+  .tme-bubbles li:nth-child(7),
+  .tme-bubbles li:nth-child(8) {
+    --bubble-tilt: 0deg;
+    --bubble-nudge-x: 0%;
+    --bubble-nudge-y: 0%;
+    margin-left: 0;
+    margin-top: 0;
+  }
+
+  .tme-bubbles li:nth-child(5) {
+    margin-top: 4px;
+  }
+
+  .tme-bubble-rays {
+    display: none;
   }
 }
 
 @media (min-width: 1040px) {
   .tme-home-wrap {
-    width: min(1100px, calc(100% - 64px));
+    width: min(var(--tme-wrap), calc(100% - 64px));
   }
 
   .tme-home .tme-brand-logo {
@@ -4584,15 +4982,24 @@ body:has(.tme-home) {
     font-size: 1.58rem;
   }
 
-  .tme-intro {
+  .tme-bar-hero .tme-wordmark {
+    font-size: 1.35rem;
+  }
+
+  .tme-lockup-title {
+    font-size: 1.12rem;
+    max-width: 100%;
+  }
+
+  .tme-lead {
     column-gap: 48px;
   }
 
   .tme-intro-copy {
-    max-width: 58ch;
+    max-width: none;
   }
 
-  .tme-intro .tme-price strong {
+  .tme-lead .tme-price strong {
     font-size: 1.05rem;
   }
 }
@@ -4601,5 +5008,11 @@ body:has(.tme-home) {
 @media (max-width: 900px) {
   .tme-home .tme-call-word {
     display: none;
+  }
+
+  .tme-lockup-title {
+    white-space: normal;
+    max-width: 28ch;
+    font-size: clamp(0.95rem, 3.4vw, 1.1rem);
   }
 }

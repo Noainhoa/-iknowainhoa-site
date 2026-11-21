@@ -300,24 +300,60 @@ const es: TechCopy = {
   heroBubbles: [
     {
       parts: [
-        { text: "No sé mandar fotos por " },
-        { text: "WhatsApp", mark: "underline" },
-      ],
-    },
-    {
-      parts: [
-        { text: "No encuentro mis " },
+        { text: "¿Cómo mando varias " },
         { text: "fotos", mark: "pill" },
+        { text: " por WhatsApp?" },
       ],
     },
     {
       parts: [
-        { text: "He tocado algo y ya " },
-        { text: "no funciona", mark: "pill" },
+        { text: "¿Dónde se han guardado mis " },
+        { text: "fotos", mark: "pill" },
+        { text: "?" },
       ],
     },
-    { parts: [{ text: "Quiero videollamar y no me sale" }] },
-    { parts: [{ text: "Se me ha llenado el móvil… ¿de qué?" }] },
+    {
+      parts: [
+        { text: "He tocado algo… ¡y ahora " },
+        { text: "no sé volver atrás", mark: "pill" },
+        { text: "!" },
+      ],
+    },
+    {
+      parts: [
+        { text: "Quiero hacer una " },
+        { text: "videollamada", mark: "pill" },
+        { text: " y no sé cómo." },
+      ],
+    },
+    {
+      parts: [
+        { text: "Me dice que no tengo " },
+        { text: "espacio", mark: "pill" },
+        { text: "… ¡pero no sé por qué!" },
+      ],
+    },
+    {
+      parts: [
+        { text: "Quiero pedir " },
+        { text: "cita en el médico", mark: "pill" },
+        { text: " y no sé cómo." },
+      ],
+    },
+    {
+      parts: [
+        { text: "Me piden la " },
+        { text: "Cl@ve", mark: "pill" },
+        { text: " para un trámite… ¿y eso qué es?" },
+      ],
+    },
+    {
+      parts: [
+        { text: "Me ha llegado un " },
+        { text: "mensaje raro", mark: "pill" },
+        { text: "… ¿será una estafa?" },
+      ],
+    },
   ],
   teacherKicker: "Quién está detrás de Guardamar Click",
   teacherHello: "Hola, soy Ainhoa.",
@@ -651,24 +687,60 @@ const en: TechCopy = {
   heroBubbles: [
     {
       parts: [
-        { text: "I can't send photos on " },
-        { text: "WhatsApp", mark: "underline" },
-      ],
-    },
-    {
-      parts: [
-        { text: "I can't find my " },
+        { text: "How do I send several " },
         { text: "photos", mark: "pill" },
+        { text: " on WhatsApp?" },
       ],
     },
     {
       parts: [
-        { text: "I tapped something and now it " },
-        { text: "won't work", mark: "pill" },
+        { text: "Where have my " },
+        { text: "photos", mark: "pill" },
+        { text: " gone?" },
       ],
     },
-    { parts: [{ text: "I want to video call and it won't start" }] },
-    { parts: [{ text: "My phone is full… with what?" }] },
+    {
+      parts: [
+        { text: "I tapped something… and now I " },
+        { text: "can’t go back", mark: "pill" },
+        { text: "!" },
+      ],
+    },
+    {
+      parts: [
+        { text: "I want to make a " },
+        { text: "video call", mark: "pill" },
+        { text: " and don’t know how." },
+      ],
+    },
+    {
+      parts: [
+        { text: "It says I’m out of " },
+        { text: "space", mark: "pill" },
+        { text: "… but I don’t know why!" },
+      ],
+    },
+    {
+      parts: [
+        { text: "I want to book a " },
+        { text: "doctor’s appointment", mark: "pill" },
+        { text: " and don’t know how." },
+      ],
+    },
+    {
+      parts: [
+        { text: "They ask for my " },
+        { text: "Cl@ve", mark: "pill" },
+        { text: " for a form… what’s that?" },
+      ],
+    },
+    {
+      parts: [
+        { text: "I got a " },
+        { text: "strange message", mark: "pill" },
+        { text: "… could it be a scam?" },
+      ],
+    },
   ],
   teacherKicker: "Who is behind Guardamar Click",
   teacherHello: "Hello, I'm Ainhoa.",
@@ -1002,25 +1074,60 @@ const nl: TechCopy = {
   heroBubbles: [
     {
       parts: [
-        { text: "Ik kan geen foto's sturen via " },
-        { text: "WhatsApp", mark: "underline" },
-      ],
-    },
-    {
-      parts: [
-        { text: "Ik vind mijn " },
+        { text: "Hoe stuur ik meerdere " },
         { text: "foto's", mark: "pill" },
-        { text: " niet" },
+        { text: " via WhatsApp?" },
       ],
     },
     {
       parts: [
-        { text: "Ik heb iets aangeraakt en nu " },
-        { text: "werkt het niet", mark: "pill" },
+        { text: "Waar zijn mijn " },
+        { text: "foto's", mark: "pill" },
+        { text: " gebleven?" },
       ],
     },
-    { parts: [{ text: "Ik wil videobellen, maar het lukt niet" }] },
-    { parts: [{ text: "Mijn telefoon zit vol… maar waarmee?" }] },
+    {
+      parts: [
+        { text: "Ik heb iets aangeraakt… en nu " },
+        { text: "kom ik niet meer terug", mark: "pill" },
+        { text: "!" },
+      ],
+    },
+    {
+      parts: [
+        { text: "Ik wil een " },
+        { text: "videogesprek", mark: "pill" },
+        { text: " starten en weet niet hoe." },
+      ],
+    },
+    {
+      parts: [
+        { text: "Hij zegt dat ik geen " },
+        { text: "ruimte", mark: "pill" },
+        { text: " meer heb… maar waarom niet?" },
+      ],
+    },
+    {
+      parts: [
+        { text: "Ik wil een " },
+        { text: "afspraak bij de dokter", mark: "pill" },
+        { text: " maken en weet niet hoe." },
+      ],
+    },
+    {
+      parts: [
+        { text: "Ze vragen om mijn " },
+        { text: "Cl@ve", mark: "pill" },
+        { text: " voor een formulier… wat is dat?" },
+      ],
+    },
+    {
+      parts: [
+        { text: "Ik kreeg een " },
+        { text: "raar bericht", mark: "pill" },
+        { text: "… zou het oplichting zijn?" },
+      ],
+    },
   ],
   teacherKicker: "Wie zit er achter Guardamar Click",
   teacherHello: "Hallo, ik ben Ainhoa.",
