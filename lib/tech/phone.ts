@@ -1,7 +1,20 @@
 import { site } from "@/lib/site";
 
+/**
+ * Digits-only key for storage / rate limits.
+ * Accepts Spanish mobiles as 9 digits (6… / 7…) or with +34 / 0034.
+ * Other international numbers stay as dialled digits (8–15).
+ */
 export function normalizePhone(input: string): string | null {
-  const digits = input.replace(/[^\d]/g, "");
+  let digits = input.replace(/[^\d]/g, "");
+  if (!digits) return null;
+
+  // 0034… → 34…
+  if (digits.startsWith("0034")) digits = digits.slice(2);
+
+  // National Spanish mobile (9 digits, starts with 6 or 7).
+  if (/^[67]\d{8}$/.test(digits)) digits = `34${digits}`;
+
   if (digits.length < 8 || digits.length > 15) return null;
   return digits;
 }

@@ -15,6 +15,9 @@
   --tme-sea: #3f86ae;
   --tme-deep: #3f86ae;
   --tme-deep-ink: #fbf1dc;
+  /* Selected + primary CTA (Elige) — one sea–ink mix */
+  --tme-active: color-mix(in srgb, var(--tme-sea) 28%, var(--tme-ink));
+  --tme-active-ink: #ffffff;
   --tme-sun: #f6bc3b;
   --tme-sun-ink: #33240a;
   --tme-btn: #3f86ae;
@@ -919,6 +922,13 @@
   margin: 8px 0 16px;
 }
 
+.tme-pay-aside {
+  margin: 8px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--tme-ink) 55%, transparent);
+}
+
 .tme-alert {
   background: var(--tme-warn-soft);
   border: 1.5px solid color-mix(in srgb, var(--tme-warn) 35%, var(--tme-line));
@@ -975,15 +985,17 @@
   flex: none;
 }
 
-.tme-inline-link {
+.tme a.tme-inline-link {
   color: var(--tme-sea);
   font-weight: 700;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
 }
 
-.tme-inline-link:hover {
+.tme a.tme-inline-link:hover {
   color: var(--tme-ink);
+  text-decoration-thickness: 2px;
 }
 
 /* Legal document — parking rhythm/weight, Guardamar Click cream + sea */
@@ -2597,11 +2609,18 @@ body:has(.tme-home) {
   width: 100%;
 }
 
-.tme-block-calendar {
+.tme-block-calendar,
+.tme-block-home {
   margin-top: 22px;
   padding-top: 22px;
   border-top: 1px solid color-mix(in srgb, var(--tme-line) 80%, transparent);
   width: 100%;
+}
+
+.tme-block-home .tme-home-book {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .tme-block-calendar .tme-calendar-block {
@@ -2839,8 +2858,8 @@ body:has(.tme-home) {
   padding: 0.7em 1.25em;
   border: 0;
   border-radius: 14px;
-  background: color-mix(in srgb, var(--tme-sea) 28%, var(--tme-ink));
-  color: #fff;
+  background: var(--tme-active);
+  color: var(--tme-active-ink);
   font: 700 0.98rem / 1.25 var(--tme-sans);
   letter-spacing: -0.01em;
   cursor: pointer;
@@ -3686,8 +3705,8 @@ body:has(.tme-home) {
 }
 
 .tme-part-option[aria-pressed="true"] {
-  background: var(--tme-ink);
-  color: var(--tme-bg);
+  background: var(--tme-active);
+  color: var(--tme-active-ink);
 }
 
 /* Call-now — section 2 between slot controls and calendar (full width). */
@@ -3781,8 +3800,8 @@ body:has(.tme-home) {
 }
 
 .tme-date-time[aria-pressed="true"] {
-  background: var(--tme-ink);
-  color: var(--tme-bg);
+  background: var(--tme-active);
+  color: var(--tme-active-ink);
 }
 
 .tme-date-none {
@@ -3880,6 +3899,131 @@ body:has(.tme-home) {
   margin-top: 16px;
   padding-top: 14px;
   border-top: 1px solid color-mix(in srgb, var(--tme-line) 75%, transparent);
+}
+
+.tme-slot-book {
+  gap: 0;
+  width: 100%;
+  max-width: none;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.tme-slot-book form {
+  gap: 8px;
+  margin-top: 0;
+}
+
+.tme-slot-book .tme-fork-step {
+  margin: 0;
+}
+
+.tme-slot-book .tme-chosen,
+.tme-slot-book .tme-where {
+  margin: 0;
+}
+
+.tme-slot-book .tme-chosen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15em 0;
+  max-width: none;
+  width: 100%;
+  line-height: 1.3;
+}
+
+.tme-slot-book .tme-chosen strong {
+  font-weight: 800;
+}
+
+.tme.tme-home .tme-slot-book form > .tme-place-check,
+.tme.tme-home .tme-slot-book form > .tme-check {
+  max-width: none;
+  width: 100%;
+  min-height: 0;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tme-slot-book .tme-place-check span {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  line-height: 1.35;
+}
+
+.tme.tme-home .tme-slot-book .tme-check input {
+  margin-top: 2px;
+}
+
+/* Book form uses the full calendar column width. */
+.tme.tme-home .tme-slot-book form > label,
+.tme.tme-home .tme-slot-book form > input,
+.tme.tme-home .tme-slot-book form > select,
+.tme.tme-home .tme-slot-book form > textarea,
+.tme.tme-home .tme-slot-book form > .tme-check,
+.tme.tme-home .tme-slot-book form > .tme-chosen,
+.tme.tme-home .tme-slot-book form > .tme-where,
+.tme.tme-home .tme-slot-book form > .tme-note,
+.tme.tme-home .tme-slot-book form > .tme-assist,
+.tme.tme-home .tme-slot-book form > .tme-request-when,
+.tme.tme-home .tme-slot-book form > .tme-book,
+.tme.tme-home .tme-slot-book form > button[type="submit"] {
+  max-width: none;
+  width: 100%;
+}
+
+.tme-slot-book .tme-request-when {
+  width: 100%;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 0;
+  align-items: stretch;
+}
+
+/* Home date/time: hug content like Mañana/Tarde, not half-page fields. */
+.tme.tme-home .tme-home-book form > .tme-request-when.is-compact,
+.tme-home-book .tme-request-when.is-compact {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  grid-template-columns: none;
+  gap: 8px;
+  align-items: center;
+}
+
+.tme-home-book .tme-request-when.is-compact .tme-request-field {
+  width: auto;
+}
+
+.tme-slot-book .tme-request-field {
+  gap: 0;
+}
+
+.tme-slot-book .tme-where {
+  max-width: none;
+}
+
+.tme-slot-book .tme-book,
+.tme-slot-book form > button[type="submit"] {
+  margin-top: 2px;
+}
+
+.tme-slot-book .tme-pay-aside {
+  margin-top: 2px;
+}
+
+.tme-slot-book .tme-alert {
+  margin: 0;
+  padding: 8px 12px;
+}
+
+@media (max-width: 520px) {
+  .tme-slot-book .tme-request-when {
+    grid-template-columns: 1fr;
+  }
 }
 
 .tme-day-name {
@@ -4050,12 +4194,12 @@ body:has(.tme-home) {
 
 .tme-fork-option[aria-pressed="true"] {
   border-color: transparent;
-  background: var(--tme-ink);
-  color: var(--tme-bg);
+  background: var(--tme-active);
+  color: var(--tme-active-ink);
 }
 
 .tme-fork-option[aria-pressed="true"] .tme-fork-body {
-  color: color-mix(in srgb, var(--tme-bg) 82%, transparent);
+  color: color-mix(in srgb, var(--tme-active-ink) 82%, transparent);
 }
 
 @media (max-width: 720px) {
@@ -4103,8 +4247,8 @@ body:has(.tme-home) {
 }
 
 .tme-seg button[aria-pressed="true"] {
-  background: var(--tme-ink);
-  color: var(--tme-bg);
+  background: var(--tme-active);
+  color: var(--tme-active-ink);
 }
 
 .tme-chosen,
@@ -4318,7 +4462,8 @@ body:has(.tme-home) {
   max-width: min(10.75rem, 100%);
 }
 
-.tme-request-when.is-compact #tme-time {
+.tme-request-when.is-compact #tme-time,
+.tme-request-when.is-compact #tme-home-time {
   width: max-content;
   min-width: 6.75rem;
   max-width: 100%;
@@ -4870,6 +5015,13 @@ body:has(.tme-home) {
     align-self: flex-start;
   }
 
+  .tme.tme-home .tme-slot-book .tme-book,
+  .tme.tme-home .tme-slot-book form > button[type="submit"] {
+    width: 100%;
+    min-width: 0;
+    align-self: stretch;
+  }
+
   .tme-week {
     gap: 8px;
   }
@@ -4898,6 +5050,7 @@ body:has(.tme-home) {
  */
 @media (min-width: 920px) {
   .tme-decision {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
     column-gap: clamp(20px, 2.5vw, 36px);
@@ -4981,11 +5134,12 @@ body:has(.tme-home) {
   }
 
   /*
-   * Sit in col 2 beside the intro without sizing that row.
-   * Tall bubbles in the same row as .tme-reassure used to stretch the row
-   * and shove price / CTA / fork hundreds of px down.
+   * Absolutely positioned grid item: paints in col 2 beside the flow but does
+   * NOT contribute to row sizing. (height:0 still lost to min-height:auto, which
+   * left a ~bubble-stack gap above the calendar on every path.)
    */
   .tme-decision .tme-bubbles {
+    position: absolute;
     grid-column: 2;
     grid-row: 2;
     align-self: start;
@@ -4993,12 +5147,18 @@ body:has(.tme-home) {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    height: 0;
+    min-height: 0;
+    height: auto;
     overflow: visible;
     gap: 10px;
     padding: 0;
     margin: 0;
     z-index: 1;
+    pointer-events: none;
+  }
+
+  .tme-decision .tme-bubbles li {
+    pointer-events: auto;
   }
 
   .tme-bubbles li {

@@ -68,6 +68,9 @@ export type TechCopy = {
   forkRemoteBody: string;
   forkHomeTitle: string;
   forkHomeBody: string;
+  /** Home-visit path: pick arrival day/time (Pedir-cita style). */
+  homePickLead: string;
+  homePickNote: string;
   chooseHeading: string;
   dateThenTime: string;
   /** After type fork: morning / evening (then calendar). */
@@ -389,6 +392,9 @@ const es: TechCopy = {
   forkHomeTitle: "En tu casa",
   forkHomeBody:
     "Sesión con tus dispositivos en tu domicilio: elige el día y la hora de llegada en Guardamar.",
+  homePickLead: "Elige el día y la hora de llegada a tu casa en Guardamar.",
+  homePickNote:
+    "La visita es a tu domicilio. Eliges la hora de llegada; el desplazamiento va incluido en el bloque de la agenda (60 min de ayuda + viaje · 45 €).",
   chooseHeading: "Elige una hora",
   dateThenTime: "Ahora elige el día y la hora.",
   slotPartHeading: "Elige huecos disponibles",
@@ -409,10 +415,10 @@ const es: TechCopy = {
   reserve: "Reservar",
   moreDates: "Ver 4 semanas",
   fewerDates: "Ver una semana",
-  privateOpen: "Prefiero una cita a solas",
+  privateOpen: "Prefiero una clase individual",
   privateClose: "Volver a las sesiones en grupo",
-  privateHeading: "Cita a solas",
-  alone: "A solas",
+  privateHeading: "Clase individual",
+  alone: "Clase individual",
   openSeat: "Hora libre",
   minutesLong: "{n} minutos",
   changeTime: "Elegir otra hora",
@@ -580,7 +586,8 @@ const es: TechCopy = {
   errors: {
     name: "Escribe tu nombre.",
     attendee: "Escribe el nombre de quien asiste.",
-    phone: "Escribe un teléfono con el prefijo, por ejemplo +34…",
+    phone: "Escribe un móvil español (6… o 7…) o con prefijo, por ejemplo +34…",
+    placeConfirm: "Marca que confirmas cómo y dónde es la sesión.",
     email: "Revisa el email o déjalo vacío.",
     question: "El texto es demasiado largo.",
     quote: "Escribe unas palabras: entre 8 y 400 caracteres.",
@@ -773,6 +780,9 @@ const en: TechCopy = {
   forkHomeTitle: "At your home",
   forkHomeBody:
     "A session with your devices at home: pick the day and arrival time in Guardamar.",
+  homePickLead: "Pick the day and arrival time at your home in Guardamar.",
+  homePickNote:
+    "This visit is at your home. You choose the arrival time; travel is included in the calendar block (60 min help + travel · €45).",
   chooseHeading: "Choose a time",
   dateThenTime: "Now pick the day and time.",
   slotPartHeading: "Pick available time slots",
@@ -793,10 +803,10 @@ const en: TechCopy = {
   reserve: "Book",
   moreDates: "Show 4 weeks",
   fewerDates: "Show one week",
-  privateOpen: "I prefer a private session",
+  privateOpen: "I prefer an individual class",
   privateClose: "Back to group sessions",
-  privateHeading: "Private session",
-  alone: "Just you",
+  privateHeading: "Individual class",
+  alone: "Individual class",
   openSeat: "Free time",
   minutesLong: "{n} minutes",
   changeTime: "Choose another time",
@@ -964,7 +974,8 @@ const en: TechCopy = {
   errors: {
     name: "Enter your name.",
     attendee: "Enter the name of the person attending.",
-    phone: "Enter a phone number with the country code, for example +34…",
+    phone: "Enter a Spanish mobile (6… or 7…) or with country code, for example +34…",
+    placeConfirm: "Please confirm how and where the session takes place.",
     email: "Check the email or leave it empty.",
     question: "That note is too long.",
     quote: "Write a few words: between 8 and 400 characters.",
@@ -1157,6 +1168,9 @@ const nl: TechCopy = {
   forkHomeTitle: "Bij jou thuis",
   forkHomeBody:
     "Een sessie met jouw apparaten bij jou thuis: kies de dag en aankomsttijd in Guardamar.",
+  homePickLead: "Kies de dag en aankomsttijd bij jou thuis in Guardamar.",
+  homePickNote:
+    "Dit bezoek is bij jou thuis. Jij kiest de aankomsttijd; reizen zit in het agenda-blok (60 min hulp + reizen · €45).",
   chooseHeading: "Kies een tijd",
   dateThenTime: "Kies nu de dag en de tijd.",
   slotPartHeading: "Kies beschikbare tijden",
@@ -1177,10 +1191,10 @@ const nl: TechCopy = {
   reserve: "Reserveren",
   moreDates: "Toon 4 weken",
   fewerDates: "Toon één week",
-  privateOpen: "Ik wil liever alleen",
+  privateOpen: "Ik wil liever een individuele les",
   privateClose: "Terug naar de groepssessies",
-  privateHeading: "Sessie alleen",
-  alone: "Alleen jij",
+  privateHeading: "Individuele les",
+  alone: "Individuele les",
   openSeat: "Vrije tijd",
   minutesLong: "{n} minuten",
   changeTime: "Kies een andere tijd",
@@ -1348,7 +1362,8 @@ const nl: TechCopy = {
   errors: {
     name: "Vul je naam in.",
     attendee: "Vul de naam in van wie komt.",
-    phone: "Vul een telefoonnummer in met landcode, bijvoorbeeld +34…",
+    phone: "Vul een Spaans mobiel nummer in (6… of 7…) of met landcode, bijvoorbeeld +34…",
+    placeConfirm: "Bevestig hoe en waar de sessie plaatsvindt.",
     email: "Controleer de e-mail of laat hem leeg.",
     question: "Die tekst is te lang.",
     quote: "Schrijf een paar woorden: tussen 8 en 400 tekens.",

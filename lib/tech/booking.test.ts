@@ -81,9 +81,18 @@ describe("tech booking rules", () => {
 
   it("normalises phones and rejects secrets, missing consent, and unknown sources", () => {
     assert.equal(normalizePhone("+44 7700 900123"), "447700900123");
+    assert.equal(normalizePhone("636 67 01 03"), "34636670103");
+    assert.equal(normalizePhone("712345678"), "34712345678");
+    assert.equal(normalizePhone("+34 636 670 103"), "34636670103");
+    assert.equal(normalizePhone("0034 636 670 103"), "34636670103");
+    assert.equal(normalizePhone("+34"), null);
+    assert.equal(normalizePhone("12345"), null);
     const ok = validateBooking(validInput);
     assert.equal(ok.ok, true);
     if (ok.ok) assert.equal(ok.value.phoneKey, "34636670103");
+    const national = validateBooking({ ...validInput, phone: "636670103" });
+    assert.equal(national.ok, true);
+    if (national.ok) assert.equal(national.value.phoneKey, "34636670103");
     const secret = validateBooking({ ...validInput, question: "password: 1234" });
     assert.equal(secret.ok, false);
     const consent = validateBooking({ ...validInput, acceptTerms: false });
