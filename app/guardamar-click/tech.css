@@ -4901,13 +4901,13 @@ body:has(.tme-home) {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
     column-gap: clamp(20px, 2.5vw, 36px);
-    row-gap: 0.75rem;
+    row-gap: 0.35rem;
     align-items: start;
     justify-content: stretch;
     width: 100%;
     max-width: none;
     margin-inline: 0;
-    padding: 18px 0 12px;
+    padding: 14px 0 8px;
     overflow: visible;
   }
 
@@ -4928,6 +4928,11 @@ body:has(.tme-home) {
     max-width: none;
   }
 
+  /* Pull price / CTA / path choices up under the intro lines. */
+  .tme-decision .tme-reassure {
+    margin-bottom: 0.15rem;
+  }
+
   .tme-decision .tme-price,
   .tme-decision .tme-intro-cta,
   .tme-decision .tme-intro-fork,
@@ -4937,11 +4942,30 @@ body:has(.tme-home) {
     max-width: 28rem;
   }
 
+  .tme-decision .tme-price {
+    margin-top: 0.1rem;
+  }
+
+  .tme-decision .tme-intro-cta {
+    margin-top: 0.2rem;
+    min-height: 44px;
+  }
+
+  .tme-decision .tme-intro-fork {
+    margin-top: 0.2rem;
+  }
+
+  .tme-decision .tme-book-section.is-slot {
+    margin-top: 0.35rem;
+  }
+
   .tme-decision .tme-block-now,
   .tme-decision .tme-block-calendar {
     grid-column: 1 / -1;
     width: 100%;
     max-width: none;
+    margin-top: 0;
+    padding-top: 8px;
   }
 
   .tme.tme-home h1 {
@@ -4956,17 +4980,25 @@ body:has(.tme-home) {
     line-height: 1.55;
   }
 
+  /*
+   * Sit in col 2 beside the intro without sizing that row.
+   * Tall bubbles in the same row as .tme-reassure used to stretch the row
+   * and shove price / CTA / fork hundreds of px down.
+   */
   .tme-decision .tme-bubbles {
     grid-column: 2;
-    grid-row: 3 / span 20;
+    grid-row: 2;
     align-self: start;
     justify-self: stretch;
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    gap: 12px;
+    height: 0;
+    overflow: visible;
+    gap: 10px;
     padding: 0;
     margin: 0;
+    z-index: 1;
   }
 
   .tme-bubbles li {
