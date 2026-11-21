@@ -2566,6 +2566,58 @@ body:has(.tme-home) {
   width: min(var(--tme-wrap), calc(100% - 20px));
   margin: 0 auto;
   padding: 10px 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Page chunks — keep the wrap as a shell, not one giant blob. */
+.tme-block {
+  width: 100%;
+  min-width: 0;
+}
+
+.tme-block-hero {
+  padding-bottom: 4px;
+}
+
+.tme-block-book {
+  /* Border lives on .tme-decision so desktop display:contents keeps the divider. */
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+
+/* Call-now — own page block, outside book section 1 */
+.tme-block-now {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid color-mix(in srgb, var(--tme-line) 80%, transparent);
+  width: 100%;
+}
+
+.tme-block-calendar {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid color-mix(in srgb, var(--tme-line) 80%, transparent);
+  width: 100%;
+}
+
+.tme-block-calendar .tme-calendar-block {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.tme-block-teacher {
+  margin-top: 28px;
+  padding-top: 26px;
+  border-top: 1px solid color-mix(in srgb, var(--tme-line) 80%, transparent);
+}
+
+.tme-block-foot {
+  margin-top: 22px;
 }
 
 .tme-bar {
@@ -2699,20 +2751,28 @@ body:has(.tme-home) {
   line-height: 1.2;
 }
 
+/*
+ * Decision stack — mobile DOM order is the booking flow, then bubbles.
+ * Desktop (≥920px) pulls bubbles into the right column beside the fork.
+ */
+.tme-decision {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 8px;
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--tme-line) 78%, transparent);
+}
+
 /* Intro + booking panel share one lead flow (panel sits under the fork). */
 .tme-lead {
   width: 100%;
-  margin: 0 0 26px;
+  margin: 0;
 }
 
 .tme-intro {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    "copy"
-    "bubbles";
-  row-gap: 22px;
-  align-items: start;
+  display: block;
   width: 100%;
   margin: 0;
   padding: 0 0 8px;
@@ -2856,17 +2916,23 @@ body:has(.tme-home) {
 }
 
 .tme-bubbles {
-  grid-area: bubbles;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 22px;
-  width: fit-content;
+  gap: 12px;
+  width: 100%;
   max-width: 100%;
-  margin: 0 auto;
-  padding: 8px 2px 14px;
+  margin: 0 0 18px;
+  padding: 0 2px 14px;
   list-style: none;
   overflow: visible;
+}
+
+/* Mobile only: bubbles sit above the lede; desktop keeps them right of the flow. */
+@media (max-width: 919px) {
+  .tme-decision .tme-bubbles {
+    order: -1;
+  }
 }
 
 .tme-bubbles li {
@@ -2992,22 +3058,47 @@ body:has(.tme-home) {
 }
 
 /*
- * Icon after the text on every bubble (DOM is icon then text → row-reverse).
- * Odd rows stay left-aligned; even rows stay right-aligned.
+ * Chat rhythm: odds speak from the left, evens from the right.
+ * Soft zigzag keeps it bubbly without looking scattered.
  */
 .tme-bubbles li {
   flex-direction: row-reverse;
   padding: 4px 10px 4px 16px;
+  /* Grow to the text — each bubble stays one line. */
+  max-width: none;
 }
 
 .tme-bubbles li:nth-child(odd) {
   align-self: flex-start;
+  margin-right: 14%;
+  margin-left: 0;
+  --bubble-tilt: -1.35deg;
+  --bubble-nudge-x: 0%;
+  --bubble-nudge-y: 0%;
   transform-origin: left bottom;
 }
 
 .tme-bubbles li:nth-child(even) {
   align-self: flex-end;
+  margin-left: 14%;
+  margin-right: 0;
+  --bubble-tilt: 1.35deg;
+  --bubble-nudge-x: 0%;
+  --bubble-nudge-y: 0%;
   transform-origin: right bottom;
+}
+
+/* Second beat of each pair steps in — mirrored L/R zigzag. */
+.tme-bubbles li:nth-child(4n + 3) {
+  margin-left: 7%;
+  margin-right: 18%;
+  --bubble-tilt: -1.1deg;
+}
+
+.tme-bubbles li:nth-child(4n + 4) {
+  margin-right: 7%;
+  margin-left: 18%;
+  --bubble-tilt: 1.1deg;
 }
 
 /* Even bubbles (2, 4, 6, 8): icon before the text. Odd keep icon after. */
@@ -3175,11 +3266,9 @@ body:has(.tme-home) {
 .tme-bubbles li:nth-child(1) {
   --bubble-fill: var(--tme-bubble-1-fill);
   --bubble-ink: var(--tme-bubble-1-ink);
-  --bubble-tilt: -1.2deg;
   --bubble-scale: 1;
   --bubble-delay: 40ms;
   --bubble-mark: #9aefb8;
-  --bubble-nudge-x: 0%;
   overflow: visible;
 }
 
@@ -3192,12 +3281,9 @@ body:has(.tme-home) {
 .tme-bubbles li:nth-child(2) {
   --bubble-fill: var(--tme-bubble-2-fill);
   --bubble-ink: var(--tme-bubble-2-ink);
-  --bubble-tilt: 1.8deg;
   --bubble-scale: 1;
   --bubble-delay: 110ms;
   --bubble-mark: #ffe27a;
-  align-self: flex-end;
-  margin-left: auto;
   overflow: visible;
 }
 
@@ -3208,12 +3294,9 @@ body:has(.tme-home) {
 .tme-bubbles li:nth-child(3) {
   --bubble-fill: var(--tme-bubble-3-fill);
   --bubble-ink: var(--tme-bubble-3-ink);
-  --bubble-tilt: -1.4deg;
   --bubble-scale: 1;
   --bubble-delay: 180ms;
   --bubble-mark: #ffc078;
-  --bubble-nudge-x: -33.333%;
-  margin-left: 0.45rem;
   overflow: visible;
 }
 
@@ -3224,11 +3307,9 @@ body:has(.tme-home) {
 .tme-bubbles li:nth-child(4) {
   --bubble-fill: var(--tme-bubble-4-fill);
   --bubble-ink: var(--tme-bubble-4-ink);
-  --bubble-tilt: 1.5deg;
   --bubble-scale: 1;
   --bubble-delay: 250ms;
   --bubble-mark: #86f0a8;
-  --bubble-nudge-y: 8.333%;
   overflow: visible;
 }
 
@@ -3256,13 +3337,8 @@ body:has(.tme-home) {
 .tme-bubbles li:nth-child(5) {
   --bubble-fill: var(--tme-bubble-5-fill);
   --bubble-ink: var(--tme-bubble-5-ink);
-  --bubble-tilt: -1.8deg;
   --bubble-scale: 1;
   --bubble-delay: 320ms;
-  /* Was -50%; shift 2/4 (half width) to the right. */
-  --bubble-nudge-x: 0%;
-  margin-top: 10px;
-  margin-left: 0.45rem;
   overflow: visible;
 }
 
@@ -3278,7 +3354,6 @@ body:has(.tme-home) {
 .tme-bubbles li:nth-child(6) {
   --bubble-fill: var(--tme-bubble-6-fill);
   --bubble-ink: var(--tme-bubble-6-ink);
-  --bubble-tilt: 1.4deg;
   --bubble-scale: 1;
   --bubble-delay: 380ms;
   --bubble-mark: #b8c9f5;
@@ -3292,12 +3367,9 @@ body:has(.tme-home) {
 .tme-bubbles li:nth-child(7) {
   --bubble-fill: var(--tme-bubble-7-fill);
   --bubble-ink: var(--tme-bubble-7-ink);
-  --bubble-tilt: -1.5deg;
   --bubble-scale: 1;
   --bubble-delay: 440ms;
   --bubble-mark: #8ec4db;
-  --bubble-nudge-x: -20%;
-  margin-left: 0.35rem;
   overflow: visible;
 }
 
@@ -3317,7 +3389,6 @@ body:has(.tme-home) {
 .tme-bubbles li:nth-child(8) {
   --bubble-fill: var(--tme-bubble-8-fill);
   --bubble-ink: var(--tme-bubble-8-ink);
-  --bubble-tilt: 1.6deg;
   --bubble-scale: 1;
   --bubble-delay: 500ms;
   --bubble-mark: #f5b8c2;
@@ -3550,16 +3621,27 @@ body:has(.tme-home) {
   cursor: pointer;
 }
 
-.tme-part-fork {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+/* Three booking sections: slot controls → call-now → calendar */
+.tme-book-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   width: 100%;
-  max-width: 28rem; /* match .tme-intro-fork / path options */
   margin-top: 12px;
 }
 
-/* Calendar sits as its own block under Mañana/Tarde — not glued to the part fork. */
+.tme-book-section {
+  width: 100%;
+}
+
+.tme-book-section.is-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 28rem;
+}
+
+.tme-book-section.is-calendar,
 .tme-calendar-block {
   width: 100%;
   max-width: none;
@@ -3580,8 +3662,13 @@ body:has(.tme-home) {
   margin-top: 0;
 }
 
-.tme-part-fork:has(.tme-part-now) {
+.tme-part-fork {
+  display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  max-width: 28rem; /* match .tme-intro-fork / path options */
+  margin-top: 0;
 }
 
 .tme-part-option {
@@ -3603,13 +3690,21 @@ body:has(.tme-home) {
   color: var(--tme-bg);
 }
 
+/* Call-now — section 2 between slot controls and calendar (full width). */
 .tme-part-now {
-  grid-column: 1 / -1;
   display: grid;
   gap: 2px;
   justify-items: center;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  margin-top: 0;
   background: color-mix(in srgb, var(--tme-sun) 78%, white);
   color: var(--tme-sun-ink);
+}
+
+.tme-book-section.is-now .tme-part-now {
+  width: 100%;
 }
 
 .tme-part-now strong {
@@ -3993,8 +4088,8 @@ body:has(.tme-home) {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   width: 100%;
-  max-width: 28rem; /* match path options + Mañana/Tarde */
-  margin-top: 12px;
+  max-width: none;
+  margin-top: 0;
 }
 
 .tme-seg button {
@@ -4230,6 +4325,13 @@ body:has(.tme-home) {
   padding-right: 2rem;
 }
 
+.tme-request-when.is-compact .tme-home-price {
+  margin: 0;
+  font: 700 0.95rem / 1.2 var(--tme-sans);
+  color: var(--tme-ink);
+  white-space: nowrap;
+}
+
 .tme-date-input {
   position: relative;
   cursor: pointer;
@@ -4255,6 +4357,14 @@ body:has(.tme-home) {
   font-weight: 650;
   line-height: 1.4;
   color: var(--tme-ink);
+}
+
+.tme-request-status.is-compact {
+  margin-top: 10px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  max-width: 36rem;
 }
 
 .tme-request-status.is-urgent {
@@ -4316,9 +4426,6 @@ body:has(.tme-home) {
 .tme-teacher {
   width: 100%;
   max-width: none; /* span the home wrap (outer max) */
-  margin-top: 26px;
-  padding: 22px 0 6px;
-  border-top: 1px solid color-mix(in srgb, var(--tme-line) 80%, transparent);
 }
 
 .tme-teacher-intro {
@@ -4426,7 +4533,6 @@ body:has(.tme-home) {
 .tme-teacher-photo img {
   object-fit: cover;
   object-position: 50% 28%;
-  filter: saturate(0.72) contrast(0.96) brightness(1.03);
 }
 
 .tme-teacher-orbit {
@@ -4559,8 +4665,7 @@ body:has(.tme-home) {
   display: grid;
   justify-items: center;
   gap: 6px;
-  margin-top: 28px;
-  padding-top: 16px;
+  padding-top: 18px;
   border-top: 1px solid color-mix(in srgb, var(--tme-line) 80%, transparent);
   text-align: center;
   font-size: 0.92rem;
@@ -4701,8 +4806,13 @@ body:has(.tme-home) {
     padding-left: 0;
   }
 
-  .tme-lead {
-    margin-bottom: 28px;
+  .tme-decision {
+    padding-top: 22px;
+  }
+
+  .tme-block-teacher {
+    margin-top: 32px;
+    padding-top: 28px;
   }
 
   .tme-intro-copy {
@@ -4724,11 +4834,6 @@ body:has(.tme-home) {
   .tme-reassure {
     font-size: 1.02rem;
     line-height: 1.55;
-  }
-
-  .tme-teacher {
-    margin-top: 30px;
-    padding-top: 24px;
   }
 
   .tme-panel {
@@ -4788,11 +4893,11 @@ body:has(.tme-home) {
 }
 
 /*
- * Lede (+ reassure) span the full lead width.
- * Price / CTA / fork / panel stay left; bubbles fill the right column.
+ * Desktop: lede/reassure full width; path + slot left; bubbles right;
+ * call-now + calendar full width below. Mobile keeps DOM order (flow → bubbles).
  */
 @media (min-width: 920px) {
-  .tme-lead {
+  .tme-decision {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
     column-gap: clamp(20px, 2.5vw, 36px);
@@ -4802,51 +4907,38 @@ body:has(.tme-home) {
     width: 100%;
     max-width: none;
     margin-inline: 0;
-    padding: 0 0 12px;
+    padding: 18px 0 12px;
     overflow: visible;
   }
 
-  /* Flatten intro so fork + panel share the left column under the lede. */
-  .tme-intro,
-  .tme-intro-copy {
+  /* Flatten wrappers so copy / slot / bubbles share one grid. */
+  .tme-decision .tme-block-book,
+  .tme-decision .tme-lead,
+  .tme-decision .tme-intro,
+  .tme-decision .tme-intro-copy,
+  .tme-decision .tme-panel:has(.tme-book-flow),
+  .tme-decision .tme-book-flow {
     display: contents;
   }
 
-  .tme-lead .tme-lede,
-  .tme-lead .tme-reassure {
+  .tme-decision .tme-lede,
+  .tme-decision .tme-reassure {
     grid-column: 1 / -1;
     width: 100%;
     max-width: none;
   }
 
-  .tme-lead .tme-price,
-  .tme-lead .tme-intro-cta,
-  .tme-lead .tme-intro-fork {
+  .tme-decision .tme-price,
+  .tme-decision .tme-intro-cta,
+  .tme-decision .tme-intro-fork,
+  .tme-decision .tme-book-section.is-slot {
     grid-column: 1;
     width: 100%;
     max-width: 28rem;
   }
 
-  /* Mañana/Tarde under the fork; calendar spans the full lead width. */
-  .tme-lead .tme-panel {
-    grid-column: 1;
-    width: 100%;
-    max-width: none;
-  }
-
-  .tme-lead .tme-panel:has(.tme-calendar-block),
-  .tme-lead .tme-panel:has(.tme-seg) {
-    display: contents;
-  }
-
-  .tme-lead .tme-part-fork,
-  .tme-lead .tme-seg {
-    grid-column: 1;
-    width: 100%;
-    max-width: 28rem;
-  }
-
-  .tme-lead .tme-calendar-block {
+  .tme-decision .tme-block-now,
+  .tme-decision .tme-block-calendar {
     grid-column: 1 / -1;
     width: 100%;
     max-width: none;
@@ -4864,56 +4956,24 @@ body:has(.tme-home) {
     line-height: 1.55;
   }
 
-  .tme-bubbles {
+  .tme-decision .tme-bubbles {
     grid-column: 2;
     grid-row: 3 / span 20;
     align-self: start;
     justify-self: stretch;
-    align-items: flex-end;
-    flex-direction: column;
-    flex-wrap: nowrap;
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    justify-content: flex-start;
-    gap: 14px;
+    gap: 12px;
     padding: 0;
     margin: 0;
   }
 
-  .tme-bubbles li,
-  .tme-bubbles li:nth-child(1),
-  .tme-bubbles li:nth-child(2),
-  .tme-bubbles li:nth-child(3),
-  .tme-bubbles li:nth-child(4),
-  .tme-bubbles li:nth-child(5),
-  .tme-bubbles li:nth-child(6),
-  .tme-bubbles li:nth-child(7),
-  .tme-bubbles li:nth-child(8) {
+  .tme-bubbles li {
     flex: none;
     width: max-content;
-    max-width: 100%;
+    max-width: none;
     min-width: 0;
-    margin-left: 0;
-    border-radius: 999px;
-  }
-
-  .tme-bubbles li:nth-child(odd) {
-    align-self: flex-start;
-  }
-
-  .tme-bubbles li:nth-child(even) {
-    align-self: flex-end;
-  }
-
-  .tme-bubbles li .tme-bubble-text {
-    white-space: normal;
-  }
-
-  .tme-bubbles li:nth-child(3),
-  .tme-bubbles li:nth-child(5),
-  .tme-bubbles li:nth-child(7) {
-    margin-left: 0.75rem;
   }
 
 }
@@ -4921,25 +4981,27 @@ body:has(.tme-home) {
 /* Narrow phones: readable type, less tilt, no clip dependence on motion */
 @media (max-width: 520px) {
   .tme-bubble-text {
-    white-space: normal;
+    white-space: nowrap;
   }
 
   .tme-bubbles {
     width: 100%;
     max-width: 100%;
     padding-inline: 4px;
-    overflow: visible;
+    overflow-x: auto;
+    overflow-y: visible;
   }
 
   .tme-bubbles li {
-    max-width: 100%;
-    width: auto;
+    max-width: none;
+    width: max-content;
     font-size: 1rem; /* ≥16px */
     line-height: 1.35;
     --bubble-tilt: 0deg;
     --bubble-nudge-x: 0%;
     --bubble-nudge-y: 0%;
     margin-left: 0 !important;
+    margin-right: 0 !important;
     border-radius: 22px;
     animation: none;
   }
@@ -4991,7 +5053,7 @@ body:has(.tme-home) {
     max-width: 100%;
   }
 
-  .tme-lead {
+  .tme-decision {
     column-gap: 48px;
   }
 
@@ -4999,7 +5061,7 @@ body:has(.tme-home) {
     max-width: none;
   }
 
-  .tme-lead .tme-price strong {
+  .tme-decision .tme-price strong {
     font-size: 1.05rem;
   }
 }

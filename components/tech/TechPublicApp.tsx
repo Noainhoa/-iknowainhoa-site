@@ -1015,7 +1015,12 @@ export default function TechPublicApp({
   return (
     <div className="tme tme-home">
       <div className="tme-home-wrap">
-        {heroBar}
+        <section className="tme-block tme-block-hero" aria-label={copy.brandName}>
+          {heroBar}
+        </section>
+
+        <div className="tme-decision">
+        <section className="tme-block tme-block-book" aria-label={copy.forkHeading}>
         <div className="tme-lead">
         <header className="tme-intro">
           <div className="tme-intro-copy">
@@ -1059,42 +1064,6 @@ export default function TechPublicApp({
               ))}
             </div>
           </div>
-          <ul className="tme-bubbles" aria-label={copy.heroBubblesLabel}>
-            {copy.heroBubbles.map((bubble, index) => {
-              const label = bubble.parts.map((part) => part.text).join("");
-              return (
-                <li key={label}>
-                  <span className="tme-bubble-shape" aria-hidden="true" />
-                  {(HERO_BUBBLE_RAYS[index] ?? []).map((group, groupIndex) => (
-                    <span
-                      key={`${label}-rays-${group.anchor}-${groupIndex}`}
-                      className={`tme-bubble-rays is-${group.anchor} is-${group.tone}`}
-                      aria-hidden="true"
-                    >
-                      <BubbleEmphasisBurst />
-                    </span>
-                  ))}
-                  <span className="tme-bubble-icon" aria-hidden="true">
-                    <HeroBubbleIcon index={index} />
-                  </span>
-                  <span className="tme-bubble-text">
-                    {bubble.parts.map((part, partIndex) =>
-                      part.mark ? (
-                        <em
-                          key={`${label}-${partIndex}`}
-                          className={`tme-bubble-mark is-${part.mark}`}
-                        >
-                          {part.text}
-                        </em>
-                      ) : (
-                        <span key={`${label}-${partIndex}`}>{part.text}</span>
-                      )
-                    )}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
         </header>
 
         <section
@@ -1277,11 +1246,6 @@ export default function TechPublicApp({
                   <>
                     <div className="tme-fork-head">
                       <h3 className="tme-fork-step">{copy.forkHomeTitle}</h3>
-                      <p className="tme-assist-lead">{copy.homePickLead}</p>
-                      <p className="tme-assist-lead">
-                        {minutes(INDIVIDUAL_MINUTES)} ·{" "}
-                        {plainEuros(homePriceCents(INDIVIDUAL_MINUTES), locale)}
-                      </p>
                     </div>
 
                     <form onSubmit={onSubmit} noValidate>
@@ -1326,9 +1290,13 @@ export default function TechPublicApp({
                             )}
                           </select>
                         </div>
+                        <p className="tme-home-price">
+                          {minutes(INDIVIDUAL_MINUTES)} ·{" "}
+                          {plainEuros(homePriceCents(INDIVIDUAL_MINUTES), locale)}
+                        </p>
                       </div>
                       {homeTimesForDate.length === 0 ? (
-                        <p className="tme-request-status" role="status">
+                        <p className="tme-request-status is-compact" role="status">
                           {copy.requestDayUnavailable}{" "}
                           <a href={telHref()}>
                             {copy.callNow} {phoneDisplay}
@@ -1355,203 +1323,250 @@ export default function TechPublicApp({
                       {homeTimesForDate.length > 0 && !homeNeedsCall && homeSlotOk
                         ? personFields(copy.submitBook)
                         : null}
-                      <p className="tme-request-footnote">
-                        <span aria-hidden="true">*</span>
-                        <strong>{copy.otherTimeNoteLabel}:</strong> {copy.homePickNote}
-                      </p>
                     </form>
                   </>
                 ) : null}
 
                 {bookingPath && bookingPath !== "home" ? (
-                  <>
-                    <div className="tme-part-fork" role="group" aria-label={copy.slotPartHeading}>
-                      <button
-                        type="button"
-                        className="tme-part-option"
-                        aria-pressed={dayPart === "morning"}
-                        onClick={() => chooseDayPart("morning")}
-                      >
-                        {copy.morningLabel}
-                      </button>
-                      <button
-                        type="button"
-                        className="tme-part-option"
-                        aria-pressed={dayPart === "evening"}
-                        onClick={() => chooseDayPart("evening")}
-                      >
-                        {copy.eveningLabel}
-                      </button>
-                      {bookingPath === "remote" ? (
-                        <a
-                          className="tme-part-option tme-part-now"
-                          href={telHref()}
-                          aria-label={`${copy.rightNowLabel}. ${copy.rightNowBody}`}
+                  <div className="tme-book-flow">
+                    {/* Section 1 — slot controls (Mañana/Tarde + duration) */}
+                    <div className="tme-book-section is-slot">
+                      <div className="tme-part-fork" role="group" aria-label={copy.slotPartHeading}>
+                        <button
+                          type="button"
+                          className="tme-part-option"
+                          aria-pressed={dayPart === "morning"}
+                          onClick={() => chooseDayPart("morning")}
                         >
-                          <strong>{copy.rightNowLabel}</strong>
-                          <span>{copy.rightNowBody}</span>
-                        </a>
+                          {copy.morningLabel}
+                        </button>
+                        <button
+                          type="button"
+                          className="tme-part-option"
+                          aria-pressed={dayPart === "evening"}
+                          onClick={() => chooseDayPart("evening")}
+                        >
+                          {copy.eveningLabel}
+                        </button>
+                      </div>
+
+                      {dayPart && bookingPath !== "group" ? (
+                        <div className="tme-seg" role="group" aria-label={copy.privateHeading}>
+                          <button
+                            type="button"
+                            aria-pressed={privateMinutes === 30}
+                            onClick={() => {
+                              setPrivateMinutes(30);
+                              setSelection(null);
+                              setDayKey(null);
+                            }}
+                          >
+                            {minutes(INDIVIDUAL_SHORT_MINUTES)} ·{" "}
+                            {plainEuros(
+                              priceCentsForCreate("individual", INDIVIDUAL_SHORT_MINUTES),
+                              locale
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            aria-pressed={privateMinutes === 60}
+                            onClick={() => {
+                              setPrivateMinutes(60);
+                              setSelection(null);
+                              setDayKey(null);
+                            }}
+                          >
+                            {minutes(INDIVIDUAL_MINUTES)} ·{" "}
+                            {plainEuros(
+                              priceCentsForCreate("individual", INDIVIDUAL_MINUTES),
+                              locale
+                            )}
+                          </button>
+                        </div>
                       ) : null}
                     </div>
-
-                    {dayPart && bookingPath !== "group" ? (
-                      <div className="tme-seg" role="group" aria-label={copy.privateHeading}>
-                        <button
-                          type="button"
-                          aria-pressed={privateMinutes === 30}
-                          onClick={() => {
-                            setPrivateMinutes(30);
-                            setSelection(null);
-                            setDayKey(null);
-                          }}
-                        >
-                          {minutes(INDIVIDUAL_SHORT_MINUTES)} ·{" "}
-                          {plainEuros(
-                            priceCentsForCreate("individual", INDIVIDUAL_SHORT_MINUTES),
-                            locale
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          aria-pressed={privateMinutes === 60}
-                          onClick={() => {
-                            setPrivateMinutes(60);
-                            setSelection(null);
-                            setDayKey(null);
-                          }}
-                        >
-                          {minutes(INDIVIDUAL_MINUTES)} ·{" "}
-                          {plainEuros(
-                            priceCentsForCreate("individual", INDIVIDUAL_MINUTES),
-                            locale
-                          )}
-                        </button>
-                      </div>
-                    ) : null}
-
-                    {dayPart ? (
-                      <div className="tme-calendar-block">
-                        {error ? (
-                          <p className="tme-alert" role="alert">
-                            {copy.errors[error] || copy.errors.tech_failed}
-                          </p>
-                        ) : null}
-
-                        <div className="tme-week-nav">
-                          <button
-                            type="button"
-                            className="tme-nudge"
-                            aria-label={copy.prevFourWeeks}
-                            disabled={!canPrev}
-                            onClick={() => shiftWeek(-1)}
-                          >
-                            <ChevronLeft className="tme-nudge-icon" aria-hidden="true" />
-                          </button>
-                          <p className="tme-week-label">
-                            {weekTitle(weekStart, locale, weekCount)}
-                          </p>
-                          <button
-                            type="button"
-                            className="tme-nudge"
-                            aria-label={copy.nextFourWeeks}
-                            disabled={!canNext}
-                            onClick={() => shiftWeek(1)}
-                          >
-                            <ChevronRight className="tme-nudge-icon" aria-hidden="true" />
-                          </button>
-                        </div>
-
-                        <div className="tme-weeks is-expanded has-times">
-                          {visibleWeeks.map((start) => {
-                            const days = Array.from({ length: 7 }, (_, index) =>
-                              shiftDay(start, index)
-                            );
-                            return (
-                              <div
-                                key={start}
-                                className="tme-week"
-                                role="group"
-                                aria-label={weekTitle(start, locale)}
-                              >
-                                {days.map((day) => {
-                                  const bits = dayBits(day, locale);
-                                  const isToday = day === todayKey;
-                                  const weekdayLabel = isToday ? copy.today : bits.weekday;
-                                  const offers = offerMap.get(day) ?? [];
-                                  const open = offers.length > 0;
-                                  const hasJoin = offers.some((item) => item.mode === "join");
-                                  return (
-                                    <div
-                                      key={day}
-                                      className={`tme-date${open ? (hasJoin ? " is-group" : " is-free") : " is-closed"}${isToday ? " is-today" : ""}${open && day === selectedDay ? " is-selected" : ""}`}
-                                      aria-current={isToday ? "date" : undefined}
-                                    >
-                                      <span className="tme-date-w">{weekdayLabel}</span>
-                                      <span className="tme-date-n">{bits.dayNum}</span>
-                                      {open ? (
-                                        <div
-                                          className="tme-date-times"
-                                          role="group"
-                                          aria-label={`${weekdayLabel} ${bits.dayNum}`}
-                                        >
-                                          {offers.map((item) => (
-                                            <button
-                                              key={item.key}
-                                              type="button"
-                                              className={`tme-date-time${item.mode === "join" ? " is-group" : " is-free"}`}
-                                              aria-pressed={selection?.key === item.key}
-                                              onClick={() => {
-                                                setDayKey(day);
-                                                setSelection(item);
-                                                setError(null);
-                                              }}
-                                            >
-                                              {clock(item.startsAt, locale)}
-                                            </button>
-                                          ))}
-                                        </div>
-                                      ) : (
-                                        <span className="tme-date-none">{copy.dayUnavailable}</span>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {selection &&
-                        selectedDay &&
-                        madridDayKey(new Date(selection.startsAt)) === selectedDay ? (
-                          <div className="tme-slot">
-                            <p className="tme-day-name">
-                              {dayTitle(selectedDay, locale)} · {clock(selection.startsAt, locale)}
-                              {chipLabel(selection) ? ` · ${chipLabel(selection)}` : ""}
-                            </p>
-                            <button
-                              type="button"
-                              className="tme-book"
-                              onClick={() => openOffer(selection, listMode)}
-                            >
-                              {`${copy.reserve} · ${clock(selection.startsAt, locale)}`}
-                            </button>
-                          </div>
-                        ) : partOffers.length === 0 ? (
-                          <div className="tme-empty">
-                            <p role="status">{copy.noTimesWeek}</p>
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </>
+                  </div>
                 ) : null}
               </>
             ) : null}
           </section>
         </div>
+        </section>
 
-        <section className="tme-teacher" aria-labelledby="tme-teacher">
+        {bookingPath === "remote" ? (
+          <section
+            className="tme-block tme-block-now"
+            aria-label={`${copy.rightNowLabel}. ${copy.rightNowBody}`}
+          >
+            <a
+              className="tme-part-option tme-part-now"
+              href={telHref()}
+              aria-label={`${copy.rightNowLabel}. ${copy.rightNowBody}`}
+            >
+              <strong>{copy.rightNowLabel}</strong>
+              <span>{copy.rightNowBody}</span>
+            </a>
+          </section>
+        ) : null}
+
+        {bookingPath && bookingPath !== "home" && dayPart ? (
+          <section className="tme-block tme-block-calendar" aria-label={copy.slotPartHeading}>
+            <div className="tme-calendar-block">
+              {error ? (
+                <p className="tme-alert" role="alert">
+                  {copy.errors[error] || copy.errors.tech_failed}
+                </p>
+              ) : null}
+
+              <div className="tme-week-nav">
+                <button
+                  type="button"
+                  className="tme-nudge"
+                  aria-label={copy.prevFourWeeks}
+                  disabled={!canPrev}
+                  onClick={() => shiftWeek(-1)}
+                >
+                  <ChevronLeft className="tme-nudge-icon" aria-hidden="true" />
+                </button>
+                <p className="tme-week-label">
+                  {weekTitle(weekStart, locale, weekCount)}
+                </p>
+                <button
+                  type="button"
+                  className="tme-nudge"
+                  aria-label={copy.nextFourWeeks}
+                  disabled={!canNext}
+                  onClick={() => shiftWeek(1)}
+                >
+                  <ChevronRight className="tme-nudge-icon" aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className="tme-weeks is-expanded has-times">
+                {visibleWeeks.map((start) => {
+                  const days = Array.from({ length: 7 }, (_, index) =>
+                    shiftDay(start, index)
+                  );
+                  return (
+                    <div
+                      key={start}
+                      className="tme-week"
+                      role="group"
+                      aria-label={weekTitle(start, locale)}
+                    >
+                      {days.map((day) => {
+                        const bits = dayBits(day, locale);
+                        const isToday = day === todayKey;
+                        const weekdayLabel = isToday ? copy.today : bits.weekday;
+                        const offers = offerMap.get(day) ?? [];
+                        const open = offers.length > 0;
+                        const hasJoin = offers.some((item) => item.mode === "join");
+                        return (
+                          <div
+                            key={day}
+                            className={`tme-date${open ? (hasJoin ? " is-group" : " is-free") : " is-closed"}${isToday ? " is-today" : ""}${open && day === selectedDay ? " is-selected" : ""}`}
+                            aria-current={isToday ? "date" : undefined}
+                          >
+                            <span className="tme-date-w">{weekdayLabel}</span>
+                            <span className="tme-date-n">{bits.dayNum}</span>
+                            {open ? (
+                              <div
+                                className="tme-date-times"
+                                role="group"
+                                aria-label={`${weekdayLabel} ${bits.dayNum}`}
+                              >
+                                {offers.map((item) => (
+                                  <button
+                                    key={item.key}
+                                    type="button"
+                                    className={`tme-date-time${item.mode === "join" ? " is-group" : " is-free"}`}
+                                    aria-pressed={selection?.key === item.key}
+                                    onClick={() => {
+                                      setDayKey(day);
+                                      setSelection(item);
+                                      setError(null);
+                                    }}
+                                  >
+                                    {clock(item.startsAt, locale)}
+                                  </button>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="tme-date-none">{copy.dayUnavailable}</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {selection &&
+              selectedDay &&
+              madridDayKey(new Date(selection.startsAt)) === selectedDay ? (
+                <div className="tme-slot">
+                  <p className="tme-day-name">
+                    {dayTitle(selectedDay, locale)} · {clock(selection.startsAt, locale)}
+                    {chipLabel(selection) ? ` · ${chipLabel(selection)}` : ""}
+                  </p>
+                  <button
+                    type="button"
+                    className="tme-book"
+                    onClick={() => openOffer(selection, listMode)}
+                  >
+                    {`${copy.reserve} · ${clock(selection.startsAt, locale)}`}
+                  </button>
+                </div>
+              ) : partOffers.length === 0 ? (
+                <div className="tme-empty">
+                  <p role="status">{copy.noTimesWeek}</p>
+                </div>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
+
+        {/* Bubbles after the decision flow on mobile; desktop CSS pins them to the right column. */}
+        <ul className="tme-bubbles" aria-label={copy.heroBubblesLabel}>
+          {copy.heroBubbles.map((bubble, index) => {
+            const label = bubble.parts.map((part) => part.text).join("");
+            return (
+              <li key={label}>
+                <span className="tme-bubble-shape" aria-hidden="true" />
+                {(HERO_BUBBLE_RAYS[index] ?? []).map((group, groupIndex) => (
+                  <span
+                    key={`${label}-rays-${group.anchor}-${groupIndex}`}
+                    className={`tme-bubble-rays is-${group.anchor} is-${group.tone}`}
+                    aria-hidden="true"
+                  >
+                    <BubbleEmphasisBurst />
+                  </span>
+                ))}
+                <span className="tme-bubble-icon" aria-hidden="true">
+                  <HeroBubbleIcon index={index} />
+                </span>
+                <span className="tme-bubble-text">
+                  {bubble.parts.map((part, partIndex) =>
+                    part.mark ? (
+                      <em
+                        key={`${label}-${partIndex}`}
+                        className={`tme-bubble-mark is-${part.mark}`}
+                      >
+                        {part.text}
+                      </em>
+                    ) : (
+                      <span key={`${label}-${partIndex}`}>{part.text}</span>
+                    )
+                  )}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+        </div>
+
+        <section className="tme-block tme-block-teacher tme-teacher" aria-labelledby="tme-teacher">
           <div className="tme-teacher-intro">
             <p className="tme-teacher-kicker">{copy.teacherKicker}</p>
             <h2 id="tme-teacher">{copy.teacherHello}</h2>
@@ -1620,7 +1635,7 @@ export default function TechPublicApp({
           </div>
         </section>
 
-        <footer className="tme-foot">
+        <footer className="tme-block tme-block-foot tme-foot">
           <p>
             {copy.placeTitle}: {copy.placeBody}
           </p>

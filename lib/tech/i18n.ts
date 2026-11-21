@@ -68,9 +68,6 @@ export type TechCopy = {
   forkRemoteBody: string;
   forkHomeTitle: string;
   forkHomeBody: string;
-  /** Home-visit path: pick arrival day/time (Pedir-cita style). */
-  homePickLead: string;
-  homePickNote: string;
   chooseHeading: string;
   dateThenTime: string;
   /** After type fork: morning / evening (then calendar). */
@@ -384,23 +381,21 @@ const es: TechCopy = {
   forkHeading: "¿Cómo prefieres aprender?",
   forkLead: "Elige la forma que mejor se adapte a ti.",
   forkGroupTitle: "En grupo",
-  forkGroupBody: "Con otras personas, paso a paso.",
+  forkGroupBody: "Clases en grupo de 1 h, con otras personas, paso a paso.",
   forkPrivateTitle: "Individual",
   forkPrivateBody: "Sesión personal, aquí en mi espacio, a tu ritmo.",
   forkRemoteTitle: "Por teléfono",
   forkRemoteBody: "Resuelve dudas y gana confianza sin desplazarte.",
   forkHomeTitle: "En tu casa",
-  forkHomeBody: "Sesión con tus dispositivos, en tu propio domicilio.",
-  homePickLead: "Elige el día y la hora de llegada a tu casa en Guardamar.",
-  homePickNote:
-    "La visita es a tu domicilio. Eliges la hora de llegada; el desplazamiento va incluido en el bloque de la agenda.",
+  forkHomeBody:
+    "Sesión con tus dispositivos en tu domicilio: elige el día y la hora de llegada en Guardamar.",
   chooseHeading: "Elige una hora",
   dateThenTime: "Ahora elige el día y la hora.",
   slotPartHeading: "Elige huecos disponibles",
   slotPartLead: "Primero mañana o tarde. Luego verás los días con horas libres.",
   morningLabel: "Mañana",
   eveningLabel: "Tarde",
-  rightNowLabel: "Ahora mismo",
+  rightNowLabel: "Necesitas asistencia ahora mismo?",
   rightNowBody: "Si necesitas ayuda ya, llama y lo vemos hoy si puedo.",
   earlierDates: "Fechas anteriores",
   laterDates: "Fechas siguientes",
@@ -637,8 +632,7 @@ const es: TechCopy = {
   requestShortNotice:
     "Faltan menos de 48 horas para el {when}. Llama mejor y cuéntale qué pasa.",
   requestUnavailable: "Esa hora no está libre en la agenda. Elige otra o llama.",
-  requestDayUnavailable:
-    "Este día no hay huecos libres en la agenda. Elige otro día o llama.",
+  requestDayUnavailable: "Sin huecos este día. Elige otro o llama.",
   back: "Volver a reservar",
   cancelTitle: "Tu reserva",
   cancelButton: "Cancelar reserva",
@@ -771,23 +765,21 @@ const en: TechCopy = {
   forkHeading: "How would you like to learn?",
   forkLead: "Choose the format that suits you best.",
   forkGroupTitle: "In a group",
-  forkGroupBody: "Together with others, step by step.",
+  forkGroupBody: "1-hour group classes, together with others, step by step.",
   forkPrivateTitle: "One-to-one",
   forkPrivateBody: "A personal session at my place, at your pace.",
   forkRemoteTitle: "By phone",
   forkRemoteBody: "Clear guidance without travelling.",
   forkHomeTitle: "At your home",
-  forkHomeBody: "A session with your own devices, at your door.",
-  homePickLead: "Pick the day and arrival time at your home in Guardamar.",
-  homePickNote:
-    "This visit is at your home. You choose the arrival time; travel is included in the calendar block.",
+  forkHomeBody:
+    "A session with your devices at home: pick the day and arrival time in Guardamar.",
   chooseHeading: "Choose a time",
   dateThenTime: "Now pick the day and time.",
   slotPartHeading: "Pick available time slots",
   slotPartLead: "First morning or evening. Then you’ll see the days with free times.",
   morningLabel: "Morning",
   eveningLabel: "Evening",
-  rightNowLabel: "Right now",
+  rightNowLabel: "Need assistance right now?",
   rightNowBody: "If you need help now, call and we’ll see if we can help today.",
   earlierDates: "Earlier dates",
   laterDates: "Later dates",
@@ -1024,8 +1016,7 @@ const en: TechCopy = {
   requestShortNotice:
     "{when} is inside 48 hours. Calling is best so you can explain what is going on.",
   requestUnavailable: "That time is not free on the schedule. Choose another or call.",
-  requestDayUnavailable:
-    "There are no free times on this day. Choose another day or call.",
+  requestDayUnavailable: "No times this day. Pick another or call.",
   back: "Back to booking",
   cancelTitle: "Your booking",
   cancelButton: "Cancel booking",
@@ -1158,23 +1149,21 @@ const nl: TechCopy = {
   forkHeading: "Hoe wil je leren?",
   forkLead: "Kies de vorm die het beste bij je past.",
   forkGroupTitle: "In een groep",
-  forkGroupBody: "Samen met anderen, stap voor stap.",
+  forkGroupBody: "Groepslessen van 1 uur, samen met anderen, stap voor stap.",
   forkPrivateTitle: "Individueel",
   forkPrivateBody: "Een persoonlijke sessie op mijn locatie, op jouw tempo.",
   forkRemoteTitle: "Via de telefoon",
   forkRemoteBody: "Duidelijke uitleg zonder de deur uit te hoeven.",
   forkHomeTitle: "Bij jou thuis",
-  forkHomeBody: "Een sessie met jouw apparaten, bij jou thuis.",
-  homePickLead: "Kies de dag en aankomsttijd bij jou thuis in Guardamar.",
-  homePickNote:
-    "Dit is een huisbezoek. Jij kiest de aankomsttijd; de reistijd zit in het agenda-blok.",
+  forkHomeBody:
+    "Een sessie met jouw apparaten bij jou thuis: kies de dag en aankomsttijd in Guardamar.",
   chooseHeading: "Kies een tijd",
   dateThenTime: "Kies nu de dag en de tijd.",
   slotPartHeading: "Kies beschikbare tijden",
   slotPartLead: "Eerst ochtend of avond. Daarna zie je de dagen met vrije uren.",
   morningLabel: "Ochtend",
   eveningLabel: "Avond",
-  rightNowLabel: "Nu meteen",
+  rightNowLabel: "Heb je nu meteen hulp nodig?",
   rightNowBody: "Als je nu hulp nodig hebt, bel dan — dan kijken we of het vandaag kan.",
   earlierDates: "Eerdere datums",
   laterDates: "Latere datums",
@@ -1413,8 +1402,7 @@ const nl: TechCopy = {
   requestShortNotice:
     "Het is binnen 48 uur voor {when}. Bel liever, zodat je kunt uitleggen wat er speelt.",
   requestUnavailable: "Die tijd is niet vrij in de agenda. Kies een andere of bel.",
-  requestDayUnavailable:
-    "Op deze dag zijn er geen vrije tijden. Kies een andere dag of bel.",
+  requestDayUnavailable: "Geen tijden deze dag. Kies een andere of bel.",
   back: "Terug naar reserveren",
   cancelTitle: "Je reservering",
   cancelButton: "Reservering annuleren",
