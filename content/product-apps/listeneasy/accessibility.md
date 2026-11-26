@@ -14,7 +14,7 @@ date: "2026-11-26"
 **App:** ListenEasy for iPhone  
 **Scope:** Common tasks that have been audited for App Store Accessibility Nutrition Labels
 
-This page is the App Store **Accessibility URL** for ListenEasy. It describes what the app supports today, what was tested, and what still needs a device check with a playing book.
+This page is the App Store **Accessibility URL** for ListenEasy. It describes what the app supports today and what was verified in the simulator and on a physical iPhone.
 
 ## App Store Nutrition Labels (iPhone)
 
@@ -38,7 +38,7 @@ Import, Settings, library rows, the grid, chapter rows, and Audiobookshelf and J
 
 ### Voice Control
 
-Voice Control uses the same names and buttons. **Playback speed** and **Speed** are extra phrases on the speed control. Speaking commands still needs a check on a physical phone; the simulator cannot verify spoken control.
+Voice Control uses the same names and buttons. **Playback speed** and **Speed** are extra phrases on the speed control. Spoken control was verified on a physical iPhone with a playing book.
 
 ### Larger Text
 
@@ -94,7 +94,7 @@ Accessibility questions or feedback: [hola@iknowainhoa.com](mailto:hola@iknowain
 **App:** ListenEasy para iPhone  
 **Alcance:** Tareas habituales auditadas para las etiquetas de accesibilidad del App Store
 
-Esta página es la **URL de accesibilidad** de ListenEasy en el App Store. Describe lo que la app admite hoy, qué se ha comprobado y qué falta verificar en un dispositivo con un libro en reproducción.
+Esta página es la **URL de accesibilidad** de ListenEasy en el App Store. Describe lo que la app admite hoy y lo verificado en el simulador y en un iPhone físico.
 
 ## Etiquetas de nutrición del App Store (iPhone)
 
@@ -118,7 +118,7 @@ Importar, Ajustes, filas de la biblioteca, la cuadrícula, filas de capítulos y
 
 ### Control por voz
 
-Usa los mismos nombres y botones. **Playback speed** y **Speed** son frases extra en el control de velocidad. Hablar los comandos aún hay que probarlo en un iPhone real; el simulador no puede verificarlo.
+Usa los mismos nombres y botones. **Playback speed** y **Speed** son frases extra en el control de velocidad. El control por voz se verificó en un iPhone físico con un libro en reproducción.
 
 ### Texto más grande
 
