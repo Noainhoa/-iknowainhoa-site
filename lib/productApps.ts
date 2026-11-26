@@ -54,6 +54,8 @@ export type ProductApp = {
     product: ProductAppPageMeta;
     support: ProductAppPageMeta;
     privacy: ProductAppPageMeta;
+    /** Optional App Store Accessibility URL page. */
+    accessibility?: ProductAppPageMeta;
   };
 };
 
@@ -184,7 +186,12 @@ export const productApps: ProductApp[] = [
       privacy: {
         title: "ListenEasy Privacy Policy",
         description:
-          "Preliminary privacy information for ListenEasy. The full policy will be published before App Store release.",
+          "How ListenEasy handles local library data, optional cover lookup, note dictation, and server connections.",
+      },
+      accessibility: {
+        title: "ListenEasy Accessibility",
+        description:
+          "Accessibility features ListenEasy supports on iPhone, including VoiceOver, Larger Text, Dark Interface, and more.",
       },
     },
   },
@@ -203,6 +210,7 @@ export function productAppPaths(slug: ProductApp["slug"]) {
     product: `/${slug}`,
     support: `/${slug}/support`,
     privacy: `/${slug}/privacy`,
+    accessibility: `/${slug}/accessibility`,
   } as const;
 }
 
@@ -211,6 +219,9 @@ export function buildProductAppMetadata(
   page: keyof ProductApp["pages"]
 ): Metadata {
   const meta = app.pages[page];
+  if (!meta) {
+    return { title: app.name };
+  }
   const paths = productAppPaths(app.slug);
   const canonicalPath = paths[page];
 
@@ -236,7 +247,7 @@ export function buildProductAppMetadata(
 
 async function loadMarkdown(
   slug: ProductApp["slug"],
-  fileName: "support.md" | "privacy.md",
+  fileName: "support.md" | "privacy.md" | "accessibility.md",
   locale: Locale = "en"
 ): Promise<ProductAppMarkdownPage | null> {
   const filePath = path.join(CONTENT_DIR, slug, fileName);
@@ -275,4 +286,11 @@ export async function getProductAppPrivacyPage(
   locale: Locale = "en"
 ) {
   return loadMarkdown(slug, "privacy.md", locale);
+}
+
+export async function getProductAppAccessibilityPage(
+  slug: ProductApp["slug"],
+  locale: Locale = "en"
+) {
+  return loadMarkdown(slug, "accessibility.md", locale);
 }

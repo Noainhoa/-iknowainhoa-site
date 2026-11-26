@@ -8,6 +8,7 @@ export type ListenEasyCopy = {
   alsoHeading: string;
   support: string;
   privacy: string;
+  accessibility: string;
   standouts: { title: string; line: string }[];
   more: { title: string; line: string }[];
   actions: {
@@ -36,6 +37,7 @@ const en: ListenEasyCopy = {
   alsoHeading: "Also in the beta",
   support: "Support",
   privacy: "Privacy",
+  accessibility: "Accessibility",
   standouts: [
     {
       title: "Stop living in folders of tracks",
@@ -114,6 +116,7 @@ const es: ListenEasyCopy = {
   alsoHeading: "También en la beta",
   support: "Soporte",
   privacy: "Privacidad",
+  accessibility: "Accesibilidad",
   standouts: [
     {
       title: "Deja de vivir entre carpetas de pistas",

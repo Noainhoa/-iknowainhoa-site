@@ -5,10 +5,12 @@ import AppPageNav from "@/components/product-apps/AppPageNav";
 import type { Locale } from "@/lib/i18n/shared";
 import { getDictionary } from "@/lib/i18n/shared";
 
+type AppDocKey = "support" | "privacy" | "accessibility";
+
 type AppMarkdownDocumentProps = {
   app: ProductApp;
   page: ProductAppMarkdownPage;
-  current: "support" | "privacy";
+  current: AppDocKey;
   locale?: Locale;
 };
 
@@ -20,6 +22,20 @@ export default function AppMarkdownDocument({
 }: AppMarkdownDocumentProps) {
   const paths = productAppPaths(app.slug);
   const t = getDictionary(locale).apps;
+  const footerLinks: { href: string; label: string }[] = [];
+
+  if (current !== "support") {
+    footerLinks.push({ href: paths.support, label: t.supportPage(app.name) });
+  }
+  if (current !== "privacy") {
+    footerLinks.push({ href: paths.privacy, label: t.privacyPolicy(app.name) });
+  }
+  if (app.pages.accessibility && current !== "accessibility") {
+    footerLinks.push({
+      href: paths.accessibility,
+      label: t.accessibilityPage(app.name),
+    });
+  }
 
   return (
     <main className="mx-auto max-w-[720px] px-8 py-10 font-sans">
@@ -34,19 +50,13 @@ export default function AppMarkdownDocument({
             {t.backTo(app.name)}
           </Link>
         </p>
-        {current === "support" ? (
-          <p>
-            <Link href={paths.privacy} className="underline-offset-2 hover:underline">
-              {t.privacyPolicy(app.name)}
+        {footerLinks.map((link) => (
+          <p key={link.href} className="mb-2 last:mb-0">
+            <Link href={link.href} className="underline-offset-2 hover:underline">
+              {link.label}
             </Link>
           </p>
-        ) : (
-          <p>
-            <Link href={paths.support} className="underline-offset-2 hover:underline">
-              {t.supportPage(app.name)}
-            </Link>
-          </p>
-        )}
+        ))}
       </footer>
     </main>
   );

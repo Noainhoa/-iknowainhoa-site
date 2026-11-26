@@ -156,9 +156,11 @@ type Dictionary = {
     product: string;
     support: string;
     privacy: string;
+    accessibility: string;
     backTo: (name: string) => string;
     privacyPolicy: (name: string) => string;
     supportPage: (name: string) => string;
+    accessibilityPage: (name: string) => string;
   };
 };
 
@@ -316,9 +318,11 @@ const en: Dictionary = {
     product: "Product",
     support: "Support",
     privacy: "Privacy",
+    accessibility: "Accessibility",
     backTo: (name) => `Back to ${name}`,
     privacyPolicy: (name) => `${name} Privacy Policy`,
     supportPage: (name) => `${name} Support`,
+    accessibilityPage: (name) => `${name} Accessibility`,
   },
 };
 
@@ -476,9 +480,11 @@ const es: Dictionary = {
     product: "Producto",
     support: "Soporte",
     privacy: "Privacidad",
+    accessibility: "Accesibilidad",
     backTo: (name) => `Volver a ${name}`,
     privacyPolicy: (name) => `Política de privacidad de ${name}`,
     supportPage: (name) => `Soporte de ${name}`,
+    accessibilityPage: (name) => `Accesibilidad de ${name}`,
   },
 };
 

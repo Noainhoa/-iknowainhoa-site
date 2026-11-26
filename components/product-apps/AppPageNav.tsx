@@ -4,21 +4,28 @@ import { productAppPaths } from "@/lib/productApps";
 import type { Locale } from "@/lib/i18n/shared";
 import { getDictionary } from "@/lib/i18n/shared";
 
+type AppPageNavKey = "product" | "support" | "privacy" | "accessibility";
+
 type AppPageNavProps = {
   app: ProductApp;
-  current: "product" | "support" | "privacy";
+  current: AppPageNavKey;
   locale?: Locale;
 };
 
 export default function AppPageNav({ app, current, locale = "en" }: AppPageNavProps) {
   const t = getDictionary(locale).apps;
   const paths = productAppPaths(app.slug);
-  const labels = {
+  const labels: Record<AppPageNavKey, string> = {
     product: app.name,
     support: t.support,
     privacy: t.privacy,
-  } as const;
-  const items = (["product", "support", "privacy"] as const).map((key) => ({
+    accessibility: t.accessibility,
+  };
+  const keys: AppPageNavKey[] = ["product", "support", "privacy"];
+  if (app.pages.accessibility) {
+    keys.push("accessibility");
+  }
+  const items = keys.map((key) => ({
     key,
     href: paths[key],
     label: labels[key],

@@ -103,6 +103,8 @@ export default async function ListenEasyProductPage() {
         <Link href={paths.support}>{copy.support}</Link>
         <span aria-hidden="true">·</span>
         <Link href={paths.privacy}>{copy.privacy}</Link>
+        <span aria-hidden="true">·</span>
+        <Link href={paths.accessibility}>{copy.accessibility}</Link>
       </footer>
 
       <style>{`
